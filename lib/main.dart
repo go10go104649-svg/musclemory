@@ -14,6 +14,16 @@ import 'services/supabase_sync_service.dart';
 
 const activeWorkoutDraftStorageKey = 'active_workout_draft';
 
+String formatVolumeKg(double volume) {
+  final raw = volume == volume.roundToDouble()
+      ? volume.toStringAsFixed(0)
+      : volume.toStringAsFixed(1);
+  return raw.replaceAllMapped(
+    RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+    (match) => '${match[1]},',
+  );
+}
+
 Future<bool> discardDraftBeforeNewWorkout(BuildContext context) async {
   final preferences = await SharedPreferences.getInstance();
   final draft = WorkoutDraftSummary.tryParse(
@@ -46,6 +56,7 @@ Future<bool> discardDraftBeforeNewWorkout(BuildContext context) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RestTimerPreference.load();
+  await WorkoutUiPreference.load();
   await CustomExercisePreference.load();
   await SupabaseConfig.initialize();
   runApp(const MuscleMemoryApp());
@@ -75,6 +86,46 @@ class RestTimerPreference {
     seconds = value;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setInt(_secondsKey, value);
+  }
+}
+
+class WorkoutUiPreference {
+  WorkoutUiPreference._();
+
+  static const _completionCheckKey = 'completion_check_enabled';
+  static const _workoutTimerKey = 'workout_timer_enabled';
+  static const _workoutDurationKey = 'workout_duration_enabled';
+  static bool completionCheckEnabled = true;
+  static bool workoutTimerEnabled = true;
+  static bool workoutDurationEnabled = true;
+
+  static Future<void> load() async {
+    final preferences = await SharedPreferences.getInstance();
+    completionCheckEnabled = preferences.getBool(_completionCheckKey) ?? true;
+    workoutTimerEnabled = preferences.getBool(_workoutTimerKey) ?? true;
+    workoutDurationEnabled = preferences.getBool(_workoutDurationKey) ?? true;
+    if (!completionCheckEnabled && RestTimerPreference.enabled) {
+      await RestTimerPreference.setEnabled(false);
+    }
+  }
+
+  static Future<void> setCompletionCheckEnabled(bool value) async {
+    completionCheckEnabled = value;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_completionCheckKey, value);
+    if (!value) await RestTimerPreference.setEnabled(false);
+  }
+
+  static Future<void> setWorkoutTimerEnabled(bool value) async {
+    workoutTimerEnabled = value;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_workoutTimerKey, value);
+  }
+
+  static Future<void> setWorkoutDurationEnabled(bool value) async {
+    workoutDurationEnabled = value;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_workoutDurationKey, value);
   }
 }
 
@@ -137,7 +188,14 @@ class _HomeShellState extends State<HomeShell> {
   Future<void> _loadHistory() async {
     final preferences = await SharedPreferences.getInstance();
     final workoutTemplates = await WorkoutTemplatePreference.load();
+    await CustomGymPreference.load();
     final encoded = preferences.getString(_storageKey);
+    final selectedGym = preferences.getString(_gymStorageKey);
+    if (selectedGym != null &&
+        !standardGyms.contains(selectedGym) &&
+        !CustomGymPreference.gyms.contains(selectedGym)) {
+      await CustomGymPreference.add(selectedGym);
+    }
     final workoutDraft = WorkoutDraftSummary.tryParse(
       preferences.getString(activeWorkoutDraftStorageKey),
     );
@@ -145,7 +203,7 @@ class _HomeShellState extends State<HomeShell> {
     final items = sortWorkoutsNewestFirst(decodeWorkoutHistory(encoded));
     setState(() {
       _history = items;
-      _selectedGym = preferences.getString(_gymStorageKey);
+      _selectedGym = selectedGym;
       _weeklyTarget = preferences.getInt(_weeklyTargetStorageKey) ?? 3;
       _workoutTemplates = workoutTemplates;
       _workoutDraft = workoutDraft;
@@ -179,6 +237,14 @@ class _HomeShellState extends State<HomeShell> {
     final updated = _workoutTemplates
         .where((item) => item.name != template.name)
         .toList();
+    setState(() => _workoutTemplates = updated);
+    await WorkoutTemplatePreference.save(updated);
+  }
+
+  Future<void> _replaceWorkoutTemplates(
+    List<SavedWorkoutTemplate> templates,
+  ) async {
+    final updated = List<SavedWorkoutTemplate>.from(templates);
     setState(() => _workoutTemplates = updated);
     await WorkoutTemplatePreference.save(updated);
   }
@@ -250,6 +316,15 @@ class _HomeShellState extends State<HomeShell> {
     if (backup.restTimerSeconds != null) {
       await _saveRestTimerSeconds(backup.restTimerSeconds!);
     }
+    if (backup.completionCheckEnabled != null) {
+      await _saveCompletionCheckEnabled(backup.completionCheckEnabled!);
+    }
+    if (backup.workoutTimerEnabled != null) {
+      await _saveWorkoutTimerEnabled(backup.workoutTimerEnabled!);
+    }
+    if (backup.workoutDurationEnabled != null) {
+      await _saveWorkoutDurationEnabled(backup.workoutDurationEnabled!);
+    }
 
     final templates = <String, SavedWorkoutTemplate>{
       for (final item in _workoutTemplates) item.name: item,
@@ -263,6 +338,10 @@ class _HomeShellState extends State<HomeShell> {
       for (final item in backup.customExercises) item.name: item,
     }.values.toList();
     await CustomExercisePreference.replaceAll(customExercises);
+    await CustomGymPreference.replaceAll([
+      ...CustomGymPreference.gyms,
+      ...backup.customGyms,
+    ]);
     return addedCount;
   }
 
@@ -299,9 +378,18 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _saveGym(String gym) async {
+    await CustomGymPreference.add(gym);
+    await _setGym(gym);
+  }
+
+  Future<void> _setGym(String? gym) async {
     setState(() => _selectedGym = gym);
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(_gymStorageKey, gym);
+    if (gym == null) {
+      await preferences.remove(_gymStorageKey);
+    } else {
+      await preferences.setString(_gymStorageKey, gym);
+    }
   }
 
   Future<void> _saveWeeklyTarget(int target) async {
@@ -317,6 +405,21 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _saveRestTimerSeconds(int seconds) async {
     await RestTimerPreference.setSeconds(seconds);
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _saveCompletionCheckEnabled(bool enabled) async {
+    await WorkoutUiPreference.setCompletionCheckEnabled(enabled);
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _saveWorkoutTimerEnabled(bool enabled) async {
+    await WorkoutUiPreference.setWorkoutTimerEnabled(enabled);
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _saveWorkoutDurationEnabled(bool enabled) async {
+    await WorkoutUiPreference.setWorkoutDurationEnabled(enabled);
     if (mounted) setState(() {});
   }
 
@@ -357,8 +460,19 @@ class _HomeShellState extends State<HomeShell> {
         onWeeklyTargetChanged: _saveWeeklyTarget,
         restTimerEnabled: RestTimerPreference.enabled,
         restTimerSeconds: RestTimerPreference.seconds,
+        completionCheckEnabled: WorkoutUiPreference.completionCheckEnabled,
+        workoutTimerEnabled: WorkoutUiPreference.workoutTimerEnabled,
+        workoutDurationEnabled: WorkoutUiPreference.workoutDurationEnabled,
         onRestTimerEnabledChanged: _saveRestTimerEnabled,
         onRestTimerSecondsChanged: _saveRestTimerSeconds,
+        onCompletionCheckEnabledChanged: _saveCompletionCheckEnabled,
+        onWorkoutTimerEnabledChanged: _saveWorkoutTimerEnabled,
+        onWorkoutDurationEnabledChanged: _saveWorkoutDurationEnabled,
+        onCustomExercisesChanged: () {
+          if (mounted) setState(() {});
+        },
+        onWorkoutTemplatesChanged: _replaceWorkoutTemplates,
+        onSelectedGymChanged: _setGym,
       ),
     ];
     return Scaffold(
@@ -517,6 +631,27 @@ class DashboardPage extends StatelessWidget {
       builder: (_) => _SaveWorkoutTemplateDialog(initialName: defaultName),
     );
     if (name == null || !context.mounted) return;
+    if (workoutTemplates.any((template) => template.name == name)) {
+      final overwrite = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('同じ名前のメニューがあります'),
+          content: Text('「$name」の内容を今回のトレーニングで上書きしますか？'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('キャンセル'),
+            ),
+            FilledButton(
+              key: const Key('overwriteTemplateButton'),
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('上書き'),
+            ),
+          ],
+        ),
+      );
+      if (overwrite != true || !context.mounted) return;
+    }
     await onTemplateSaved(SavedWorkoutTemplate(name: name, sets: workout.sets));
     if (context.mounted) {
       ScaffoldMessenger.of(context)
@@ -545,7 +680,8 @@ class DashboardPage extends StatelessWidget {
     BuildContext context,
     WorkoutRecord workout,
   ) async {
-    await Navigator.of(context).push<void>(
+    final messenger = ScaffoldMessenger.of(context);
+    final deleted = await Navigator.of(context).push<WorkoutRecord>(
       MaterialPageRoute(
         builder: (_) => WorkoutDetailPage(
           workout: workout,
@@ -556,6 +692,9 @@ class DashboardPage extends StatelessWidget {
         ),
       ),
     );
+    if (deleted != null) {
+      _showDeletedWorkoutUndo(messenger, deleted, onWorkoutCompleted);
+    }
     await onDraftChanged();
   }
 
@@ -733,7 +872,9 @@ class SavedMenusCard extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w900),
                 ),
                 subtitle: Text(
-                  '${template.exerciseNames.length}種目・${template.sets.length}セット',
+                  '${template.exerciseNames.join('・')} ・ ${template.sets.length}セット',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 onTap: () => onSelected(template),
                 trailing: IconButton(
@@ -773,6 +914,251 @@ class SavedMenusCard extends StatelessWidget {
   }
 }
 
+class SavedMenuManagementPage extends StatefulWidget {
+  const SavedMenuManagementPage({
+    super.key,
+    required this.initialTemplates,
+    required this.onChanged,
+  });
+
+  final List<SavedWorkoutTemplate> initialTemplates;
+  final Future<void> Function(List<SavedWorkoutTemplate>) onChanged;
+
+  @override
+  State<SavedMenuManagementPage> createState() =>
+      _SavedMenuManagementPageState();
+}
+
+class _SavedMenuManagementPageState extends State<SavedMenuManagementPage> {
+  late List<SavedWorkoutTemplate> _templates;
+
+  @override
+  void initState() {
+    super.initState();
+    _templates = List<SavedWorkoutTemplate>.from(widget.initialTemplates);
+  }
+
+  Future<void> _save(List<SavedWorkoutTemplate> updated) async {
+    setState(() => _templates = List<SavedWorkoutTemplate>.from(updated));
+    await widget.onChanged(_templates);
+  }
+
+  Future<void> _rename(SavedWorkoutTemplate template) async {
+    final name = await showDialog<String>(
+      context: context,
+      builder: (_) => _RenameWorkoutTemplateDialog(
+        initialName: template.name,
+        reservedNames: _templates
+            .where((item) => item.name != template.name)
+            .map((item) => item.name)
+            .toSet(),
+      ),
+    );
+    if (name == null || name == template.name) return;
+    final updated = _templates
+        .map(
+          (item) => item.name == template.name
+              ? SavedWorkoutTemplate(name: name, sets: item.sets)
+              : item,
+        )
+        .toList();
+    await _save(updated);
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('「$name」に名前を変更しました')));
+    }
+  }
+
+  Future<void> _delete(SavedWorkoutTemplate template) async {
+    final index = _templates.indexOf(template);
+    final messenger = ScaffoldMessenger.of(context);
+    await _save(_templates.where((item) => item != template).toList());
+    if (!mounted) return;
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('「${template.name}」を削除しました'),
+          action: SnackBarAction(
+            label: '元に戻す',
+            onPressed: () async {
+              final restored = List<SavedWorkoutTemplate>.from(_templates);
+              restored.insert(index.clamp(0, restored.length), template);
+              await _save(restored);
+              if (mounted) {
+                messenger.showSnackBar(
+                  SnackBar(content: Text('「${template.name}」を元に戻しました')),
+                );
+              }
+            },
+          ),
+        ),
+      );
+  }
+
+  Future<void> _reorder(int oldIndex, int newIndex) async {
+    final updated = List<SavedWorkoutTemplate>.from(_templates);
+    final item = updated.removeAt(oldIndex);
+    updated.insert(newIndex, item);
+    await _save(updated);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('マイメニュー管理')),
+      body: _templates.isEmpty
+          ? const Center(
+              child: Text(
+                '保存したマイメニューはありません',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+            )
+          : Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 12, 20, 4),
+                  child: Row(
+                    children: [
+                      Icon(Icons.drag_indicator_rounded, size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        '右端を長押しして並び替え',
+                        style: TextStyle(color: Color(0xFF6C746D)),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ReorderableListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                    buildDefaultDragHandles: false,
+                    itemCount: _templates.length,
+                    onReorderItem: _reorder,
+                    itemBuilder: (context, index) {
+                      final template = _templates[index];
+                      return Card(
+                        key: ValueKey('managedMenu_${template.name}'),
+                        margin: const EdgeInsets.only(bottom: 10),
+                        child: ListTile(
+                          title: Text(
+                            template.name,
+                            style: const TextStyle(fontWeight: FontWeight.w900),
+                          ),
+                          subtitle: Text(
+                            '${template.exerciseNames.join('・')} ・ ${template.sets.length}セット',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          onTap: () => _rename(template),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                tooltip: '${template.name}の名前を変更',
+                                onPressed: () => _rename(template),
+                                icon: const Icon(Icons.edit_outlined),
+                              ),
+                              IconButton(
+                                tooltip: '${template.name}を削除',
+                                onPressed: () => _delete(template),
+                                icon: const Icon(Icons.delete_outline_rounded),
+                              ),
+                              ReorderableDragStartListener(
+                                key: Key('reorderMenu$index'),
+                                index: index,
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Icon(Icons.drag_handle_rounded),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+class _RenameWorkoutTemplateDialog extends StatefulWidget {
+  const _RenameWorkoutTemplateDialog({
+    required this.initialName,
+    required this.reservedNames,
+  });
+
+  final String initialName;
+  final Set<String> reservedNames;
+
+  @override
+  State<_RenameWorkoutTemplateDialog> createState() =>
+      _RenameWorkoutTemplateDialogState();
+}
+
+class _RenameWorkoutTemplateDialogState
+    extends State<_RenameWorkoutTemplateDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialName);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('メニュー名を変更'),
+      content: Form(
+        key: _formKey,
+        child: TextFormField(
+          key: const Key('renameTemplateField'),
+          controller: _controller,
+          autofocus: true,
+          maxLength: 30,
+          validator: (value) {
+            final name = value?.trim() ?? '';
+            if (name.isEmpty) return 'メニュー名を入力してください';
+            if (widget.reservedNames.any(
+              (item) => item.toLowerCase() == name.toLowerCase(),
+            )) {
+              return '同じ名前のメニューがあります';
+            }
+            return null;
+          },
+          decoration: const InputDecoration(labelText: 'メニュー名'),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('キャンセル'),
+        ),
+        FilledButton(
+          key: const Key('saveTemplateNameButton'),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              Navigator.pop(context, _controller.text.trim());
+            }
+          },
+          child: const Text('保存'),
+        ),
+      ],
+    );
+  }
+}
+
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
@@ -790,14 +1176,6 @@ class HomeHeader extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   letterSpacing: 2.1,
                   color: const Color(0xFF6C746D),
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                '今日も積み上げよう',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFF101820),
                 ),
               ),
             ],
@@ -1082,11 +1460,7 @@ class WeeklySummary extends StatelessWidget {
           children: [
             StatItem(value: '$workoutCount', unit: '回', label: 'ワークアウト'),
             Container(width: 1, height: 46, color: const Color(0xFFE4E7E1)),
-            StatItem(
-              value: (volume / 1000).toStringAsFixed(1),
-              unit: 't',
-              label: 'ボリューム',
-            ),
+            StatItem(value: formatVolumeKg(volume), unit: 'kg', label: 'ボリューム'),
             Container(width: 1, height: 46, color: const Color(0xFFE4E7E1)),
             StatItem(value: '$personalBests', unit: '個', label: '自己ベスト'),
           ],
@@ -1270,7 +1644,7 @@ class LastWorkoutCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          '${item.exerciseNames.length}種目・${item.sets.length}セット${item.durationLabel.isEmpty ? '' : '・${item.durationLabel}'}',
+                          '${item.exerciseNames.length}種目・${item.sets.length}セット${!WorkoutUiPreference.workoutDurationEnabled || item.durationLabel.isEmpty ? '' : '・${item.durationLabel}'}',
                           style: const TextStyle(
                             color: Color(0xFF777F78),
                             fontSize: 12,
@@ -1460,45 +1834,153 @@ int countPersonalBests(List<WorkoutRecord> history, DateTime since) {
   return count;
 }
 
-class BodyMapPage extends StatelessWidget {
-  const BodyMapPage({super.key, required this.history});
+enum MuscleMapPeriod {
+  week('1週間', 7),
+  month('1ヶ月', 30),
+  threeMonths('3ヶ月', 90),
+  sixMonths('6ヶ月', 180),
+  year('1年', 365);
 
+  const MuscleMapPeriod(this.label, this.days);
+  final String label;
+  final int days;
+}
+
+Map<String, int> bodyPartSetCounts(
+  List<WorkoutRecord> history,
+  MuscleMapPeriod period, {
+  DateTime? now,
+}) {
+  final cutoff = (now ?? DateTime.now()).subtract(Duration(days: period.days));
+  final counts = <String, int>{};
+  for (final workout in history.where((item) => !item.date.isBefore(cutoff))) {
+    for (final set in workout.sets.where((item) => item.completed)) {
+      counts.update(set.bodyPart, (value) => value + 1, ifAbsent: () => 1);
+    }
+  }
+  return counts;
+}
+
+class BodyMapPage extends StatefulWidget {
+  const BodyMapPage({super.key, required this.history});
   final List<WorkoutRecord> history;
+  @override
+  State<BodyMapPage> createState() => _BodyMapPageState();
+}
+
+class _BodyMapPageState extends State<BodyMapPage> {
+  MuscleMapPeriod _period = MuscleMapPeriod.week;
+  bool _showBack = false;
+  double _tilt = 0;
 
   @override
   Widget build(BuildContext context) {
-    final counts = _bodyPartCounts(history);
-    final maximum = counts.values.fold<int>(
-      1,
-      (max, value) => value > max ? value : max,
-    );
+    final counts = bodyPartSetCounts(widget.history, _period);
+    final maximum = counts.values.fold<int>(1, (a, b) => b > a ? b : a);
     const parts = ['胸', '背中', '脚', '肩', '腕', '腹'];
+    final total = counts.values.fold<int>(0, (sum, value) => sum + value);
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 28, 20, 32),
         children: [
           const Text(
-            '部位ヒートマップ',
+            '3D筋肉マップ',
             style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 6),
-          const Text('直近7日間の完了セット', style: TextStyle(color: Color(0xFF6C746D))),
-          const SizedBox(height: 24),
+          const Text(
+            '完了セット数に応じて部位の色が濃くなります',
+            style: TextStyle(color: Color(0xFF6C746D)),
+          ),
+          const SizedBox(height: 18),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: MuscleMapPeriod.values
+                  .map(
+                    (period) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        key: Key('musclePeriod${period.name}'),
+                        label: Text(period.label),
+                        selected: _period == period,
+                        onSelected: (_) => setState(() => _period = period),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+          const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(22),
+            key: const Key('muscleModel3D'),
+            height: 390,
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
             decoration: BoxDecoration(
               color: const Color(0xFF101820),
               borderRadius: BorderRadius.circular(28),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(
-                  Icons.accessibility_new_rounded,
-                  size: 92,
-                  color: Color(0xFFC7F36B),
+                Row(
+                  children: [
+                    Text(
+                      '${_period.label} ・ $totalセット',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const Spacer(),
+                    SegmentedButton<bool>(
+                      segments: const [
+                        ButtonSegment(value: false, label: Text('前面')),
+                        ButtonSegment(value: true, label: Text('背面')),
+                      ],
+                      selected: {_showBack},
+                      onSelectionChanged: (value) => setState(() {
+                        _showBack = value.first;
+                        _tilt = 0;
+                      }),
+                      style: const ButtonStyle(
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 8),
-                Text('鍛えた部位ほど濃く表示', style: TextStyle(color: Colors.white70)),
+                const SizedBox(height: 6),
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onHorizontalDragUpdate: (details) => setState(
+                      () => _tilt = (_tilt + details.delta.dx / 180).clamp(
+                        -0.7,
+                        0.7,
+                      ),
+                    ),
+                    onDoubleTap: () => setState(() => _tilt = 0),
+                    child: Center(
+                      child: Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.identity()
+                          ..setEntry(3, 2, 0.002)
+                          ..rotateY(_tilt),
+                        child: CustomPaint(
+                          size: const Size(210, 315),
+                          painter: _MuscleBodyPainter(
+                            counts: counts,
+                            maximum: maximum,
+                            showBack: _showBack,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const Text(
+                  '左右にドラッグして回転 ・ ダブルタップで正面',
+                  style: TextStyle(color: Colors.white60, fontSize: 11),
+                ),
               ],
             ),
           ),
@@ -1507,44 +1989,32 @@ class BodyMapPage extends StatelessWidget {
             final value = counts[part] ?? 0;
             return Card(
               margin: const EdgeInsets.only(bottom: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 48,
-                      child: Text(
-                        part,
-                        style: const TextStyle(fontWeight: FontWeight.w800),
-                      ),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: _muscleHeatColor(value, maximum),
+                  child: Text(
+                    part.substring(0, 1),
+                    style: const TextStyle(
+                      color: Color(0xFF101820),
+                      fontWeight: FontWeight.w900,
                     ),
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(99),
-                        child: LinearProgressIndicator(
-                          value: value / maximum,
-                          minHeight: 10,
-                          backgroundColor: const Color(0xFFE8EBE5),
-                          color: const Color(0xFFC7F36B),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    SizedBox(
-                      width: 54,
-                      child: Text(
-                        '$valueセット',
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
+                ),
+                title: Text(
+                  part,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                subtitle: LinearProgressIndicator(
+                  value: value / maximum,
+                  minHeight: 7,
+                  borderRadius: BorderRadius.circular(99),
+                  backgroundColor: const Color(0xFFE8EBE5),
+                  color: _muscleHeatColor(value, maximum),
+                ),
+                trailing: Text(
+                  '$valueセット',
+                  key: Key('muscleCount$part'),
+                  style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
               ),
             );
@@ -1553,6 +2023,146 @@ class BodyMapPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Color _muscleHeatColor(int value, int maximum) {
+  if (value <= 0) return const Color(0xFFD9DDD7);
+  final intensity = (value / maximum).clamp(0.0, 1.0);
+  return Color.lerp(
+    const Color(0xFFE9F4D1),
+    const Color(0xFF82B62D),
+    0.25 + intensity * 0.75,
+  )!;
+}
+
+class _MuscleBodyPainter extends CustomPainter {
+  const _MuscleBodyPainter({
+    required this.counts,
+    required this.maximum,
+    required this.showBack,
+  });
+  final Map<String, int> counts;
+  final int maximum;
+  final bool showBack;
+  Paint _paint(String part) => Paint()
+    ..color = _muscleHeatColor(counts[part] ?? 0, maximum)
+    ..style = PaintingStyle.fill;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final skin = Paint()..color = const Color(0xFF4A534C);
+    final outline = Paint()
+      ..color = Colors.white24
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    void oval(Rect rect, Paint paint) {
+      canvas.drawOval(rect, paint);
+      canvas.drawOval(rect, outline);
+    }
+
+    void round(Rect rect, double radius, Paint paint) {
+      final r = RRect.fromRectAndRadius(rect, Radius.circular(radius));
+      canvas.drawRRect(r, paint);
+      canvas.drawRRect(r, outline);
+    }
+
+    void limb(Offset a, Offset b, double width, Paint paint) {
+      canvas.drawLine(
+        a,
+        b,
+        Paint()
+          ..color = paint.color
+          ..strokeWidth = width
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+
+    final floorGrid = Paint()
+      ..color = const Color(0xFFBFEA72).withValues(alpha: 0.13)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    for (var y = 230.0; y <= size.height; y += 15) {
+      canvas.drawLine(Offset(12, y), Offset(size.width - 12, y), floorGrid);
+    }
+    for (var x = 12.0; x <= size.width - 12; x += 24) {
+      canvas.drawLine(
+        Offset(size.width / 2, 205),
+        Offset(x, size.height),
+        floorGrid,
+      );
+    }
+
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width / 2 + 7, size.height - 4),
+        width: 122,
+        height: 14,
+      ),
+      Paint()..color = Colors.black38,
+    );
+    oval(const Rect.fromLTWH(78, 4, 54, 52), skin);
+    limb(const Offset(83, 73), const Offset(50, 153), 25, _paint('腕'));
+    limb(const Offset(127, 73), const Offset(160, 153), 25, _paint('腕'));
+    limb(const Offset(49, 151), const Offset(40, 223), 19, _paint('腕'));
+    limb(const Offset(161, 151), const Offset(170, 223), 19, _paint('腕'));
+    limb(const Offset(90, 203), const Offset(75, 294), 31, _paint('脚'));
+    limb(const Offset(120, 203), const Offset(135, 294), 31, _paint('脚'));
+    round(const Rect.fromLTWH(65, 55, 80, 155), 34, skin);
+    oval(const Rect.fromLTWH(60, 53, 48, 43), _paint('肩'));
+    oval(const Rect.fromLTWH(102, 53, 48, 43), _paint('肩'));
+    if (showBack) {
+      round(const Rect.fromLTWH(72, 75, 66, 92), 24, _paint('背中'));
+      round(const Rect.fromLTWH(83, 164, 44, 37), 16, _paint('腹'));
+    } else {
+      round(const Rect.fromLTWH(72, 76, 31, 55), 15, _paint('胸'));
+      round(const Rect.fromLTWH(107, 76, 31, 55), 15, _paint('胸'));
+      round(const Rect.fromLTWH(86, 134, 38, 65), 15, _paint('腹'));
+    }
+    canvas.drawLine(
+      Offset(size.width / 2, 62),
+      Offset(size.width / 2, 201),
+      outline..strokeWidth = 1,
+    );
+    final mesh = Paint()
+      ..color = Colors.white.withValues(alpha: 0.28)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    for (var y = 70.0; y <= 195; y += 13) {
+      final inset = ((y - 132).abs() / 5).clamp(0.0, 11.0);
+      canvas.drawLine(Offset(70 + inset, y), Offset(140 - inset, y), mesh);
+    }
+    for (final x in [82.0, 94.0, 105.0, 116.0, 128.0]) {
+      canvas.drawLine(Offset(x, 61), Offset(x, 201), mesh);
+    }
+    for (var y = 220.0; y <= 292; y += 12) {
+      canvas.drawLine(Offset(67, y), Offset(88, y), mesh);
+      canvas.drawLine(Offset(122, y), Offset(143, y), mesh);
+    }
+    for (final joint in const [
+      Offset(83, 73),
+      Offset(127, 73),
+      Offset(49, 151),
+      Offset(161, 151),
+      Offset(90, 203),
+      Offset(120, 203),
+    ]) {
+      canvas.drawCircle(joint, 2.6, Paint()..color = Colors.white54);
+    }
+    canvas.drawLine(
+      const Offset(86, 13),
+      const Offset(101, 9),
+      Paint()
+        ..color = Colors.white12
+        ..strokeWidth = 4
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _MuscleBodyPainter old) =>
+      old.counts != counts ||
+      old.maximum != maximum ||
+      old.showBack != showBack;
 }
 
 class MonthlyHistoryPage extends StatefulWidget {
@@ -1567,7 +2177,7 @@ class MonthlyHistoryPage extends StatefulWidget {
 
   final List<WorkoutRecord> history;
   final String? selectedGym;
-  final ValueChanged<WorkoutRecord> onWorkoutCompleted;
+  final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
   final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
 
@@ -1596,6 +2206,14 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
         _visibleMonth.year,
         _visibleMonth.month + amount,
       );
+      _selectedDay = null;
+    });
+  }
+
+  void _showCurrentMonth() {
+    final now = DateTime.now();
+    setState(() {
+      _visibleMonth = DateTime(now.year, now.month);
       _selectedDay = null;
     });
   }
@@ -1717,6 +2335,16 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
               ),
             ],
           ),
+          if (!isCurrentMonth)
+            Align(
+              alignment: Alignment.center,
+              child: TextButton.icon(
+                key: const Key('historyCurrentMonthButton'),
+                onPressed: _showCurrentMonth,
+                icon: const Icon(Icons.today_rounded, size: 18),
+                label: const Text('今月に戻る'),
+              ),
+            ),
           const SizedBox(height: 12),
           Card(
             shape: RoundedRectangleBorder(
@@ -1743,8 +2371,8 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
                     color: const Color(0xFFE4E7E1),
                   ),
                   StatItem(
-                    value: (volume / 1000).toStringAsFixed(1),
-                    unit: 't',
+                    value: formatVolumeKg(volume),
+                    unit: 'kg',
                     label: 'ボリューム',
                   ),
                 ],
@@ -1858,12 +2486,12 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
           ),
           const SizedBox(height: 12),
           if (shownWorkouts.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
               child: Center(
                 child: Text(
-                  'この日の記録はありません',
-                  style: TextStyle(color: Color(0xFF6C746D)),
+                  _selectedDay == null ? 'この月の記録はありません' : 'この日の記録はありません',
+                  style: const TextStyle(color: Color(0xFF6C746D)),
                 ),
               ),
             )
@@ -1898,7 +2526,7 @@ class HistorySearchPage extends StatefulWidget {
 
   final List<WorkoutRecord> history;
   final String? selectedGym;
-  final ValueChanged<WorkoutRecord> onWorkoutCompleted;
+  final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
   final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
 
@@ -1906,21 +2534,52 @@ class HistorySearchPage extends StatefulWidget {
   State<HistorySearchPage> createState() => _HistorySearchPageState();
 }
 
+bool workoutMatchesQuery(WorkoutRecord workout, String query) {
+  final normalized = _normalizeWorkoutSearchText(query);
+  if (normalized.isEmpty) return true;
+  final date = workout.date;
+  final month = date.month.toString().padLeft(2, '0');
+  final day = date.day.toString().padLeft(2, '0');
+  final searchable = [
+    ...workout.exerciseNames,
+    ...workout.bodyParts,
+    workout.gymName ?? '',
+    workout.note,
+    '${date.year}年${date.month}月${date.day}日',
+    '${date.year}/${date.month}/${date.day}',
+    '${date.year}-$month-$day',
+    '${date.month}/${date.day}',
+  ].join(' ');
+  return _normalizeWorkoutSearchText(searchable).contains(normalized);
+}
+
+String _normalizeWorkoutSearchText(String value) {
+  const fullWidthDigits = '０１２３４５６７８９';
+  var normalized = value.trim().toLowerCase();
+  for (var index = 0; index < fullWidthDigits.length; index++) {
+    normalized = normalized.replaceAll(fullWidthDigits[index], '$index');
+  }
+  return normalized
+      .replaceAll('／', '/')
+      .replaceAll('・', '/')
+      .replaceAll('-', '/');
+}
+
 class _HistorySearchPageState extends State<HistorySearchPage> {
+  final TextEditingController _searchController = TextEditingController();
   String _query = '';
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final normalized = _query.toLowerCase();
-    final results = widget.history.where((workout) {
-      if (normalized.isEmpty) return true;
-      return workout.exerciseNames.any(
-            (name) => name.toLowerCase().contains(normalized),
-          ) ||
-          workout.bodyParts.any((part) => part.contains(normalized)) ||
-          (workout.gymName?.toLowerCase().contains(normalized) ?? false) ||
-          workout.note.toLowerCase().contains(normalized);
-    }).toList();
+    final results = widget.history
+        .where((workout) => workoutMatchesQuery(workout, _query))
+        .toList();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF4F5F0),
@@ -1931,15 +2590,41 @@ class _HistorySearchPageState extends State<HistorySearchPage> {
         child: Column(
           children: [
             TextField(
+              key: const Key('historySearchField'),
+              controller: _searchController,
               autofocus: true,
               onChanged: (value) => setState(() => _query = value.trim()),
-              decoration: const InputDecoration(
-                hintText: '種目・部位・場所・メモ',
-                prefixIcon: Icon(Icons.search_rounded),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: '種目・部位・場所・メモ・日付',
+                prefixIcon: const Icon(Icons.search_rounded),
+                suffixIcon: _query.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: '検索をクリア',
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _query = '');
+                        },
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+                border: const OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _query.isEmpty
+                    ? '全${results.length}件'
+                    : '${results.length}件の記録',
+                key: const Key('historySearchResultCount'),
+                style: const TextStyle(
+                  color: Color(0xFF6C746D),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             Expanded(
               child: results.isEmpty
                   ? const Center(child: Text('該当する記録はありません'))
@@ -2254,7 +2939,7 @@ class HistoryCard extends StatelessWidget {
 
   final WorkoutRecord workout;
   final String? selectedGym;
-  final ValueChanged<WorkoutRecord> onWorkoutCompleted;
+  final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
   final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
 
@@ -2264,17 +2949,23 @@ class HistoryCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       child: InkWell(
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => WorkoutDetailPage(
-              workout: workout,
-              selectedGym: selectedGym,
-              onWorkoutCompleted: onWorkoutCompleted,
-              onWorkoutUpdated: onWorkoutUpdated,
-              onWorkoutDeleted: onWorkoutDeleted,
+        onTap: () async {
+          final messenger = ScaffoldMessenger.of(context);
+          final deleted = await Navigator.of(context).push<WorkoutRecord>(
+            MaterialPageRoute<WorkoutRecord>(
+              builder: (_) => WorkoutDetailPage(
+                workout: workout,
+                selectedGym: selectedGym,
+                onWorkoutCompleted: onWorkoutCompleted,
+                onWorkoutUpdated: onWorkoutUpdated,
+                onWorkoutDeleted: onWorkoutDeleted,
+              ),
             ),
-          ),
-        ),
+          );
+          if (deleted != null) {
+            _showDeletedWorkoutUndo(messenger, deleted, onWorkoutCompleted);
+          }
+        },
         child: Padding(
           padding: const EdgeInsets.all(18),
           child: Row(
@@ -2296,7 +2987,7 @@ class HistoryCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${workout.sets.length}セット ・ ${(workout.volume / 1000).toStringAsFixed(1)} t${workout.durationLabel.isEmpty ? '' : ' ・ ${workout.durationLabel}'}',
+                      '${workout.sets.length}セット ・ ${formatVolumeKg(workout.volume)} kg${!WorkoutUiPreference.workoutDurationEnabled || workout.durationLabel.isEmpty ? '' : ' ・ ${workout.durationLabel}'}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF777F78),
@@ -2371,6 +3062,29 @@ class HistoryCard extends StatelessWidget {
   }
 }
 
+void _showDeletedWorkoutUndo(
+  ScaffoldMessengerState messenger,
+  WorkoutRecord workout,
+  Future<void> Function(WorkoutRecord) onRestore,
+) {
+  messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: const Text('トレーニング記録を削除しました'),
+        action: SnackBarAction(
+          label: '元に戻す',
+          onPressed: () async {
+            await onRestore(workout);
+            messenger.showSnackBar(
+              const SnackBar(content: Text('トレーニング記録を元に戻しました')),
+            );
+          },
+        ),
+      ),
+    );
+}
+
 class WorkoutDetailPage extends StatelessWidget {
   const WorkoutDetailPage({
     super.key,
@@ -2383,7 +3097,7 @@ class WorkoutDetailPage extends StatelessWidget {
 
   final WorkoutRecord workout;
   final String? selectedGym;
-  final ValueChanged<WorkoutRecord> onWorkoutCompleted;
+  final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
   final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
 
@@ -2451,7 +3165,7 @@ class WorkoutDetailPage extends StatelessWidget {
           ],
           const SizedBox(height: 10),
           Text(
-            '${workout.exerciseNames.length}種目 ・ ${workout.sets.length}セット ・ ${(workout.volume / 1000).toStringAsFixed(1)} t${workout.durationLabel.isEmpty ? '' : ' ・ ${workout.durationLabel}'}',
+            '${workout.exerciseNames.length}種目 ・ ${workout.sets.length}セット ・ ${formatVolumeKg(workout.volume)} kg${!WorkoutUiPreference.workoutDurationEnabled || workout.durationLabel.isEmpty ? '' : ' ・ ${workout.durationLabel}'}',
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
           ),
           if (workout.note.isNotEmpty) ...[
@@ -2562,7 +3276,7 @@ class WorkoutDetailPage extends StatelessWidget {
                         ),
                       ),
                     );
-                if (repeated != null) onWorkoutCompleted(repeated);
+                if (repeated != null) await onWorkoutCompleted(repeated);
               },
               icon: const Icon(Icons.replay_rounded),
               label: const Text('この内容でもう一度'),
@@ -2578,7 +3292,7 @@ class WorkoutDetailPage extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('この記録を削除しますか？'),
-        content: const Text('削除した記録は元に戻せません。'),
+        content: const Text('削除後も直後なら元に戻せます。'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -2595,7 +3309,7 @@ class WorkoutDetailPage extends StatelessWidget {
     final deleted = await onWorkoutDeleted(workout);
     if (!context.mounted) return;
     if (deleted) {
-      Navigator.pop(context);
+      Navigator.pop(context, workout);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('クラウドとの通信に失敗したため削除できませんでした')),
@@ -2633,6 +3347,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   int _inputRevision = 0;
   bool _allowPop = false;
   bool _leaveDialogOpen = false;
+  bool _workoutTimerStopped = false;
   late final TextEditingController _noteController;
   late final List<WorkoutExercise> _exercises;
 
@@ -2644,7 +3359,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
         ? widget.initialWorkout!.date
         : DateTime.now();
     _exercises = widget.initialWorkout == null
-        ? [_exerciseFromTemplate(exerciseTemplates.first)]
+        ? []
         : _exercisesFrom(widget.initialWorkout!, completed: widget.isEditing);
     _noteController = TextEditingController(
       text: widget.isEditing ? widget.initialWorkout?.note ?? '' : '',
@@ -2655,9 +3370,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
     }
     if (widget.isEditing) {
       _elapsed = Duration(seconds: widget.initialWorkout!.durationSeconds);
-    } else {
+    } else if (WorkoutUiPreference.workoutTimerEnabled ||
+        WorkoutUiPreference.workoutDurationEnabled) {
       _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (mounted) {
+        if (mounted && !_workoutTimerStopped) {
           setState(() => _elapsed = DateTime.now().difference(_startedAt));
         }
       });
@@ -2678,39 +3394,49 @@ class _WorkoutPageState extends State<WorkoutPage> {
     return '$minutes:$seconds';
   }
 
+  Duration _stopWorkoutTimer({bool keepStopped = false}) {
+    if (!widget.isEditing && _timer != null) {
+      _elapsed = DateTime.now().difference(_startedAt);
+      _timer?.cancel();
+      _timer = null;
+    }
+    if (keepStopped) _workoutTimerStopped = true;
+    _restTimer?.cancel();
+    _restTimer = null;
+    _restRemaining = 0;
+    return _elapsed;
+  }
+
   void _addSet(int exerciseIndex) {
     setState(() {
       final sets = _exercises[exerciseIndex].sets;
-      final previous = sets.last;
-      sets.add(WorkoutSet(weight: previous.weight, reps: previous.reps));
+      final previous = sets.isEmpty ? null : sets.last;
+      sets.add(
+        WorkoutSet(weight: previous?.weight ?? 0, reps: previous?.reps ?? 0),
+      );
     });
     unawaited(_saveDraft());
   }
 
-  void _removeLastSet(int exerciseIndex) {
+  void _removeSet(int exerciseIndex, int setIndex) {
     final exercise = _exercises[exerciseIndex];
-    final sets = exercise.sets;
-    if (sets.length <= 1) return;
-    final removedIndex = sets.length - 1;
-    final removed = sets[removedIndex];
-    setState(() {
-      sets.removeLast();
-    });
+    final removed = exercise.sets[setIndex];
+    setState(() => exercise.sets.removeAt(setIndex));
     unawaited(_saveDraft());
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: const Text('最後のセットを削除しました'),
+          content: Text('${exercise.name}の${setIndex + 1}セット目を削除しました'),
           action: SnackBarAction(
             label: '元に戻す',
             onPressed: () {
               if (!mounted || !_exercises.contains(exercise)) return;
               setState(() {
-                final restoreIndex = removedIndex > sets.length
-                    ? sets.length
-                    : removedIndex;
-                sets.insert(restoreIndex, removed);
+                final restoreIndex = setIndex > exercise.sets.length
+                    ? exercise.sets.length
+                    : setIndex;
+                exercise.sets.insert(restoreIndex, removed);
               });
               unawaited(_saveDraft());
             },
@@ -2720,9 +3446,13 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   void _removeExercise(int exerciseIndex) {
-    if (_exercises.length <= 1) return;
     final removed = _exercises[exerciseIndex];
-    setState(() => _exercises.removeAt(exerciseIndex));
+    setState(() {
+      _exercises.removeAt(exerciseIndex);
+      if (_exercises.isEmpty) {
+        _stopWorkoutTimer(keepStopped: true);
+      }
+    });
     unawaited(_saveDraft());
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -2751,9 +3481,41 @@ class _WorkoutPageState extends State<WorkoutPage> {
     setState(() => set.completed = !set.completed);
     unawaited(_saveDraft());
     if (set.completed) HapticFeedback.mediumImpact();
-    if (set.completed && !widget.isEditing && RestTimerPreference.enabled) {
+    if (set.completed &&
+        !widget.isEditing &&
+        WorkoutUiPreference.completionCheckEnabled &&
+        RestTimerPreference.enabled) {
       _startRestTimer();
     }
+  }
+
+  void _applyPreviousSets(int exerciseIndex, List<RecordedSet> previousSets) {
+    if (previousSets.isEmpty) return;
+    setState(() {
+      _inputRevision++;
+      final sets = _exercises[exerciseIndex].sets;
+      sets
+        ..clear()
+        ..addAll(
+          previousSets.map(
+            (set) => WorkoutSet(weight: set.weight, reps: set.reps),
+          ),
+        );
+    });
+    unawaited(_saveDraft());
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${_exercises[exerciseIndex].name}に前回の記録を反映しました')),
+    );
+  }
+
+  void _setAllSetsCompleted(int exerciseIndex, bool completed) {
+    setState(() {
+      for (final set in _exercises[exerciseIndex].sets) {
+        set.completed = completed;
+      }
+    });
+    if (completed) HapticFeedback.mediumImpact();
+    unawaited(_saveDraft());
   }
 
   void _startRestTimer([int? seconds]) {
@@ -2810,13 +3572,23 @@ class _WorkoutPageState extends State<WorkoutPage> {
       final exercises = (draft['exercises'] as List<dynamic>)
           .map((item) => _exerciseFromDraft(item as Map<String, dynamic>))
           .toList();
-      if (exercises.isEmpty) return;
+      final timerStopped = draft['timerStopped'] as bool? ?? false;
+      if (exercises.isEmpty) {
+        await preferences.remove(activeWorkoutDraftStorageKey);
+        return;
+      }
       setState(() {
         _inputRevision++;
-        final savedStartedAt = draft['startedAt'] as String?;
-        if (savedStartedAt != null) {
-          _startedAt = DateTime.tryParse(savedStartedAt) ?? _startedAt;
-          _elapsed = DateTime.now().difference(_startedAt);
+        final savedElapsedSeconds = (draft['elapsedSeconds'] as num?)?.toInt();
+        if (savedElapsedSeconds != null) {
+          _elapsed = Duration(seconds: savedElapsedSeconds);
+          _startedAt = DateTime.now().subtract(_elapsed);
+        } else {
+          final savedStartedAt = draft['startedAt'] as String?;
+          if (savedStartedAt != null) {
+            _startedAt = DateTime.tryParse(savedStartedAt) ?? _startedAt;
+            _elapsed = DateTime.now().difference(_startedAt);
+          }
         }
         _exercises
           ..clear()
@@ -2825,6 +3597,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
         final savedDate = draft['date'] as String?;
         if (savedDate != null) _workoutDate = DateTime.parse(savedDate);
       });
+      if (timerStopped) {
+        _stopWorkoutTimer(keepStopped: true);
+      }
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('入力途中のトレーニングを再開しました')));
@@ -2836,33 +3611,33 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   Future<void> _saveDraft() async {
     if (widget.isEditing) return;
+    final encodedDraft = jsonEncode({
+      'startedAt': _startedAt.toIso8601String(),
+      'elapsedSeconds': _elapsed.inSeconds,
+      'timerStopped': _workoutTimerStopped,
+      'date': _workoutDate.toIso8601String(),
+      'note': _noteController.text,
+      'exercises': _exercises
+          .map(
+            (exercise) => {
+              'name': exercise.name,
+              'bodyPart': exercise.bodyPart,
+              'equipment': exercise.equipment,
+              'sets': exercise.sets
+                  .map(
+                    (set) => {
+                      'weight': set.weight,
+                      'reps': set.reps,
+                      'completed': set.completed,
+                    },
+                  )
+                  .toList(),
+            },
+          )
+          .toList(),
+    });
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(
-      activeWorkoutDraftStorageKey,
-      jsonEncode({
-        'startedAt': _startedAt.toIso8601String(),
-        'date': _workoutDate.toIso8601String(),
-        'note': _noteController.text,
-        'exercises': _exercises
-            .map(
-              (exercise) => {
-                'name': exercise.name,
-                'bodyPart': exercise.bodyPart,
-                'equipment': exercise.equipment,
-                'sets': exercise.sets
-                    .map(
-                      (set) => {
-                        'weight': set.weight,
-                        'reps': set.reps,
-                        'completed': set.completed,
-                      },
-                    )
-                    .toList(),
-              },
-            )
-            .toList(),
-      }),
-    );
+    await preferences.setString(activeWorkoutDraftStorageKey, encodedDraft);
   }
 
   Future<void> _clearDraft() async {
@@ -2909,7 +3684,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     final leave = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(widget.isEditing ? '修正を中止しますか？' : 'ホームに戻りますか？'),
+        title: Text(widget.isEditing ? '修正を中止しますか？' : 'トレーニングを中断しますか？'),
         content: Text(
           widget.isEditing ? '変更した内容は保存されません。' : '入力内容は自動保存され、次回ここから再開できます。',
         ),
@@ -2920,7 +3695,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('戻る'),
+            child: Text(widget.isEditing ? '戻る' : '中断する'),
           ),
         ],
       ),
@@ -2931,9 +3706,43 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   void _exitWorkout([WorkoutRecord? workout]) {
     if (!mounted) return;
+    if (!widget.isEditing) {
+      _stopWorkoutTimer();
+      if (workout == null) unawaited(_saveDraft());
+    }
     setState(() => _allowPop = true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) Navigator.of(context).pop(workout);
+    });
+  }
+
+  Future<void> _deleteWorkoutDraft() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('記録をすべて削除しますか？'),
+        content: const Text('入力中の種目・セット・メモを削除します。この操作は元に戻せません。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('キャンセル'),
+          ),
+          FilledButton(
+            key: const Key('confirmDeleteWorkoutDraftButton'),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red.shade700),
+            child: const Text('削除する'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    _stopWorkoutTimer(keepStopped: true);
+    await _clearDraft();
+    if (!mounted) return;
+    setState(() => _allowPop = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Navigator.of(context).pop();
     });
   }
 
@@ -2956,12 +3765,24 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
               ),
               Text(
-                '${widget.isEditing ? (widget.initialWorkout!.durationLabel.isEmpty ? '記録済み' : widget.initialWorkout!.durationLabel) : _elapsedLabel} ・ ${widget.gymName ?? '店舗未選択'}',
+                key: const Key('workoutElapsedLabel'),
+                widget.isEditing
+                    ? '${!WorkoutUiPreference.workoutDurationEnabled || widget.initialWorkout!.durationLabel.isEmpty ? '記録済み' : widget.initialWorkout!.durationLabel} ・ ${widget.gymName ?? '店舗未選択'}'
+                    : WorkoutUiPreference.workoutTimerEnabled
+                    ? '$_elapsedLabel ・ ${widget.gymName ?? '店舗未選択'}'
+                    : widget.gymName ?? '店舗未選択',
                 style: const TextStyle(fontSize: 11, color: Color(0xFF777F78)),
               ),
             ],
           ),
           actions: [
+            if (!widget.isEditing)
+              IconButton(
+                key: const Key('deleteWorkoutDraftButton'),
+                tooltip: '記録を全削除',
+                onPressed: _deleteWorkoutDraft,
+                icon: const Icon(Icons.delete_outline_rounded),
+              ),
             TextButton(
               key: const Key('completeWorkoutButton'),
               onPressed: _completeWorkout,
@@ -3039,6 +3860,44 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   ),
                 ),
               ],
+              if (_exercises.isEmpty) ...[
+                Container(
+                  key: const Key('emptyWorkoutExercises'),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 28,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: const Color(0xFFE0E4DE)),
+                  ),
+                  child: const Column(
+                    children: [
+                      Icon(
+                        Icons.fitness_center_rounded,
+                        size: 34,
+                        color: Color(0xFF777F78),
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        '種目はまだありません',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        '下の「種目を追加」から選んでください',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Color(0xFF777F78)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               ...List.generate(
                 _exercises.length,
                 (exerciseIndex) => Padding(
@@ -3049,12 +3908,15 @@ class _WorkoutPageState extends State<WorkoutPage> {
                     exercise: _exercises[exerciseIndex],
                     history: widget.history,
                     onAddSet: () => _addSet(exerciseIndex),
-                    onRemoveLastSet: () => _removeLastSet(exerciseIndex),
-                    onRemove: _exercises.length <= 1
-                        ? null
-                        : () => _removeExercise(exerciseIndex),
+                    onRemoveSet: (setIndex) =>
+                        _removeSet(exerciseIndex, setIndex),
+                    onRemove: () => _removeExercise(exerciseIndex),
                     onToggleSet: (setIndex) =>
                         _toggleSet(exerciseIndex, setIndex),
+                    onApplyPrevious: (sets) =>
+                        _applyPreviousSets(exerciseIndex, sets),
+                    onSetAllCompleted: (completed) =>
+                        _setAllSetsCompleted(exerciseIndex, completed),
                     onValuesChanged: _saveDraft,
                   ),
                 ),
@@ -3117,7 +3979,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     final completedSets = <RecordedSet>[
       for (final exercise in _exercises)
         for (final set in exercise.sets)
-          if (set.completed)
+          if (!WorkoutUiPreference.completionCheckEnabled || set.completed)
             RecordedSet(
               exerciseName: exercise.name,
               bodyPart: exercise.bodyPart,
@@ -3140,9 +4002,11 @@ class _WorkoutPageState extends State<WorkoutPage> {
       return;
     }
     FocusScope.of(context).unfocus();
+    final finalElapsed = _stopWorkoutTimer();
     final personalBests = _personalBestExercises(completedSets);
     showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
         title: Text(widget.isEditing ? '修正を保存' : 'トレーニング完了'),
         content: Column(
@@ -3184,7 +4048,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 sets: completedSets,
                 durationSeconds: widget.isEditing
                     ? widget.initialWorkout!.durationSeconds
-                    : _elapsed.inSeconds,
+                    : WorkoutUiPreference.workoutDurationEnabled
+                    ? finalElapsed.inSeconds
+                    : 0,
                 gymName: widget.gymName,
                 note: _noteController.text.trim(),
               );
@@ -3221,20 +4087,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   WorkoutExercise _exerciseFromTemplate(ExerciseTemplate template) {
-    for (final workout in widget.history) {
-      final matching = workout.sets
-          .where((set) => set.exerciseName == template.name)
-          .toList();
-      if (matching.isNotEmpty) {
-        return WorkoutExercise(
-          name: template.name,
-          bodyPart: template.bodyPart,
-          equipment: template.equipment,
-          sets: matching
-              .map((set) => WorkoutSet(weight: set.weight, reps: set.reps))
-              .toList(),
-        );
-      }
+    final previousSets = latestSetsForExercise(widget.history, template.name);
+    if (previousSets.isNotEmpty) {
+      return WorkoutExercise(
+        name: template.name,
+        bodyPart: template.bodyPart,
+        equipment: template.equipment,
+        sets: previousSets
+            .map((set) => WorkoutSet(weight: set.weight, reps: set.reps))
+            .toList(),
+      );
     }
     return WorkoutExercise(
       name: template.name,
@@ -3358,19 +4220,27 @@ class MuscleMemoryBackup {
     required this.workouts,
     this.workoutTemplates = const [],
     this.customExercises = const [],
+    this.customGyms = const [],
     this.selectedGym,
     this.weeklyTarget,
     this.restTimerEnabled,
     this.restTimerSeconds,
+    this.completionCheckEnabled,
+    this.workoutTimerEnabled,
+    this.workoutDurationEnabled,
   });
 
   final List<WorkoutRecord> workouts;
   final List<SavedWorkoutTemplate> workoutTemplates;
   final List<ExerciseTemplate> customExercises;
+  final List<String> customGyms;
   final String? selectedGym;
   final int? weeklyTarget;
   final bool? restTimerEnabled;
   final int? restTimerSeconds;
+  final bool? completionCheckEnabled;
+  final bool? workoutTimerEnabled;
+  final bool? workoutDurationEnabled;
 
   factory MuscleMemoryBackup.fromJson(Map<String, dynamic> json) {
     final version = json['version'] as int?;
@@ -3386,10 +4256,16 @@ class MuscleMemoryBackup {
       customExercises: version == 1
           ? const []
           : decodeExerciseTemplates(json['customExercises']),
+      customGyms: version == 1
+          ? const []
+          : decodeCustomGyms(json['customGyms']),
       selectedGym: settings['selectedGym'] as String?,
       weeklyTarget: settings['weeklyTarget'] as int?,
       restTimerEnabled: settings['restTimerEnabled'] as bool?,
       restTimerSeconds: settings['restTimerSeconds'] as int?,
+      completionCheckEnabled: settings['completionCheckEnabled'] as bool?,
+      workoutTimerEnabled: settings['workoutTimerEnabled'] as bool?,
+      workoutDurationEnabled: settings['workoutDurationEnabled'] as bool?,
     );
   }
 
@@ -3400,11 +4276,15 @@ class MuscleMemoryBackup {
     'workouts': workouts.map((item) => item.toJson()).toList(),
     'workoutTemplates': workoutTemplates.map((item) => item.toJson()).toList(),
     'customExercises': customExercises.map((item) => item.toJson()).toList(),
+    'customGyms': customGyms,
     'settings': {
       'selectedGym': selectedGym,
       'weeklyTarget': weeklyTarget,
       'restTimerEnabled': restTimerEnabled,
       'restTimerSeconds': restTimerSeconds,
+      'completionCheckEnabled': completionCheckEnabled,
+      'workoutTimerEnabled': workoutTimerEnabled,
+      'workoutDurationEnabled': workoutDurationEnabled,
     },
   };
 }
@@ -3475,21 +4355,65 @@ class CustomExercisePreference {
     }
   }
 
-  static Future<void> add(ExerciseTemplate exercise) async {
-    if (exerciseTemplates.any((item) => item.name == exercise.name) ||
-        exercises.any((item) => item.name == exercise.name)) {
-      return;
-    }
+  static Future<bool> add(ExerciseTemplate exercise) async {
+    if (containsName(exercise.name)) return false;
     await replaceAll([...exercises, exercise]);
+    return true;
+  }
+
+  static bool containsName(String name, {String? excludingName}) {
+    final normalized = name.trim().toLowerCase();
+    return exerciseTemplates.any(
+          (item) => item.name.toLowerCase() == normalized,
+        ) ||
+        exercises.any(
+          (item) =>
+              item.name != excludingName &&
+              item.name.toLowerCase() == normalized,
+        );
+  }
+
+  static Future<bool> update(
+    String originalName,
+    ExerciseTemplate exercise,
+  ) async {
+    if (containsName(exercise.name, excludingName: originalName)) return false;
+    final updated = exercises
+        .map((item) => item.name == originalName ? exercise : item)
+        .toList();
+    if (!exercises.any((item) => item.name == originalName)) return false;
+    await replaceAll(updated);
+    return true;
+  }
+
+  static Future<void> remove(ExerciseTemplate exercise) async {
+    await replaceAll(
+      exercises.where((item) => item.name != exercise.name).toList(),
+    );
   }
 
   static Future<void> replaceAll(List<ExerciseTemplate> updated) async {
-    exercises = updated
-        .where(
-          (exercise) =>
-              !exerciseTemplates.any((item) => item.name == exercise.name),
-        )
-        .toList();
+    final unique = <String, ExerciseTemplate>{};
+    for (final exercise in updated) {
+      final name = exercise.name.trim();
+      if (name.isEmpty ||
+          exerciseTemplates.any(
+            (item) => item.name.toLowerCase() == name.toLowerCase(),
+          )) {
+        continue;
+      }
+      unique.putIfAbsent(
+        name.toLowerCase(),
+        () => ExerciseTemplate(
+          name: name,
+          bodyPart: exercise.bodyPart,
+          equipment: exercise.equipment,
+          startWeight: exercise.startWeight,
+          startReps: exercise.startReps,
+        ),
+      );
+    }
+    exercises = unique.values.toList();
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(
       _storageKey,
@@ -3621,6 +4545,41 @@ const exerciseTemplates = [
     startWeight: 1,
     startReps: 15,
   ),
+  ExerciseTemplate(
+    name: 'トレッドミル',
+    bodyPart: '有酸素',
+    equipment: 'マシン',
+    startWeight: 1,
+    startReps: 10,
+  ),
+  ExerciseTemplate(
+    name: 'エアロバイク',
+    bodyPart: '有酸素',
+    equipment: 'マシン',
+    startWeight: 1,
+    startReps: 10,
+  ),
+  ExerciseTemplate(
+    name: 'クロストレーナー',
+    bodyPart: '有酸素',
+    equipment: 'マシン',
+    startWeight: 1,
+    startReps: 10,
+  ),
+  ExerciseTemplate(
+    name: 'ステアクライマー',
+    bodyPart: '有酸素',
+    equipment: 'マシン',
+    startWeight: 1,
+    startReps: 10,
+  ),
+  ExerciseTemplate(
+    name: 'ローイングマシン',
+    bodyPart: '有酸素',
+    equipment: 'マシン',
+    startWeight: 1,
+    startReps: 10,
+  ),
 ];
 
 class ExercisePickerSheet extends StatefulWidget {
@@ -3633,7 +4592,21 @@ class ExercisePickerSheet extends StatefulWidget {
 }
 
 class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
+  static const _categories = ['胸', '背中', '肩', '腕', '脚', '腹', '有酸素'];
   String _query = '';
+  String? _selectedCategory;
+
+  String _categoryLabel(String category) => category == '腹' ? '腹筋' : category;
+
+  IconData _categoryIcon(String category) => switch (category) {
+    '胸' => Icons.favorite_outline_rounded,
+    '背中' => Icons.accessibility_new_rounded,
+    '肩' => Icons.expand_rounded,
+    '腕' => Icons.fitness_center_rounded,
+    '脚' => Icons.directions_run_rounded,
+    '腹' => Icons.grid_view_rounded,
+    _ => Icons.monitor_heart_outlined,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -3643,77 +4616,123 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     ];
     final filtered = allExercises.where((template) {
       final query = _query.toLowerCase();
-      return template.name.toLowerCase().contains(query) ||
-          template.bodyPart.contains(query) ||
-          template.equipment.toLowerCase().contains(query);
+      return template.bodyPart == _selectedCategory &&
+          (template.name.toLowerCase().contains(query) ||
+              template.bodyPart.contains(query) ||
+              template.equipment.toLowerCase().contains(query));
     }).toList();
     return SafeArea(
       child: Column(
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(20, 4, 20, 12),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                '種目を選択',
-                style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
+              child: Row(
+                children: [
+                  if (_selectedCategory != null)
+                    IconButton(
+                      key: const Key('backToExerciseCategories'),
+                      onPressed: () => setState(() {
+                        _selectedCategory = null;
+                        _query = '';
+                      }),
+                      icon: const Icon(Icons.arrow_back_rounded),
+                    ),
+                  Text(
+                    _selectedCategory == null
+                        ? '部位・カテゴリを選択'
+                        : '${_categoryLabel(_selectedCategory!)}の種目',
+                    style: const TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              autofocus: false,
-              onChanged: (value) => setState(() => _query = value.trim()),
-              decoration: const InputDecoration(
-                hintText: '種目名・部位・器具で検索',
-                prefixIcon: Icon(Icons.search_rounded),
-                border: OutlineInputBorder(),
+          if (_selectedCategory != null) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                key: const Key('exerciseSearchField'),
+                autofocus: false,
+                onChanged: (value) => setState(() => _query = value.trim()),
+                decoration: const InputDecoration(
+                  hintText: '種目名・器具で検索',
+                  prefixIcon: Icon(Icons.search_rounded),
+                  border: OutlineInputBorder(),
+                ),
               ),
             ),
-          ),
+          ],
           const SizedBox(height: 8),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
               children: [
-                ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xFF101820),
-                    foregroundColor: Colors.white,
-                    child: Icon(Icons.add_rounded),
-                  ),
-                  title: const Text(
-                    '自分で種目を作る',
-                    style: TextStyle(fontWeight: FontWeight.w900),
-                  ),
-                  subtitle: const Text('一覧にない種目を追加'),
-                  onTap: _createCustomExercise,
-                ),
-                const Divider(),
-                ...filtered.map((template) {
-                  final added = widget.existingNames.contains(template.name);
-                  return ListTile(
-                    enabled: !added,
+                if (_selectedCategory == null) ...[
+                  ..._categories.map((category) {
+                    final count = allExercises
+                        .where((exercise) => exercise.bodyPart == category)
+                        .length;
+                    return Card(
+                      child: ListTile(
+                        key: Key('exerciseCategory$category'),
+                        leading: CircleAvatar(
+                          backgroundColor: const Color(0xFFC7F36B),
+                          child: Icon(_categoryIcon(category)),
+                        ),
+                        title: Text(
+                          _categoryLabel(category),
+                          style: const TextStyle(fontWeight: FontWeight.w900),
+                        ),
+                        subtitle: Text('$count種目'),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () =>
+                            setState(() => _selectedCategory = category),
+                      ),
+                    );
+                  }),
+                  const Divider(),
+                  ListTile(
                     leading: const CircleAvatar(
-                      backgroundColor: Color(0xFFC7F36B),
-                      child: Icon(Icons.fitness_center_rounded),
+                      backgroundColor: Color(0xFF101820),
+                      foregroundColor: Colors.white,
+                      child: Icon(Icons.add_rounded),
                     ),
-                    title: Text(
-                      template.name,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    title: const Text(
+                      '自分で種目を作る',
+                      style: TextStyle(fontWeight: FontWeight.w900),
                     ),
-                    subtitle: Text(
-                      '${template.bodyPart} ・ ${template.equipment}',
-                    ),
-                    trailing: added
-                        ? const Text('追加済み')
-                        : const Icon(Icons.add_rounded),
-                    onTap: added
-                        ? null
-                        : () => Navigator.pop(context, template),
-                  );
-                }),
+                    subtitle: const Text('一覧にない種目を追加'),
+                    onTap: _createCustomExercise,
+                  ),
+                ] else
+                  ...filtered.map((template) {
+                    final added = widget.existingNames.contains(template.name);
+                    return ListTile(
+                      enabled: !added,
+                      leading: const CircleAvatar(
+                        backgroundColor: Color(0xFFC7F36B),
+                        child: Icon(Icons.fitness_center_rounded),
+                      ),
+                      title: Text(
+                        template.name,
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      subtitle: Text(
+                        '${template.bodyPart} ・ ${template.equipment}',
+                      ),
+                      trailing: added
+                          ? const Text('追加済み')
+                          : const Icon(Icons.add_rounded),
+                      onTap: added
+                          ? null
+                          : () => Navigator.pop(context, template),
+                    );
+                  }),
               ],
             ),
           ),
@@ -3723,69 +4742,343 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
   }
 
   Future<void> _createCustomExercise() async {
-    final nameController = TextEditingController();
-    String bodyPart = '胸';
     final created = await showDialog<ExerciseTemplate>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('新しい種目'),
-          content: Column(
+      builder: (_) =>
+          _ExerciseEditorDialog(additionalReservedNames: widget.existingNames),
+    );
+    if (created != null) {
+      final added = await CustomExercisePreference.add(created);
+      if (mounted && added) Navigator.pop(context, created);
+    }
+  }
+}
+
+class CustomExerciseManagementPage extends StatefulWidget {
+  const CustomExerciseManagementPage({super.key});
+
+  @override
+  State<CustomExerciseManagementPage> createState() =>
+      _CustomExerciseManagementPageState();
+}
+
+class _CustomExerciseManagementPageState
+    extends State<CustomExerciseManagementPage> {
+  Future<void> _addExercise() async {
+    final exercise = await showDialog<ExerciseTemplate>(
+      context: context,
+      builder: (_) => const _ExerciseEditorDialog(),
+    );
+    if (exercise == null) return;
+    final added = await CustomExercisePreference.add(exercise);
+    if (mounted && added) setState(() {});
+  }
+
+  Future<void> _editExercise(ExerciseTemplate exercise) async {
+    final updated = await showDialog<ExerciseTemplate>(
+      context: context,
+      builder: (_) => _ExerciseEditorDialog(initial: exercise),
+    );
+    if (updated == null) return;
+    final saved = await CustomExercisePreference.update(exercise.name, updated);
+    if (mounted && saved) {
+      setState(() {});
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('「${updated.name}」を更新しました')));
+    }
+  }
+
+  Future<void> _deleteExercise(ExerciseTemplate exercise) async {
+    final messenger = ScaffoldMessenger.of(context);
+    await CustomExercisePreference.remove(exercise);
+    if (!mounted) return;
+    setState(() {});
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('「${exercise.name}」を削除しました'),
+          action: SnackBarAction(
+            label: '元に戻す',
+            onPressed: () async {
+              final restored = await CustomExercisePreference.add(exercise);
+              if (!mounted || !restored) return;
+              setState(() {});
+              messenger.showSnackBar(
+                SnackBar(content: Text('「${exercise.name}」を元に戻しました')),
+              );
+            },
+          ),
+        ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final exercises = CustomExercisePreference.exercises;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('カスタム種目'),
+        actions: [
+          IconButton(
+            key: const Key('addCustomExerciseButton'),
+            tooltip: 'カスタム種目を追加',
+            onPressed: _addExercise,
+            icon: const Icon(Icons.add_rounded),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: exercises.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.fitness_center_rounded,
+                      size: 48,
+                      color: Color(0xFF777F78),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'カスタム種目はまだありません',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      onPressed: _addExercise,
+                      icon: const Icon(Icons.add_rounded),
+                      label: const Text('種目を作る'),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+              itemCount: exercises.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final exercise = exercises[index];
+                return Card(
+                  key: Key('customExercise$index'),
+                  child: ListTile(
+                    title: Text(
+                      exercise.name,
+                      style: const TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    subtitle: Text(
+                      '${exercise.bodyPart} ・ ${exercise.equipment} ・ ${formatWeight(exercise.startWeight)}kg × ${exercise.startReps}回',
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          tooltip: '${exercise.name}を編集',
+                          onPressed: () => _editExercise(exercise),
+                          icon: const Icon(Icons.edit_outlined),
+                        ),
+                        IconButton(
+                          tooltip: '${exercise.name}を削除',
+                          onPressed: () => _deleteExercise(exercise),
+                          icon: const Icon(Icons.delete_outline_rounded),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
+class _ExerciseEditorDialog extends StatefulWidget {
+  const _ExerciseEditorDialog({
+    this.initial,
+    this.additionalReservedNames = const {},
+  });
+
+  final ExerciseTemplate? initial;
+  final Set<String> additionalReservedNames;
+
+  @override
+  State<_ExerciseEditorDialog> createState() => _ExerciseEditorDialogState();
+}
+
+class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameController;
+  late final TextEditingController _weightController;
+  late final TextEditingController _repsController;
+  late String _bodyPart;
+  late String _equipment;
+
+  static const _bodyParts = ['胸', '背中', '脚', '肩', '腕', '腹', '有酸素'];
+  static const _equipmentOptions = [
+    'フリーウェイト',
+    'ダンベル',
+    'マシン',
+    'ケーブル',
+    '自重',
+    'カスタム',
+    'その他',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initial;
+    _nameController = TextEditingController(text: initial?.name ?? '');
+    _weightController = TextEditingController(
+      text: formatWeight(initial?.startWeight ?? 10),
+    );
+    _repsController = TextEditingController(
+      text: (initial?.startReps ?? 10).toString(),
+    );
+    _bodyPart = initial?.bodyPart ?? '胸';
+    _equipment = initial == null
+        ? 'マシン'
+        : _equipmentOptions.contains(initial.equipment)
+        ? initial.equipment
+        : 'その他';
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _weightController.dispose();
+    _repsController.dispose();
+    super.dispose();
+  }
+
+  String? _validateName(String? value) {
+    final name = value?.trim() ?? '';
+    if (name.isEmpty) return '種目名を入力してください';
+    final isAdditionalDuplicate = widget.additionalReservedNames.any(
+      (item) =>
+          item != widget.initial?.name &&
+          item.toLowerCase() == name.toLowerCase(),
+    );
+    if (isAdditionalDuplicate ||
+        CustomExercisePreference.containsName(
+          name,
+          excludingName: widget.initial?.name,
+        )) {
+      return '同じ名前の種目があります';
+    }
+    return null;
+  }
+
+  void _save() {
+    if (!_formKey.currentState!.validate()) return;
+    Navigator.pop(
+      context,
+      ExerciseTemplate(
+        name: _nameController.text.trim(),
+        bodyPart: _bodyPart,
+        equipment: _equipment,
+        startWeight: double.parse(_weightController.text),
+        startReps: int.parse(_repsController.text),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.initial == null ? '新しい種目' : 'カスタム種目を編集'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: nameController,
+              TextFormField(
+                key: const Key('customExerciseNameField'),
+                controller: _nameController,
                 autofocus: true,
+                maxLength: 40,
+                validator: _validateName,
                 decoration: const InputDecoration(labelText: '種目名'),
               ),
-              const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: bodyPart,
+                key: const Key('customExerciseBodyPartField'),
+                initialValue: _bodyPart,
                 decoration: const InputDecoration(labelText: '鍛える部位'),
-                items: const ['胸', '背中', '脚', '肩', '腕', '腹']
+                items: _bodyParts
                     .map(
                       (part) =>
                           DropdownMenuItem(value: part, child: Text(part)),
                     )
                     .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setDialogState(() => bodyPart = value);
-                  }
-                },
+                onChanged: (value) => setState(() => _bodyPart = value!),
+              ),
+              const SizedBox(height: 10),
+              DropdownButtonFormField<String>(
+                key: const Key('customExerciseEquipmentField'),
+                initialValue: _equipment,
+                decoration: const InputDecoration(labelText: '器具'),
+                items: _equipmentOptions
+                    .map(
+                      (equipment) => DropdownMenuItem(
+                        value: equipment,
+                        child: Text(equipment),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) => setState(() => _equipment = value!),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      key: const Key('customExerciseWeightField'),
+                      controller: _weightController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      validator: (value) {
+                        final weight = double.tryParse(value ?? '');
+                        return weight == null || weight < 0 ? '0以上で入力' : null;
+                      },
+                      decoration: const InputDecoration(labelText: '初期重量 kg'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      key: const Key('customExerciseRepsField'),
+                      controller: _repsController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        final reps = int.tryParse(value ?? '');
+                        return reps == null || reps < 1 ? '1以上で入力' : null;
+                      },
+                      decoration: const InputDecoration(labelText: '初期回数'),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('キャンセル'),
-            ),
-            FilledButton(
-              onPressed: () {
-                final name = nameController.text.trim();
-                if (name.isEmpty || widget.existingNames.contains(name)) return;
-                Navigator.pop(
-                  dialogContext,
-                  ExerciseTemplate(
-                    name: name,
-                    bodyPart: bodyPart,
-                    equipment: 'カスタム',
-                    startWeight: 10,
-                  ),
-                );
-              },
-              child: const Text('追加'),
-            ),
-          ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('キャンセル'),
+        ),
+        FilledButton(
+          key: const Key('saveCustomExerciseButton'),
+          onPressed: _save,
+          child: Text(widget.initial == null ? '追加' : '保存'),
+        ),
+      ],
     );
-    nameController.dispose();
-    if (created != null) {
-      await CustomExercisePreference.add(created);
-      if (mounted) Navigator.pop(context, created);
-    }
   }
 }
 
@@ -3810,9 +5103,11 @@ class ExerciseInputCard extends StatelessWidget {
     required this.exercise,
     required this.history,
     required this.onAddSet,
-    required this.onRemoveLastSet,
+    required this.onRemoveSet,
     required this.onRemove,
     required this.onToggleSet,
+    required this.onApplyPrevious,
+    required this.onSetAllCompleted,
     required this.onValuesChanged,
   });
 
@@ -3820,23 +5115,18 @@ class ExerciseInputCard extends StatelessWidget {
   final WorkoutExercise exercise;
   final List<WorkoutRecord> history;
   final VoidCallback onAddSet;
-  final VoidCallback onRemoveLastSet;
+  final ValueChanged<int> onRemoveSet;
   final VoidCallback? onRemove;
   final ValueChanged<int> onToggleSet;
+  final ValueChanged<List<RecordedSet>> onApplyPrevious;
+  final ValueChanged<bool> onSetAllCompleted;
   final VoidCallback onValuesChanged;
 
   @override
   Widget build(BuildContext context) {
-    List<RecordedSet> previousSets = [];
-    for (final workout in history) {
-      final matching = workout.sets
-          .where((set) => set.exerciseName == exercise.name)
-          .toList();
-      if (matching.isNotEmpty) {
-        previousSets = matching;
-        break;
-      }
-    }
+    final previousSets = latestSetsForExercise(history, exercise.name);
+    final completedCount = exercise.sets.where((set) => set.completed).length;
+    final allCompleted = completedCount == exercise.sets.length;
     final previousText = previousSets.isEmpty
         ? '前回の記録はありません'
         : '前回  ${previousSets.map((set) => '${formatWeight(set.weight)}kg × ${set.reps}').join(' ・ ')}';
@@ -3903,11 +5193,46 @@ class ExerciseInputCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (previousSets.isNotEmpty)
+                  TextButton(
+                    key: Key('applyPrevious$exerciseIndex'),
+                    onPressed: () => onApplyPrevious(previousSets),
+                    child: const Text('反映'),
+                  ),
               ],
             ),
           ),
           const SizedBox(height: 18),
-          const SetHeader(),
+          if (WorkoutUiPreference.completionCheckEnabled)
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '完了 $completedCount / ${exercise.sets.length}',
+                    style: const TextStyle(
+                      color: Color(0xFF6C746D),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                if (exercise.sets.isNotEmpty)
+                  TextButton.icon(
+                    key: Key('toggleAllSets$exerciseIndex'),
+                    onPressed: () => onSetAllCompleted(!allCompleted),
+                    icon: Icon(
+                      allCompleted
+                          ? Icons.remove_done_rounded
+                          : Icons.done_all_rounded,
+                      size: 18,
+                    ),
+                    label: Text(allCompleted ? 'すべて解除' : 'すべて完了'),
+                  ),
+              ],
+            ),
+          SetHeader(
+            showCompletionCheck: WorkoutUiPreference.completionCheckEnabled,
+          ),
           const SizedBox(height: 8),
           ...List.generate(exercise.sets.length, (setIndex) {
             final set = exercise.sets[setIndex];
@@ -3915,6 +5240,7 @@ class ExerciseInputCard extends StatelessWidget {
               number: setIndex + 1,
               fieldPrefix: '${exerciseIndex}_',
               set: set,
+              showCompletionCheck: WorkoutUiPreference.completionCheckEnabled,
               onWeightChanged: (value) {
                 set.weight = value;
                 onValuesChanged();
@@ -3924,28 +5250,20 @@ class ExerciseInputCard extends StatelessWidget {
                 onValuesChanged();
               },
               onToggle: () => onToggleSet(setIndex),
+              onDelete: () => onRemoveSet(setIndex),
             );
           }),
           const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  key: exerciseIndex == 0
-                      ? const Key('addSetButton')
-                      : Key('addSetButton$exerciseIndex'),
-                  onPressed: onAddSet,
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text('セットを追加'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              IconButton.outlined(
-                tooltip: '最後のセットを削除',
-                onPressed: exercise.sets.length > 1 ? onRemoveLastSet : null,
-                icon: const Icon(Icons.remove_rounded),
-              ),
-            ],
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              key: exerciseIndex == 0
+                  ? const Key('addSetButton')
+                  : Key('addSetButton$exerciseIndex'),
+              onPressed: onAddSet,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('セットを追加'),
+            ),
           ),
         ],
       ),
@@ -4087,8 +5405,10 @@ class WorkoutRecord {
     return '$minutes分';
   }
 
-  double get volume =>
-      sets.fold<double>(0, (total, set) => total + (set.weight * set.reps));
+  double get volume => sets.fold<double>(
+    0,
+    (total, set) => total + (set.bodyPart == '有酸素' ? 0 : set.weight * set.reps),
+  );
 
   RecordedSet get bestSet => sets.reduce(
     (best, set) => set.weight * set.reps > best.weight * best.reps ? set : best,
@@ -4143,6 +5463,21 @@ List<WorkoutRecord> decodeWorkoutHistory(String? encoded) {
 List<WorkoutRecord> sortWorkoutsNewestFirst(Iterable<WorkoutRecord> workouts) =>
     workouts.toList()..sort((a, b) => b.date.compareTo(a.date));
 
+List<RecordedSet> latestSetsForExercise(
+  Iterable<WorkoutRecord> workouts,
+  String exerciseName,
+) {
+  WorkoutRecord? latest;
+  for (final workout in workouts) {
+    if (!workout.sets.any((set) => set.exerciseName == exerciseName)) continue;
+    if (latest == null || workout.date.isAfter(latest.date)) latest = workout;
+  }
+  if (latest == null) return [];
+  return latest.sets
+      .where((set) => set.exerciseName == exerciseName)
+      .toList(growable: false);
+}
+
 const setLabelStyle = TextStyle(
   fontSize: 10,
   color: Color(0xFF777F78),
@@ -4151,20 +5486,22 @@ const setLabelStyle = TextStyle(
 );
 
 class SetHeader extends StatelessWidget {
-  const SetHeader({super.key});
+  const SetHeader({super.key, this.showCompletionCheck = true});
+
+  final bool showCompletionCheck;
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       children: [
-        SizedBox(width: 42, child: Text('SET', style: setLabelStyle)),
-        Expanded(
+        const SizedBox(width: 42, child: Text('SET', style: setLabelStyle)),
+        const Expanded(
           child: Center(child: Text('KG', style: setLabelStyle)),
         ),
-        Expanded(
+        const Expanded(
           child: Center(child: Text('REPS', style: setLabelStyle)),
         ),
-        SizedBox(width: 42),
+        SizedBox(width: showCompletionCheck ? 76 : 38),
       ],
     );
   }
@@ -4179,6 +5516,8 @@ class SetRow extends StatelessWidget {
     required this.onWeightChanged,
     required this.onRepsChanged,
     required this.onToggle,
+    required this.onDelete,
+    this.showCompletionCheck = true,
   });
 
   final int number;
@@ -4187,6 +5526,8 @@ class SetRow extends StatelessWidget {
   final ValueChanged<double> onWeightChanged;
   final ValueChanged<int> onRepsChanged;
   final VoidCallback onToggle;
+  final VoidCallback onDelete;
+  final bool showCompletionCheck;
 
   @override
   Widget build(BuildContext context) {
@@ -4218,22 +5559,36 @@ class SetRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
+          if (showCompletionCheck) ...[
+            SizedBox(
+              width: 34,
+              height: 34,
+              child: IconButton.filled(
+                padding: EdgeInsets.zero,
+                onPressed: onToggle,
+                style: IconButton.styleFrom(
+                  backgroundColor: set.completed
+                      ? const Color(0xFFC7F36B)
+                      : const Color(0xFFE8EBE5),
+                  foregroundColor: const Color(0xFF101820),
+                ),
+                icon: Icon(
+                  set.completed ? Icons.check_rounded : Icons.circle_outlined,
+                  size: 18,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+          ],
           SizedBox(
             width: 34,
             height: 34,
-            child: IconButton.filled(
+            child: IconButton(
+              key: Key('deleteSet$fieldPrefix$number'),
+              tooltip: 'セットを削除',
               padding: EdgeInsets.zero,
-              onPressed: onToggle,
-              style: IconButton.styleFrom(
-                backgroundColor: set.completed
-                    ? const Color(0xFFC7F36B)
-                    : const Color(0xFFE8EBE5),
-                foregroundColor: const Color(0xFF101820),
-              ),
-              icon: Icon(
-                set.completed ? Icons.check_rounded : Icons.circle_outlined,
-                size: 18,
-              ),
+              onPressed: onDelete,
+              icon: const Icon(Icons.delete_outline_rounded, size: 18),
             ),
           ),
         ],
@@ -4294,11 +5649,88 @@ class ValueBox extends StatelessWidget {
   }
 }
 
+const standardGyms = ['自宅', 'エニタイムフィットネス', 'ゴールドジム', 'FIT PLACE24'];
+
+List<String> decodeCustomGyms(Object? source) {
+  if (source is! List<dynamic>) return [];
+  final unique = <String, String>{};
+  for (final item in source.whereType<String>()) {
+    final name = item.trim();
+    if (name.isEmpty || standardGyms.contains(name)) continue;
+    unique.putIfAbsent(name.toLowerCase(), () => name);
+  }
+  return unique.values.toList(growable: false);
+}
+
+class CustomGymPreference {
+  CustomGymPreference._();
+
+  static const _storageKey = 'custom_gyms';
+  static List<String> gyms = [];
+
+  static Future<void> load() async {
+    final preferences = await SharedPreferences.getInstance();
+    final encoded = preferences.getString(_storageKey);
+    if (encoded == null) {
+      gyms = [];
+      return;
+    }
+    try {
+      gyms = decodeCustomGyms(jsonDecode(encoded));
+    } catch (_) {
+      gyms = [];
+    }
+  }
+
+  static bool contains(String name, {String? excludingName}) {
+    final normalized = name.trim().toLowerCase();
+    return standardGyms.any((item) => item.toLowerCase() == normalized) ||
+        gyms.any(
+          (item) => item != excludingName && item.toLowerCase() == normalized,
+        );
+  }
+
+  static Future<bool> add(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty || standardGyms.contains(trimmed)) return false;
+    if (gyms.any((item) => item.toLowerCase() == trimmed.toLowerCase())) {
+      return false;
+    }
+    await replaceAll([...gyms, trimmed]);
+    return true;
+  }
+
+  static Future<bool> update(String originalName, String updatedName) async {
+    final trimmed = updatedName.trim();
+    if (trimmed.isEmpty || contains(trimmed, excludingName: originalName)) {
+      return false;
+    }
+    if (!gyms.contains(originalName)) return false;
+    await replaceAll(
+      gyms.map((item) => item == originalName ? trimmed : item).toList(),
+    );
+    return true;
+  }
+
+  static Future<void> remove(String name) async {
+    await replaceAll(gyms.where((item) => item != name).toList());
+  }
+
+  static Future<void> replaceAll(List<String> updated) async {
+    gyms = decodeCustomGyms(updated);
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(_storageKey, jsonEncode(gyms));
+  }
+}
+
 Future<String?> showGymPicker(BuildContext context, String? currentGym) {
-  const standardGyms = ['自宅', 'エニタイムフィットネス', 'ゴールドジム', 'FIT PLACE24'];
   final gyms = [
-    if (currentGym != null && !standardGyms.contains(currentGym)) currentGym,
     ...standardGyms,
+    ...CustomGymPreference.gyms,
+    if (currentGym != null &&
+        !standardGyms.contains(currentGym) &&
+        !CustomGymPreference.gyms.contains(currentGym))
+      currentGym,
   ];
   return showModalBottomSheet<String>(
     context: context,
@@ -4341,6 +5773,7 @@ Future<String?> showGymPicker(BuildContext context, String? currentGym) {
             subtitle: const Text('ジム名などを自由に入力'),
             onTap: () async {
               final gym = await _showCustomGymDialog(context);
+              if (gym != null) await CustomGymPreference.add(gym);
               if (gym != null && context.mounted) Navigator.pop(context, gym);
             },
           ),
@@ -4350,43 +5783,306 @@ Future<String?> showGymPicker(BuildContext context, String? currentGym) {
   );
 }
 
-Future<String?> _showCustomGymDialog(BuildContext context) async {
-  final controller = TextEditingController();
-  final result = await showDialog<String>(
+Future<String?> _showCustomGymDialog(
+  BuildContext context, {
+  String? initialName,
+}) {
+  return showDialog<String>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: const Text('場所を追加'),
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        maxLength: 40,
-        textInputAction: TextInputAction.done,
-        decoration: const InputDecoration(
-          labelText: '場所の名前',
-          hintText: '例：近所の体育館',
+    builder: (_) => _CustomGymDialog(initialName: initialName),
+  );
+}
+
+class _CustomGymDialog extends StatefulWidget {
+  const _CustomGymDialog({this.initialName});
+
+  final String? initialName;
+
+  @override
+  State<_CustomGymDialog> createState() => _CustomGymDialogState();
+}
+
+class _CustomGymDialogState extends State<_CustomGymDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialName ?? '');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    if (!_formKey.currentState!.validate()) return;
+    Navigator.pop(context, _controller.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.initialName == null ? '場所を追加' : '場所名を変更'),
+      content: Form(
+        key: _formKey,
+        child: TextFormField(
+          key: const Key('customGymNameField'),
+          controller: _controller,
+          autofocus: true,
+          maxLength: 40,
+          textInputAction: TextInputAction.done,
+          validator: (value) {
+            final name = value?.trim() ?? '';
+            if (name.isEmpty) return '場所の名前を入力してください';
+            if (CustomGymPreference.contains(
+              name,
+              excludingName: widget.initialName,
+            )) {
+              return '同じ名前の場所があります';
+            }
+            return null;
+          },
+          decoration: const InputDecoration(
+            labelText: '場所の名前',
+            hintText: '例：近所の体育館',
+          ),
+          onFieldSubmitted: (_) => _save(),
         ),
-        onSubmitted: (value) {
-          final name = value.trim();
-          if (name.isNotEmpty) Navigator.pop(dialogContext, name);
-        },
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(dialogContext),
+          onPressed: () => Navigator.pop(context),
           child: const Text('キャンセル'),
         ),
         FilledButton(
-          onPressed: () {
-            final name = controller.text.trim();
-            if (name.isNotEmpty) Navigator.pop(dialogContext, name);
-          },
+          key: const Key('saveCustomGymButton'),
+          onPressed: _save,
           child: const Text('保存'),
         ),
       ],
-    ),
-  );
-  controller.dispose();
-  return result;
+    );
+  }
+}
+
+class CustomGymManagementPage extends StatefulWidget {
+  const CustomGymManagementPage({
+    super.key,
+    required this.selectedGym,
+    required this.onSelectedGymChanged,
+  });
+
+  final String? selectedGym;
+  final Future<void> Function(String?) onSelectedGymChanged;
+
+  @override
+  State<CustomGymManagementPage> createState() =>
+      _CustomGymManagementPageState();
+}
+
+class _CustomGymManagementPageState extends State<CustomGymManagementPage> {
+  late String? _selectedGym;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedGym = widget.selectedGym;
+  }
+
+  Future<void> _notifyChanged() => widget.onSelectedGymChanged(_selectedGym);
+
+  Future<void> _add() async {
+    final name = await _showCustomGymDialog(context);
+    if (name == null) return;
+    final added = await CustomGymPreference.add(name);
+    if (!mounted || !added) return;
+    setState(() {});
+    await _notifyChanged();
+  }
+
+  Future<void> _edit(String originalName) async {
+    final name = await _showCustomGymDialog(context, initialName: originalName);
+    if (name == null || name == originalName) return;
+    final updated = await CustomGymPreference.update(originalName, name);
+    if (!updated || !mounted) return;
+    if (_selectedGym == originalName) _selectedGym = name;
+    setState(() {});
+    await _notifyChanged();
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('「$name」に名前を変更しました')));
+    }
+  }
+
+  Future<void> _delete(String name) async {
+    final index = CustomGymPreference.gyms.indexOf(name);
+    final wasSelected = _selectedGym == name;
+    final messenger = ScaffoldMessenger.of(context);
+    await CustomGymPreference.remove(name);
+    if (wasSelected) _selectedGym = null;
+    if (!mounted) return;
+    setState(() {});
+    await _notifyChanged();
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('「$name」を削除しました'),
+          action: SnackBarAction(
+            label: '元に戻す',
+            onPressed: () async {
+              final restored = List<String>.from(CustomGymPreference.gyms);
+              restored.insert(index.clamp(0, restored.length), name);
+              await CustomGymPreference.replaceAll(restored);
+              if (wasSelected) _selectedGym = name;
+              if (!mounted) return;
+              setState(() {});
+              await _notifyChanged();
+              messenger.showSnackBar(
+                SnackBar(content: Text('「$name」を元に戻しました')),
+              );
+            },
+          ),
+        ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final gyms = CustomGymPreference.gyms;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('カスタム場所'),
+        actions: [
+          IconButton(
+            key: const Key('addCustomGymButton'),
+            tooltip: '場所を追加',
+            onPressed: _add,
+            icon: const Icon(Icons.add_location_alt_outlined),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: gyms.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    '登録した場所はありません',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed: _add,
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text('場所を登録'),
+                  ),
+                ],
+              ),
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+              itemCount: gyms.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final gym = gyms[index];
+                return Card(
+                  key: Key('customGym$index'),
+                  child: ListTile(
+                    leading: const Icon(Icons.location_on_outlined),
+                    title: Text(
+                      gym,
+                      style: const TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    subtitle: gym == _selectedGym ? const Text('現在選択中') : null,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          tooltip: '$gymの名前を変更',
+                          onPressed: () => _edit(gym),
+                          icon: const Icon(Icons.edit_outlined),
+                        ),
+                        IconButton(
+                          tooltip: '$gymを削除',
+                          onPressed: () => _delete(gym),
+                          icon: const Icon(Icons.delete_outline_rounded),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
+class BackupDataManagementPage extends StatelessWidget {
+  const BackupDataManagementPage({
+    super.key,
+    required this.onExport,
+    required this.onImportFile,
+    required this.onCopy,
+    required this.onImportClipboard,
+  });
+
+  final Future<void> Function(BuildContext) onExport;
+  final Future<void> Function(BuildContext) onImportFile;
+  final Future<void> Function(BuildContext) onCopy;
+  final Future<void> Function(BuildContext) onImportClipboard;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('バックアップ・データ管理')),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                ListTile(
+                  key: const Key('exportBackupFile'),
+                  leading: const Icon(Icons.ios_share_rounded),
+                  title: const Text('バックアップを書き出す'),
+                  subtitle: const Text('日付付きJSONファイルとして保存・共有'),
+                  onTap: () => onExport(context),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  key: const Key('importBackupFile'),
+                  leading: const Icon(Icons.folder_open_rounded),
+                  title: const Text('ファイルから復元'),
+                  subtitle: const Text('JSONバックアップを選んで読み込み'),
+                  onTap: () => onImportFile(context),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.copy_all_outlined),
+                  title: const Text('バックアップをコピー'),
+                  subtitle: const Text('JSONをクリップボードへコピー'),
+                  onTap: () => onCopy(context),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.settings_backup_restore_rounded),
+                  title: const Text('バックアップを読み込む'),
+                  subtitle: const Text('コピーした記録をこの端末に追加'),
+                  onTap: () => onImportClipboard(context),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class ProfilePage extends StatelessWidget {
@@ -4402,8 +6098,17 @@ class ProfilePage extends StatelessWidget {
     required this.onWeeklyTargetChanged,
     required this.restTimerEnabled,
     required this.restTimerSeconds,
+    required this.completionCheckEnabled,
+    required this.workoutTimerEnabled,
+    required this.workoutDurationEnabled,
     required this.onRestTimerEnabledChanged,
     required this.onRestTimerSecondsChanged,
+    required this.onCompletionCheckEnabledChanged,
+    required this.onWorkoutTimerEnabledChanged,
+    required this.onWorkoutDurationEnabledChanged,
+    required this.onCustomExercisesChanged,
+    required this.onWorkoutTemplatesChanged,
+    required this.onSelectedGymChanged,
   });
 
   final String? selectedGym;
@@ -4416,8 +6121,18 @@ class ProfilePage extends StatelessWidget {
   final ValueChanged<int> onWeeklyTargetChanged;
   final bool restTimerEnabled;
   final int restTimerSeconds;
+  final bool completionCheckEnabled;
+  final bool workoutTimerEnabled;
+  final bool workoutDurationEnabled;
   final ValueChanged<bool> onRestTimerEnabledChanged;
   final ValueChanged<int> onRestTimerSecondsChanged;
+  final ValueChanged<bool> onCompletionCheckEnabledChanged;
+  final ValueChanged<bool> onWorkoutTimerEnabledChanged;
+  final ValueChanged<bool> onWorkoutDurationEnabledChanged;
+  final VoidCallback onCustomExercisesChanged;
+  final Future<void> Function(List<SavedWorkoutTemplate>)
+  onWorkoutTemplatesChanged;
+  final Future<void> Function(String?) onSelectedGymChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -4468,57 +6183,10 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          _sectionTitle('トレーニング設定'),
+          _trainingSettingsCard(context),
+          _sectionTitle('アカウント関連'),
           Card(
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(22),
-            ),
-            child: Column(
-              children: [
-                ListTile(
-                  key: const Key('exportBackupFile'),
-                  leading: const Icon(Icons.ios_share_rounded),
-                  title: const Text('バックアップを書き出す'),
-                  subtitle: const Text('日付付きJSONファイルとして保存・共有'),
-                  onTap: () => _shareBackup(context),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  key: const Key('importBackupFile'),
-                  leading: const Icon(Icons.folder_open_rounded),
-                  title: const Text('ファイルから復元'),
-                  subtitle: const Text('JSONバックアップを選んで読み込み'),
-                  onTap: () => _restoreFromFile(context),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.copy_all_outlined),
-                  title: const Text('バックアップをコピー'),
-                  subtitle: const Text('JSONをクリップボードへコピー'),
-                  onTap: () => _copyBackup(context),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.settings_backup_restore_rounded),
-                  title: const Text('バックアップを読み込む'),
-                  subtitle: const Text('コピーした記録をこの端末に追加'),
-                  onTap: () => _restoreBackup(context),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'データ同期',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
-          ),
-          const SizedBox(height: 10),
-          Card(
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(22),
-            ),
             child: ListTile(
               leading: const Icon(Icons.cloud_outlined),
               title: const Text('Supabaseクラウド'),
@@ -4536,76 +6204,167 @@ class ProfilePage extends StatelessWidget {
                   : null,
             ),
           ),
-          const SizedBox(height: 20),
-          const Text(
-            'トレーニング設定',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
-          ),
-          const SizedBox(height: 10),
-          Card(
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(22),
+          _sectionTitle('その他設定'),
+          const Card(
+            child: ListTile(
+              leading: Icon(Icons.info_outline_rounded),
+              title: Text('アプリについて'),
+              subtitle: Text('MUSCLE MEMORY'),
             ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.location_on_outlined),
-                  title: const Text('いつもの場所'),
-                  subtitle: Text(selectedGym ?? '未選択'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () async {
-                    final selected = await showGymPicker(context, selectedGym);
-                    if (selected != null) onGymChanged(selected);
-                  },
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.flag_outlined),
-                  title: const Text('1週間の目標'),
-                  trailing: Text(
-                    '$weeklyTarget回',
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  onTap: () => _selectWeeklyTarget(context),
-                ),
-                const Divider(height: 1),
-                SwitchListTile(
-                  key: const Key('restTimerSwitch'),
-                  secondary: const Icon(Icons.timer_outlined),
-                  title: const Text('休憩タイマー'),
-                  subtitle: Text(restTimerEnabled ? 'セット完了後に開始' : '使用しない'),
-                  value: restTimerEnabled,
-                  onChanged: onRestTimerEnabledChanged,
-                ),
-                if (restTimerEnabled) ...[
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.hourglass_bottom_rounded),
-                    title: const Text('休憩時間'),
-                    trailing: Text(
-                      _restDurationLabel(restTimerSeconds),
-                      style: const TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    onTap: () => _selectRestDuration(context),
-                  ),
-                ],
-                const Divider(height: 1),
-                const ListTile(
-                  leading: Icon(Icons.scale_outlined),
-                  title: Text('重量の単位'),
-                  trailing: Text(
-                    'kg',
-                    style: TextStyle(fontWeight: FontWeight.w800),
+          ),
+          _sectionTitle('バックアップ・データ管理'),
+          Card(
+            child: ListTile(
+              key: const Key('backupDataManagementButton'),
+              leading: const Icon(Icons.backup_outlined),
+              title: const Text('バックアップ・データ管理'),
+              subtitle: const Text('書き出し・復元・コピー'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BackupDataManagementPage(
+                    onExport: _shareBackup,
+                    onImportFile: _restoreFromFile,
+                    onCopy: _copyBackup,
+                    onImportClipboard: _restoreBackup,
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
+
+  Widget _sectionTitle(String title) => Padding(
+    padding: const EdgeInsets.only(top: 20, bottom: 10),
+    child: Text(
+      title,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+    ),
+  );
+
+  Widget _trainingSettingsCard(BuildContext context) => Card(
+    clipBehavior: Clip.antiAlias,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+    child: Column(
+      children: [
+        ListTile(
+          leading: const Icon(Icons.location_on_outlined),
+          title: const Text('いつもの場所'),
+          subtitle: Text(selectedGym ?? '未選択'),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () async {
+            final selected = await showGymPicker(context, selectedGym);
+            if (selected != null) onGymChanged(selected);
+          },
+        ),
+        const Divider(height: 1),
+        ListTile(
+          key: const Key('customGymManagementButton'),
+          leading: const Icon(Icons.add_location_alt_outlined),
+          title: const Text('カスタム場所'),
+          subtitle: Text(
+            CustomGymPreference.gyms.isEmpty
+                ? '登録なし'
+                : '${CustomGymPreference.gyms.length}件を登録中',
+          ),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () => Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => CustomGymManagementPage(
+                selectedGym: selectedGym,
+                onSelectedGymChanged: onSelectedGymChanged,
+              ),
+            ),
+          ),
+        ),
+        const Divider(height: 1),
+        ListTile(
+          leading: const Icon(Icons.flag_outlined),
+          title: const Text('1週間の目標'),
+          trailing: Text(
+            '$weeklyTarget回',
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+          onTap: () => _selectWeeklyTarget(context),
+        ),
+        const Divider(height: 1),
+        ListTile(
+          key: const Key('trainingSettingsButton'),
+          leading: const Icon(Icons.fitness_center_rounded),
+          title: const Text('トレーニング設定'),
+          subtitle: const Text('チェック・タイマー・筋トレ時間'),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () => Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => TrainingSettingsPage(
+                completionCheckEnabled: completionCheckEnabled,
+                workoutTimerEnabled: workoutTimerEnabled,
+                workoutDurationEnabled: workoutDurationEnabled,
+                restTimerEnabled: restTimerEnabled,
+                restTimerSeconds: restTimerSeconds,
+                onCompletionCheckEnabledChanged:
+                    onCompletionCheckEnabledChanged,
+                onWorkoutTimerEnabledChanged: onWorkoutTimerEnabledChanged,
+                onWorkoutDurationEnabledChanged:
+                    onWorkoutDurationEnabledChanged,
+                onRestTimerEnabledChanged: onRestTimerEnabledChanged,
+                onRestTimerSecondsChanged: onRestTimerSecondsChanged,
+              ),
+            ),
+          ),
+        ),
+        const Divider(height: 1),
+        ListTile(
+          key: const Key('savedMenuManagementButton'),
+          leading: const Icon(Icons.bookmarks_outlined),
+          title: const Text('マイメニュー管理'),
+          subtitle: Text(
+            workoutTemplates.isEmpty
+                ? '保存なし'
+                : '${workoutTemplates.length}件を保存中',
+          ),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () => Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => SavedMenuManagementPage(
+                initialTemplates: workoutTemplates,
+                onChanged: onWorkoutTemplatesChanged,
+              ),
+            ),
+          ),
+        ),
+        const Divider(height: 1),
+        ListTile(
+          key: const Key('customExerciseManagementButton'),
+          leading: const Icon(Icons.tune_rounded),
+          title: const Text('カスタム種目'),
+          subtitle: Text(
+            CustomExercisePreference.exercises.isEmpty
+                ? '登録なし'
+                : '${CustomExercisePreference.exercises.length}種目を登録中',
+          ),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () async {
+            await Navigator.of(context).push<void>(
+              MaterialPageRoute(
+                builder: (_) => const CustomExerciseManagementPage(),
+              ),
+            );
+            onCustomExercisesChanged();
+          },
+        ),
+        const Divider(height: 1),
+        const ListTile(
+          leading: Icon(Icons.scale_outlined),
+          title: Text('重量の単位'),
+          trailing: Text('kg', style: TextStyle(fontWeight: FontWeight.w800)),
+        ),
+      ],
+    ),
+  );
 
   String get _cloudStatus {
     if (!SupabaseConfig.isConfigured) return '未設定・端末内に安全に保存中';
@@ -4640,10 +6399,14 @@ class ProfilePage extends StatelessWidget {
       workouts: history,
       workoutTemplates: workoutTemplates,
       customExercises: CustomExercisePreference.exercises,
+      customGyms: CustomGymPreference.gyms,
       selectedGym: selectedGym,
       weeklyTarget: weeklyTarget,
       restTimerEnabled: restTimerEnabled,
       restTimerSeconds: restTimerSeconds,
+      completionCheckEnabled: completionCheckEnabled,
+      workoutTimerEnabled: workoutTimerEnabled,
+      workoutDurationEnabled: workoutDurationEnabled,
     ).toJson(),
   );
 
@@ -4735,15 +6498,63 @@ class ProfilePage extends StatelessWidget {
     );
     if (selected != null) onWeeklyTargetChanged(selected);
   }
+}
 
-  String _restDurationLabel(int seconds) {
+class TrainingSettingsPage extends StatefulWidget {
+  const TrainingSettingsPage({
+    super.key,
+    required this.completionCheckEnabled,
+    required this.workoutTimerEnabled,
+    required this.workoutDurationEnabled,
+    required this.restTimerEnabled,
+    required this.restTimerSeconds,
+    required this.onCompletionCheckEnabledChanged,
+    required this.onWorkoutTimerEnabledChanged,
+    required this.onWorkoutDurationEnabledChanged,
+    required this.onRestTimerEnabledChanged,
+    required this.onRestTimerSecondsChanged,
+  });
+
+  final bool completionCheckEnabled;
+  final bool workoutTimerEnabled;
+  final bool workoutDurationEnabled;
+  final bool restTimerEnabled;
+  final int restTimerSeconds;
+  final ValueChanged<bool> onCompletionCheckEnabledChanged;
+  final ValueChanged<bool> onWorkoutTimerEnabledChanged;
+  final ValueChanged<bool> onWorkoutDurationEnabledChanged;
+  final ValueChanged<bool> onRestTimerEnabledChanged;
+  final ValueChanged<int> onRestTimerSecondsChanged;
+
+  @override
+  State<TrainingSettingsPage> createState() => _TrainingSettingsPageState();
+}
+
+class _TrainingSettingsPageState extends State<TrainingSettingsPage> {
+  late bool _completionCheckEnabled;
+  late bool _workoutTimerEnabled;
+  late bool _workoutDurationEnabled;
+  late bool _restTimerEnabled;
+  late int _restTimerSeconds;
+
+  @override
+  void initState() {
+    super.initState();
+    _completionCheckEnabled = widget.completionCheckEnabled;
+    _workoutTimerEnabled = widget.workoutTimerEnabled;
+    _workoutDurationEnabled = widget.workoutDurationEnabled;
+    _restTimerEnabled = widget.restTimerEnabled && _completionCheckEnabled;
+    _restTimerSeconds = widget.restTimerSeconds;
+  }
+
+  String _durationLabel(int seconds) {
     if (seconds < 60) return '$seconds秒';
     final minutes = seconds ~/ 60;
     final remainder = seconds % 60;
     return remainder == 0 ? '$minutes分' : '$minutes分$remainder秒';
   }
 
-  Future<void> _selectRestDuration(BuildContext context) async {
+  Future<void> _selectRestDuration() async {
     const durations = [30, 60, 90, 120, 180];
     final selected = await showModalBottomSheet<int>(
       context: context,
@@ -4762,8 +6573,8 @@ class ProfilePage extends StatelessWidget {
             ),
             ...durations.map(
               (seconds) => ListTile(
-                title: Text(_restDurationLabel(seconds)),
-                trailing: seconds == restTimerSeconds
+                title: Text(_durationLabel(seconds)),
+                trailing: seconds == _restTimerSeconds
                     ? const Icon(
                         Icons.check_circle_rounded,
                         color: Color(0xFF83AD30),
@@ -4776,7 +6587,112 @@ class ProfilePage extends StatelessWidget {
         ),
       ),
     );
-    if (selected != null) onRestTimerSecondsChanged(selected);
+    if (selected == null) return;
+    setState(() => _restTimerSeconds = selected);
+    widget.onRestTimerSecondsChanged(selected);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('トレーニング設定')),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+        children: [
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                SwitchListTile(
+                  key: const Key('completionCheckSwitch'),
+                  secondary: const Icon(Icons.check_circle_outline_rounded),
+                  title: const Text('セット完了チェック'),
+                  subtitle: Text(
+                    _completionCheckEnabled ? '丸チェックを表示' : '入力した全セットを記録',
+                  ),
+                  value: _completionCheckEnabled,
+                  onChanged: (enabled) {
+                    setState(() {
+                      _completionCheckEnabled = enabled;
+                      if (!enabled) _restTimerEnabled = false;
+                    });
+                    widget.onCompletionCheckEnabledChanged(enabled);
+                  },
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  key: const Key('workoutTimerSwitch'),
+                  secondary: const Icon(Icons.timelapse_rounded),
+                  title: const Text('トレーニングタイマー'),
+                  subtitle: Text(
+                    _workoutTimerEnabled ? '記録中に経過時間を表示' : '画面に表示しない',
+                  ),
+                  value: _workoutTimerEnabled,
+                  onChanged: (enabled) {
+                    setState(() => _workoutTimerEnabled = enabled);
+                    widget.onWorkoutTimerEnabledChanged(enabled);
+                  },
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  key: const Key('workoutDurationSwitch'),
+                  secondary: const Icon(Icons.schedule_rounded),
+                  title: const Text('筋トレ時間'),
+                  subtitle: Text(
+                    _workoutDurationEnabled ? '時間を記録・履歴に表示' : '時間を記録しない',
+                  ),
+                  value: _workoutDurationEnabled,
+                  onChanged: (enabled) {
+                    setState(() => _workoutDurationEnabled = enabled);
+                    widget.onWorkoutDurationEnabledChanged(enabled);
+                  },
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  key: const Key('restTimerSwitch'),
+                  secondary: const Icon(Icons.timer_outlined),
+                  title: const Text('休憩タイマー'),
+                  subtitle: Text(
+                    !_completionCheckEnabled
+                        ? 'セット完了チェックをONにすると利用できます'
+                        : _restTimerEnabled
+                        ? 'セット完了後に開始'
+                        : '使用しない',
+                  ),
+                  value: _restTimerEnabled,
+                  onChanged: _completionCheckEnabled
+                      ? (enabled) {
+                          setState(() => _restTimerEnabled = enabled);
+                          widget.onRestTimerEnabledChanged(enabled);
+                        }
+                      : null,
+                ),
+                if (_completionCheckEnabled && _restTimerEnabled) ...[
+                  const Divider(height: 1),
+                  ListTile(
+                    key: const Key('restTimerDurationButton'),
+                    leading: const Icon(Icons.hourglass_bottom_rounded),
+                    title: const Text('休憩時間'),
+                    trailing: Text(
+                      _durationLabel(_restTimerSeconds),
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    onTap: _selectRestDuration,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(8, 12, 8, 0),
+            child: Text(
+              '休憩タイマーは、セット完了チェックを付けたときに開始します。',
+              style: TextStyle(fontSize: 12, color: Color(0xFF777F78)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
