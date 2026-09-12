@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
@@ -2029,9 +2030,9 @@ Color _muscleHeatColor(int value, int maximum) {
   if (value <= 0) return const Color(0xFFD9DDD7);
   final intensity = (value / maximum).clamp(0.0, 1.0);
   return Color.lerp(
-    const Color(0xFFE9F4D1),
-    const Color(0xFF82B62D),
-    0.25 + intensity * 0.75,
+    const Color(0xFFFFD5D5),
+    const Color(0xFFE11D2E),
+    0.2 + intensity * 0.8,
   )!;
 }
 
@@ -2041,120 +2042,336 @@ class _MuscleBodyPainter extends CustomPainter {
     required this.maximum,
     required this.showBack,
   });
+
   final Map<String, int> counts;
   final int maximum;
   final bool showBack;
-  Paint _paint(String part) => Paint()
-    ..color = _muscleHeatColor(counts[part] ?? 0, maximum)
-    ..style = PaintingStyle.fill;
+
+  static const _wire = Color(0xFF24F4EE);
+  static const _wireDim = Color(0xFF087E8C);
+  static const _heat = Color(0xFFFF2638);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final skin = Paint()..color = const Color(0xFF4A534C);
-    final outline = Paint()
-      ..color = Colors.white24
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    void oval(Rect rect, Paint paint) {
-      canvas.drawOval(rect, paint);
-      canvas.drawOval(rect, outline);
-    }
+    final scaleX = size.width / 230;
+    final scaleY = size.height / 350;
+    canvas.save();
+    canvas.scale(scaleX, scaleY);
 
-    void round(Rect rect, double radius, Paint paint) {
-      final r = RRect.fromRectAndRadius(rect, Radius.circular(radius));
-      canvas.drawRRect(r, paint);
-      canvas.drawRRect(r, outline);
-    }
-
-    void limb(Offset a, Offset b, double width, Paint paint) {
-      canvas.drawLine(
-        a,
-        b,
-        Paint()
-          ..color = paint.color
-          ..strokeWidth = width
-          ..strokeCap = StrokeCap.round,
-      );
-    }
-
-    final floorGrid = Paint()
-      ..color = const Color(0xFFBFEA72).withValues(alpha: 0.13)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.8;
-    for (var y = 230.0; y <= size.height; y += 15) {
-      canvas.drawLine(Offset(12, y), Offset(size.width - 12, y), floorGrid);
-    }
-    for (var x = 12.0; x <= size.width - 12; x += 24) {
-      canvas.drawLine(
-        Offset(size.width / 2, 205),
-        Offset(x, size.height),
-        floorGrid,
-      );
-    }
-
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(size.width / 2 + 7, size.height - 4),
-        width: 122,
-        height: 14,
-      ),
-      Paint()..color = Colors.black38,
-    );
-    oval(const Rect.fromLTWH(78, 4, 54, 52), skin);
-    limb(const Offset(83, 73), const Offset(50, 153), 25, _paint('腕'));
-    limb(const Offset(127, 73), const Offset(160, 153), 25, _paint('腕'));
-    limb(const Offset(49, 151), const Offset(40, 223), 19, _paint('腕'));
-    limb(const Offset(161, 151), const Offset(170, 223), 19, _paint('腕'));
-    limb(const Offset(90, 203), const Offset(75, 294), 31, _paint('脚'));
-    limb(const Offset(120, 203), const Offset(135, 294), 31, _paint('脚'));
-    round(const Rect.fromLTWH(65, 55, 80, 155), 34, skin);
-    oval(const Rect.fromLTWH(60, 53, 48, 43), _paint('肩'));
-    oval(const Rect.fromLTWH(102, 53, 48, 43), _paint('肩'));
-    if (showBack) {
-      round(const Rect.fromLTWH(72, 75, 66, 92), 24, _paint('背中'));
-      round(const Rect.fromLTWH(83, 164, 44, 37), 16, _paint('腹'));
-    } else {
-      round(const Rect.fromLTWH(72, 76, 31, 55), 15, _paint('胸'));
-      round(const Rect.fromLTWH(107, 76, 31, 55), 15, _paint('胸'));
-      round(const Rect.fromLTWH(86, 134, 38, 65), 15, _paint('腹'));
-    }
-    canvas.drawLine(
-      Offset(size.width / 2, 62),
-      Offset(size.width / 2, 201),
-      outline..strokeWidth = 1,
-    );
-    final mesh = Paint()
-      ..color = Colors.white.withValues(alpha: 0.28)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.8;
-    for (var y = 70.0; y <= 195; y += 13) {
-      final inset = ((y - 132).abs() / 5).clamp(0.0, 11.0);
-      canvas.drawLine(Offset(70 + inset, y), Offset(140 - inset, y), mesh);
-    }
-    for (final x in [82.0, 94.0, 105.0, 116.0, 128.0]) {
-      canvas.drawLine(Offset(x, 61), Offset(x, 201), mesh);
-    }
-    for (var y = 220.0; y <= 292; y += 12) {
-      canvas.drawLine(Offset(67, y), Offset(88, y), mesh);
-      canvas.drawLine(Offset(122, y), Offset(143, y), mesh);
-    }
-    for (final joint in const [
-      Offset(83, 73),
-      Offset(127, 73),
-      Offset(49, 151),
-      Offset(161, 151),
-      Offset(90, 203),
-      Offset(120, 203),
-    ]) {
-      canvas.drawCircle(joint, 2.6, Paint()..color = Colors.white54);
-    }
-    canvas.drawLine(
-      const Offset(86, 13),
-      const Offset(101, 9),
+    _paintStage(canvas);
+    final body = _bodySilhouette();
+    canvas.drawPath(
+      body,
       Paint()
-        ..color = Colors.white12
-        ..strokeWidth = 4
-        ..strokeCap = StrokeCap.round,
+        ..color = const Color(0xFF062B38).withValues(alpha: 0.64)
+        ..style = PaintingStyle.fill,
+    );
+
+    canvas.save();
+    canvas.clipPath(body);
+    _paintMuscleDots(canvas, body);
+    _paintBodyGrid(canvas);
+    canvas.restore();
+
+    final glow = Paint()
+      ..color = _wire.withValues(alpha: 0.34)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.4
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    final edge = Paint()
+      ..color = _wire.withValues(alpha: 0.9)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.05;
+    canvas.drawPath(body, glow);
+    canvas.drawPath(body, edge);
+    _paintAnatomyContours(canvas);
+    canvas.restore();
+  }
+
+  void _paintStage(Canvas canvas) {
+    final horizon = Paint()
+      ..color = _wire.withValues(alpha: 0.08)
+      ..strokeWidth = 0.7;
+    for (var y = 250.0; y <= 350; y += 13) {
+      canvas.drawLine(Offset(8, y), Offset(222, y), horizon);
+    }
+    for (var x = 8.0; x <= 222; x += 18) {
+      canvas.drawLine(const Offset(115, 238), Offset(x, 350), horizon);
+    }
+    canvas.drawOval(
+      const Rect.fromLTWH(58, 337, 114, 10),
+      Paint()..color = Colors.black.withValues(alpha: 0.42),
+    );
+  }
+
+  Path _bodySilhouette() {
+    final body = Path()
+      ..addOval(const Rect.fromLTWH(94, 4, 42, 51))
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          const Rect.fromLTWH(105, 48, 20, 23),
+          const Radius.circular(7),
+        ),
+      );
+
+    body
+      ..moveTo(99, 57)
+      ..cubicTo(90, 61, 78, 63, 70, 72)
+      ..cubicTo(65, 83, 66, 105, 72, 125)
+      ..cubicTo(77, 142, 85, 157, 89, 176)
+      ..lineTo(86, 194)
+      ..cubicTo(96, 201, 106, 204, 115, 204)
+      ..cubicTo(124, 204, 134, 201, 144, 194)
+      ..lineTo(141, 176)
+      ..cubicTo(145, 157, 153, 142, 158, 125)
+      ..cubicTo(164, 105, 165, 83, 160, 72)
+      ..cubicTo(152, 63, 140, 61, 131, 57)
+      ..cubicTo(124, 63, 106, 63, 99, 57)
+      ..close();
+
+    _addLimb(body, const [
+      Offset(72, 70),
+      Offset(58, 76),
+      Offset(43, 126),
+      Offset(57, 132),
+      Offset(78, 93),
+    ]);
+    _addLimb(body, const [
+      Offset(43, 123),
+      Offset(31, 199),
+      Offset(46, 202),
+      Offset(59, 130),
+    ]);
+    body.addOval(const Rect.fromLTWH(27, 195, 20, 31));
+    _addLimb(body, const [
+      Offset(158, 70),
+      Offset(172, 76),
+      Offset(187, 126),
+      Offset(173, 132),
+      Offset(152, 93),
+    ]);
+    _addLimb(body, const [
+      Offset(187, 123),
+      Offset(199, 199),
+      Offset(184, 202),
+      Offset(171, 130),
+    ]);
+    body.addOval(const Rect.fromLTWH(183, 195, 20, 31));
+
+    _addLimb(body, const [
+      Offset(88, 183),
+      Offset(114, 188),
+      Offset(108, 256),
+      Offset(97, 276),
+      Offset(77, 271),
+      Offset(80, 228),
+    ]);
+    _addLimb(body, const [
+      Offset(77, 263),
+      Offset(99, 266),
+      Offset(93, 326),
+      Offset(75, 327),
+      Offset(69, 294),
+    ]);
+    _addLimb(body, const [
+      Offset(142, 183),
+      Offset(116, 188),
+      Offset(122, 256),
+      Offset(133, 276),
+      Offset(153, 271),
+      Offset(150, 228),
+    ]);
+    _addLimb(body, const [
+      Offset(153, 263),
+      Offset(131, 266),
+      Offset(137, 326),
+      Offset(155, 327),
+      Offset(161, 294),
+    ]);
+    _addLimb(body, const [
+      Offset(75, 320),
+      Offset(94, 320),
+      Offset(98, 339),
+      Offset(65, 339),
+      Offset(66, 331),
+    ]);
+    _addLimb(body, const [
+      Offset(155, 320),
+      Offset(136, 320),
+      Offset(132, 339),
+      Offset(165, 339),
+      Offset(164, 331),
+    ]);
+    return body;
+  }
+
+  void _addLimb(Path path, List<Offset> points) {
+    path.moveTo(points.first.dx, points.first.dy);
+    for (final point in points.skip(1)) {
+      path.lineTo(point.dx, point.dy);
+    }
+    path.close();
+  }
+
+  void _paintBodyGrid(Canvas canvas) {
+    final fine = Paint()
+      ..color = _wire.withValues(alpha: 0.54)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.55;
+    final strong = Paint()
+      ..color = _wire.withValues(alpha: 0.82)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.78;
+
+    for (var y = 7.0; y < 340; y += 5.5) {
+      final bend = math.sin(y / 19) * 3.2;
+      final path = Path()
+        ..moveTo(20, y)
+        ..quadraticBezierTo(115 + bend, y + 2.6, 210, y);
+      canvas.drawPath(path, ((y / 5.5).round().isEven) ? strong : fine);
+    }
+    for (var x = 30.0; x <= 200; x += 6.5) {
+      final distance = (x - 115) / 100;
+      final path = Path()
+        ..moveTo(x, 0)
+        ..cubicTo(
+          x + distance * 8,
+          92,
+          x - distance * 7,
+          246,
+          x + distance * 5,
+          345,
+        );
+      canvas.drawPath(path, ((x / 6.5).round().isEven) ? strong : fine);
+    }
+
+    final face = Paint()
+      ..color = _wire.withValues(alpha: 0.84)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.65;
+    for (var i = 1; i < 7; i++) {
+      final top = 5 + i * 6.5;
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(115, top),
+          width: 38 - (top - 28).abs() * 0.32,
+          height: 6.5,
+        ),
+        face,
+      );
+    }
+    for (final dx in [-13.0, -7.0, 0.0, 7.0, 13.0]) {
+      final path = Path()
+        ..moveTo(115 + dx * 0.35, 5)
+        ..quadraticBezierTo(115 + dx * 1.2, 29, 115 + dx * 0.55, 54);
+      canvas.drawPath(path, face);
+    }
+  }
+
+  void _paintMuscleDots(Canvas canvas, Path body) {
+    final regions = <String, List<Path>>{
+      '肩': [
+        Path()..addOval(const Rect.fromLTWH(65, 65, 31, 34)),
+        Path()..addOval(const Rect.fromLTWH(134, 65, 31, 34)),
+      ],
+      '腕': [
+        Path()..addOval(const Rect.fromLTWH(49, 85, 24, 49)),
+        Path()..addOval(const Rect.fromLTWH(157, 85, 24, 49)),
+        Path()..addOval(const Rect.fromLTWH(32, 133, 20, 67)),
+        Path()..addOval(const Rect.fromLTWH(178, 133, 20, 67)),
+      ],
+      '脚': [
+        Path()..addOval(const Rect.fromLTWH(78, 190, 35, 85)),
+        Path()..addOval(const Rect.fromLTWH(117, 190, 35, 85)),
+        Path()..addOval(const Rect.fromLTWH(70, 267, 29, 61)),
+        Path()..addOval(const Rect.fromLTWH(131, 267, 29, 61)),
+      ],
+      if (showBack)
+        '背中': [
+          Path()
+            ..moveTo(83, 72)
+            ..lineTo(147, 72)
+            ..lineTo(139, 154)
+            ..lineTo(115, 178)
+            ..lineTo(91, 154)
+            ..close(),
+        ]
+      else
+        '胸': [
+          Path()..addOval(const Rect.fromLTWH(80, 74, 34, 52)),
+          Path()..addOval(const Rect.fromLTWH(116, 74, 34, 52)),
+        ],
+      '腹': [
+        Path()..addRRect(const RRect.fromLTRBXY(96, 126, 134, 190, 13, 13)),
+      ],
+    };
+
+    for (final entry in regions.entries) {
+      final value = counts[entry.key] ?? 0;
+      if (value <= 0) continue;
+      final intensity = (value / maximum).clamp(0.0, 1.0);
+      final spacing = 7.5 - intensity * 3.2;
+      final dotPaint = Paint()
+        ..color = _heat.withValues(alpha: 0.48 + intensity * 0.46)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 0.5 + intensity);
+      for (final region in entry.value) {
+        final bounds = region.getBounds();
+        for (var y = bounds.top; y <= bounds.bottom; y += spacing) {
+          for (var x = bounds.left; x <= bounds.right; x += spacing) {
+            final staggeredX =
+                x + ((y / spacing).round().isEven ? 0 : spacing / 2);
+            final point = Offset(staggeredX, y);
+            if (region.contains(point) && body.contains(point)) {
+              canvas.drawCircle(point, 0.85 + intensity * 0.65, dotPaint);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  void _paintAnatomyContours(Canvas canvas) {
+    final contour = Paint()
+      ..color = _wireDim.withValues(alpha: 0.95)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    final bright = Paint()
+      ..color = _wire.withValues(alpha: 0.72)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.72;
+
+    canvas.drawLine(const Offset(115, 58), const Offset(115, 202), contour);
+    canvas.drawArc(
+      const Rect.fromLTWH(79, 67, 72, 39),
+      0.1,
+      2.95,
+      false,
+      bright,
+    );
+    canvas.drawArc(
+      const Rect.fromLTWH(84, 111, 62, 68),
+      0.15,
+      2.85,
+      false,
+      contour,
+    );
+    canvas.drawArc(
+      const Rect.fromLTWH(83, 177, 64, 28),
+      0,
+      math.pi,
+      false,
+      bright,
+    );
+    canvas.drawLine(const Offset(114, 202), const Offset(108, 257), contour);
+    canvas.drawLine(const Offset(116, 202), const Offset(122, 257), contour);
+    canvas.drawOval(const Rect.fromLTWH(105, 23, 8, 4), bright);
+    canvas.drawOval(const Rect.fromLTWH(117, 23, 8, 4), bright);
+    canvas.drawArc(
+      const Rect.fromLTWH(107, 34, 16, 8),
+      0,
+      math.pi,
+      false,
+      bright,
     );
   }
 
