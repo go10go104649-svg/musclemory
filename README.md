@@ -1,4 +1,4 @@
-# MuscleMemory
+# MuscleMory
 
 トレーニングの記録を、次のトレーニングにつなげるためのFlutterアプリです。
 
