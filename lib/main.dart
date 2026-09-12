@@ -12,6 +12,37 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
 import 'services/supabase_sync_service.dart';
 
+const activeWorkoutDraftStorageKey = 'active_workout_draft';
+
+Future<bool> discardDraftBeforeNewWorkout(BuildContext context) async {
+  final preferences = await SharedPreferences.getInstance();
+  final draft = WorkoutDraftSummary.tryParse(
+    preferences.getString(activeWorkoutDraftStorageKey),
+  );
+  if (draft == null) return true;
+  if (!context.mounted) return false;
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('新しく始めますか？'),
+      content: const Text('入力途中の内容は破棄されます。'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext, false),
+          child: const Text('キャンセル'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(dialogContext, true),
+          child: const Text('破棄して始める'),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true) return false;
+  await preferences.remove(activeWorkoutDraftStorageKey);
+  return true;
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RestTimerPreference.load();
@@ -95,6 +126,7 @@ class _HomeShellState extends State<HomeShell> {
   String? _selectedGym;
   int _weeklyTarget = 3;
   List<SavedWorkoutTemplate> _workoutTemplates = [];
+  WorkoutDraftSummary? _workoutDraft;
 
   @override
   void initState() {
@@ -106,21 +138,32 @@ class _HomeShellState extends State<HomeShell> {
     final preferences = await SharedPreferences.getInstance();
     final workoutTemplates = await WorkoutTemplatePreference.load();
     final encoded = preferences.getString(_storageKey);
+    final workoutDraft = WorkoutDraftSummary.tryParse(
+      preferences.getString(activeWorkoutDraftStorageKey),
+    );
     if (!mounted) return;
-    final decodedItems = encoded == null
-        ? <WorkoutRecord>[]
-        : (jsonDecode(encoded) as List<dynamic>)
-              .map(
-                (item) => WorkoutRecord.fromJson(item as Map<String, dynamic>),
-              )
-              .toList();
-    final items = sortWorkoutsNewestFirst(decodedItems);
+    final items = sortWorkoutsNewestFirst(decodeWorkoutHistory(encoded));
     setState(() {
       _history = items;
       _selectedGym = preferences.getString(_gymStorageKey);
       _weeklyTarget = preferences.getInt(_weeklyTargetStorageKey) ?? 3;
       _workoutTemplates = workoutTemplates;
+      _workoutDraft = workoutDraft;
     });
+  }
+
+  Future<void> _refreshWorkoutDraft() async {
+    final preferences = await SharedPreferences.getInstance();
+    final draft = WorkoutDraftSummary.tryParse(
+      preferences.getString(activeWorkoutDraftStorageKey),
+    );
+    if (mounted) setState(() => _workoutDraft = draft);
+  }
+
+  Future<void> _discardWorkoutDraft() async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(activeWorkoutDraftStorageKey);
+    if (mounted) setState(() => _workoutDraft = null);
   }
 
   Future<void> _saveWorkoutTemplate(SavedWorkoutTemplate template) async {
@@ -237,7 +280,8 @@ class _HomeShellState extends State<HomeShell> {
           workout.date.toIso8601String(): workout,
       };
       for (final item in cloudItems) {
-        final workout = WorkoutRecord.fromJson(item);
+        final workout = WorkoutRecord.tryFromJson(item);
+        if (workout == null) continue;
         merged[workout.date.toIso8601String()] = workout;
       }
       final updated = sortWorkoutsNewestFirst(merged.values);
@@ -285,9 +329,14 @@ class _HomeShellState extends State<HomeShell> {
         onGymChanged: _saveGym,
         weeklyTarget: _weeklyTarget,
         onWorkoutCompleted: _saveWorkout,
+        onWorkoutUpdated: _replaceWorkout,
+        onWorkoutDeleted: _deleteWorkout,
         workoutTemplates: _workoutTemplates,
         onTemplateSaved: _saveWorkoutTemplate,
         onTemplateDeleted: _deleteWorkoutTemplate,
+        workoutDraft: _workoutDraft,
+        onDraftChanged: _refreshWorkoutDraft,
+        onDraftDiscarded: _discardWorkoutDraft,
       ),
       MonthlyHistoryPage(
         history: _history,
@@ -319,8 +368,10 @@ class _HomeShellState extends State<HomeShell> {
         height: 72,
         backgroundColor: Colors.white,
         indicatorColor: const Color(0xFFC7F36B),
-        onDestinationSelected: (index) =>
-            setState(() => _selectedIndex = index),
+        onDestinationSelected: (index) {
+          setState(() => _selectedIndex = index);
+          if (index == 0) unawaited(_refreshWorkoutDraft());
+        },
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -356,19 +407,29 @@ class DashboardPage extends StatelessWidget {
     required this.onGymChanged,
     required this.weeklyTarget,
     required this.onWorkoutCompleted,
+    required this.onWorkoutUpdated,
+    required this.onWorkoutDeleted,
     required this.workoutTemplates,
     required this.onTemplateSaved,
     required this.onTemplateDeleted,
+    required this.workoutDraft,
+    required this.onDraftChanged,
+    required this.onDraftDiscarded,
   });
 
   final List<WorkoutRecord> history;
   final String? selectedGym;
   final ValueChanged<String> onGymChanged;
   final int weeklyTarget;
-  final ValueChanged<WorkoutRecord> onWorkoutCompleted;
+  final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
+  final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
+  final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
   final List<SavedWorkoutTemplate> workoutTemplates;
   final Future<void> Function(SavedWorkoutTemplate) onTemplateSaved;
   final Future<void> Function(SavedWorkoutTemplate) onTemplateDeleted;
+  final WorkoutDraftSummary? workoutDraft;
+  final Future<void> Function() onDraftChanged;
+  final Future<void> Function() onDraftDiscarded;
 
   @override
   Widget build(BuildContext context) {
@@ -379,14 +440,22 @@ class DashboardPage extends StatelessWidget {
         children: [
           const HomeHeader(),
           const SizedBox(height: 24),
+          if (workoutDraft != null) ...[
+            ActiveWorkoutDraftCard(
+              summary: workoutDraft!,
+              onResume: () => _openWorkout(context),
+            ),
+            const SizedBox(height: 14),
+          ],
           StartWorkoutCard(
             gymName: selectedGym,
+            buttonLabel: workoutDraft == null ? 'トレーニングを始める' : '新しいトレーニングを始める',
             onSelectGym: () async {
               final selected = await showGymPicker(context, selectedGym);
               if (selected != null) onGymChanged(selected);
             },
             onPressed: () async {
-              await _openWorkout(context);
+              await _startWorkout(context);
             },
           ),
           if (workoutTemplates.isNotEmpty) ...[
@@ -395,11 +464,12 @@ class DashboardPage extends StatelessWidget {
             const SizedBox(height: 12),
             SavedMenusCard(
               templates: workoutTemplates,
-              onSelected: (template) => _openWorkout(
+              onSelected: (template) => _startWorkout(
                 context,
                 initialWorkout: template.toWorkoutRecord(),
               ),
               onDeleted: onTemplateDeleted,
+              onRestored: onTemplateSaved,
             ),
           ],
           if (history.isNotEmpty) ...[
@@ -409,7 +479,7 @@ class DashboardPage extends StatelessWidget {
             RecentMenusCard(
               history: history,
               onSelected: (workout) =>
-                  _openWorkout(context, initialWorkout: workout),
+                  _startWorkout(context, initialWorkout: workout),
               onSave: (workout) => _saveAsTemplate(context, workout),
             ),
           ],
@@ -422,7 +492,12 @@ class DashboardPage extends StatelessWidget {
           const SizedBox(height: 24),
           const SectionTitle(title: '前回のトレーニング', action: '履歴'),
           const SizedBox(height: 12),
-          LastWorkoutCard(workout: history.isEmpty ? null : history.first),
+          LastWorkoutCard(
+            workout: history.isEmpty ? null : history.first,
+            onTap: history.isEmpty
+                ? null
+                : () => _openWorkoutDetail(context, history.first),
+          ),
           const SizedBox(height: 24),
           const SectionTitle(title: '最近鍛えた部位', action: '7日間'),
           const SizedBox(height: 12),
@@ -462,7 +537,40 @@ class DashboardPage extends StatelessWidget {
         ),
       ),
     );
-    if (workout != null) onWorkoutCompleted(workout);
+    if (workout != null) await onWorkoutCompleted(workout);
+    await onDraftChanged();
+  }
+
+  Future<void> _openWorkoutDetail(
+    BuildContext context,
+    WorkoutRecord workout,
+  ) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => WorkoutDetailPage(
+          workout: workout,
+          selectedGym: selectedGym,
+          onWorkoutCompleted: onWorkoutCompleted,
+          onWorkoutUpdated: onWorkoutUpdated,
+          onWorkoutDeleted: onWorkoutDeleted,
+        ),
+      ),
+    );
+    await onDraftChanged();
+  }
+
+  Future<void> _startWorkout(
+    BuildContext context, {
+    WorkoutRecord? initialWorkout,
+  }) async {
+    if (workoutDraft != null) {
+      final canStart = await discardDraftBeforeNewWorkout(context);
+      if (!canStart || !context.mounted) return;
+      await onDraftDiscarded();
+    }
+    if (context.mounted) {
+      await _openWorkout(context, initialWorkout: initialWorkout);
+    }
   }
 }
 
@@ -559,6 +667,7 @@ class RecentMenusCard extends StatelessWidget {
             children: [
               if (index > 0) const Divider(height: 1),
               ListTile(
+                key: Key('recentMenu$index'),
                 leading: const CircleAvatar(
                   backgroundColor: Color(0xFFC7F36B),
                   child: Icon(Icons.play_arrow_rounded),
@@ -593,11 +702,13 @@ class SavedMenusCard extends StatelessWidget {
     required this.templates,
     required this.onSelected,
     required this.onDeleted,
+    required this.onRestored,
   });
 
   final List<SavedWorkoutTemplate> templates;
   final ValueChanged<SavedWorkoutTemplate> onSelected;
   final Future<void> Function(SavedWorkoutTemplate) onDeleted;
+  final Future<void> Function(SavedWorkoutTemplate) onRestored;
 
   @override
   Widget build(BuildContext context) {
@@ -628,11 +739,27 @@ class SavedMenusCard extends StatelessWidget {
                 trailing: IconButton(
                   tooltip: '${template.name}を削除',
                   onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
                     await onDeleted(template);
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('「${template.name}」を削除しました')),
-                      );
+                      messenger
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          SnackBar(
+                            content: Text('「${template.name}」を削除しました'),
+                            action: SnackBarAction(
+                              label: '元に戻す',
+                              onPressed: () async {
+                                await onRestored(template);
+                                messenger.showSnackBar(
+                                  SnackBar(
+                                    content: Text('「${template.name}」を元に戻しました'),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
                     }
                   },
                   icon: const Icon(Icons.delete_outline_rounded),
@@ -696,11 +823,13 @@ class StartWorkoutCard extends StatelessWidget {
     required this.gymName,
     required this.onSelectGym,
     required this.onPressed,
+    this.buttonLabel = 'トレーニングを始める',
   });
 
   final String? gymName;
   final VoidCallback onSelectGym;
   final VoidCallback onPressed;
+  final String buttonLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -776,13 +905,87 @@ class StartWorkoutCard extends StatelessWidget {
                 ),
               ),
               icon: const Icon(Icons.play_arrow_rounded),
-              label: const Text(
-                'トレーニングを始める',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+              label: Text(
+                buttonLabel,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ActiveWorkoutDraftCard extends StatelessWidget {
+  const ActiveWorkoutDraftCard({
+    super.key,
+    required this.summary,
+    required this.onResume,
+  });
+
+  final WorkoutDraftSummary summary;
+  final VoidCallback onResume;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      key: const Key('activeWorkoutDraftCard'),
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      child: InkWell(
+        onTap: onResume,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            children: [
+              const CircleAvatar(
+                backgroundColor: Color(0xFFC7F36B),
+                child: Icon(Icons.edit_note_rounded),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '入力途中のトレーニング',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      summary.exerciseNames.join('・'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xFF6C746D)),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${workoutDateLabel(summary.date)}・${summary.setCount}セット',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF777F78),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.play_arrow_rounded),
+                  Text(
+                    '再開',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -819,6 +1022,37 @@ class SectionTitle extends StatelessWidget {
   }
 }
 
+DateTime startOfWeek(DateTime date) {
+  final day = DateTime(date.year, date.month, date.day);
+  return day.subtract(Duration(days: day.weekday - 1));
+}
+
+int workoutCountInWeek(List<WorkoutRecord> history, DateTime weekStart) {
+  final nextWeek = weekStart.add(const Duration(days: 7));
+  return history
+      .where(
+        (workout) =>
+            !workout.date.isBefore(weekStart) &&
+            workout.date.isBefore(nextWeek),
+      )
+      .length;
+}
+
+int weeklyGoalStreak(List<WorkoutRecord> history, int target, {DateTime? now}) {
+  if (target <= 0) return 0;
+  var cursor = startOfWeek(now ?? DateTime.now());
+  if (workoutCountInWeek(history, cursor) < target) {
+    cursor = cursor.subtract(const Duration(days: 7));
+  }
+
+  var streak = 0;
+  while (workoutCountInWeek(history, cursor) >= target) {
+    streak++;
+    cursor = cursor.subtract(const Duration(days: 7));
+  }
+  return streak;
+}
+
 class WeeklySummary extends StatelessWidget {
   const WeeklySummary({super.key, required this.history});
 
@@ -826,21 +1060,20 @@ class WeeklySummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final startOfWeek = DateTime.now().subtract(
-      Duration(days: DateTime.now().weekday - 1),
+    final weekStart = startOfWeek(DateTime.now());
+    final nextWeek = weekStart.add(const Duration(days: 7));
+    final weekly = history.where(
+      (item) => !item.date.isBefore(weekStart) && item.date.isBefore(nextWeek),
     );
-    final weekStart = DateTime(
-      startOfWeek.year,
-      startOfWeek.month,
-      startOfWeek.day,
-    );
-    final weekly = history.where((item) => !item.date.isBefore(weekStart));
     final workoutCount = weekly.length;
     final volume = weekly.fold<double>(
       0,
       (total, workout) => total + workout.volume,
     );
-    final personalBests = countPersonalBests(history, weekStart);
+    final historyThroughThisWeek = history
+        .where((item) => item.date.isBefore(nextWeek))
+        .toList();
+    final personalBests = countPersonalBests(historyThroughThisWeek, weekStart);
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       child: Padding(
@@ -873,34 +1106,11 @@ class WeeklyGoalCard extends StatelessWidget {
   final List<WorkoutRecord> history;
   final int target;
 
-  DateTime _weekStart(DateTime date) {
-    final day = DateTime(date.year, date.month, date.day);
-    return day.subtract(Duration(days: day.weekday - 1));
-  }
-
-  int get _streak {
-    if (history.isEmpty) return 0;
-    final now = DateTime.now();
-    var cursor = _weekStart(now);
-    final currentHasWorkout = history.any(
-      (workout) => _weekStart(workout.date) == cursor,
-    );
-    if (!currentHasWorkout) cursor = cursor.subtract(const Duration(days: 7));
-
-    var streak = 0;
-    while (history.any((workout) => _weekStart(workout.date) == cursor)) {
-      streak++;
-      cursor = cursor.subtract(const Duration(days: 7));
-    }
-    return streak;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final currentWeek = _weekStart(DateTime.now());
-    final count = history
-        .where((workout) => !workout.date.isBefore(currentWeek))
-        .length;
+    final currentWeek = startOfWeek(DateTime.now());
+    final count = workoutCountInWeek(history, currentWeek);
+    final streak = weeklyGoalStreak(history, target);
     final progress = (count / target).clamp(0.0, 1.0);
     final remaining = target - count;
     return Container(
@@ -922,7 +1132,7 @@ class WeeklyGoalCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '$_streak週継続',
+                streak == 0 ? '今週から開始' : '$streak週連続達成',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
@@ -1004,9 +1214,10 @@ class StatItem extends StatelessWidget {
 }
 
 class LastWorkoutCard extends StatelessWidget {
-  const LastWorkoutCard({super.key, required this.workout});
+  const LastWorkoutCard({super.key, required this.workout, this.onTap});
 
   final WorkoutRecord? workout;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1033,52 +1244,57 @@ class LastWorkoutCard extends StatelessWidget {
 
     final item = workout!;
     return Card(
+      key: const Key('lastWorkoutCard'),
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                DateBadge(date: item.date),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.bodyParts.join('・'),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  DateBadge(date: item.date),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.bodyParts.join('・'),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        '${item.exerciseNames.length}種目・${item.sets.length}セット${item.durationLabel.isEmpty ? '' : '・${item.durationLabel}'}',
-                        style: const TextStyle(
-                          color: Color(0xFF777F78),
-                          fontSize: 12,
+                        const SizedBox(height: 3),
+                        Text(
+                          '${item.exerciseNames.length}種目・${item.sets.length}セット${item.durationLabel.isEmpty ? '' : '・${item.durationLabel}'}',
+                          style: const TextStyle(
+                            color: Color(0xFF777F78),
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  color: Color(0xFF777F78),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(height: 1, color: const Color(0xFFE9EBE6)),
-            const SizedBox(height: 14),
-            ExerciseLine(
-              name: item.bestSet.exerciseName,
-              detail:
-                  '${formatWeight(item.bestSet.weight)} kg × ${item.bestSet.reps}  ベストセット',
-            ),
-          ],
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: Color(0xFF777F78),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(height: 1, color: const Color(0xFFE9EBE6)),
+              const SizedBox(height: 14),
+              ExerciseLine(
+                name: item.bestSet.exerciseName,
+                detail:
+                    '${formatWeight(item.bestSet.weight)} kg × ${item.bestSet.reps}  ベストセット',
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -2332,7 +2548,10 @@ class WorkoutDetailPage extends StatelessWidget {
           SizedBox(
             height: 54,
             child: FilledButton.icon(
+              key: const Key('repeatWorkoutButton'),
               onPressed: () async {
+                final canStart = await discardDraftBeforeNewWorkout(context);
+                if (!canStart || !context.mounted) return;
                 final repeated = await Navigator.of(context)
                     .push<WorkoutRecord>(
                       MaterialPageRoute(
@@ -2404,14 +2623,16 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class _WorkoutPageState extends State<WorkoutPage> {
-  static const _draftStorageKey = 'active_workout_draft';
   final _formKey = GlobalKey<FormState>();
-  late final DateTime _startedAt;
+  late DateTime _startedAt;
   late DateTime _workoutDate;
   Timer? _timer;
   Timer? _restTimer;
   Duration _elapsed = Duration.zero;
   int _restRemaining = 0;
+  int _inputRevision = 0;
+  bool _allowPop = false;
+  bool _leaveDialogOpen = false;
   late final TextEditingController _noteController;
   late final List<WorkoutExercise> _exercises;
 
@@ -2419,7 +2640,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
   void initState() {
     super.initState();
     _startedAt = DateTime.now();
-    _workoutDate = widget.initialWorkout?.date ?? DateTime.now();
+    _workoutDate = widget.isEditing
+        ? widget.initialWorkout!.date
+        : DateTime.now();
     _exercises = widget.initialWorkout == null
         ? [_exerciseFromTemplate(exerciseTemplates.first)]
         : _exercisesFrom(widget.initialWorkout!, completed: widget.isEditing);
@@ -2465,11 +2688,62 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   void _removeLastSet(int exerciseIndex) {
+    final exercise = _exercises[exerciseIndex];
+    final sets = exercise.sets;
+    if (sets.length <= 1) return;
+    final removedIndex = sets.length - 1;
+    final removed = sets[removedIndex];
     setState(() {
-      final sets = _exercises[exerciseIndex].sets;
-      if (sets.length > 1) sets.removeLast();
+      sets.removeLast();
     });
     unawaited(_saveDraft());
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: const Text('最後のセットを削除しました'),
+          action: SnackBarAction(
+            label: '元に戻す',
+            onPressed: () {
+              if (!mounted || !_exercises.contains(exercise)) return;
+              setState(() {
+                final restoreIndex = removedIndex > sets.length
+                    ? sets.length
+                    : removedIndex;
+                sets.insert(restoreIndex, removed);
+              });
+              unawaited(_saveDraft());
+            },
+          ),
+        ),
+      );
+  }
+
+  void _removeExercise(int exerciseIndex) {
+    if (_exercises.length <= 1) return;
+    final removed = _exercises[exerciseIndex];
+    setState(() => _exercises.removeAt(exerciseIndex));
+    unawaited(_saveDraft());
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('${removed.name}を削除しました'),
+          action: SnackBarAction(
+            label: '元に戻す',
+            onPressed: () {
+              if (!mounted || _exercises.contains(removed)) return;
+              setState(() {
+                final restoreIndex = exerciseIndex > _exercises.length
+                    ? _exercises.length
+                    : exerciseIndex;
+                _exercises.insert(restoreIndex, removed);
+              });
+              unawaited(_saveDraft());
+            },
+          ),
+        ),
+      );
   }
 
   void _toggleSet(int exerciseIndex, int setIndex) {
@@ -2529,7 +2803,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   Future<void> _loadDraft() async {
     final preferences = await SharedPreferences.getInstance();
-    final encoded = preferences.getString(_draftStorageKey);
+    final encoded = preferences.getString(activeWorkoutDraftStorageKey);
     if (encoded == null || !mounted) return;
     try {
       final draft = jsonDecode(encoded) as Map<String, dynamic>;
@@ -2538,6 +2812,12 @@ class _WorkoutPageState extends State<WorkoutPage> {
           .toList();
       if (exercises.isEmpty) return;
       setState(() {
+        _inputRevision++;
+        final savedStartedAt = draft['startedAt'] as String?;
+        if (savedStartedAt != null) {
+          _startedAt = DateTime.tryParse(savedStartedAt) ?? _startedAt;
+          _elapsed = DateTime.now().difference(_startedAt);
+        }
         _exercises
           ..clear()
           ..addAll(exercises);
@@ -2550,7 +2830,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
             .showSnackBar(const SnackBar(content: Text('入力途中のトレーニングを再開しました')));
       }
     } catch (_) {
-      await preferences.remove(_draftStorageKey);
+      await preferences.remove(activeWorkoutDraftStorageKey);
     }
   }
 
@@ -2558,8 +2838,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
     if (widget.isEditing) return;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(
-      _draftStorageKey,
+      activeWorkoutDraftStorageKey,
       jsonEncode({
+        'startedAt': _startedAt.toIso8601String(),
         'date': _workoutDate.toIso8601String(),
         'note': _noteController.text,
         'exercises': _exercises
@@ -2586,7 +2867,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   Future<void> _clearDraft() async {
     final preferences = await SharedPreferences.getInstance();
-    await preferences.remove(_draftStorageKey);
+    await preferences.remove(activeWorkoutDraftStorageKey);
   }
 
   WorkoutExercise _exerciseFromDraft(Map<String, dynamic> json) {
@@ -2623,6 +2904,8 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   Future<void> _confirmLeave() async {
+    if (_leaveDialogOpen) return;
+    _leaveDialogOpen = true;
     final leave = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -2642,169 +2925,188 @@ class _WorkoutPageState extends State<WorkoutPage> {
         ],
       ),
     );
-    if (leave == true && mounted) Navigator.of(context).pop();
+    _leaveDialogOpen = false;
+    if (leave == true) _exitWorkout();
+  }
+
+  void _exitWorkout([WorkoutRecord? workout]) {
+    if (!mounted) return;
+    setState(() => _allowPop = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Navigator.of(context).pop(workout);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF4F5F0),
-        leading: BackButton(onPressed: _confirmLeave),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.isEditing ? '記録を修正' : 'トレーニング',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+    return PopScope<WorkoutRecord>(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) unawaited(_confirmLeave());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFF4F5F0),
+          leading: BackButton(onPressed: _confirmLeave),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.isEditing ? '記録を修正' : 'トレーニング',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              ),
+              Text(
+                '${widget.isEditing ? (widget.initialWorkout!.durationLabel.isEmpty ? '記録済み' : widget.initialWorkout!.durationLabel) : _elapsedLabel} ・ ${widget.gymName ?? '店舗未選択'}',
+                style: const TextStyle(fontSize: 11, color: Color(0xFF777F78)),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              key: const Key('completeWorkoutButton'),
+              onPressed: _completeWorkout,
+              child: Text(
+                widget.isEditing ? '保存' : '完了',
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
             ),
-            Text(
-              '${widget.isEditing ? (widget.initialWorkout!.durationLabel.isEmpty ? '記録済み' : widget.initialWorkout!.durationLabel) : _elapsedLabel} ・ ${widget.gymName ?? '店舗未選択'}',
-              style: const TextStyle(fontSize: 11, color: Color(0xFF777F78)),
-            ),
+            const SizedBox(width: 8),
           ],
         ),
-        actions: [
-          TextButton(
-            key: const Key('completeWorkoutButton'),
-            onPressed: _completeWorkout,
-            child: Text(
-              widget.isEditing ? '保存' : '完了',
-              style: const TextStyle(fontWeight: FontWeight.w800),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-          children: [
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: ListTile(
-                key: const Key('workoutDateButton'),
-                leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFE9F4D1),
-                  child: Icon(Icons.calendar_today_rounded),
-                ),
-                title: const Text(
-                  'トレーニング日',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF6C746D)),
-                ),
-                subtitle: Text(
-                  workoutDateLabel(_workoutDate),
-                  style: const TextStyle(
-                    color: Color(0xFF101820),
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                trailing: const Icon(Icons.edit_calendar_outlined),
-                onTap: _selectWorkoutDate,
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (_restRemaining > 0) ...[
-              Container(
-                key: const Key('restTimerBanner'),
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.fromLTRB(16, 12, 10, 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF101820),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+            children: [
+              Card(
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.timer_outlined, color: Color(0xFFC7F36B)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        '休憩  $_restLabel',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
+                child: ListTile(
+                  key: const Key('workoutDateButton'),
+                  leading: const CircleAvatar(
+                    backgroundColor: Color(0xFFE9F4D1),
+                    child: Icon(Icons.calendar_today_rounded),
+                  ),
+                  title: const Text(
+                    'トレーニング日',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF6C746D)),
+                  ),
+                  subtitle: Text(
+                    workoutDateLabel(_workoutDate),
+                    style: const TextStyle(
+                      color: Color(0xFF101820),
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  trailing: const Icon(Icons.edit_calendar_outlined),
+                  onTap: _selectWorkoutDate,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (_restRemaining > 0) ...[
+                Container(
+                  key: const Key('restTimerBanner'),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 10, 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF101820),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.timer_outlined,
+                        color: Color(0xFFC7F36B),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          '休憩  $_restLabel',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
+                      TextButton(
+                        onPressed: () => _startRestTimer(_restRemaining + 30),
+                        child: const Text('+30秒'),
+                      ),
+                      TextButton(onPressed: _skipRest, child: const Text('終了')),
+                    ],
+                  ),
+                ),
+              ],
+              ...List.generate(
+                _exercises.length,
+                (exerciseIndex) => Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: ExerciseInputCard(
+                    key: ValueKey('exercise_${_inputRevision}_$exerciseIndex'),
+                    exerciseIndex: exerciseIndex,
+                    exercise: _exercises[exerciseIndex],
+                    history: widget.history,
+                    onAddSet: () => _addSet(exerciseIndex),
+                    onRemoveLastSet: () => _removeLastSet(exerciseIndex),
+                    onRemove: _exercises.length <= 1
+                        ? null
+                        : () => _removeExercise(exerciseIndex),
+                    onToggleSet: (setIndex) =>
+                        _toggleSet(exerciseIndex, setIndex),
+                    onValuesChanged: _saveDraft,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 54,
+                child: FilledButton.icon(
+                  key: const Key('addExerciseButton'),
+                  onPressed: _addExercise,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF101820),
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.add_rounded),
+                  label: const Text(
+                    '種目を追加',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'トレーニングメモ',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                    TextButton(
-                      onPressed: () => _startRestTimer(_restRemaining + 30),
-                      child: const Text('+30秒'),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _noteController,
+                      maxLines: 3,
+                      maxLength: 200,
+                      decoration: const InputDecoration(
+                        hintText: 'フォームや体調などをメモ',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                    TextButton(onPressed: _skipRest, child: const Text('終了')),
                   ],
                 ),
               ),
             ],
-            ...List.generate(
-              _exercises.length,
-              (exerciseIndex) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: ExerciseInputCard(
-                  exerciseIndex: exerciseIndex,
-                  exercise: _exercises[exerciseIndex],
-                  history: widget.history,
-                  onAddSet: () => _addSet(exerciseIndex),
-                  onRemoveLastSet: () => _removeLastSet(exerciseIndex),
-                  onRemove: exerciseIndex == 0
-                      ? null
-                      : () {
-                          setState(() => _exercises.removeAt(exerciseIndex));
-                          unawaited(_saveDraft());
-                        },
-                  onToggleSet: (setIndex) =>
-                      _toggleSet(exerciseIndex, setIndex),
-                  onValuesChanged: _saveDraft,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 54,
-              child: FilledButton.icon(
-                key: const Key('addExerciseButton'),
-                onPressed: _addExercise,
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF101820),
-                  foregroundColor: Colors.white,
-                ),
-                icon: const Icon(Icons.add_rounded),
-                label: const Text(
-                  '種目を追加',
-                  style: TextStyle(fontWeight: FontWeight.w800),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'トレーニングメモ',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _noteController,
-                    maxLines: 3,
-                    maxLength: 200,
-                    decoration: const InputDecoration(
-                      hintText: 'フォームや体調などをメモ',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -2886,10 +3188,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 gymName: widget.gymName,
                 note: _noteController.text.trim(),
               );
-              await _clearDraft();
+              if (!widget.isEditing) await _clearDraft();
               if (!dialogContext.mounted || !mounted) return;
               Navigator.of(dialogContext).pop();
-              Navigator.of(context).pop(record);
+              _exitWorkout(record);
             },
             child: Text(widget.isEditing ? '保存する' : 'ホームへ戻る'),
           ),
@@ -3009,6 +3311,17 @@ class SavedWorkoutTemplate {
             .toList(),
       );
 
+  static SavedWorkoutTemplate? tryFromJson(Object? source) {
+    if (source is! Map<String, dynamic>) return null;
+    try {
+      final template = SavedWorkoutTemplate.fromJson(source);
+      if (template.name.trim().isEmpty || template.sets.isEmpty) return null;
+      return template;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Map<String, dynamic> toJson() => {
     'name': name,
     'sets': sets.map((set) => set.toJson()).toList(),
@@ -3025,12 +3338,7 @@ class WorkoutTemplatePreference {
     final encoded = preferences.getString(_storageKey);
     if (encoded == null) return [];
     try {
-      return (jsonDecode(encoded) as List<dynamic>)
-          .map(
-            (item) =>
-                SavedWorkoutTemplate.fromJson(item as Map<String, dynamic>),
-          )
-          .toList();
+      return decodeWorkoutTemplates(jsonDecode(encoded));
     } catch (_) {
       return [];
     }
@@ -3071,26 +3379,13 @@ class MuscleMemoryBackup {
     }
     final settings = json['settings'] as Map<String, dynamic>? ?? const {};
     return MuscleMemoryBackup(
-      workouts: (json['workouts'] as List<dynamic>? ?? const [])
-          .map((item) => WorkoutRecord.fromJson(item as Map<String, dynamic>))
-          .toList(),
+      workouts: decodeWorkoutItems(json['workouts']),
       workoutTemplates: version == 1
           ? const []
-          : (json['workoutTemplates'] as List<dynamic>? ?? const [])
-                .map(
-                  (item) => SavedWorkoutTemplate.fromJson(
-                    item as Map<String, dynamic>,
-                  ),
-                )
-                .toList(),
+          : decodeWorkoutTemplates(json['workoutTemplates']),
       customExercises: version == 1
           ? const []
-          : (json['customExercises'] as List<dynamic>? ?? const [])
-                .map(
-                  (item) =>
-                      ExerciseTemplate.fromJson(item as Map<String, dynamic>),
-                )
-                .toList(),
+          : decodeExerciseTemplates(json['customExercises']),
       selectedGym: settings['selectedGym'] as String?,
       weeklyTarget: settings['weeklyTarget'] as int?,
       restTimerEnabled: settings['restTimerEnabled'] as bool?,
@@ -3138,6 +3433,19 @@ class ExerciseTemplate {
         startReps: json['startReps'] as int? ?? 10,
       );
 
+  static ExerciseTemplate? tryFromJson(Object? source) {
+    if (source is! Map<String, dynamic>) return null;
+    try {
+      final exercise = ExerciseTemplate.fromJson(source);
+      if (exercise.name.trim().isEmpty || exercise.bodyPart.trim().isEmpty) {
+        return null;
+      }
+      return exercise;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Map<String, dynamic> toJson() => {
     'name': name,
     'bodyPart': bodyPart,
@@ -3161,10 +3469,7 @@ class CustomExercisePreference {
       return;
     }
     try {
-      exercises = (jsonDecode(encoded) as List<dynamic>).map((item) {
-        final json = item as Map<String, dynamic>;
-        return ExerciseTemplate.fromJson(json);
-      }).toList();
+      exercises = decodeExerciseTemplates(jsonDecode(encoded));
     } catch (_) {
       exercises = [];
     }
@@ -3648,6 +3953,46 @@ class ExerciseInputCard extends StatelessWidget {
   }
 }
 
+class WorkoutDraftSummary {
+  const WorkoutDraftSummary({
+    required this.date,
+    required this.exerciseNames,
+    required this.setCount,
+  });
+
+  final DateTime date;
+  final List<String> exerciseNames;
+  final int setCount;
+
+  static WorkoutDraftSummary? tryParse(String? encoded) {
+    if (encoded == null) return null;
+    try {
+      final json = jsonDecode(encoded) as Map<String, dynamic>;
+      final exercises = json['exercises'] as List<dynamic>;
+      if (exercises.isEmpty) return null;
+      final names = <String>[];
+      var sets = 0;
+      for (final item in exercises) {
+        final exercise = item as Map<String, dynamic>;
+        final name = exercise['name'] as String?;
+        if (name != null && name.isNotEmpty && !names.contains(name)) {
+          names.add(name);
+        }
+        sets += (exercise['sets'] as List<dynamic>? ?? const []).length;
+      }
+      if (names.isEmpty) return null;
+      return WorkoutDraftSummary(
+        date:
+            DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.now(),
+        exerciseNames: names,
+        setCount: sets,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
 String formatWeight(double weight) {
   if (weight == weight.roundToDouble()) return weight.toInt().toString();
   return weight
@@ -3699,6 +4044,22 @@ class RecordedSet {
   };
 }
 
+List<SavedWorkoutTemplate> decodeWorkoutTemplates(Object? source) {
+  if (source is! List<dynamic>) return [];
+  return source
+      .map(SavedWorkoutTemplate.tryFromJson)
+      .whereType<SavedWorkoutTemplate>()
+      .toList(growable: false);
+}
+
+List<ExerciseTemplate> decodeExerciseTemplates(Object? source) {
+  if (source is! List<dynamic>) return [];
+  return source
+      .map(ExerciseTemplate.tryFromJson)
+      .whereType<ExerciseTemplate>()
+      .toList(growable: false);
+}
+
 class WorkoutRecord {
   const WorkoutRecord({
     required this.date,
@@ -3735,13 +4096,23 @@ class WorkoutRecord {
 
   factory WorkoutRecord.fromJson(Map<String, dynamic> json) => WorkoutRecord(
     date: DateTime.parse(json['date'] as String),
-    durationSeconds: json['durationSeconds'] as int? ?? 0,
+    durationSeconds: (json['durationSeconds'] as num?)?.toInt() ?? 0,
     gymName: json['gymName'] as String?,
     note: json['note'] as String? ?? '',
     sets: (json['sets'] as List<dynamic>)
         .map((item) => RecordedSet.fromJson(item as Map<String, dynamic>))
         .toList(),
   );
+
+  static WorkoutRecord? tryFromJson(Object? source) {
+    if (source is! Map<String, dynamic>) return null;
+    try {
+      final workout = WorkoutRecord.fromJson(source);
+      return workout.sets.isEmpty ? null : workout;
+    } catch (_) {
+      return null;
+    }
+  }
 
   Map<String, dynamic> toJson() => {
     'date': date.toIso8601String(),
@@ -3750,6 +4121,23 @@ class WorkoutRecord {
     'note': note,
     'sets': sets.map((set) => set.toJson()).toList(),
   };
+}
+
+List<WorkoutRecord> decodeWorkoutItems(Object? source) {
+  if (source is! List<dynamic>) return [];
+  return source
+      .map(WorkoutRecord.tryFromJson)
+      .whereType<WorkoutRecord>()
+      .toList(growable: false);
+}
+
+List<WorkoutRecord> decodeWorkoutHistory(String? encoded) {
+  if (encoded == null) return [];
+  try {
+    return decodeWorkoutItems(jsonDecode(encoded));
+  } catch (_) {
+    return [];
+  }
 }
 
 List<WorkoutRecord> sortWorkoutsNewestFirst(Iterable<WorkoutRecord> workouts) =>
