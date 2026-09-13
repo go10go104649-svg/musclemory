@@ -1,16 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
+import 'package:interactive_3d/interactive_3d.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config/supabase_config.dart';
+import 'muscle_targets.dart';
 import 'services/supabase_sync_service.dart';
 
 const activeWorkoutDraftStorageKey = 'active_workout_draft';
@@ -1871,12 +1874,18 @@ class BodyMapPage extends StatefulWidget {
 
 class _BodyMapPageState extends State<BodyMapPage> {
   MuscleMapPeriod _period = MuscleMapPeriod.week;
-  bool _showBack = false;
-  double _tilt = 0;
 
   @override
   Widget build(BuildContext context) {
     final counts = bodyPartSetCounts(widget.history, _period);
+    final cutoff = DateTime.now().subtract(Duration(days: _period.days));
+    final muscleScores = muscleScoresForSets(
+      widget.history
+          .where((workout) => !workout.date.isBefore(cutoff))
+          .expand((workout) => workout.sets)
+          .where((set) => set.completed)
+          .map((set) => MuscleSetUsage(set.exerciseName, set.bodyPart)),
+    );
     final maximum = counts.values.fold<int>(1, (a, b) => b > a ? b : a);
     const parts = ['胸', '背中', '脚', '肩', '腕', '腹'];
     final total = counts.values.fold<int>(0, (sum, value) => sum + value);
@@ -1885,12 +1894,12 @@ class _BodyMapPageState extends State<BodyMapPage> {
         padding: const EdgeInsets.fromLTRB(20, 28, 20, 32),
         children: [
           const Text(
-            '3D筋肉マップ',
+            '3D筋肉マネキン',
             style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 6),
           const Text(
-            '完了セット数に応じて部位の色が濃くなります',
+            '鍛えた筋肉をセット数に応じた赤の濃淡で表示します',
             style: TextStyle(color: Color(0xFF6C746D)),
           ),
           const SizedBox(height: 18),
@@ -1915,7 +1924,7 @@ class _BodyMapPageState extends State<BodyMapPage> {
           const SizedBox(height: 16),
           Container(
             key: const Key('muscleModel3D'),
-            height: 390,
+            height: 440,
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
             decoration: BoxDecoration(
               color: const Color(0xFF101820),
@@ -1933,53 +1942,23 @@ class _BodyMapPageState extends State<BodyMapPage> {
                       ),
                     ),
                     const Spacer(),
-                    SegmentedButton<bool>(
-                      segments: const [
-                        ButtonSegment(value: false, label: Text('前面')),
-                        ButtonSegment(value: true, label: Text('背面')),
-                      ],
-                      selected: {_showBack},
-                      onSelectionChanged: (value) => setState(() {
-                        _showBack = value.first;
-                        _tilt = 0;
-                      }),
-                      style: const ButtonStyle(
-                        visualDensity: VisualDensity.compact,
-                      ),
+                    const Chip(
+                      avatar: Icon(Icons.threed_rotation_rounded, size: 16),
+                      label: Text('3方向表示'),
+                      visualDensity: VisualDensity.compact,
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onHorizontalDragUpdate: (details) => setState(
-                      () => _tilt = (_tilt + details.delta.dx / 180).clamp(
-                        -0.7,
-                        0.7,
-                      ),
-                    ),
-                    onDoubleTap: () => setState(() => _tilt = 0),
-                    child: Center(
-                      child: Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.identity()
-                          ..setEntry(3, 2, 0.002)
-                          ..rotateY(_tilt),
-                        child: CustomPaint(
-                          size: const Size(210, 315),
-                          painter: _MuscleBodyPainter(
-                            counts: counts,
-                            maximum: maximum,
-                            showBack: _showBack,
-                          ),
-                        ),
-                      ),
-                    ),
+                  child: MuscleMannequinView(
+                    key: ValueKey('history-${_period.name}-$muscleScores'),
+                    scores: muscleScores,
+                    fallbackBodyPartCounts: counts,
                   ),
                 ),
                 const Text(
-                  '左右にドラッグして回転 ・ ダブルタップで正面',
+                  '前面・側面・背面を切り替えて確認できます',
                   style: TextStyle(color: Colors.white60, fontSize: 11),
                 ),
               ],
@@ -2022,6 +2001,128 @@ class _BodyMapPageState extends State<BodyMapPage> {
           }),
         ],
       ),
+    );
+  }
+}
+
+enum MuscleMannequinAngle {
+  front('前面', 'assets/models/muscle_mannequin_front.glb'),
+  side('側面', 'assets/models/muscle_mannequin_side.glb'),
+  back('背面', 'assets/models/muscle_mannequin_back.glb');
+
+  const MuscleMannequinAngle(this.label, this.assetPath);
+  final String label;
+  final String assetPath;
+}
+
+class MuscleMannequinView extends StatefulWidget {
+  const MuscleMannequinView({
+    super.key,
+    required this.scores,
+    this.fallbackBodyPartCounts = const {},
+  });
+
+  final Map<MuscleRegion, double> scores;
+  final Map<String, int> fallbackBodyPartCounts;
+
+  @override
+  State<MuscleMannequinView> createState() => _MuscleMannequinViewState();
+}
+
+class _MuscleMannequinViewState extends State<MuscleMannequinView> {
+  MuscleMannequinAngle _angle = MuscleMannequinAngle.front;
+
+  List<MaterialOverride> get _materialOverrides {
+    final maximum = widget.scores.values.fold<double>(1, math.max);
+    return [
+      for (final entry in widget.scores.entries)
+        if (entry.value > 0)
+          for (final meshName in entry.key.meshNames)
+            MaterialOverride(
+              name: meshName,
+              color: [
+                1,
+                0.42 - (entry.value / maximum).clamp(0, 1) * 0.36,
+                0.38 - (entry.value / maximum).clamp(0, 1) * 0.33,
+                1,
+              ],
+              metallic: 0,
+              roughness: 0.76,
+            ),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controls = SegmentedButton<MuscleMannequinAngle>(
+      key: const Key('muscleMannequinAngle'),
+      segments: MuscleMannequinAngle.values
+          .map((angle) => ButtonSegment(value: angle, label: Text(angle.label)))
+          .toList(),
+      selected: {_angle},
+      showSelectedIcon: false,
+      style: ButtonStyle(
+        visualDensity: VisualDensity.compact,
+        foregroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? const Color(0xFF101820)
+              : Colors.white,
+        ),
+        backgroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? const Color(0xFFFFD5D5)
+              : const Color(0xFF1A2A34),
+        ),
+        side: const WidgetStatePropertyAll(BorderSide(color: Colors.white24)),
+      ),
+      onSelectionChanged: (selection) =>
+          setState(() => _angle = selection.first),
+    );
+
+    if (Platform.isIOS || Platform.isAndroid) {
+      return Column(
+        children: [
+          controls,
+          const SizedBox(height: 5),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Interactive3d(
+                key: ValueKey('${_angle.name}-${widget.scores}'),
+                modelPath: _angle.assetPath,
+                solidBackgroundColor: const [0.035, 0.047, 0.055, 1],
+                backgroundColor: const Color(0xFF091219),
+                defaultZoom: 1.12,
+                selectionColor: const [0.84, 0.03, 0.05, 1],
+                initialMaterialOverrides: _materialOverrides,
+                loadingWidget: const Center(
+                  child: CircularProgressIndicator(color: Color(0xFFE33A46)),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    final maximum = widget.fallbackBodyPartCounts.values.fold<int>(1, math.max);
+    return Column(
+      children: [
+        controls,
+        const SizedBox(height: 5),
+        Expanded(
+          child: Center(
+            child: CustomPaint(
+              size: const Size(210, 300),
+              painter: _MuscleBodyPainter(
+                counts: widget.fallbackBodyPartCounts,
+                maximum: maximum,
+                showBack: _angle == MuscleMannequinAngle.back,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -4942,9 +5043,21 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                       subtitle: Text(
                         '${template.bodyPart} ・ ${template.equipment}',
                       ),
-                      trailing: added
-                          ? const Text('追加済み')
-                          : const Icon(Icons.add_rounded),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            key: Key('exerciseMuscles${template.name}'),
+                            tooltip: '使う筋肉を見る',
+                            onPressed: () => _showExerciseMuscles(template),
+                            icon: const Icon(Icons.accessibility_new_rounded),
+                          ),
+                          if (added)
+                            const Text('追加済み')
+                          else
+                            const Icon(Icons.add_rounded),
+                        ],
+                      ),
                       onTap: added
                           ? null
                           : () => Navigator.pop(context, template),
@@ -4968,6 +5081,97 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
       final added = await CustomExercisePreference.add(created);
       if (mounted && added) Navigator.pop(context, created);
     }
+  }
+
+  Future<void> _showExerciseMuscles(ExerciseTemplate template) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => ExerciseMuscleDetailPage(exercise: template),
+      ),
+    );
+  }
+}
+
+class ExerciseMuscleDetailPage extends StatelessWidget {
+  const ExerciseMuscleDetailPage({super.key, required this.exercise});
+
+  final ExerciseTemplate exercise;
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = muscleProfileForExercise(exercise.name, exercise.bodyPart);
+    final scores = <MuscleRegion, double>{
+      for (final muscle in profile.primary) muscle: 1,
+      for (final muscle in profile.secondary) muscle: 0.35,
+    };
+    return Scaffold(
+      appBar: AppBar(title: Text(exercise.name)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        children: [
+          Container(
+            key: const Key('exerciseMuscleModel3D'),
+            height: 470,
+            decoration: BoxDecoration(
+              color: const Color(0xFF091219),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: MuscleMannequinView(
+              scores: scores,
+              fallbackBodyPartCounts: {exercise.bodyPart: 1},
+            ),
+          ),
+          const SizedBox(height: 18),
+          const Text(
+            '主に使う筋肉',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: profile.primary
+                .map(
+                  (muscle) => Chip(
+                    avatar: const CircleAvatar(
+                      backgroundColor: Color(0xFFD4162A),
+                    ),
+                    label: Text(muscle.label),
+                  ),
+                )
+                .toList(),
+          ),
+          if (profile.secondary.isNotEmpty) ...[
+            const SizedBox(height: 18),
+            const Text(
+              '補助的に使う筋肉',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: profile.secondary
+                  .map(
+                    (muscle) => Chip(
+                      avatar: const CircleAvatar(
+                        backgroundColor: Color(0xFFFF8B91),
+                      ),
+                      label: Text(muscle.label),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+          const SizedBox(height: 16),
+          const Text(
+            '濃い赤がメインターゲット、薄い赤が補助的に使う筋肉です。前面・側面・背面を切り替えて確認できます。',
+            style: TextStyle(color: Color(0xFF666D68)),
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muscle_memory/main.dart';
+import 'package:muscle_memory/muscle_targets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -71,6 +72,28 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('エアロバイク'), findsOneWidget);
     expect(find.text('トレッドミル'), findsNothing);
+  });
+
+  testWidgets('exercise muscle detail explains main and supporting targets', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final exercise = exerciseTemplates.firstWhere(
+      (item) => item.name == 'チェストプレス',
+    );
+    await tester.pumpWidget(
+      MaterialApp(home: ExerciseMuscleDetailPage(exercise: exercise)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('exerciseMuscleModel3D')), findsOneWidget);
+    expect(find.text('主に使う筋肉'), findsOneWidget);
+    expect(find.text('大胸筋'), findsOneWidget);
+    expect(find.text('三角筋前部'), findsOneWidget);
+    expect(find.text('上腕三頭筋'), findsOneWidget);
   });
 
   test('workout UI preferences persist', () async {
@@ -327,7 +350,21 @@ void main() {
     );
   });
 
-  testWidgets('3D muscle map switches period and body side', (tester) async {
+  test('chest press maps primary and secondary muscles independently', () {
+    final profile = muscleProfileForExercise('チェストプレス', '胸');
+    expect(profile.primary, [MuscleRegion.pectoralisMajor]);
+    expect(profile.secondary, contains(MuscleRegion.anteriorDeltoid));
+    expect(profile.secondary, contains(MuscleRegion.triceps));
+
+    final scores = muscleScoresForSets(const [
+      MuscleSetUsage('チェストプレス', '胸'),
+      MuscleSetUsage('チェストプレス', '胸'),
+    ]);
+    expect(scores[MuscleRegion.pectoralisMajor], 2);
+    expect(scores[MuscleRegion.anteriorDeltoid], closeTo(0.7, 0.001));
+  });
+
+  testWidgets('3D muscle mannequin switches history periods', (tester) async {
     final workout = WorkoutRecord(
       date: DateTime.now().subtract(const Duration(days: 15)),
       sets: const [
@@ -347,19 +384,20 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('3D筋肉マップ'), findsOneWidget);
+    expect(find.text('3D筋肉マネキン'), findsOneWidget);
     expect(find.byKey(const Key('muscleModel3D')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('musclePeriodmonth')));
     await tester.pumpAndSettle();
     expect(find.text('1ヶ月 ・ 1セット'), findsOneWidget);
+    expect(find.text('3方向表示'), findsOneWidget);
+    expect(find.text('側面'), findsOneWidget);
     await tester.tap(find.text('背面'));
     await tester.pumpAndSettle();
-    await tester.drag(
-      find.byKey(const Key('muscleModel3D')),
-      const Offset(40, 0),
+    final angleControl = tester.widget<SegmentedButton<MuscleMannequinAngle>>(
+      find.byKey(const Key('muscleMannequinAngle')),
     );
-    await tester.pumpAndSettle();
+    expect(angleControl.selected, {MuscleMannequinAngle.back});
     await tester.scrollUntilVisible(
       find.byKey(const Key('muscleCount背中')),
       250,
