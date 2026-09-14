@@ -2,12 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "MuscleMemory（端末保存）",
+      "name": "MUSCLEMORY（端末保存）",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "MuscleMemory（Supabase同期）",
+      "name": "MUSCLEMORY（Supabase同期）",
       "request": "launch",
       "type": "dart",
       "args": [

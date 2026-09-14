@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muscle_memory/main.dart';
+import 'package:muscle_memory/body_weight.dart';
 import 'package:muscle_memory/muscle_targets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,6 +24,9 @@ void main() {
       'クロストレーナー',
       'ステアクライマー',
       'ローイングマシン',
+      'ランニング',
+      'ウォーキング',
+      'サイクリング',
     });
     final workout = WorkoutRecord(
       date: DateTime(2026, 9, 13),
@@ -46,6 +50,107 @@ void main() {
     expect(workout.volume, 500);
   });
 
+  test('record types preserve metrics and only weights add volume', () {
+    final workout = WorkoutRecord(
+      date: DateTime(2026, 9, 14),
+      sets: const [
+        RecordedSet(
+          exerciseName: 'ベンチプレス',
+          bodyPart: '胸',
+          recordType: ExerciseRecordType.weightReps,
+          weight: 60,
+          reps: 10,
+          completed: true,
+        ),
+        RecordedSet(
+          exerciseName: 'クランチ',
+          bodyPart: '腹',
+          recordType: ExerciseRecordType.bodyweightReps,
+          weight: 0,
+          reps: 20,
+          completed: true,
+        ),
+        RecordedSet(
+          exerciseName: 'トレッドミル',
+          bodyPart: '有酸素',
+          recordType: ExerciseRecordType.cardio,
+          weight: 0,
+          reps: 0,
+          durationSeconds: 1800,
+          distanceKm: 4.2,
+          speedKmh: 8.4,
+          inclinePercent: 2,
+          completed: true,
+        ),
+      ],
+    );
+
+    final restored = WorkoutRecord.fromJson(workout.toJson());
+    expect(restored.volume, 600);
+    expect(restored.sets[1].displaySummary, '20 回');
+    expect(restored.sets[2].durationSeconds, 1800);
+    expect(restored.sets[2].distanceKm, 4.2);
+    expect(restored.sets[2].displaySummary, contains('4.2 km'));
+  });
+
+  testWidgets('record type selects natural workout fields', (tester) async {
+    WorkoutUiPreference.completionCheckEnabled = true;
+    tester.view.physicalSize = const Size(900, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final workout = WorkoutRecord(
+      date: DateTime(2026, 9, 14),
+      sets: const [
+        RecordedSet(
+          exerciseName: 'クランチ',
+          bodyPart: '腹',
+          recordType: ExerciseRecordType.bodyweightReps,
+          weight: 0,
+          reps: 15,
+          completed: true,
+        ),
+        RecordedSet(
+          exerciseName: 'プランク',
+          bodyPart: '腹',
+          recordType: ExerciseRecordType.timed,
+          weight: 0,
+          reps: 0,
+          durationSeconds: 60,
+          completed: true,
+        ),
+        RecordedSet(
+          exerciseName: 'トレッドミル',
+          bodyPart: '有酸素',
+          recordType: ExerciseRecordType.cardio,
+          weight: 0,
+          reps: 0,
+          durationSeconds: 1200,
+          distanceKm: 3,
+          speedKmh: 9,
+          inclinePercent: 1,
+          completed: true,
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(home: WorkoutPage(initialWorkout: workout)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('repsField0_1')), findsOneWidget);
+    expect(find.byKey(const Key('weightField0_1')), findsNothing);
+    expect(find.byKey(const Key('durationField1_1')), findsOneWidget);
+    expect(find.byKey(const Key('repsField1_1')), findsNothing);
+    expect(find.byKey(const Key('durationField2_')), findsOneWidget);
+    expect(find.byKey(const Key('distanceField2_')), findsOneWidget);
+    expect(find.byKey(const Key('speedField2_')), findsOneWidget);
+    expect(find.byKey(const Key('inclineField2_')), findsOneWidget);
+    expect(find.byKey(const Key('weightField2_1')), findsNothing);
+    expect(find.byKey(const Key('addSetButton2')), findsNothing);
+  });
+
   testWidgets('exercise picker selects a category before searching exercises', (
     tester,
   ) async {
@@ -62,6 +167,9 @@ void main() {
 
     expect(find.text('部位・カテゴリを選択'), findsOneWidget);
     expect(find.text('トレッドミル'), findsNothing);
+    for (final category in ['胸', '背中', '肩', '腕', '脚', '腹', '有酸素']) {
+      expect(find.byKey(Key('bodyPartIllustration$category')), findsOneWidget);
+    }
     await tester.tap(find.byKey(const Key('exerciseCategory有酸素')));
     await tester.pumpAndSettle();
     expect(find.text('有酸素の種目'), findsOneWidget);
@@ -117,6 +225,21 @@ void main() {
     await WorkoutUiPreference.setCompletionCheckEnabled(true);
     await WorkoutUiPreference.setWorkoutTimerEnabled(true);
     await WorkoutUiPreference.setWorkoutDurationEnabled(true);
+  });
+
+  test('timer display and saved duration remain independent', () async {
+    SharedPreferences.setMockInitialValues({
+      'workout_timer_enabled': false,
+      'workout_duration_enabled': true,
+    });
+
+    await WorkoutUiPreference.load();
+
+    expect(WorkoutUiPreference.workoutTimerEnabled, isFalse);
+    expect(WorkoutUiPreference.workoutDurationEnabled, isTrue);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getBool('workout_timer_enabled'), isFalse);
+    expect(preferences.getBool('workout_duration_enabled'), isTrue);
   });
 
   test('custom exercises persist between sessions', () async {
@@ -278,43 +401,6 @@ void main() {
     expect(countPersonalBests(history, DateTime(2026, 1, 2)), 3);
   });
 
-  test('weekly streak counts only weeks that reached the target', () {
-    WorkoutRecord workout(DateTime date) => WorkoutRecord(
-      date: date,
-      sets: const [
-        RecordedSet(
-          exerciseName: 'スクワット',
-          bodyPart: '脚',
-          weight: 80,
-          reps: 5,
-          completed: true,
-        ),
-      ],
-    );
-    final now = DateTime(2026, 9, 16, 12);
-    final currentWeek = startOfWeek(now);
-    final history = [
-      workout(currentWeek.add(const Duration(days: 1))),
-      workout(currentWeek.add(const Duration(days: 8))),
-      for (final day in [1, 2, 4])
-        workout(currentWeek.subtract(Duration(days: 7 - day))),
-      for (final day in [1, 3, 5])
-        workout(currentWeek.subtract(Duration(days: 14 - day))),
-      for (final day in [1, 2])
-        workout(currentWeek.subtract(Duration(days: 21 - day))),
-    ];
-
-    expect(workoutCountInWeek(history, currentWeek), 1);
-    expect(weeklyGoalStreak(history, 3, now: now), 2);
-
-    final reachedThisWeek = [
-      ...history,
-      workout(currentWeek.add(const Duration(days: 2))),
-      workout(currentWeek.add(const Duration(days: 3))),
-    ];
-    expect(weeklyGoalStreak(reachedThisWeek, 3, now: now), 3);
-  });
-
   test('muscle map periods count completed sets by body part', () {
     final now = DateTime(2026, 9, 12, 12);
     WorkoutRecord workout(DateTime date, String part, int sets) =>
@@ -398,6 +484,20 @@ void main() {
       find.byKey(const Key('muscleMannequinAngle')),
     );
     expect(angleControl.selected, {MuscleMannequinAngle.back});
+    await tester.tap(find.byKey(const Key('musclePeriodweek')));
+    await tester.pumpAndSettle();
+    expect(find.text('1週間 ・ 0セット'), findsOneWidget);
+    expect(
+      tester
+          .widget<SegmentedButton<MuscleMannequinAngle>>(
+            find.byKey(const Key('muscleMannequinAngle')),
+          )
+          .selected,
+      {MuscleMannequinAngle.back},
+    );
+    await tester.tap(find.byKey(const Key('musclePeriodmonth')));
+    await tester.pumpAndSettle();
+
     await tester.scrollUntilVisible(
       find.byKey(const Key('muscleCount背中')),
       250,
@@ -585,7 +685,7 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('saveCustomGymButton')));
     await tester.pumpAndSettle();
-    expect(find.text('中央体育館'), findsOneWidget);
+    expect(find.text('中央体育館'), findsNWidgets(2));
     expect(CustomGymPreference.gyms, ['中央体育館']);
 
     await tester.tap(find.byTooltip('中央体育館の名前を変更'));
@@ -596,7 +696,7 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('saveCustomGymButton')));
     await tester.pumpAndSettle();
-    expect(find.text('市民スポーツセンター'), findsOneWidget);
+    expect(find.text('市民スポーツセンター'), findsNWidgets(2));
     expect(selectedGym, '市民スポーツセンター');
 
     await tester.tap(find.byTooltip('市民スポーツセンターを削除'));
@@ -607,7 +707,7 @@ void main() {
 
     await tester.tap(find.text('元に戻す'));
     await tester.pumpAndSettle();
-    expect(find.text('市民スポーツセンター'), findsOneWidget);
+    expect(find.text('市民スポーツセンター'), findsNWidgets(2));
     expect(find.text('「市民スポーツセンター」を元に戻しました'), findsOneWidget);
     expect(selectedGym, '市民スポーツセンター');
 
@@ -629,6 +729,17 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.person_outline_rounded));
     await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('locationSettingsButton')), findsOneWidget);
+    expect(find.text('ジム・場所設定'), findsOneWidget);
+    expect(find.text('いつもの場所'), findsNothing);
+    expect(find.text('カスタム場所'), findsNothing);
+    expect(find.text('重量の単位'), findsNothing);
+    expect(find.byKey(const Key('savedMenuManagementButton')), findsNothing);
+    expect(
+      find.byKey(const Key('customExerciseManagementButton')),
+      findsNothing,
+    );
 
     final trainingY = tester.getTopLeft(find.text('トレーニング設定').first).dy;
     final accountY = tester.getTopLeft(find.text('アカウント関連')).dy;
@@ -674,32 +785,50 @@ void main() {
       expect(find.byKey(const Key('completionCheckSwitch')), findsOneWidget);
       expect(find.byKey(const Key('workoutTimerSwitch')), findsOneWidget);
       expect(find.byKey(const Key('workoutDurationSwitch')), findsOneWidget);
-      expect(find.byKey(const Key('restTimerSwitch')), findsOneWidget);
-      expect(find.byKey(const Key('restTimerDurationButton')), findsNothing);
+      expect(find.text('トレーニングタイマー'), findsOneWidget);
+      expect(find.text('筋トレ時間'), findsOneWidget);
+      expect(find.byKey(const Key('restTimerSwitch')), findsNothing);
       expect(
-        tester
-            .widget<SwitchListTile>(find.byKey(const Key('restTimerSwitch')))
-            .onChanged,
-        isNull,
+        find.byKey(const Key('savedMenuManagementButton')),
+        findsOneWidget,
       );
-
+      expect(
+        find.byKey(const Key('customExerciseManagementButton')),
+        findsOneWidget,
+      );
+      final completionY = tester
+          .getTopLeft(find.byKey(const Key('completionCheckSwitch')))
+          .dy;
+      final timerY = tester
+          .getTopLeft(find.byKey(const Key('workoutTimerSwitch')))
+          .dy;
+      final durationY = tester
+          .getTopLeft(find.byKey(const Key('workoutDurationSwitch')))
+          .dy;
+      final menuY = tester
+          .getTopLeft(find.byKey(const Key('savedMenuManagementButton')))
+          .dy;
+      final customExerciseY = tester
+          .getTopLeft(find.byKey(const Key('customExerciseManagementButton')))
+          .dy;
+      expect(completionY, lessThan(timerY));
+      expect(timerY, lessThan(durationY));
+      expect(durationY, lessThan(menuY));
+      expect(menuY, lessThan(customExerciseY));
+      expect(find.byKey(const Key('restTimerDurationButton')), findsNothing);
       await tester.tap(find.byKey(const Key('completionCheckSwitch')));
       await tester.pumpAndSettle();
       expect(RestTimerPreference.enabled, isFalse);
-      expect(
-        tester
-            .widget<SwitchListTile>(find.byKey(const Key('restTimerSwitch')))
-            .onChanged,
-        isNotNull,
-      );
+      expect(find.byKey(const Key('restTimerSwitch')), findsOneWidget);
       await tester.tap(find.byKey(const Key('restTimerSwitch')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('restTimerDurationButton')), findsOneWidget);
 
-      await tester.tap(find.byKey(const Key('workoutDurationSwitch')));
+      await tester.tap(find.byKey(const Key('workoutTimerSwitch')));
       await tester.pumpAndSettle();
-      expect(WorkoutUiPreference.workoutDurationEnabled, isFalse);
-      await WorkoutUiPreference.setWorkoutDurationEnabled(true);
+      expect(WorkoutUiPreference.workoutTimerEnabled, isFalse);
+      expect(WorkoutUiPreference.workoutDurationEnabled, isTrue);
+      await WorkoutUiPreference.setTrainingDurationEnabled(true);
     },
   );
 
@@ -748,13 +877,46 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('中央体育館'), findsOneWidget);
     expect(find.text('会社のジム'), findsOneWidget);
+    expect(find.text('場所を追加'), findsNothing);
 
     await tester.tap(find.text('会社のジム'));
     await tester.pumpAndSettle();
     expect(selected, '会社のジム');
   });
 
-  test('version 2 backup preserves workouts menus exercises and settings', () {
+  testWidgets('location settings chooses a usual place without adding there', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'custom_gyms': jsonEncode(['中央体育館']),
+    });
+    await CustomGymPreference.load();
+    String? selectedGym;
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CustomGymManagementPage(
+          selectedGym: selectedGym,
+          onSelectedGymChanged: (gym) async => selectedGym = gym,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('いつもの場所'), findsOneWidget);
+    expect(find.text('カスタム場所'), findsOneWidget);
+    expect(find.byKey(const Key('addCustomGymButton')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('preferredGym自宅')));
+    await tester.pumpAndSettle();
+    expect(selectedGym, '自宅');
+    expect(CustomGymPreference.gyms, ['中央体育館']);
+  });
+
+  test('version 3 backup preserves workouts body weights and settings', () {
     final backup = MuscleMemoryBackup(
       workouts: [
         WorkoutRecord(
@@ -784,6 +946,13 @@ void main() {
           ],
         ),
       ],
+      bodyWeights: [
+        BodyWeightEntry(
+          id: 'weight-1',
+          recordedAt: DateTime(2026, 9, 12, 7),
+          weightKg: 82.5,
+        ),
+      ],
       customExercises: const [
         ExerciseTemplate(
           name: 'テストプレス',
@@ -794,19 +963,20 @@ void main() {
       ],
       customGyms: const ['中央体育館'],
       selectedGym: 'テストジム',
-      weeklyTarget: 4,
       restTimerEnabled: true,
       restTimerSeconds: 120,
     );
 
     final restored = MuscleMemoryBackup.fromJson(backup.toJson());
 
+    expect(backup.toJson()['app'], 'MUSCLEMORY');
+    expect(backup.toJson()['version'], 3);
     expect(restored.workouts.single.sets.single.weight, 52.5);
     expect(restored.workoutTemplates.single.name, '胸の日');
+    expect(restored.bodyWeights.single.weightKg, 82.5);
     expect(restored.customExercises.single.startWeight, 12.5);
     expect(restored.customGyms, ['中央体育館']);
     expect(restored.selectedGym, 'テストジム');
-    expect(restored.weeklyTarget, 4);
     expect(restored.restTimerEnabled, isTrue);
     expect(restored.restTimerSeconds, 120);
 
@@ -832,7 +1002,17 @@ void main() {
     expect(restored.workouts, isEmpty);
     expect(restored.workoutTemplates, isEmpty);
     expect(restored.customGyms, isEmpty);
-    expect(restored.weeklyTarget, isNull);
+  });
+
+  testWidgets('about page uses the official MUSCLEMORY name', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: AppAboutPage()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('MUSCLEMORY'), findsOneWidget);
+    expect(find.text('バージョン 1.0.0'), findsOneWidget);
+    expect(find.text('端末内への保存'), findsOneWidget);
+    expect(find.text('クラウド同期'), findsOneWidget);
+    expect(find.text('バックアップ'), findsOneWidget);
   });
 
   test('workout draft summary reads exercises date and set count', () {
@@ -1052,10 +1232,12 @@ void main() {
       MaterialApp(
         home: MonthlyHistoryPage(
           history: const [],
+          bodyWeights: const [],
           selectedGym: null,
           onWorkoutCompleted: (_) async {},
           onWorkoutUpdated: (_, _) async {},
           onWorkoutDeleted: (_) async => true,
+          onBodyWeightSaved: (_) async {},
         ),
       ),
     );
@@ -1063,7 +1245,6 @@ void main() {
 
     final now = DateTime.now();
     expect(find.text('${now.year}年 ${now.month}月'), findsOneWidget);
-    expect(find.text('この月の記録はありません'), findsOneWidget);
     expect(find.byKey(const Key('historyCurrentMonthButton')), findsNothing);
 
     await tester.tap(find.byTooltip('前の月'));
@@ -1320,7 +1501,6 @@ void main() {
             history: [workout],
             selectedGym: null,
             onGymChanged: (_) {},
-            weeklyTarget: 3,
             onWorkoutCompleted: (_) async {},
             onWorkoutUpdated: (_, _) async {},
             onWorkoutDeleted: (_) async => true,
@@ -1586,6 +1766,12 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('addExerciseButton')));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('exerciseCategory脚')),
+      180,
+      scrollable: find.descendant(of: find.byType(ExercisePickerSheet), matching: find.byType(Scrollable)).last,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('exerciseCategory脚')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('スクワット'));
@@ -1696,6 +1882,8 @@ void main() {
     await tester.tap(find.byKey(const Key('completeWorkoutButton')));
     await tester.pumpAndSettle();
     expect(find.textContaining('自己ベスト更新'), findsOneWidget);
+    expect(find.text('共有画像を確認'), findsOneWidget);
+    expect(find.text('ホームへ戻る'), findsOneWidget);
     final stoppedTimer = tester
         .widget<Text>(find.byKey(const Key('workoutElapsedLabel')))
         .data;
@@ -1997,7 +2185,6 @@ void main() {
             history: [oldWorkout],
             selectedGym: null,
             onGymChanged: (_) {},
-            weeklyTarget: 3,
             onWorkoutCompleted: (_) async {},
             onWorkoutUpdated: (_, _) async {},
             onWorkoutDeleted: (_) async => true,
@@ -2135,5 +2322,139 @@ void main() {
     expect(find.text('55'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox());
+  });
+
+  test(
+    'body weights keep multiple entries on the same date and skip missing days',
+    () {
+      final now = DateTime(2026, 9, 13, 12);
+      final entries = [
+        BodyWeightEntry(
+          id: 'old',
+          recordedAt: DateTime(2026, 5, 1),
+          weightKg: 84,
+        ),
+        BodyWeightEntry(
+          id: 'morning',
+          recordedAt: DateTime(2026, 9, 12, 8),
+          weightKg: 82.5,
+        ),
+        BodyWeightEntry(
+          id: 'night',
+          recordedAt: DateTime(2026, 9, 12, 21),
+          weightKg: 82.1,
+        ),
+      ];
+
+      final shown = bodyWeightsForPeriod(
+        entries,
+        BodyWeightPeriod.oneMonth,
+        now: now,
+      );
+
+      expect(shown.map((entry) => entry.id), ['morning', 'night']);
+      expect(shown.map((entry) => entry.weightKg), [82.5, 82.1]);
+    },
+  );
+
+  testWidgets('body weight can be saved and appears in the history chart', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final entries = ValueNotifier<List<BodyWeightEntry>>([]);
+    addTearDown(entries.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: ValueListenableBuilder<List<BodyWeightEntry>>(
+              valueListenable: entries,
+              builder: (context, value, _) => BodyWeightTrendSection(
+                entries: value,
+                onSaved: (entry) async {
+                  entries.value = [entry];
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const Key('addBodyWeightButton')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('bodyWeightField')), '82.5');
+    await tester.tap(find.byKey(const Key('saveBodyWeightButton')));
+    await tester.pumpAndSettle();
+
+    expect(entries.value.single.weightKg, 82.5);
+    expect(find.byKey(const Key('bodyWeightChart')), findsOneWidget);
+    expect(find.text('82.5 kg'), findsOneWidget);
+
+    final originalId = entries.value.single.id;
+    await tester.tap(find.byTooltip('体重を編集'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('bodyWeightField')), '81.9');
+    await tester.tap(find.byKey(const Key('saveBodyWeightButton')));
+    await tester.pumpAndSettle();
+    expect(entries.value, hasLength(1));
+    expect(entries.value.single.id, originalId);
+    expect(entries.value.single.weightKg, 81.9);
+  });
+
+  testWidgets('SNS preview contains workout data and optional metrics toggle', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final workout = WorkoutRecord(
+      date: DateTime(2026, 9, 13),
+      durationSeconds: 1800,
+      sets: const [
+        RecordedSet(
+          exerciseName: 'チェストプレス',
+          bodyPart: '胸',
+          weight: 50,
+          reps: 10,
+          completed: true,
+        ),
+        RecordedSet(
+          exerciseName: 'チェストプレス',
+          bodyPart: '胸',
+          weight: 55,
+          reps: 8,
+          completed: true,
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(home: WorkoutSharePage(workout: workout)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('チェストプレス'), findsOneWidget);
+    expect(find.text('55 kg × 8 回  /  2 セット'), findsOneWidget);
+    expect(find.text('総ボリューム'), findsOneWidget);
+    expect(find.text('トレーニング時間'), findsOneWidget);
+    expect(find.byKey(const Key('chooseSharePhotoButton')), findsOneWidget);
+    expect(find.byKey(const Key('shareWorkoutImageButton')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('shareVolumeToggle')));
+    await tester.pump();
+    expect(find.text('総ボリューム'), findsNothing);
+    expect(find.text('総ボリュームを表示'), findsOneWidget);
+  });
+
+  testWidgets('weekly goal UI is removed', (tester) async {
+    SharedPreferences.setMockInitialValues(const {});
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    expect(find.text('1週間の目標'), findsNothing);
   });
 }

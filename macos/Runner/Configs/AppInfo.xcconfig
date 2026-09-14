@@ -5,7 +5,7 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = muscle_memory
+PRODUCT_NAME = MUSCLEMORY
 
 // The application's bundle identifier
 PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory

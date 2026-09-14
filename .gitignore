@@ -49,3 +49,6 @@ app.*.map.json
 
 # Local Supabase connection values
 supabase.json
+
+# Blender automatic backups (editable .blend sources are tracked)
+*.blend[0-9]*

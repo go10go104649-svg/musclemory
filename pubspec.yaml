@@ -1,5 +1,5 @@
 name: muscle_memory
-description: "A new Flutter project."
+description: "MUSCLEMORY - トレーニングの記録を次の成長につなげるアプリ。"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -40,7 +40,9 @@ dependencies:
   shared_preferences: ^2.5.5
   share_plus: ^13.3.0
   supabase_flutter: ^2.17.2
-  interactive_3d: ^2.2.0
+  interactive_3d:
+    path: packages/interactive_3d
+  image_picker: ^1.2.3
 
 dev_dependencies:
   flutter_test:
@@ -65,7 +67,10 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/models/
+    - assets/models/body_tab.glb
+    - assets/models/bench_press.glb
+    - assets/models/incline_dumbbell_press.glb
+    - assets/category_muscles/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

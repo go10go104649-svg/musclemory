@@ -1,11 +1,11 @@
 {
-    "name": "muscle_memory",
-    "short_name": "muscle_memory",
+    "name": "MUSCLEMORY",
+    "short_name": "MUSCLEMORY",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F4F5F0",
+    "theme_color": "#101820",
+    "description": "トレーニングの記録を、次の成長につなげるアプリです。",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

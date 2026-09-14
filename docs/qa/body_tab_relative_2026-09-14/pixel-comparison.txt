@@ -1,0 +1,2 @@
+three-months-front.png vs year-front.png: 0 differing pixels within model viewport
+six-months-back.png vs year-back.png: 0 differing pixels within model viewport

@@ -1,4 +1,4 @@
-# MuscleMory
+# MUSCLEMORY
 
 トレーニングの記録を、次のトレーニングにつなげるためのFlutterアプリです。
 
@@ -78,7 +78,7 @@
 1. Supabaseでプロジェクトを作る
 2. DashboardのSQL Editorで `supabase/schema.sql` を実行する
 3. `supabase.example.json` を複製して `supabase.json` にし、Project URLとPublishable keyを入れる
-4. VS Codeの「実行とデバッグ」で `MuscleMemory（Supabase同期）` を選んで起動する
+4. VS Codeの「実行とデバッグ」で `MUSCLEMORY（Supabase同期）` を選んで起動する
 
 ターミナルから起動する場合:
 

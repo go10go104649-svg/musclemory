@@ -1,0 +1,27 @@
+{
+  "source": "/Users/macintosh/Documents/Codex/muscle_memory/art/body_tab/body_tab.blend",
+  "vertices": 73220,
+  "polygons": 146436,
+  "region_faces": {
+    "neutral": 102143,
+    "pectoralisMajor": 3808,
+    "anteriorDeltoid": 2706,
+    "posteriorDeltoid": 1481,
+    "biceps": 2500,
+    "triceps": 1845,
+    "forearms": 3027,
+    "trapezius": 3190,
+    "latissimusDorsi": 3779,
+    "rectusAbdominis": 2862,
+    "obliques": 3612,
+    "gluteus": 3216,
+    "quadriceps": 5950,
+    "hamstrings": 1982,
+    "adductors": 1210,
+    "calves": 3125
+  },
+  "bytes": 3687724,
+  "meshes": 1,
+  "animations": 0,
+  "skins": 0
+}
