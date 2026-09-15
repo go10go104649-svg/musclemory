@@ -41,10 +41,15 @@ class BodyWeightEntry {
 
   static BodyWeightEntry? tryFromJson(Object? source) {
     if (source is! Map) return null;
-    final recordedAt = DateTime.tryParse(source['recordedAt'] as String? ?? '');
-    final weight = (source['weightKg'] as num?)?.toDouble();
-    if (recordedAt == null || weight == null || weight <= 0) return null;
-    final id = source['id'] as String?;
+    final rawDate = source['recordedAt'];
+    final rawWeight = source['weightKg'];
+    if (rawDate is! String || rawWeight is! num) return null;
+    final recordedAt = DateTime.tryParse(rawDate);
+    final weight = rawWeight.toDouble();
+    if (recordedAt == null || !weight.isFinite || weight <= 0) return null;
+    final rawId = source['id'];
+    if (rawId != null && rawId is! String) return null;
+    final id = rawId as String?;
     return BodyWeightEntry(
       id: id?.isNotEmpty == true
           ? id!

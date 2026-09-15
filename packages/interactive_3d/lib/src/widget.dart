@@ -226,6 +226,12 @@ class Interactive3dState extends State<Interactive3d> {
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
 
+        if (!size.width.isFinite ||
+            !size.height.isFinite ||
+            size.width <= 0 ||
+            size.height <= 0) {
+          return const SizedBox.shrink();
+        }
         if (_textureId == null &&
             !_isInitializing &&
             size.width > 0 &&
@@ -401,6 +407,11 @@ class Interactive3dState extends State<Interactive3d> {
         height: (size.height * _renderRatio).toInt(),
       );
 
+      if (!mounted) {
+        final abandonedId = result['textureId'] as int?;
+        if (abandonedId != null) await _platform!.disposeTexture(abandonedId);
+        return;
+      }
       _textureId = result['textureId'] as int?;
       if (_textureId == null) throw Exception('Failed to create texture');
 

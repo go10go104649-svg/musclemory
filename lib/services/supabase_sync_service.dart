@@ -5,11 +5,20 @@ import '../config/supabase_config.dart';
 class SupabaseSyncService {
   SupabaseSyncService._();
 
+  // Fail closed until a verified subscription provider is connected.
+  // Never infer membership from sign-in, local preferences, or user_metadata.
+  static bool get canUseCloud => false;
+
+  static void requirePremium() {
+    if (!canUseCloud) throw StateError('クラウドバックアップはPremium限定です');
+  }
+
   static bool get isSignedIn =>
       SupabaseConfig.initialized &&
       Supabase.instance.client.auth.currentUser != null;
 
   static Future<int> syncWorkouts(List<Map<String, dynamic>> workouts) async {
+    requirePremium();
     if (!isSignedIn || workouts.isEmpty) return 0;
 
     final client = Supabase.instance.client;
@@ -34,6 +43,7 @@ class SupabaseSyncService {
   }
 
   static Future<List<Map<String, dynamic>>> fetchWorkouts() async {
+    requirePremium();
     if (!isSignedIn) return [];
 
     final rows = await Supabase.instance.client
@@ -57,6 +67,7 @@ class SupabaseSyncService {
   }
 
   static Future<void> deleteWorkout(String clientId) async {
+    requirePremium();
     if (!isSignedIn) return;
     await Supabase.instance.client
         .from('workouts')

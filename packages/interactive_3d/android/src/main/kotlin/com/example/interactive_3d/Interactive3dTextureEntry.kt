@@ -106,6 +106,9 @@ class Interactive3dTextureEntry(
         filamentRenderer?.startRenderLoop()
     }
 
+    fun cameraDiagnostics() = filamentRenderer?.cameraDiagnostics()
+    fun debugRecreateSurface() { initializeRendererIfReady() }
+
     // -- Delegated operations -------------------------------------------------
 
     fun updateSize(width: Int, height: Int) {

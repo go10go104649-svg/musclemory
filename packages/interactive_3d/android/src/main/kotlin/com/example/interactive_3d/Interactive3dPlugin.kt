@@ -55,6 +55,14 @@ class Interactive3dPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     when (call.method) {
+      "debugCameraStates", "debugRecreateSurfaces" -> {
+        if (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE == 0) {
+          result.notImplemented()
+        } else {
+          if (call.method == "debugRecreateSurfaces") textureEntries.values.forEach { it.debugRecreateSurface() }
+          result.success(textureEntries.values.mapNotNull { it.cameraDiagnostics() })
+        }
+      }
       "configureFormPlayback" -> {
         val id = call.argument<Number>("textureId")?.toLong()
         val entry = textureEntries[id]

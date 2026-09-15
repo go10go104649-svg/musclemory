@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
+import 'form_model.dart';
 import 'models.dart';
 import 'platform_interface.dart';
 
@@ -122,6 +123,13 @@ class MethodChannelInteractive3d extends Interactive3dPlatform {
       modelName = modelUrl.split('/').last;
     } else {
       throw ArgumentError('Must provide either modelPath or modelUrl');
+    }
+
+    // Filament 1.68 and 1.74 crash natively on Android 16 when a GLB contains
+    // the authored _MUSCLE_* vertex masks. They are editing metadata and are
+    // not used by the runtime materials, so strip them from the drawing copy.
+    if (modelName.toLowerCase().endsWith('.glb')) {
+      modelBytes = prepareFormModelForSceneKit(modelBytes);
     }
 
     final resourceMap = resources.map(

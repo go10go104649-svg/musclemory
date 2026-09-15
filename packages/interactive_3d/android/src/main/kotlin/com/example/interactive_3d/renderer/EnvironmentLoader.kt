@@ -31,7 +31,7 @@ internal class EnvironmentLoader {
 
     // Solid background
     var useSolidBackground = false; private set
-    var solidBackgroundColor = floatArrayOf(0.92f, 0.92f, 0.92f, 1.0f)
+    var solidBackgroundColor = doubleArrayOf(0.92, 0.92, 0.92, 1.0)
         private set
 
     /**
@@ -121,11 +121,11 @@ internal class EnvironmentLoader {
     fun setBackgroundColor(color: List<Double>, renderer: Renderer, scene: Scene) {
         if (color.size < 3) return
         useSolidBackground = true
-        solidBackgroundColor = floatArrayOf(
-            color[0].toFloat(),
-            color[1].toFloat(),
-            color[2].toFloat(),
-            if (color.size >= 4) color[3].toFloat() else 1.0f
+        solidBackgroundColor = doubleArrayOf(
+            color[0],
+            color[1],
+            color[2],
+            if (color.size >= 4) color[3] else 1.0
         )
         applyClearColor(renderer)
         scene.skybox = null
@@ -138,7 +138,7 @@ internal class EnvironmentLoader {
         renderer.setClearOptions(
             Renderer.ClearOptions().apply {
                 clearColor = if (useSolidBackground) solidBackgroundColor
-                else floatArrayOf(0.2f, 0.2f, 0.2f, 1.0f)
+                else doubleArrayOf(0.2, 0.2, 0.2, 1.0)
                 clear = true
             }
         )

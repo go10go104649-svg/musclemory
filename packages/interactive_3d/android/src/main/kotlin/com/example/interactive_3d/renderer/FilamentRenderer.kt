@@ -70,6 +70,8 @@ class FilamentRenderer(
     private val choreographer = Choreographer.getInstance()
     private var isRendering = false
     private val frameCallback = FrameCallback()
+    private var pausedFramesRemaining = 0
+    private var successfulFrames = 0
     private var formMode = false
     private var formPlaying = false
     private var formSpeed = 1.0
@@ -85,13 +87,11 @@ class FilamentRenderer(
         formSpeed = if (speed.isFinite()) speed.coerceIn(0.25, 2.0) else 1.0
         formLastFrame = null
         applyFormCamera()
-        // A paused form paints once, then has no idle frame callbacks.
-        choreographer.removeFrameCallback(frameCallback)
-        if (isRendering) choreographer.postFrameCallback(frameCallback)
+        requestRender()
     }
 
     private fun applyFormCamera() {
-        if (!formMode) return
+        if (!formMode || width <= 0 || height <= 0) return
         camera?.let {
             val halfHeight = if (bodyViewAngle != null) 1.0 else 1.225
             val halfWidth = halfHeight * width.toDouble() / height.coerceAtLeast(1)
@@ -105,6 +105,17 @@ class FilamentRenderer(
             } else it.lookAt(2.8, 2.5, 3.4, 0.0, 0.58, 0.13, 0.0, 1.0, 0.0)
         }
     }
+    fun cameraDiagnostics(): Map<String, Any> {
+        val projection = DoubleArray(16)
+        camera?.getProjectionMatrix(projection)
+        val bounds = modelLoader.getBoundingBox()
+        return mapOf("formMode" to formMode, "angle" to (bodyViewAngle ?: -1),
+            "width" to width, "height" to height, "projection" to projection.toList(),
+            "successfulFrames" to successfulFrames,
+            "center" to (bounds?.first?.toList() ?: emptyList<Float>()),
+            "halfExtent" to (bounds?.second?.toList() ?: emptyList<Float>()))
+    }
+
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // Background I/O (no Filament calls allowed on this scope)
@@ -227,13 +238,19 @@ class FilamentRenderer(
             eng.createSwapChain(surface, SwapChainFlags.CONFIG_TRANSPARENT)
         }
         filamentView?.viewport = Viewport(0, 0, width, height)
-        camera?.let {
+        applyActiveCamera()
+    }
+
+    private fun applyActiveCamera() {
+        if (width <= 0 || height <= 0) return
+        if (formMode) applyFormCamera() else camera?.let {
             cameraController.applyProjection(it, width, height)
             cameraController.applyToCamera(it)
         }
     }
 
     fun destroySwapChain() {
+        stopRenderLoop()
         swapChain?.let { engine?.destroySwapChain(it) }
         swapChain = null
     }
@@ -244,8 +261,8 @@ class FilamentRenderer(
         this.height = height
 
         filamentView?.viewport = Viewport(0, 0, width, height)
-        camera?.let { cameraController.applyProjection(it, width, height) }
-        applyFormCamera()
+        applyActiveCamera()
+        requestRender()
     }
 
     // -------------------------------------------------------------------------
@@ -255,6 +272,7 @@ class FilamentRenderer(
     fun startRenderLoop() {
         if (isRendering) return
         isRendering = true
+        pausedFramesRemaining = 3
         choreographer.postFrameCallback(frameCallback)
     }
 
@@ -270,6 +288,9 @@ class FilamentRenderer(
      * (clear, refresh, visibility toggle, etc.).
      */
     private fun requestRender() {
+        // Filament can decline beginFrame while a surface/back buffer is settling.
+        // Drain a small number of successful frames, rather than losing a one-shot draw.
+        pausedFramesRemaining = 3
         if (formMode && !formPlaying && isRendering) {
             choreographer.removeFrameCallback(frameCallback)
             choreographer.postFrameCallback(frameCallback)
@@ -351,6 +372,7 @@ class FilamentRenderer(
             selection.highlightCachedEntities(asset, eng)
             selection.notifyCacheChanged()
         }
+        requestRender()
     }
 
     fun setEntityMaterials(overrides: List<Map<String, Any>>) {
@@ -446,12 +468,14 @@ class FilamentRenderer(
     }
 
     fun onPan(deltaX: Float, deltaY: Float) {
+        if (formMode) return
         if (cameraController.onPan(deltaX, deltaY)) {
             camera?.let { cameraController.applyToCamera(it) }
         }
     }
 
     fun onScale(scale: Float) {
+        if (formMode) return
         if (cameraController.onScale(scale)) {
             // Re-lock render quality during zoom to prevent driver-side blur
             filamentView?.let { v ->
@@ -475,6 +499,7 @@ class FilamentRenderer(
     // -------------------------------------------------------------------------
 
     fun setCameraZoomLevel(zoom: Float) {
+        if (formMode) return
         cameraController.setZoom(zoom)
         camera?.let {
             cameraController.applyProjection(it, width, height)
@@ -628,7 +653,9 @@ class FilamentRenderer(
 
         override fun doFrame(frameTimeNanos: Long) {
             if (!isRendering) return
-            if (!formMode || formPlaying) choreographer.postFrameCallback(this)
+            if (!formMode || formPlaying || pausedFramesRemaining > 0) {
+                choreographer.postFrameCallback(this)
+            }
 
             // Adaptive frame pacing based on user interaction
             if (!formMode && !cameraController.isInteracting) {
@@ -664,6 +691,8 @@ class FilamentRenderer(
                     rend.render(v)
                     rend.endFrame()
                     frameCount++
+                    successfulFrames++
+                    pausedFramesRemaining = maxOf(0, pausedFramesRemaining - 1)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Render error: ${e.message}")

@@ -11,7 +11,7 @@ import 'package:muscle_memory/bench_press_form.dart';
 
 void main() {
   test(
-    'iOS drawing copy preserves binary animation and authored muscle masks',
+    'native drawing copy preserves binary animation and authored muscle masks',
     () {
       final source = File('assets/models/bench_press.glb').readAsBytesSync();
       final original = Uint8List.fromList(source);

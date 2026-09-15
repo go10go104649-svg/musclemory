@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-/// SceneKit's GLTF importer rejects valid custom vertex semantics. Keep the
-/// authored GLB (including editable muscle masks) intact and adapt only the
-/// in-memory drawing copy. Skin weights, vertex colours and BIN data are kept.
+/// Native GLTF importers may reject custom vertex semantics. Keep the authored
+/// GLB (including editable muscle masks) intact and adapt only the in-memory
+/// drawing copy. Skin weights, vertex colours and BIN data are kept.
 Uint8List prepareFormModelForSceneKit(Uint8List bytes) {
   final header = ByteData.sublistView(bytes);
   if (bytes.length < 28 || header.getUint32(0, Endian.little) != 0x46546c67) {

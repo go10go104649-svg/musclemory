@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muscle_memory/main.dart';
 import 'package:muscle_memory/body_weight.dart';
@@ -8,6 +9,50 @@ import 'package:muscle_memory/muscle_targets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  testWidgets(
+    'hidden body model is released while its selected angle survives',
+    (tester) async {
+      Future<void> show(bool active) => tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MuscleMannequinView(scores: const {}, active: active),
+          ),
+        ),
+      );
+      await show(false);
+      expect(find.byKey(const Key('muscleMannequinAngle')), findsNothing);
+      await show(true);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('背面'));
+      await tester.pumpAndSettle();
+      await show(false);
+      expect(find.byKey(const Key('muscleMannequinAngle')), findsNothing);
+      await show(true);
+      await tester.pumpAndSettle();
+      final control = tester.widget<SegmentedButton<MuscleMannequinAngle>>(
+        find.byKey(const Key('muscleMannequinAngle')),
+      );
+      expect(control.selected, {MuscleMannequinAngle.back});
+    },
+  );
+
+  test('rest countdown does not finish before its absolute deadline', () {
+    final end = DateTime(2026, 9, 14, 12);
+    expect(
+      remainingRestSeconds(end, end.subtract(const Duration(microseconds: 1))),
+      1,
+    );
+    expect(
+      remainingRestSeconds(
+        end,
+        end.subtract(const Duration(milliseconds: 1001)),
+      ),
+      2,
+    );
+    expect(remainingRestSeconds(end, end), 0);
+    expect(remainingRestSeconds(end, end.add(const Duration(seconds: 10))), 0);
+  });
+
   test('training volume is formatted in kilograms', () {
     expect(formatVolumeKg(12500), '12,500');
     expect(formatVolumeKg(987.5), '987.5');
@@ -204,6 +249,70 @@ void main() {
     expect(find.text('上腕三頭筋'), findsOneWidget);
   });
 
+  testWidgets('exercise list opens 3D detail for multiple exercises', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: ExercisePickerSheet(existingNames: {}, menus: []),
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const Key('exerciseCategory胸')));
+    await tester.pumpAndSettle();
+
+    for (final name in ['ベンチプレス', 'インクラインダンベルプレス']) {
+      await tester.tap(find.byKey(Key('exerciseMuscles$name')));
+      await tester.pumpAndSettle();
+      expect(find.text(name), findsWidgets);
+      expect(find.byKey(const Key('exerciseMuscleModel3D')), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('custom exercise is created from and inherits its category', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    await CustomExercisePreference.load();
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: ExercisePickerSheet(existingNames: {}, menus: []),
+        ),
+      ),
+    );
+    expect(find.text('自分で種目を作る'), findsNothing);
+    await tester.tap(find.byKey(const Key('exerciseCategory背中')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addCustomExerciseForCategory')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('customExerciseBodyPartField')), findsNothing);
+    expect(
+      find.byKey(const Key('inheritedCustomExerciseBodyPart')),
+      findsOneWidget,
+    );
+    expect(find.text('背中'), findsWidgets);
+    await tester.enterText(
+      find.byKey(const Key('customExerciseNameField')),
+      'テスト背中種目',
+    );
+    await tester.tap(find.byKey(const Key('saveCustomExerciseButton')));
+    await tester.pumpAndSettle();
+    expect(find.text('テスト背中種目'), findsOneWidget);
+    expect(CustomExercisePreference.exercises.single.bodyPart, '背中');
+  });
+
   test('workout UI preferences persist', () async {
     SharedPreferences.setMockInitialValues({});
     await WorkoutUiPreference.load();
@@ -227,20 +336,23 @@ void main() {
     await WorkoutUiPreference.setWorkoutDurationEnabled(true);
   });
 
-  test('timer display and saved duration remain independent', () async {
-    SharedPreferences.setMockInitialValues({
-      'workout_timer_enabled': false,
-      'workout_duration_enabled': true,
-    });
+  test(
+    'legacy timer settings migrate to one training duration value',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'workout_timer_enabled': false,
+        'workout_duration_enabled': true,
+      });
 
-    await WorkoutUiPreference.load();
+      await WorkoutUiPreference.load();
 
-    expect(WorkoutUiPreference.workoutTimerEnabled, isFalse);
-    expect(WorkoutUiPreference.workoutDurationEnabled, isTrue);
-    final preferences = await SharedPreferences.getInstance();
-    expect(preferences.getBool('workout_timer_enabled'), isFalse);
-    expect(preferences.getBool('workout_duration_enabled'), isTrue);
-  });
+      expect(WorkoutUiPreference.workoutTimerEnabled, isFalse);
+      expect(WorkoutUiPreference.workoutDurationEnabled, isFalse);
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.getBool('workout_timer_enabled'), isFalse);
+      expect(preferences.getBool('workout_duration_enabled'), isFalse);
+    },
+  );
 
   test('custom exercises persist between sessions', () async {
     SharedPreferences.setMockInitialValues({});
@@ -675,9 +787,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('登録した場所はありません'), findsOneWidget);
-
-    await tester.tap(find.text('場所を登録'));
+    await tester.tap(find.byKey(const Key('addCustomGymButton')));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.byKey(const Key('customGymNameField')),
@@ -685,10 +795,12 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('saveCustomGymButton')));
     await tester.pumpAndSettle();
-    expect(find.text('中央体育館'), findsNWidgets(2));
+    expect(find.text('中央体育館'), findsOneWidget);
     expect(CustomGymPreference.gyms, ['中央体育館']);
 
-    await tester.tap(find.byTooltip('中央体育館の名前を変更'));
+    await tester.tap(find.byKey(const Key('gymActions中央体育館')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('名前を変更'));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.byKey(const Key('customGymNameField')),
@@ -696,18 +808,20 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('saveCustomGymButton')));
     await tester.pumpAndSettle();
-    expect(find.text('市民スポーツセンター'), findsNWidgets(2));
+    expect(find.text('市民スポーツセンター'), findsOneWidget);
     expect(selectedGym, '市民スポーツセンター');
 
-    await tester.tap(find.byTooltip('市民スポーツセンターを削除'));
+    await tester.tap(find.byKey(const Key('gymActions市民スポーツセンター')));
     await tester.pumpAndSettle();
-    expect(find.text('登録した場所はありません'), findsOneWidget);
+    await tester.tap(find.text('削除'));
+    await tester.pumpAndSettle();
+    expect(find.text('市民スポーツセンター'), findsNothing);
     expect(find.text('「市民スポーツセンター」を削除しました'), findsOneWidget);
     expect(selectedGym, isNull);
 
     await tester.tap(find.text('元に戻す'));
     await tester.pumpAndSettle();
-    expect(find.text('市民スポーツセンター'), findsNWidgets(2));
+    expect(find.text('市民スポーツセンター'), findsOneWidget);
     expect(find.text('「市民スポーツセンター」を元に戻しました'), findsOneWidget);
     expect(selectedGym, '市民スポーツセンター');
 
@@ -731,8 +845,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('locationSettingsButton')), findsOneWidget);
-    expect(find.text('ジム・場所設定'), findsOneWidget);
-    expect(find.text('いつもの場所'), findsNothing);
+    expect(find.text('いつもの場所'), findsOneWidget);
     expect(find.text('カスタム場所'), findsNothing);
     expect(find.text('重量の単位'), findsNothing);
     expect(find.byKey(const Key('savedMenuManagementButton')), findsNothing);
@@ -742,11 +855,11 @@ void main() {
     );
 
     final trainingY = tester.getTopLeft(find.text('トレーニング設定').first).dy;
-    final accountY = tester.getTopLeft(find.text('アカウント関連')).dy;
+    expect(find.text('アカウント関連'), findsNothing);
+    expect(find.text('Supabaseクラウド'), findsNothing);
     final otherY = tester.getTopLeft(find.text('その他設定')).dy;
     final backupY = tester.getTopLeft(find.text('バックアップ・データ管理').first).dy;
-    expect(trainingY, lessThan(accountY));
-    expect(accountY, lessThan(otherY));
+    expect(trainingY, lessThan(otherY));
     expect(otherY, lessThan(backupY));
 
     await tester.ensureVisible(
@@ -756,6 +869,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('exportBackupFile')), findsOneWidget);
     expect(find.byKey(const Key('importBackupFile')), findsOneWidget);
+    expect(find.text('バックアップをコピー'), findsNothing);
+    expect(find.text('バックアップを読み込む'), findsNothing);
   });
 
   testWidgets(
@@ -783,10 +898,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('completionCheckSwitch')), findsOneWidget);
-      expect(find.byKey(const Key('workoutTimerSwitch')), findsOneWidget);
-      expect(find.byKey(const Key('workoutDurationSwitch')), findsOneWidget);
-      expect(find.text('トレーニングタイマー'), findsOneWidget);
-      expect(find.text('筋トレ時間'), findsOneWidget);
+      expect(find.byKey(const Key('trainingDurationSwitch')), findsOneWidget);
+      expect(find.byKey(const Key('workoutTimerSwitch')), findsNothing);
+      expect(find.byKey(const Key('workoutDurationSwitch')), findsNothing);
+      expect(find.text('トレーニング時間'), findsOneWidget);
+      expect(find.text('トレーニングタイマー'), findsNothing);
+      expect(find.text('筋トレ時間'), findsNothing);
       expect(find.byKey(const Key('restTimerSwitch')), findsNothing);
       expect(
         find.byKey(const Key('savedMenuManagementButton')),
@@ -800,10 +917,7 @@ void main() {
           .getTopLeft(find.byKey(const Key('completionCheckSwitch')))
           .dy;
       final timerY = tester
-          .getTopLeft(find.byKey(const Key('workoutTimerSwitch')))
-          .dy;
-      final durationY = tester
-          .getTopLeft(find.byKey(const Key('workoutDurationSwitch')))
+          .getTopLeft(find.byKey(const Key('trainingDurationSwitch')))
           .dy;
       final menuY = tester
           .getTopLeft(find.byKey(const Key('savedMenuManagementButton')))
@@ -812,22 +926,29 @@ void main() {
           .getTopLeft(find.byKey(const Key('customExerciseManagementButton')))
           .dy;
       expect(completionY, lessThan(timerY));
-      expect(timerY, lessThan(durationY));
-      expect(durationY, lessThan(menuY));
+      expect(timerY, lessThan(menuY));
       expect(menuY, lessThan(customExerciseY));
       expect(find.byKey(const Key('restTimerDurationButton')), findsNothing);
       await tester.tap(find.byKey(const Key('completionCheckSwitch')));
       await tester.pumpAndSettle();
       expect(RestTimerPreference.enabled, isFalse);
       expect(find.byKey(const Key('restTimerSwitch')), findsOneWidget);
+      final restY = tester
+          .getTopLeft(find.byKey(const Key('restTimerSwitch')))
+          .dy;
+      final timerAfterRestY = tester
+          .getTopLeft(find.byKey(const Key('trainingDurationSwitch')))
+          .dy;
+      expect(completionY, lessThan(restY));
+      expect(restY, lessThan(timerAfterRestY));
       await tester.tap(find.byKey(const Key('restTimerSwitch')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('restTimerDurationButton')), findsOneWidget);
 
-      await tester.tap(find.byKey(const Key('workoutTimerSwitch')));
+      await tester.tap(find.byKey(const Key('trainingDurationSwitch')));
       await tester.pumpAndSettle();
       expect(WorkoutUiPreference.workoutTimerEnabled, isFalse);
-      expect(WorkoutUiPreference.workoutDurationEnabled, isTrue);
+      expect(WorkoutUiPreference.workoutDurationEnabled, isFalse);
       await WorkoutUiPreference.setTrainingDurationEnabled(true);
     },
   );
@@ -908,7 +1029,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('いつもの場所'), findsOneWidget);
-    expect(find.text('カスタム場所'), findsOneWidget);
+    expect(find.text('カスタム場所'), findsNothing);
     expect(find.byKey(const Key('addCustomGymButton')), findsOneWidget);
     await tester.tap(find.byKey(const Key('preferredGym自宅')));
     await tester.pumpAndSettle();
@@ -1002,6 +1123,25 @@ void main() {
     expect(restored.workouts, isEmpty);
     expect(restored.workoutTemplates, isEmpty);
     expect(restored.customGyms, isEmpty);
+  });
+
+  test('invalid and unsupported backups are rejected before import', () {
+    expect(
+      () => MuscleMemoryBackup.fromJson({
+        'app': 'MUSCLEMORY',
+        'version': 3,
+        'workouts': 'invalid',
+      }),
+      throwsFormatException,
+    );
+    expect(
+      () => MuscleMemoryBackup.fromJson({
+        'app': 'MUSCLEMORY',
+        'version': 99,
+        'workouts': <dynamic>[],
+      }),
+      throwsFormatException,
+    );
   });
 
   testWidgets('about page uses the official MUSCLEMORY name', (tester) async {
@@ -1189,7 +1329,7 @@ void main() {
     expect(find.byType(HistoryCard), findsNWidgets(2));
   });
 
-  testWidgets('last workout card opens its history detail', (tester) async {
+  testWidgets('removing home summaries preserves history detail', (tester) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -1215,8 +1355,12 @@ void main() {
     await tester.pumpWidget(const MuscleMemoryApp());
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.byKey(const Key('lastWorkoutCard')));
-    await tester.tap(find.byKey(const Key('lastWorkoutCard')));
+    expect(find.byKey(const Key('lastWorkoutCard')), findsNothing);
+    await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(Key('calendarDay${DateTime.now().day}')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(HistoryCard));
     await tester.pumpAndSettle();
 
     expect(find.text('トレーニング詳細'), findsOneWidget);
@@ -1232,12 +1376,10 @@ void main() {
       MaterialApp(
         home: MonthlyHistoryPage(
           history: const [],
-          bodyWeights: const [],
           selectedGym: null,
           onWorkoutCompleted: (_) async {},
           onWorkoutUpdated: (_, _) async {},
           onWorkoutDeleted: (_) async => true,
-          onBodyWeightSaved: (_) async {},
         ),
       ),
     );
@@ -1461,34 +1603,10 @@ void main() {
     expect(persisted.map((item) => item.name), ['脚の日', '胸メイン']);
   });
 
-  testWidgets('saving over an existing menu asks before replacing it', (
+  testWidgets('a menu is created directly with multiple ordered exercises', (
     tester,
   ) async {
-    final workout = WorkoutRecord(
-      date: DateTime.now(),
-      sets: const [
-        RecordedSet(
-          exerciseName: 'ベンチプレス',
-          bodyPart: '胸',
-          weight: 60,
-          reps: 8,
-          completed: true,
-        ),
-      ],
-    );
-    const existing = SavedWorkoutTemplate(
-      name: '胸',
-      sets: [
-        RecordedSet(
-          exerciseName: 'ダンベルフライ',
-          bodyPart: '胸',
-          weight: 10,
-          reps: 10,
-          completed: true,
-        ),
-      ],
-    );
-    SavedWorkoutTemplate? saved;
+    List<SavedWorkoutTemplate> saved = [];
     tester.view.physicalSize = const Size(900, 1600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -1496,44 +1614,32 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(
-          body: DashboardPage(
-            history: [workout],
-            selectedGym: null,
-            onGymChanged: (_) {},
-            onWorkoutCompleted: (_) async {},
-            onWorkoutUpdated: (_, _) async {},
-            onWorkoutDeleted: (_) async => true,
-            workoutTemplates: const [existing],
-            onTemplateSaved: (template) async => saved = template,
-            onTemplateDeleted: (_) async {},
-            workoutDraft: null,
-            onDraftChanged: () async {},
-            onDraftDiscarded: () async {},
-          ),
+        home: SavedMenuManagementPage(
+          initialTemplates: const [],
+          onChanged: (templates) async => saved = templates,
         ),
       ),
     );
+    await tester.tap(find.byKey(const Key('createSavedMenuButton')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('templateNameField')), '胸の日');
+    await tester.tap(find.byKey(const Key('saveNewTemplateNameButton')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('exerciseCategory胸')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('ベンチプレス'));
+    await tester.tap(find.text('ダンベルフライ'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addSelectedExercises')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('menuExerciseOrderList')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('saveCreatedMenuButton')));
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.byKey(const Key('recentMenu0')));
-    await tester.tap(find.byTooltip('マイメニューに保存'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('保存'));
-    await tester.pumpAndSettle();
-    expect(find.text('同じ名前のメニューがあります'), findsOneWidget);
-    await tester.tap(find.text('キャンセル'));
-    await tester.pumpAndSettle();
-    expect(saved, isNull);
-
-    await tester.tap(find.byTooltip('マイメニューに保存'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('保存'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('overwriteTemplateButton')));
-    await tester.pumpAndSettle();
-    expect(saved?.name, '胸');
-    expect(saved?.sets.single.exerciseName, 'ベンチプレス');
+    expect(saved, hasLength(1));
+    expect(saved.single.name, '胸の日');
+    expect(saved.single.exerciseNames, ['ベンチプレス', 'ダンベルフライ']);
+    expect(saved.single.sets, hasLength(2));
   });
 
   testWidgets('previous sets can be applied and completed together', (
@@ -1673,27 +1779,30 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('ベンチプレス'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addSelectedExercises')));
+    await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('emptyWorkoutExercises')), findsNothing);
     expect(find.text('ベンチプレス'), findsOneWidget);
-    expect(find.text('3'), findsOneWidget);
+    expect(find.byKey(const Key('weightField0_1')), findsOneWidget);
+    expect(find.byKey(const Key('weightField0_2')), findsNothing);
 
     await tester.enterText(find.byKey(const Key('weightField0_1')), '42.5');
     expect(find.text('42.5'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('addSetButton')));
     await tester.pump();
-    expect(find.text('4'), findsOneWidget);
+    expect(find.byKey(const Key('weightField0_2')), findsOneWidget);
     final preferences = await SharedPreferences.getInstance();
     expect(
       preferences.getString('active_workout_draft'),
       contains('"weight":42.5'),
     );
 
-    await tester.ensureVisible(find.byKey(const Key('deleteSet0_4')));
-    await tester.tap(find.byKey(const Key('deleteSet0_4')));
+    await tester.ensureVisible(find.byKey(const Key('deleteSet0_2')));
+    await tester.tap(find.byKey(const Key('deleteSet0_2')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('weightField0_4')), findsNothing);
+    expect(find.byKey(const Key('weightField0_2')), findsNothing);
   });
 
   testWidgets('an empty draft from any app version becomes a fresh workout', (
@@ -1726,6 +1835,7 @@ void main() {
     SharedPreferences.setMockInitialValues({
       'completion_check_enabled': false,
       'workout_timer_enabled': false,
+      'workout_duration_enabled': false,
     });
     await WorkoutUiPreference.load();
     addTearDown(() async {
@@ -1746,12 +1856,14 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('ベンチプレス'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addSelectedExercises')));
+    await tester.pumpAndSettle();
 
     expect(find.byIcon(Icons.circle_outlined), findsNothing);
     expect(find.byKey(const Key('toggleAllSets0')), findsNothing);
     await tester.tap(find.byKey(const Key('completeWorkoutButton')));
     await tester.pumpAndSettle();
-    expect(find.text('3セットを記録します。'), findsOneWidget);
+    expect(find.text('1セットを記録します。'), findsOneWidget);
   });
 
   testWidgets('active workout can be deleted without leaving a draft', (
@@ -1769,12 +1881,19 @@ void main() {
     await tester.scrollUntilVisible(
       find.byKey(const Key('exerciseCategory脚')),
       180,
-      scrollable: find.descendant(of: find.byType(ExercisePickerSheet), matching: find.byType(Scrollable)).last,
+      scrollable: find
+          .descendant(
+            of: find.byType(ExercisePickerSheet),
+            matching: find.byType(Scrollable),
+          )
+          .last,
     );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('exerciseCategory脚')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('スクワット'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addSelectedExercises')));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('deleteWorkoutDraftButton')));
@@ -1808,9 +1927,14 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('スクワット'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addSelectedExercises')));
+    await tester.pumpAndSettle();
 
     expect(find.byTooltip('種目を削除'), findsOneWidget);
-    await tester.pump(const Duration(seconds: 2));
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 1100)),
+    );
+    await tester.pump(const Duration(seconds: 1));
     await tester.tap(find.byTooltip('種目を削除'));
     await tester.pumpAndSettle();
 
@@ -1878,6 +2002,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('ベンチプレス'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addSelectedExercises')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.circle_outlined).first);
     await tester.tap(find.byKey(const Key('completeWorkoutButton')));
     await tester.pumpAndSettle();
@@ -1895,15 +2021,7 @@ void main() {
     await tester.tap(find.text('ホームへ戻る'));
     await tester.pumpAndSettle();
 
-    expect(find.text('クイックスタート'), findsOneWidget);
-
-    await tester.tap(find.byTooltip('マイメニューに保存'));
-    await tester.pumpAndSettle();
-    await tester.enterText(find.byKey(const Key('templateNameField')), '胸の日');
-    await tester.tap(find.text('保存'));
-    await tester.pumpAndSettle();
-    expect(find.text('マイメニュー'), findsOneWidget);
-    expect(find.text('胸の日'), findsOneWidget);
+    expect(find.text('クイックスタート'), findsNothing);
 
     await tester.tap(find.byIcon(Icons.calendar_month_outlined));
     await tester.pumpAndSettle();
@@ -2029,6 +2147,16 @@ void main() {
   });
 
   testWidgets('rest timer only starts when enabled', (tester) async {
+    final platformCalls = <MethodCall>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+          platformCalls.add(call);
+          return null;
+        });
+    addTearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null);
+    });
     SharedPreferences.setMockInitialValues({
       'rest_timer_enabled': false,
       'rest_timer_seconds': 60,
@@ -2046,6 +2174,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('ベンチプレス'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addSelectedExercises')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.circle_outlined).first);
     await tester.pump();
     expect(find.byKey(const Key('restTimerBanner')), findsNothing);
@@ -2053,7 +2183,7 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     SharedPreferences.setMockInitialValues({
       'rest_timer_enabled': true,
-      'rest_timer_seconds': 60,
+      'rest_timer_seconds': 1,
     });
     await RestTimerPreference.load();
     await tester.pumpWidget(const MuscleMemoryApp());
@@ -2067,11 +2197,18 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('ベンチプレス'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addSelectedExercises')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.circle_outlined).first);
     await tester.pump();
 
     expect(find.byKey(const Key('restTimerBanner')), findsOneWidget);
-    expect(find.textContaining('休憩  01:'), findsOneWidget);
+    expect(find.text('休憩  00:01'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 2));
+    expect(
+      platformCalls.any((call) => call.method == 'SystemSound.play'),
+      isTrue,
+    );
   });
 
   testWidgets('workout draft is saved and leaving asks for confirmation', (
@@ -2090,6 +2227,8 @@ void main() {
     await tester.tap(find.byKey(const Key('exerciseCategory胸')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('ベンチプレス'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addSelectedExercises')));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).first, '55');
     await tester.pumpAndSettle();
@@ -2136,7 +2275,7 @@ void main() {
     expect(find.text('55'), findsOneWidget);
   });
 
-  testWidgets('quick start protects a draft and starts with today', (
+  testWidgets('saved menu start protects a draft and starts with today', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({
@@ -2188,7 +2327,9 @@ void main() {
             onWorkoutCompleted: (_) async {},
             onWorkoutUpdated: (_, _) async {},
             onWorkoutDeleted: (_) async => true,
-            workoutTemplates: const [],
+            workoutTemplates: [
+              SavedWorkoutTemplate(name: '背中メニュー', sets: oldWorkout.sets),
+            ],
             onTemplateSaved: (_) async {},
             onTemplateDeleted: (_) async {},
             workoutDraft: draft,
@@ -2200,8 +2341,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.byKey(const Key('recentMenu0')));
-    await tester.tap(find.byKey(const Key('recentMenu0')));
+    await tester.ensureVisible(find.byKey(const Key('savedMenu0')));
+    await tester.tap(find.byKey(const Key('savedMenu0')));
     await tester.pumpAndSettle();
     expect(find.text('新しく始めますか？'), findsOneWidget);
     expect(find.text('入力途中の内容は破棄されます。'), findsOneWidget);
@@ -2213,7 +2354,7 @@ void main() {
     var preferences = await SharedPreferences.getInstance();
     expect(preferences.getString(activeWorkoutDraftStorageKey), isNotNull);
 
-    await tester.tap(find.byKey(const Key('recentMenu0')));
+    await tester.tap(find.byKey(const Key('savedMenu0')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('破棄して始める'));
     await tester.pumpAndSettle();
@@ -2291,6 +2432,86 @@ void main() {
     expect(find.text('スクワット'), findsOneWidget);
     expect(find.text(workoutDateLabel(DateTime.now())), findsOneWidget);
 
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets(
+    'frozen draft restores exact duration without rewriting its date',
+    (tester) async {
+      final draft = jsonEncode({
+        'startedAt': DateTime(2025, 1, 1).toIso8601String(),
+        'elapsedSeconds': 543,
+        'timerStopped': true,
+        'date': DateTime(2026, 8, 1).toIso8601String(),
+        'note': '確定したメモ',
+        'exercises': [
+          {
+            'name': 'ベンチプレス',
+            'bodyPart': '胸',
+            'equipment': 'フリーウェイト',
+            'sets': [
+              {'weight': 55, 'reps': 8, 'completed': false},
+            ],
+          },
+        ],
+      });
+      SharedPreferences.setMockInitialValues({
+        activeWorkoutDraftStorageKey: draft,
+      });
+      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('activeWorkoutDraftCard')));
+      await tester.pumpAndSettle();
+      final label = find.byKey(const Key('workoutElapsedLabel'));
+      expect(tester.widget<Text>(label).data, contains('09:03'));
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump(const Duration(seconds: 10));
+      expect(tester.widget<Text>(label).data, contains('09:03'));
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.getString(activeWorkoutDraftStorageKey), draft);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
+
+  testWidgets('removing the final set freezes time including after undo', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      activeWorkoutDraftStorageKey: jsonEncode({
+        'elapsedSeconds': 123,
+        'timerStopped': false,
+        'date': DateTime.now().toIso8601String(),
+        'exercises': [
+          {
+            'name': 'ベンチプレス',
+            'bodyPart': '胸',
+            'equipment': 'フリーウェイト',
+            'sets': [
+              {'weight': 55, 'reps': 8, 'completed': false},
+            ],
+          },
+        ],
+      }),
+    });
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('activeWorkoutDraftCard')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('セットを削除'));
+    await tester.pumpAndSettle();
+    final preferences = await SharedPreferences.getInstance();
+    final frozen = jsonDecode(
+      preferences.getString(activeWorkoutDraftStorageKey)!,
+    ) as Map<String, dynamic>;
+    expect(frozen['timerStopped'], true);
+    final label = find.byKey(const Key('workoutElapsedLabel'));
+    final elapsed = tester.widget<Text>(label).data;
+    await tester.tap(find.text('元に戻す'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 10));
+    expect(tester.widget<Text>(label).data, elapsed);
+    expect(find.byTooltip('セットを削除'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -2405,7 +2626,7 @@ void main() {
     expect(entries.value.single.weightKg, 81.9);
   });
 
-  testWidgets('SNS preview contains workout data and optional metrics toggle', (
+  testWidgets('SNS preview contains exercise data without workout totals', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(900, 1800);
@@ -2421,6 +2642,13 @@ void main() {
           bodyPart: '胸',
           weight: 50,
           reps: 10,
+          completed: true,
+        ),
+        RecordedSet(
+          exerciseName: 'インクラインダンベルプレス（スローテンポ・ワイドグリップ）',
+          bodyPart: '胸',
+          weight: 12.5,
+          reps: 12,
           completed: true,
         ),
         RecordedSet(
@@ -2440,15 +2668,60 @@ void main() {
 
     expect(find.text('チェストプレス'), findsOneWidget);
     expect(find.text('55 kg × 8 回  /  2 セット'), findsOneWidget);
-    expect(find.text('総ボリューム'), findsOneWidget);
-    expect(find.text('トレーニング時間'), findsOneWidget);
+    expect(find.text('インクラインダンベルプレス（スローテンポ・ワイドグリップ）'), findsOneWidget);
+    expect(find.text('総ボリューム'), findsNothing);
+    expect(find.text('トレーニング時間'), findsNothing);
     expect(find.byKey(const Key('chooseSharePhotoButton')), findsOneWidget);
     expect(find.byKey(const Key('shareWorkoutImageButton')), findsOneWidget);
+    expect(find.text('保存'), findsOneWidget);
+    expect(tester.takeException(), isNull);
 
-    await tester.tap(find.byKey(const Key('shareVolumeToggle')));
-    await tester.pump();
-    expect(find.text('総ボリューム'), findsNothing);
-    expect(find.text('総ボリュームを表示'), findsOneWidget);
+    expect(find.byKey(const Key('shareVolumeToggle')), findsNothing);
+    expect(find.byKey(const Key('shareDurationToggle')), findsNothing);
+  });
+
+  testWidgets('body weight trend appears on home but not history', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'body_weight_entries': jsonEncode([
+        BodyWeightEntry(
+          id: 'home-weight',
+          recordedAt: DateTime(2026, 9, 15),
+          weightKg: 82.5,
+        ).toJson(),
+      ]),
+    });
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('bodyWeightTrendSection')), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('bodyWeightTrendSection')), findsNothing);
+    expect(find.byKey(const Key('monthlyCalendar')), findsOneWidget);
+  });
+
+  testWidgets('contact form is available from profile', (tester) async {
+    SharedPreferences.setMockInitialValues(const {});
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.person_outline_rounded));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('contactButton')));
+    await tester.tap(find.byKey(const Key('contactButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('不具合報告'), findsOneWidget);
+    expect(find.text('機能要望'), findsNothing);
+    expect(find.byKey(const Key('contactSubjectField')), findsOneWidget);
+    expect(find.byKey(const Key('contactMessageField')), findsOneWidget);
+    expect(find.byKey(const Key('contactImageButton')), findsOneWidget);
+    expect(find.byKey(const Key('sendContactButton')), findsOneWidget);
   });
 
   testWidgets('weekly goal UI is removed', (tester) async {
