@@ -63,3 +63,12 @@ android/key.properties
 
 # Generated beta installers remain local
 /docs/beta/*.apk
+
+# QA media is generated during verification and remains local.
+# Keep Markdown verification notes in Git.
+/docs/qa/**/*.png
+/docs/qa/**/*.jpg
+/docs/qa/**/*.jpeg
+/docs/qa/**/*.webp
+/docs/qa/**/*.mp4
+/docs/qa/**/*.mov
