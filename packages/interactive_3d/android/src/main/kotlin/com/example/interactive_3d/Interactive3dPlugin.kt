@@ -70,7 +70,8 @@ class Interactive3dPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         else {
           entry.configureFormPlayback(call.argument<Boolean>("playing") ?: false,
             call.argument<Number>("speed")?.toDouble() ?: 1.0,
-            call.argument<Number>("bodyViewAngle")?.toInt())
+            call.argument<Number>("bodyViewAngle")?.toInt(),
+            call.argument<Map<String, Any>>("formCamera"))
           result.success(null)
         }
       }

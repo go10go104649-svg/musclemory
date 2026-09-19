@@ -75,7 +75,19 @@ final class FormPlaybackController: NSObject {
         view.sceneTime = 0
     }
 
-    func configure(playing: Bool, speed: Double, bodyViewAngle: Int? = nil) {
+    func configure(playing: Bool, speed: Double, bodyViewAngle: Int? = nil, formCamera: [String: Any]? = nil) {
+        if bodyViewAngle == nil, let settings = formCamera, let camera = view?.pointOfView {
+            if let p = settings["position"] as? [Double], let t = settings["target"] as? [Double],
+               p.count == 3, t.count == 3, (p + t).allSatisfy({ $0.isFinite }) {
+                camera.position = SCNVector3(p[0], p[1], p[2])
+                // Explicit world up prevents roll inherited from the previous camera pose.
+                camera.look(at: SCNVector3(t[0], t[1], t[2]),
+                            up: SCNVector3(0, 1, 0), localFront: SCNVector3(0, 0, -1))
+            }
+            if let scale = settings["scale"] as? Double, scale.isFinite {
+                camera.camera?.orthographicScale = min(4, max(0.5, scale))
+            }
+        }
         if let angle = bodyViewAngle, let camera = view?.pointOfView {
             // glTF converts production Z-up to Y-up; front faces positive Z.
             let positions = [SCNVector3(0, 0.85, 4), SCNVector3(4, 0.85, 0), SCNVector3(0, 0.85, -4)]

@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:interactive_3d/interactive_3d.dart';
 
+import 'exercise_form_catalog.dart';
+
 /// Shared playback for explicitly authored, local exercise animations.
-class BenchPressFormView extends StatefulWidget {
-  const BenchPressFormView({super.key, this.exerciseName = 'ベンチプレス'});
+class ExerciseFormView extends StatefulWidget {
+  const ExerciseFormView({
+    super.key,
+    this.exerciseName = 'ベンチプレス',
+    this.definition,
+  });
+  final ExerciseFormDefinition? definition;
 
   final String exerciseName;
-  static const models = {
-    'ベンチプレス': 'assets/models/bench_press.glb',
-    'インクラインダンベルプレス': 'assets/models/incline_dumbbell_press.glb',
-  };
-  static bool supports(String name) => models.containsKey(name);
+  static bool supports(String name) =>
+      ExerciseFormCatalog.forName(name)?.available ?? false;
 
   @override
-  State<BenchPressFormView> createState() => _BenchPressFormViewState();
+  State<ExerciseFormView> createState() => _BenchPressFormViewState();
 }
 
-class _BenchPressFormViewState extends State<BenchPressFormView>
+class _BenchPressFormViewState extends State<ExerciseFormView>
     with WidgetsBindingObserver {
   bool _playing = true;
   bool _foreground = true;
@@ -30,6 +34,22 @@ class _BenchPressFormViewState extends State<BenchPressFormView>
     WidgetsBinding.instance.addObserver(this);
     final lifecycle = WidgetsBinding.instance.lifecycleState;
     _foreground = lifecycle == null || lifecycle == AppLifecycleState.resumed;
+  }
+
+  @override
+  void didUpdateWidget(covariant ExerciseFormView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldForm =
+        oldWidget.definition ??
+        ExerciseFormCatalog.forName(oldWidget.exerciseName);
+    final newForm =
+        widget.definition ?? ExerciseFormCatalog.forName(widget.exerciseName);
+    if (oldForm?.assetPath != newForm?.assetPath) {
+      _ready = false;
+      _failed = false;
+      _playing = true;
+      _speed = 1;
+    }
   }
 
   @override
@@ -47,6 +67,9 @@ class _BenchPressFormViewState extends State<BenchPressFormView>
 
   @override
   Widget build(BuildContext context) {
+    final form =
+        widget.definition ?? ExerciseFormCatalog.forName(widget.exerciseName);
+    if (form?.assetPath == null) return const SizedBox.shrink();
     return Container(
       key: const Key('benchPressForm3D'),
       decoration: BoxDecoration(
@@ -72,7 +95,7 @@ class _BenchPressFormViewState extends State<BenchPressFormView>
                 Spacer(),
                 Flexible(
                   child: Text(
-                    widget.exerciseName,
+                    exerciseDisplayName(widget.exerciseName),
                     maxLines: 2,
                     textAlign: TextAlign.end,
                     style: const TextStyle(color: Colors.white60, fontSize: 12),
@@ -88,15 +111,16 @@ class _BenchPressFormViewState extends State<BenchPressFormView>
               children: [
                 if (!_failed)
                   IgnorePointer(
+                    key: ValueKey(form!.assetPath),
                     child: Interactive3d(
                       key: const Key('benchPressNativeScene'),
-                      modelPath:
-                          BenchPressFormView.models[widget.exerciseName]!,
+                      modelPath: form.assetPath,
+                      formCamera: form.camera,
                       solidBackgroundColor: const [0.067, 0.094, 0.125, 1],
                       backgroundColor: const Color(0xFF111820),
                       formAnimation: true,
                       animationPlaying: _playing && _foreground,
-                      animationSpeed: _speed,
+                      animationSpeed: _speed * form.animationSpeed,
                       onModelReady: () {
                         if (mounted) setState(() => _ready = true);
                       },
@@ -174,4 +198,14 @@ class _BenchPressFormViewState extends State<BenchPressFormView>
       ),
     );
   }
+}
+
+/// Compatibility wrapper for existing callers and baseline regression tests.
+class BenchPressFormView extends ExerciseFormView {
+  const BenchPressFormView({super.key, super.exerciseName});
+  static const models = {
+    'ベンチプレス': 'assets/models/bench_press.glb',
+    'インクラインダンベルプレス': 'assets/models/incline_dumbbell_press.glb',
+  };
+  static bool supports(String name) => ExerciseFormView.supports(name);
 }

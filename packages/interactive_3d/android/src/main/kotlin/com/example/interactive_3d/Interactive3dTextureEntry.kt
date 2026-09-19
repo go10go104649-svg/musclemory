@@ -155,8 +155,8 @@ class Interactive3dTextureEntry(
     fun setCameraZoomLevel(zoom: Float) =
         mainHandler.post { filamentRenderer?.setCameraZoomLevel(zoom) }
 
-    fun configureFormPlayback(playing: Boolean, speed: Double, bodyViewAngle: Int? = null) =
-        mainHandler.post { filamentRenderer?.configureFormPlayback(playing, speed, bodyViewAngle) }
+    fun configureFormPlayback(playing: Boolean, speed: Double, bodyViewAngle: Int? = null, formCamera: Map<String, Any>? = null) =
+        mainHandler.post { filamentRenderer?.configureFormPlayback(playing, speed, bodyViewAngle, formCamera) }
 
     fun setPartGroupVisibility(group: Map<String, Any>, isVisible: Boolean) =
         mainHandler.post { filamentRenderer?.setPartGroupVisibility(group, isVisible) }

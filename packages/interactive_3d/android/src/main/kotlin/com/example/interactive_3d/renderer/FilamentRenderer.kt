@@ -79,8 +79,10 @@ class FilamentRenderer(
     private var formLastFrame: Long? = null
 
     private var bodyViewAngle: Int? = null
+    private var formCamera: Map<String, Any>? = null
 
-    fun configureFormPlayback(playing: Boolean, speed: Double, bodyViewAngle: Int? = null) {
+    fun configureFormPlayback(playing: Boolean, speed: Double, bodyViewAngle: Int? = null, formCamera: Map<String, Any>? = null) {
+        this.formCamera = formCamera
         this.bodyViewAngle = bodyViewAngle
         formMode = true
         formPlaying = playing
@@ -92,8 +94,20 @@ class FilamentRenderer(
 
     private fun applyFormCamera() {
         if (!formMode || width <= 0 || height <= 0) return
+        // MSAA produces bright samples along vertex-color boundaries on the
+        // Android OpenGL path. FXAA avoids those samples without altering the
+        // athlete's geometry/colors. Preserve legacy scenes' sampling settings.
+        filamentView?.let { view ->
+            val customForm = formCamera != null
+            view.multiSampleAntiAliasingOptions = view.multiSampleAntiAliasingOptions.apply {
+                enabled = !customForm
+                sampleCount = 4
+            }
+            view.antiAliasing = if (customForm) View.AntiAliasing.FXAA else View.AntiAliasing.NONE
+        }
         camera?.let {
-            val halfHeight = if (bodyViewAngle != null) 1.0 else 1.225
+            val scale = (formCamera?.get("scale") as? Number)?.toDouble()
+            val halfHeight = if (bodyViewAngle != null) 1.0 else if (scale != null && scale.isFinite()) scale.coerceIn(0.5, 4.0) else 1.225
             val halfWidth = halfHeight * width.toDouble() / height.coerceAtLeast(1)
             it.setProjection(Camera.Projection.ORTHO, -halfWidth, halfWidth,
                 -halfHeight, halfHeight, 0.01, 20.0)
@@ -102,7 +116,15 @@ class FilamentRenderer(
                 val x = if (angle == 1) 4.0 else 0.0
                 val z = if (angle == 1) 0.0 else if (angle == 2) -4.0 else 4.0
                 it.lookAt(x, 0.85, z, 0.0, 0.85, 0.0, 0.0, 1.0, 0.0)
-            } else it.lookAt(2.8, 2.5, 3.4, 0.0, 0.58, 0.13, 0.0, 1.0, 0.0)
+            } else {
+                fun vector(key: String, fallback: List<Double>): List<Double> {
+                    val values = (formCamera?.get(key) as? List<*>)?.mapNotNull { (it as? Number)?.toDouble() }
+                    return if (values?.size == 3 && values.all { it.isFinite() }) values else fallback
+                }
+                val p = vector("position", listOf(2.8, 2.5, 3.4))
+                val t = vector("target", listOf(0.0, 0.58, 0.13))
+                it.lookAt(p[0], p[1], p[2], t[0], t[1], t[2], 0.0, 1.0, 0.0)
+            }
         }
     }
     fun cameraDiagnostics(): Map<String, Any> {

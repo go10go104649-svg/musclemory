@@ -70,6 +70,8 @@ flutter:
 
   assets:
     - assets/models/body_tab.glb
+    - assets/models/forms/
+    - assets/models/form_chunks/
     - assets/models/bench_press.glb
     - assets/models/incline_dumbbell_press.glb
     - assets/category_muscles/

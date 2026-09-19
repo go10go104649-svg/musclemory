@@ -1,7 +1,9 @@
+import 'form_asset_bundle.dart';
 import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
@@ -105,6 +107,7 @@ class Interactive3d extends StatefulWidget {
 
   /// Opt-in, fixed-camera form player. Other model views keep upstream behavior.
   final bool formAnimation;
+  final Map<String, Object?>? formCamera;
 
   /// Fixed neutral body camera: 0 front, 1 side, 2 back.
   final int? bodyViewAngle;
@@ -141,6 +144,7 @@ class Interactive3d extends StatefulWidget {
     this.initialMaterialOverrides,
     this.initialEntityTextures,
     this.formAnimation = false,
+    this.formCamera,
     this.bodyViewAngle,
     this.animationPlaying = true,
     this.animationSpeed = 1,
@@ -190,7 +194,8 @@ class Interactive3dState extends State<Interactive3d> {
         widget.formAnimation &&
         (oldWidget.animationPlaying != widget.animationPlaying ||
             oldWidget.animationSpeed != widget.animationSpeed ||
-            oldWidget.bodyViewAngle != widget.bodyViewAngle)) {
+            oldWidget.bodyViewAngle != widget.bodyViewAngle ||
+            !mapEquals(oldWidget.formCamera, widget.formCamera))) {
       unawaited(_configureFormPlayback().catchError((Object error) {
         if (mounted) widget.onModelError?.call(error);
       }));
@@ -203,6 +208,7 @@ class Interactive3dState extends State<Interactive3d> {
       'playing': widget.animationPlaying,
       'speed': widget.animationSpeed,
       'bodyViewAngle': widget.bodyViewAngle,
+      'formCamera': widget.formCamera,
     };
     if (Platform.isIOS) {
       await _iosMethodChannel?.invokeMethod('configureFormPlayback', arguments);
@@ -312,9 +318,9 @@ class Interactive3dState extends State<Interactive3d> {
       String modelName;
 
       if (widget.modelPath != null) {
-        final data = await rootBundle.load(widget.modelPath!);
-        modelBytes = data.buffer.asUint8List();
-        modelName = widget.modelPath!.split('/').last;
+        modelBytes = await loadFormAsset(widget.modelPath!);
+        modelName =
+            widget.modelPath!.split('/').last.replaceAll('.form.json', '.glb');
       } else if (widget.modelUrl != null) {
         final response = await http.get(Uri.parse(widget.modelUrl!));
         if (response.statusCode != 200) {

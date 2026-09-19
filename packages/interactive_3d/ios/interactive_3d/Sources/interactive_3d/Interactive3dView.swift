@@ -93,7 +93,8 @@ class Interactive3DPlatformView: NSObject, FlutterPlatformView, FlutterStreamHan
             if formPlayback == nil { formPlayback = FormPlaybackController(view: scnView) }
             formPlayback?.configure(playing: args["playing"] as? Bool ?? false,
                                     speed: args["speed"] as? Double ?? 1,
-                                    bodyViewAngle: args["bodyViewAngle"] as? Int)
+                                    bodyViewAngle: args["bodyViewAngle"] as? Int,
+                                    formCamera: args["formCamera"] as? [String: Any])
             result(nil)
         case "loadModel":
             handleLoadModel(call, result: result)

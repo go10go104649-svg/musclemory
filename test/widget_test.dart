@@ -2203,6 +2203,8 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const Key('restTimerBanner')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('startRestTimerButton')));
+    await tester.pump();
     expect(find.text('休憩  00:01'), findsOneWidget);
     await tester.pump(const Duration(seconds: 2));
     expect(

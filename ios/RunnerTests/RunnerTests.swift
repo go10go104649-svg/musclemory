@@ -8,7 +8,23 @@ final class RunnerTests: XCTestCase {
   func testCompletionSoundHasExpectedDuration() throws {
     RestCompletionFeedback.prepareSound()
     let player = try AVAudioPlayer(contentsOf: RestCompletionFeedback.soundURL)
-    XCTAssertEqual(player.duration, 2.4, accuracy: 0.02)
+    XCTAssertEqual(player.duration, 2.8, accuracy: 0.02)
+  }
+
+  func testForegroundCueUsesOSSoundAndCancellationRemovesLateDelivery() {
+    let center = FakeNotificationCenter()
+    center.delayAdd = true
+    let timer = RestTimerNotifications(center: center)
+    let done = expectation(description: "foreground callback")
+    timer.presentCompletion { _ in done.fulfill() }
+    XCTAssertEqual(center.requests.count, 1)
+    XCTAssertNil(center.requests[0].trigger)
+    XCTAssertNotNil(center.requests[0].content.sound)
+    let id = center.requests[0].identifier
+    timer.handle(FlutterMethodCall(methodName: "cancel", arguments: nil)) { _ in }
+    center.addCallbacks[0](nil)
+    wait(for: [done], timeout: 2)
+    XCTAssertTrue(center.removed.contains(id))
   }
 
   private func schedule(_ timer: RestTimerNotifications, seconds: Int = 90,

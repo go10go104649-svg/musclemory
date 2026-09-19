@@ -11,7 +11,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   const native = MethodChannel('com.musclememory/rest_timer');
   testWidgets(
-    'rest completion keeps playing after banner removal, stop cancels native audio',
+    'rest completion uses persistent controls and OS-respecting sound',
     (tester) async {
       SharedPreferences.setMockInitialValues({
         'completion_check_enabled': true,
@@ -48,22 +48,30 @@ void main() {
       debugPrint(
         'QA_SOUND_START lifecycle=${WidgetsBinding.instance.lifecycleState}',
       );
-      await tester.tap(find.byIcon(Icons.circle_outlined).first);
+      await tester.tap(find.byKey(const Key('startRestTimerButton')));
       await tester.pump();
       await Future<void>.delayed(const Duration(milliseconds: 2400));
       await tester.pump();
-      expect(find.byKey(const Key('restTimerBanner')), findsNothing);
+      expect(find.byKey(const Key('startRestTimerButton')), findsOneWidget);
       expect(find.byKey(const Key('restTimerFinishedMessage')), findsOneWidget);
       var status = await native.invokeMapMethod<String, dynamic>('debugStatus');
       expect(
-        status!['playing'],
+        Platform.isIOS
+            ? (status!['delivered'] as List).any(
+                (id) => (id as String).endsWith('_foreground'),
+              )
+            : status!['playing'],
         isTrue,
         reason: 'cue must survive the countdown disappearing',
       );
       await Future<void>.delayed(const Duration(milliseconds: 900));
       status = await native.invokeMapMethod<String, dynamic>('debugStatus');
       expect(
-        status!['playing'],
+        Platform.isIOS
+            ? (status!['delivered'] as List).any(
+                (id) => (id as String).endsWith('_foreground'),
+              )
+            : status!['playing'],
         isTrue,
         reason: 'cue must not stop after a short beep',
       );

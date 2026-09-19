@@ -3,6 +3,7 @@ package com.musclememory.muscle_memory
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.media.AudioFocusRequest
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -16,6 +17,18 @@ internal object RestTimerFeedback {
     const val CHANNEL = "musclemory_rest_timer_sound_v3"
     var foreground = false
     private var player: MediaPlayer? = null
+    private var focus: AudioFocusRequest? = null
+    private val focusListener = AudioManager.OnAudioFocusChangeListener { }
+    private fun releaseFocus(context: Context) {
+        val audio = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            focus?.let { audio.abandonAudioFocusRequest(it) }
+            focus = null
+        } else {
+            @Suppress("DEPRECATION")
+            audio.abandonAudioFocus(focusListener)
+        }
+    }
     val isPlaying: Boolean get() = player?.isPlaying == true
     val vibration = longArrayOf(0, 180, 120, 180, 120, 180, 500, 180, 120, 180)
     fun sound(context: Context): Uri = Uri.parse("android.resource://${context.packageName}/raw/rest_complete")
@@ -52,18 +65,32 @@ internal object RestTimerFeedback {
         if (audio.ringerMode == AudioManager.RINGER_MODE_NORMAL &&
             (channel == null || channel.sound != null)) {
             try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    focus = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                        .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
+                        .setOnAudioFocusChangeListener(focusListener).build()
+                    audio.requestAudioFocus(focus!!)
+                } else {
+                    @Suppress("DEPRECATION")
+                    audio.requestAudioFocus(focusListener, AudioManager.STREAM_NOTIFICATION,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                }
                 player = MediaPlayer().apply {
                     setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
                     setDataSource(context.applicationContext, channel?.sound ?: sound(context))
                     setOnCompletionListener { finished ->
-                        if (player === finished) player = null
+                        if (player === finished) {
+                            player = null
+                            releaseFocus(context)
+                        }
                         finished.release()
                     }
                     prepare()
                     start()
                 }
-            } catch (_: Exception) { player?.release(); player = null }
+            } catch (_: Exception) { player?.release(); player = null; releaseFocus(context) }
         }
         if (channel?.shouldVibrate() != false) {
             val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -77,6 +104,7 @@ internal object RestTimerFeedback {
     }
 
     fun stop(context: Context) {
+        releaseFocus(context)
         player?.release()
         player = null
         (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).cancel()

@@ -16,6 +16,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+    private var notificationPermissionRequested = false
     private val channelName = "com.musclememory/rest_timer"
     private val imageChannelName = "com.musclememory/workout_image"
 
@@ -173,10 +174,11 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+        if (!notificationPermissionRequested && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
             PackageManager.PERMISSION_GRANTED
         ) {
+            notificationPermissionRequested = true
             requestPermissions(
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                 7342

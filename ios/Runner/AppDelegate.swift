@@ -11,6 +11,7 @@ import UserNotifications
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    UNUserNotificationCenter.current().delegate = self
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
@@ -20,11 +21,24 @@ import UserNotifications
     withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
   ) {
     if notification.request.identifier.hasPrefix("musclemory_rest_timer") {
-      // Foreground sound is owned by the native player, never played twice.
-      completionHandler([])
+      // Scheduled deadline is suppressed in foreground; Dart cancels it and
+      // submits exactly one immediate OS cue. OS owns sound/focus/silent rules.
+      completionHandler(notification.request.identifier.hasSuffix("_foreground") ? [.banner, .sound] : [])
       return
     }
     super.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler)
+  }
+
+  override func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    if response.notification.request.identifier.hasPrefix("musclemory_rest_timer") {
+      completionHandler()
+      return
+    }
+    super.userNotificationCenter(center, didReceive: response, withCompletionHandler: completionHandler)
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
@@ -61,8 +75,7 @@ import UserNotifications
       }
       #endif
       if call.method == "playCompletionFeedback" {
-        feedback.play()
-        result(nil)
+        notifications.presentCompletion(result: result)
         return
       }
       if call.method == "cancel" || call.method == "schedule" { feedback.stop() }
@@ -176,6 +189,28 @@ final class RestTimerNotifications {
     }
   }
 
+  func presentCompletion(result: @escaping FlutterResult) {
+    revision += 1
+    let requested = revision
+    let content = UNMutableNotificationContent()
+    content.title = "MUSCLEMORY"
+    content.body = "休憩終了。次のセットへ！"
+    content.sound = UNNotificationSound(named: UNNotificationSoundName("rest_complete.wav"))
+    let identifier = "\(prefix)_\(UUID().uuidString)_foreground"
+    activeIdentifier = identifier
+    center.add(UNNotificationRequest(identifier: identifier, content: content, trigger: nil)) { error in
+      DispatchQueue.main.async {
+        if requested != self.revision {
+          self.center.removePendingNotificationRequests(withIdentifiers: [identifier])
+          self.center.removeDeliveredNotifications(withIdentifiers: [identifier])
+          result(nil)
+        } else if let error {
+          result(FlutterError(code: "notification_feedback", message: error.localizedDescription, details: nil))
+        } else { result(nil) }
+      }
+    }
+  }
+
   func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
       switch call.method {
       case "schedule":
@@ -270,9 +305,8 @@ final class RestCompletionFeedback {
     guard let source = Bundle.main.url(forResource: key, withExtension: nil) else { return }
     do {
       try FileManager.default.createDirectory(at: soundURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-      if !FileManager.default.fileExists(atPath: soundURL.path) {
-        try FileManager.default.copyItem(at: source, to: soundURL)
-      }
+      let data = try Data(contentsOf: source)
+      try data.write(to: soundURL, options: .atomic)
     } catch { NSLog("Rest sound preparation failed: %@", error.localizedDescription) }
   }
 

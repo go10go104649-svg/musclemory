@@ -1,3 +1,4 @@
+import 'exercise_form_catalog.dart';
 import 'body_tab_colors.dart';
 
 import 'dart:async';
@@ -77,8 +78,8 @@ ExerciseRecordType recordTypeForExerciseName(
   String equipment = '',
 }) {
   for (final item in [
-    ...exerciseTemplates,
     ...CustomExercisePreference.exercises,
+    ...exerciseTemplates,
   ]) {
     if (item.name == name) return item.recordType;
   }
@@ -918,7 +919,7 @@ class RecentMenusCard extends StatelessWidget {
                   child: Icon(Icons.play_arrow_rounded),
                 ),
                 title: Text(
-                  workout.exerciseNames.join('・'),
+                  workout.exerciseNames.map(exerciseDisplayName).join('・'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontWeight: FontWeight.w800),
@@ -976,7 +977,7 @@ class SavedMenusCard extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w900),
                 ),
                 subtitle: Text(
-                  '${template.exerciseNames.join('・')} ・ ${template.sets.length}セット',
+                  '${template.exerciseNames.map(exerciseDisplayName).join('・')} ・ ${template.sets.length}セット',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -1202,7 +1203,7 @@ class _SavedMenuManagementPageState extends State<SavedMenuManagementPage> {
                             style: const TextStyle(fontWeight: FontWeight.w900),
                           ),
                           subtitle: Text(
-                            '${template.exerciseNames.join('・')} ・ ${template.sets.length}セット',
+                            '${template.exerciseNames.map(exerciseDisplayName).join('・')} ・ ${template.sets.length}セット',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -1310,7 +1311,7 @@ class _MenuExerciseOrderPageState extends State<_MenuExerciseOrderPage> {
                   key: ValueKey('menuOrder${exercise.name}'),
                   child: ListTile(
                     leading: const Icon(Icons.drag_handle_rounded),
-                    title: Text(exercise.name),
+                    title: Text(exerciseDisplayName(exercise.name)),
                     subtitle: Text(
                       '${exercise.bodyPart} ・ ${exercise.equipment}',
                     ),
@@ -1596,7 +1597,7 @@ class ActiveWorkoutDraftCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      summary.exerciseNames.join('・'),
+                      summary.exerciseNames.map(exerciseDisplayName).join('・'),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: Color(0xFF6C746D)),
@@ -1908,7 +1909,10 @@ class ExerciseLine extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text(
+                exerciseDisplayName(name),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
               const SizedBox(height: 2),
               Text(
                 detail,
@@ -3685,7 +3689,12 @@ class _ExerciseProgressPageState extends State<ExerciseProgressPage> {
               border: OutlineInputBorder(),
             ),
             items: _exerciseNames
-                .map((name) => DropdownMenuItem(value: name, child: Text(name)))
+                .map(
+                  (name) => DropdownMenuItem(
+                    value: name,
+                    child: Text(exerciseDisplayName(name)),
+                  ),
+                )
                 .toList(),
             onChanged: (value) {
               if (value != null) setState(() => _selectedExercise = value);
@@ -4494,7 +4503,7 @@ List<Widget> _exerciseShareRows(WorkoutRecord workout) {
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Text(
-                name,
+                exerciseDisplayName(name),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -4545,6 +4554,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   Timer? _restTimer;
   Duration _elapsed = Duration.zero;
   int _restRemaining = 0;
+  int _restRevision = 0;
   DateTime? _restEndsAt;
   int _inputRevision = 0;
   bool _allowPop = false;
@@ -4627,6 +4637,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   }
 
   Duration _stopWorkoutTimer({bool keepStopped = false}) {
+    _restRevision++;
     if (!widget.isEditing && _timer != null) {
       _elapsed = DateTime.now().difference(_startedAt);
       _timer?.cancel();
@@ -4733,7 +4744,11 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         !widget.isEditing &&
         WorkoutUiPreference.completionCheckEnabled &&
         RestTimerPreference.enabled) {
-      _startRestTimer();
+      if (setIndex == _exercises[exerciseIndex].sets.length - 1) {
+        _skipRest();
+      } else {
+        _startRestTimer();
+      }
     }
   }
 
@@ -4777,11 +4792,12 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         !widget.isEditing &&
         WorkoutUiPreference.completionCheckEnabled &&
         RestTimerPreference.enabled) {
-      _startRestTimer();
+      _skipRest();
     }
   }
 
   void _startRestTimer([int? seconds]) {
+    _restRevision++;
     _restTimer?.cancel();
     final duration = seconds ?? RestTimerPreference.seconds;
     _restEndsAt = DateTime.now().add(Duration(seconds: duration));
@@ -4797,18 +4813,23 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
 
   void _finishRestTimer({bool notify = true}) {
     if (_restEndsAt == null) return;
-    if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
-      unawaited(RestNotificationService.cancel());
-    }
+    final revision = ++_restRevision;
+    final foreground =
+        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     _restTimer?.cancel();
     _restTimer = null;
     _restEndsAt = null;
+    if (foreground) {
+      unawaited(
+        RestNotificationService.cancel().then((_) async {
+          if (mounted && notify && revision == _restRevision) {
+            await RestNotificationService.playCompletionFeedback();
+          }
+        }),
+      );
+    }
     if (mounted) {
       setState(() => _restRemaining = 0);
-      if (notify &&
-          WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
-        unawaited(RestNotificationService.playCompletionFeedback());
-      }
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -4820,13 +4841,32 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     }
   }
 
+  void _pauseRest() {
+    _restRevision++;
+    if (_restEndsAt == null) return;
+    final remaining = remainingRestSeconds(_restEndsAt!, DateTime.now());
+    _restTimer?.cancel();
+    _restTimer = null;
+    _restEndsAt = null;
+    unawaited(RestNotificationService.cancel());
+    setState(() => _restRemaining = remaining);
+  }
+
+  void _resumeRest() => _startRestTimer(
+    _restRemaining > 0 ? _restRemaining : RestTimerPreference.seconds,
+  );
+
   void _skipRest() {
+    _restRevision++;
     _restTimer?.cancel();
     _restTimer = null;
     _restEndsAt = null;
     unawaited(RestNotificationService.cancel());
     setState(() => _restRemaining = 0);
   }
+
+  String get _configuredRestLabel =>
+      '${(RestTimerPreference.seconds ~/ 60).toString().padLeft(2, '0')}:${(RestTimerPreference.seconds % 60).toString().padLeft(2, '0')}';
 
   String get _restLabel {
     final minutes = (_restRemaining ~/ 60).toString().padLeft(2, '0');
@@ -5174,7 +5214,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                 ),
               ),
               const SizedBox(height: 16),
-              if (_restRemaining > 0) ...[
+              if (!widget.isEditing &&
+                  WorkoutUiPreference.completionCheckEnabled &&
+                  RestTimerPreference.enabled) ...[
                 Container(
                   key: const Key('restTimerBanner'),
                   margin: const EdgeInsets.only(bottom: 16),
@@ -5192,7 +5234,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          '休憩  $_restLabel',
+                          '休憩  ${_restRemaining > 0 ? _restLabel : _configuredRestLabel}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -5201,13 +5243,36 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                         ),
                       ),
                       TextButton(
-                        onPressed: () => _startRestTimer(_restRemaining + 30),
+                        onPressed: () {
+                          if (_restEndsAt != null) {
+                            _startRestTimer(_restRemaining + 30);
+                          } else {
+                            setState(
+                              () => _restRemaining =
+                                  (_restRemaining > 0
+                                      ? _restRemaining
+                                      : RestTimerPreference.seconds) +
+                                  30,
+                            );
+                          }
+                        },
                         child: const Text('+30秒'),
                       ),
                       TextButton(
-                        key: const Key('stopRestTimerButton'),
-                        onPressed: _skipRest,
-                        child: const Text('ストップ'),
+                        key: Key(
+                          _restEndsAt != null
+                              ? 'stopRestTimerButton'
+                              : 'startRestTimerButton',
+                        ),
+                        onPressed: _restEndsAt != null
+                            ? _pauseRest
+                            : _resumeRest,
+                        child: SizedBox(
+                          width: 64,
+                          child: Center(
+                            child: Text(_restEndsAt != null ? 'ストップ' : '開始'),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -5803,7 +5868,9 @@ class CustomExercisePreference {
   static bool containsName(String name, {String? excludingName}) {
     final normalized = name.trim().toLowerCase();
     return exerciseTemplates.any(
-          (item) => item.name.toLowerCase() == normalized,
+          (item) =>
+              item.name.toLowerCase() == normalized &&
+              excludingName?.trim().toLowerCase() != normalized,
         ) ||
         exercises.any(
           (item) =>
@@ -5836,7 +5903,7 @@ class CustomExercisePreference {
     for (final exercise in updated) {
       final name = exercise.name.trim();
       if (name.isEmpty ||
-          exerciseTemplates.any(
+          _legacyExerciseTemplates.any(
             (item) => item.name.toLowerCase() == name.toLowerCase(),
           )) {
         continue;
@@ -5862,7 +5929,7 @@ class CustomExercisePreference {
   }
 }
 
-const exerciseTemplates = [
+const _legacyExerciseTemplates = [
   ExerciseTemplate(
     name: 'ベンチプレス',
     bodyPart: '胸',
@@ -6106,6 +6173,31 @@ const exerciseTemplates = [
   ),
 ];
 
+// Keep legacy names as persistence keys; new forms use catalog identifiers.
+final exerciseTemplates = <ExerciseTemplate>[
+  ..._legacyExerciseTemplates,
+  for (final form in ExerciseFormCatalog.entries)
+    if (!_legacyExerciseTemplates.any(
+      (e) => ExerciseFormCatalog.forName(e.name)?.exerciseId == form.exerciseId,
+    ))
+      ExerciseTemplate(
+        name: form.exerciseName,
+        bodyPart: form.category == '腹筋' ? '腹' : form.category,
+        equipment: form.equipmentId.contains('dumbbell')
+            ? 'ダンベル'
+            : form.equipmentId.contains('barbell')
+            ? 'フリーウェイト'
+            : form.loadMode == 'bodyweight'
+            ? '自重'
+            : 'マシン',
+        startWeight:
+            form.loadMode == 'external' && form.recordType == 'weightReps'
+            ? 10
+            : 0,
+        recordType: ExerciseRecordType.fromName(form.recordType),
+      ),
+];
+
 class ExerciseSelection {
   const ExerciseSelection(this.template, {this.savedSets});
   final ExerciseTemplate template;
@@ -6128,14 +6220,26 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
   static const _categories = ['胸', '背中', '肩', '腕', '脚', '腹', '有酸素'];
   String _query = '';
   String? _selectedCategory;
+  String? _recentCustomName;
+  final _listController = ScrollController();
+
+  @override
+  void dispose() {
+    _listController.dispose();
+    super.dispose();
+  }
+
   SavedWorkoutTemplate? _menu;
   final Map<String, ExerciseSelection> _selected = {};
   final List<String> _order = [];
   String _categoryLabel(String category) => category == '腹' ? '腹筋' : category;
-  List<ExerciseTemplate> get _catalog => [
-    ...exerciseTemplates,
-    ...CustomExercisePreference.exercises,
-  ];
+  List<ExerciseTemplate> get _catalog => <String, ExerciseTemplate>{
+    for (final item in exerciseTemplates) item.name.toLowerCase(): item,
+    // A formerly custom exercise keeps its saved recording settings when a
+    // later release adds a built-in exercise with the same name.
+    for (final item in CustomExercisePreference.exercises)
+      item.name.toLowerCase(): item,
+  }.values.toList();
 
   List<ExerciseSelection> get _source {
     if (_menu == null) {
@@ -6186,10 +6290,20 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     final filtered = _source.where((item) {
       final e = item.template;
       final query = _query.toLowerCase();
-      return e.name.toLowerCase().contains(query) ||
+      return exerciseDisplayName(e.name).toLowerCase().contains(query) ||
+          e.name.toLowerCase().contains(query) ||
+          (ExerciseFormCatalog.forName(e.name)?.englishName
+                  ?.toLowerCase()
+                  .contains(query) ??
+              false) ||
           e.bodyPart.contains(query) ||
           e.equipment.toLowerCase().contains(query);
     }).toList();
+    // Keep a newly created exercise visible even as the catalog grows.
+    final recent = filtered.indexWhere(
+      (item) => item.template.name == _recentCustomName,
+    );
+    if (recent > 0) filtered.insert(0, filtered.removeAt(recent));
     return SafeArea(
       child: Column(
         children: [
@@ -6269,6 +6383,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
           ],
           Expanded(
             child: ListView(
+              controller: _listController,
               key: ValueKey(
                 'exercisePickerList${_menu?.name ?? _selectedCategory}',
               ),
@@ -6308,7 +6423,11 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                         onChanged: added ? null : (_) => _toggle(item),
                       ),
                       title: Text(
-                        e.name,
+                        exerciseDisplayName(
+                          e.name,
+                          languageCode: Localizations.localeOf(context)
+                              .languageCode,
+                        ),
                         style: const TextStyle(fontWeight: FontWeight.w800),
                       ),
                       subtitle: Text(
@@ -6392,10 +6511,16 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     final added = await CustomExercisePreference.add(created);
     if (mounted && added) {
       setState(() {
+        _recentCustomName = created.name;
         _selected[created.name] = ExerciseSelection(created);
         _order.add(created.name);
         _selectedCategory = created.bodyPart;
         _query = '';
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _listController.hasClients) {
+          _listController.jumpTo(0);
+        }
       });
     }
   }
@@ -6417,18 +6542,25 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profile = muscleProfileForExercise(exercise.name, exercise.bodyPart);
+    final form = ExerciseFormCatalog.forName(exercise.name);
+    final primaryLabels = form?.available == true
+        ? form!.primaryMuscleLabels
+        : profile.primary.map((muscle) => muscle.label).toList();
+    final secondaryLabels = form?.available == true
+        ? form!.secondaryMuscleLabels
+        : profile.secondary.map((muscle) => muscle.label).toList();
     final scores = <MuscleRegion, double>{
       for (final muscle in profile.primary) muscle: 1,
       for (final muscle in profile.secondary) muscle: 0.35,
     };
     return Scaffold(
-      appBar: AppBar(title: Text(exercise.name)),
+      appBar: AppBar(title: Text(exerciseDisplayName(exercise.name))),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          if (BenchPressFormView.supports(exercise.name) &&
+          if (ExerciseFormView.supports(exercise.name) &&
               (Platform.isIOS || Platform.isAndroid))
-            BenchPressFormView(
+            ExerciseFormView(
               key: ValueKey(exercise.name),
               exerciseName: exercise.name,
             )
@@ -6455,18 +6587,18 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: profile.primary
+            children: primaryLabels
                 .map(
                   (muscle) => Chip(
                     avatar: const CircleAvatar(
                       backgroundColor: Color(0xFFD4162A),
                     ),
-                    label: Text(muscle.label),
+                    label: Text(muscle),
                   ),
                 )
                 .toList(),
           ),
-          if (profile.secondary.isNotEmpty) ...[
+          if (secondaryLabels.isNotEmpty) ...[
             const SizedBox(height: 18),
             const Text(
               '補助的に使う筋肉',
@@ -6476,13 +6608,13 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: profile.secondary
+              children: secondaryLabels
                   .map(
                     (muscle) => Chip(
                       avatar: const CircleAvatar(
                         backgroundColor: Color(0xFFFF8B91),
                       ),
-                      label: Text(muscle.label),
+                      label: Text(muscle),
                     ),
                   )
                   .toList(),
@@ -6490,8 +6622,8 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
           ],
           const SizedBox(height: 16),
           Text(
-            BenchPressFormView.supports(exercise.name)
-                ? '濃い赤が大胸筋、薄い赤が三角筋前部・上腕三頭筋です。対象筋を説明する表示で、筋活動の実測値ではありません。'
+            ExerciseFormView.supports(exercise.name)
+                ? '濃い赤がメインターゲット、薄い赤が補助的に使う筋肉です。対象筋の説明で、筋活動の実測値ではありません。'
                 : '濃い赤がメインターゲット、薄い赤が補助的に使う筋肉です。前面・側面・背面を切り替えて確認できます。',
             style: const TextStyle(color: Color(0xFF666D68)),
           ),
@@ -6613,7 +6745,7 @@ class _CustomExerciseManagementPageState
                   key: Key('customExercise$index'),
                   child: ListTile(
                     title: Text(
-                      exercise.name,
+                      exerciseDisplayName(exercise.name),
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
                     subtitle: Text(
@@ -6959,7 +7091,7 @@ class ExerciseInputCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      exercise.name,
+                      exerciseDisplayName(exercise.name),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
@@ -7043,6 +7175,11 @@ class ExerciseInputCard extends StatelessWidget {
                     label: Text(allCompleted ? 'すべて解除' : 'すべて完了'),
                   ),
               ],
+            ),
+          if (usesAdditionalWeight(exercise.name))
+            const Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: Text('追加重量（kg）・自重のみは0', style: TextStyle(fontSize: 12)),
             ),
           SetHeader(
             recordType: exercise.recordType,
@@ -7233,7 +7370,9 @@ class RecordedSet {
   final bool completed;
 
   bool get hasRequiredValues => switch (recordType) {
-    ExerciseRecordType.weightReps => weight > 0 && reps > 0,
+    ExerciseRecordType.weightReps =>
+      (weight > 0 || (weight == 0 && usesAdditionalWeight(exerciseName))) &&
+          reps > 0,
     ExerciseRecordType.bodyweightReps => reps > 0,
     ExerciseRecordType.timed => durationSeconds > 0,
     ExerciseRecordType.cardio =>
@@ -7245,7 +7384,10 @@ class RecordedSet {
   };
 
   String get displaySummary => switch (recordType) {
-    ExerciseRecordType.weightReps => '${formatWeight(weight)} kg × $reps 回',
+    ExerciseRecordType.weightReps =>
+      usesAdditionalWeight(exerciseName)
+          ? '${weight == 0 ? '自重' : '+${formatWeight(weight)} kg'} × $reps 回'
+          : '${formatWeight(weight)} kg × $reps 回',
     ExerciseRecordType.bodyweightReps => '$reps 回',
     ExerciseRecordType.timed => '${formatDurationSeconds(durationSeconds)} 保持',
     ExerciseRecordType.cardio || ExerciseRecordType.distance => activitySummary,
@@ -7583,6 +7725,7 @@ class SetRow extends StatelessWidget {
               width: 34,
               height: 34,
               child: IconButton.filled(
+                key: Key('toggleSet$fieldPrefix$number'),
                 padding: EdgeInsets.zero,
                 onPressed: onToggle,
                 style: IconButton.styleFrom(

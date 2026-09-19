@@ -1,6 +1,7 @@
 package com.musclememory.muscle_memory
 
 import android.app.Notification
+import android.app.PendingIntent
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -24,7 +25,13 @@ class RestTimerReceiver : BroadcastReceiver() {
             Notification.Builder(context).setSound(RestTimerFeedback.sound(context))
                 .setVibrate(RestTimerFeedback.vibration)
         }
+        val launch = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        val openApp = PendingIntent.getActivity(context, 7341, launch,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val notification = builder
+            .setContentIntent(openApp)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("MUSCLEMORY")
             .setContentText("休憩終了。次のセットへ！")

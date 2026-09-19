@@ -65,6 +65,10 @@ class MuscleSetUsage {
 }
 
 const exerciseMuscleProfiles = <String, ExerciseMuscleProfile>{
+  'インクラインフライマシン': ExerciseMuscleProfile(
+    primary: [MuscleRegion.pectoralisMajor],
+    secondary: [MuscleRegion.anteriorDeltoid],
+  ),
   'ベンチプレス': ExerciseMuscleProfile(
     primary: [MuscleRegion.pectoralisMajor],
     secondary: [MuscleRegion.anteriorDeltoid, MuscleRegion.triceps],

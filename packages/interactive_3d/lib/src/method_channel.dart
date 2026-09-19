@@ -1,3 +1,4 @@
+import 'form_asset_bundle.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -110,9 +111,8 @@ class MethodChannelInteractive3d extends Interactive3dPlatform {
     String modelName;
 
     if (modelPath != null) {
-      final data = await rootBundle.load(modelPath);
-      modelBytes = data.buffer.asUint8List();
-      modelName = modelPath.split('/').last;
+      modelBytes = await loadFormAsset(modelPath);
+      modelName = modelPath.split('/').last.replaceAll('.form.json', '.glb');
     } else if (modelUrl != null) {
       final response = await http.get(Uri.parse(modelUrl));
       if (response.statusCode != 200) {
