@@ -1,14 +1,14 @@
 """Blender authoring entry point. Reuses the approved athlete and joint hierarchy.
 Source GLBs and previews go to --output, never duplicated in Flutter's bundle.
 """
-import bpy, json, math, pathlib, sys, argparse
+import bpy, json, math, pathlib, sys
 from mathutils import Vector, Matrix, Quaternion
 ROOT=pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from anatomy import paint
+from author_options import parse_options, prepare_output
 args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
-parser=argparse.ArgumentParser();parser.add_argument('--ids',required=True);parser.add_argument('--output',type=pathlib.Path,required=True);parser.add_argument('--preview',action='store_true');opt=parser.parse_args(args)
-opt.output.mkdir(parents=True,exist_ok=True)
+opt=parse_options(args, ROOT)
 catalog=json.loads((pathlib.Path(__file__).parent/'catalog.json').read_text())['exercises']
 FPS=24;FRAMES=96
 
@@ -537,6 +537,20 @@ class Author:
   # Shared base geometry and skinning stay unchanged; muscles are painted onto
   # the same vertex surface, never separate floating muscle objects.
   self.scene.frame_set(1)
+  if opt.preview_only:
+   self.fit_camera()
+   (opt.output/(self.id+'.preview.metrics.json')).write_text(json.dumps(self.metrics))
+   self.preview(draft=True)
+   images=[self.id+'_'+label+'.png' for label in ('start','mid','end')]
+   if not all((opt.output/name).is_file() and (opt.output/name).stat().st_size>0 for name in images):
+    raise RuntimeError('Preview render did not produce all requested images')
+   (opt.output/(self.id+'.preview.json')).write_text(json.dumps({
+    'exerciseId':self.id,'mode':'preview-only','images':images,
+    'frames':[1,24,47],'productionExport':False,'reviewApproved':False,
+    'unchecked':['motion loop','Android','iOS','production route','appearance approval'],
+   },indent=2))
+   print('PREVIEW_ONLY',self.id,str(opt.output),flush=True)
+   return
   path=opt.output/(self.id+'.glb')
   bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',export_animations=True,export_animation_mode='SCENE',export_frame_range=True,export_force_sampling=True,export_anim_scene_split_object=False,export_morph=False,export_skins=True,export_def_bones=True,export_cameras=False,export_lights=False,export_extras=True,export_attributes=True,export_all_influences=False,export_materials='EXPORT')
   (opt.output/(self.id+'.metrics.json')).write_text(json.dumps(self.metrics))
@@ -568,14 +582,17 @@ class Author:
   self.spec['cameraAngle']=[eye.x,eye.z,-eye.y]
   self.spec['cameraScale']=max(hi[0]-lo[0],hi[1]-lo[1])*.56
   (opt.output/(self.id+'.camera.json')).write_text(json.dumps({k:self.spec[k] for k in ['cameraTarget','cameraAngle','cameraScale']}))
- def preview(self):
-  self.scene.render.engine='CYCLES';self.scene.cycles.samples=12
-  self.scene.render.resolution_x=700;self.scene.render.resolution_y=700;self.scene.render.resolution_percentage=100
+ def preview(self,draft=False):
+  self.scene.render.engine='CYCLES';self.scene.cycles.samples=6 if draft else 12
+  resolution=420 if draft else 700
+  self.scene.render.resolution_x=resolution;self.scene.render.resolution_y=resolution;self.scene.render.resolution_percentage=100
+  if draft:self.scene.render.image_settings.file_format='PNG'
   self.scene.world.use_nodes=True;self.scene.world.node_tree.nodes['Background'].inputs[0].default_value=(.04,.05,.065,1);self.scene.world.node_tree.nodes['Background'].inputs[1].default_value=.3
   eye=self.spec['cameraAngle'];bpy.ops.object.camera_add(location=(eye[0],-eye[2],eye[1]));cam=bpy.context.object;target=self.spec['cameraTarget'];aim(cam,(target[0],-target[2],target[1]));cam.data.type='ORTHO';cam.data.ortho_scale=self.spec['cameraScale']*2;self.scene.camera=cam
   for name,pos,power,size in [('Key',(-2,-3,4),550,3),('Fill',(3,-1,3),220,3),('Rim',(0,3,3),600,2)]:
    bpy.ops.object.light_add(type='AREA',location=pos);light=bpy.context.object;light.data.energy=power;light.data.shape='DISK';light.data.size=size;aim(light,(0,0,.65))
-  for frame,label in [(1,'top'),(47,'bottom')]:
+  frames=[(1,'start'),(24,'mid'),(47,'end')] if draft else [(1,'top'),(47,'bottom')]
+  for frame,label in frames:
    self.scene.frame_set(frame);self.scene.render.filepath=str(opt.output/(self.id+'_'+label+'.png'));bpy.ops.render.render(write_still=True)
 
 unknown=set(opt.ids.split(','))-{spec['exerciseId'] for spec in catalog}
@@ -584,4 +601,7 @@ for spec in catalog:
  if spec['exerciseId'] in opt.ids.split(','):
   if not spec.get('references') or not spec.get('review',{}).get('equipmentReference'):
    raise ValueError(f'Review actual equipment and usage before authoring {spec["exerciseId"]}')
+prepare_output(opt)
+for spec in catalog:
+ if spec['exerciseId'] in opt.ids.split(','):
   Author(spec).run()

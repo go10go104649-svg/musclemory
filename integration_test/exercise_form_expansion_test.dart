@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -8,6 +9,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:muscle_memory/bench_press_form.dart';
 import 'package:muscle_memory/exercise_form_catalog.dart';
 
+import 'support/form_qa_plan.dart';
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
@@ -15,23 +18,29 @@ void main() {
     'baseline and revised form load, play, pause, change speed and reopen',
     (tester) async {
       const selected = String.fromEnvironment('FORM_QA_IDS');
-      final ids = selected.isEmpty
-          ? [
-              'bench_press',
-              'incline_dumbbell_press',
-              'incline_press_machine',
-              'lat_pulldown',
-              'mag_narrow',
-              'mag_medium',
-              'mag_wide',
-              'linear_row',
-              'decline_fly_machine',
-              'decline_press_machine',
-              'assisted_chin_up',
-              'mag_narrow',
-            ]
-          : selected.split(',');
-      for (final id in ids) {
+      final plan = FormQaPlan.parse(
+        mode: const String.fromEnvironment('FORM_QA_MODE', defaultValue: 'full'),
+        selected: selected,
+        baselineEvidence: const String.fromEnvironment('FORM_QA_BASELINE'),
+        knownIds: ExerciseFormCatalog.byId.keys.toSet(),
+        assetIds: ExerciseFormCatalog.entries
+            .where((form) => form.assetPath != null)
+            .map((form) => form.exerciseId)
+            .toSet(),
+      );
+      final completed = <String>[];
+      final report = <String, Object?>{
+        ...plan.report(),
+        'os': Platform.operatingSystem,
+        'completedSessions': completed,
+        'passed': false,
+      };
+      binding.reportData ??= <String, dynamic>{};
+      binding.reportData!['formQa'] = report;
+      debugPrint('QA_FORM_PLAN ${jsonEncode(report)}');
+      final ids = plan.executionIds;
+      for (var index = 0; index < ids.length; index++) {
+        final id = ids[index];
         final form = ExerciseFormCatalog.byId[id]!;
         await tester.pumpWidget(
           MaterialApp(
@@ -68,7 +77,7 @@ void main() {
         }
         // Native asset loading can finish before the first textured frame.
         // Begin motion evidence only after visible geometry reaches the screen.
-        if (Platform.isAndroid) {
+        if (Platform.isAndroid || plan.isLight) {
           var visible = false;
           for (var attempt = 0; attempt < 15; attempt++) {
             final pixels = await capture(
@@ -85,33 +94,49 @@ void main() {
           }
           expect(visible, isTrue, reason: 'First visible frame failed: $id');
         }
-        for (var frame = 0; frame < 4; frame++) {
+        if (plan.isLight) {
+          // Display/reopen smoke check, NOT motion or playback-control approval.
           await Future<void>.delayed(const Duration(seconds: 1));
           await tester.pump();
-          final pixels = await capture(binding, '${id}_stage_$frame');
-          if (frame == 3) {
-            expect(
-              await brightSceneFraction(tester, pixels),
-              greaterThan(.015),
-              reason: 'The native scene must contain visible geometry: $id',
-            );
+          final pixels = await capture(binding, '${id}_light_$index');
+          expect(
+            await brightSceneFraction(tester, pixels),
+            greaterThan(.015),
+            reason: 'Light display check failed: $id',
+          );
+        } else {
+          for (var frame = 0; frame < 4; frame++) {
+            await Future<void>.delayed(const Duration(seconds: 1));
+            await tester.pump();
+            final pixels = await capture(binding, '${id}_stage_$frame');
+            if (frame == 3) {
+              expect(
+                await brightSceneFraction(tester, pixels),
+                greaterThan(.015),
+                reason: 'The native scene must contain visible geometry: $id',
+              );
+            }
           }
+          await tester.tap(find.byKey(const Key('benchPressPlayPause')));
+          await tester.pump();
+          await capture(binding, '${id}_paused');
+          await tester.tap(find.byKey(const Key('benchPressPlaybackSpeed')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('0.5倍速').last);
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const Key('benchPressPlayPause')));
+          await tester.pump();
+          await Future<void>.delayed(const Duration(seconds: 8));
+          await capture(binding, '${id}_half_speed');
         }
-        await tester.tap(find.byKey(const Key('benchPressPlayPause')));
-        await tester.pump();
-        await capture(binding, '${id}_paused');
-        await tester.tap(find.byKey(const Key('benchPressPlaybackSpeed')));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('0.5倍速').last);
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const Key('benchPressPlayPause')));
-        await tester.pump();
-        await Future<void>.delayed(const Duration(seconds: 8));
-        await capture(binding, '${id}_half_speed');
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        completed.add(id);
       }
+      report['passed'] = true;
+      debugPrint('QA_FORM_RESULT ${jsonEncode(report)}');
     },
   );
 }
@@ -133,7 +158,15 @@ Future<List<int>> capture(
     shots.add({'screenshotName': 'form_$name', 'bytes': bytes!.toList()});
     return bytes;
   } else {
-    return binding.takeScreenshot('form_$name');
+    final before = (binding.reportData?['screenshots'] as List?)?.length ?? 0;
+    final bytes = await binding.takeScreenshot('form_$name');
+    if (!record) {
+      final shots = binding.reportData?['screenshots'] as List?;
+      if (shots != null && shots.length > before) {
+        shots.removeRange(before, shots.length);
+      }
+    }
+    return bytes;
   }
 }
 

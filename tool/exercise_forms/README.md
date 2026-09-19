@@ -1,89 +1,85 @@
 # Exercise form authoring
 
-`catalog.json` is the source of truth. The viewer consumes generated Dart data. Reuse the athlete, rig, motion families and recipes; preserve the original bench/incline-dumbbell GLBs and legacy cameras.
+`catalog.json` is the source of truth. Reuse the athlete, rig, motion families and recipes; preserve the original bench/incline-dumbbell GLBs and legacy cameras. The viewer consumes generated Dart data.
 
 ## Scope and stopping rules
 
-- Work only on requested IDs, normally one family and up to three distinct exercises unless explicitly requested otherwise. Historical `progress.md` / `next_session.md` files do not authorize backlog resumption.
-- Separate parameter variants from new mechanisms. A new mechanism is a bounded task, not a screen-specific branch or an unsuitable reused motion.
-- Reuse matching reference observations; investigate gaps/conflicts. Preserve posture, grip/contact, support, joint paths and pivots. Skip decoration, logos, hidden internals and shared lighting/material retuning unless required for correctness or explicitly requested.
-- After two unsuccessful corrections of the same defect, stop that scene safely. Record symptoms, attempts and the next decision; leave it unverified, preserve working scenes and do not start other unfinished work.
-- Stop after the requested implementation and necessary checks. Report actual results and uncertainties, never invented usage savings or user quality approval.
+- Work only on requested IDs, normally one family and up to three distinct exercises unless explicitly requested otherwise. Historical logs do not authorize backlog resumption.
+- Separate parameter variants from new mechanisms. Reuse matching reference observations; investigate gaps/conflicts. Preserve posture, contacts, support, paths and pivots, not decorative detail or unrelated lighting changes.
+- After two unsuccessful corrections of the same defect, stop that scene safely. Record attempts and the next decision; leave it unverified and preserve working scenes.
+- Stop after requested implementation and necessary checks. Report actual results, omissions and uncertainties, not invented usage savings or user approval.
 
 ## Choose the minimum pipeline
 
-| Change | Required work |
+| Change | Work |
 | --- | --- |
-| Only `animationSpeed`, or custom-camera `cameraAngle` / `cameraTarget` / `cameraScale` | Edit `catalog.json`, regenerate the Dart catalog and check playback/framing. No Blender regeneration or asset packing. Preserve `legacy_press` behavior. |
-| Pose, grip, joint path, geometry, or authored range of motion | Regenerate and pack affected IDs; review poses/motion and affected native behavior. A catalog entry alone cannot create a missing motion. |
-| Shared rig, authoring family, renderer, camera logic or loader | Determine affected families first; expand generation/regression checks accordingly. |
+| Only `animationSpeed`, or custom-camera angle/target/scale | Edit catalog, regenerate Dart, check playback/framing. No Blender regeneration or packing. Preserve `legacy_press`. |
+| Pose, grip, path, geometry or authored range of motion | Regenerate/pack affected IDs and review motion plus native behavior. |
+| Shared rig/family/renderer/camera logic/loader | Determine affected families and expand regression checks. |
 
-When later regenerating a scene, review its emitted camera metadata before replacing deliberately tuned catalog values. Do not change unrelated assets, publication status or review flags.
+Review emitted camera metadata before overwriting deliberately tuned catalog values. Do not change unrelated assets or publication status. A catalog entry alone cannot create a missing motion.
 
-## Reference and verification
+## Production gates
 
-1. Review actual manufacturer references and demonstrations. Record URLs/observations in task QA notes; reuse `docs/qa/forms_expansion_2026-09-16/reference_review.md` where relevant. Distinguish facts, chosen dimensions and unknowns. Confirm orientation, contacts, grip, joint path, pivot/rail and moving equipment; names alone are not evidence. Only then set `review.equipmentReference`.
-2. Select the shared motion family and recipe, expressing differences through `parameters`. Review start/intermediate/end poses and a motion loop before repeated packaging/builds. Keep working output outside app assets. Palm-anchor metrics alone do not certify visual contact or anatomy.
-3. Current `--preview` exports GLB first and renders only two endpoints, NOT preview-only. Inspect missing views in Blender. Export after geometry/motion review; check the emitted camera metadata (fixed view fitted from loop samples).
-4. Pack only the affected IDs, regenerate the catalog and run relevant tests. Run common analysis/tests once for unchanged code/assets, then necessary per-OS checks. Later changes invalidate affected results. Do not skip required tests for a usage target.
-5. Use explicit `FORM_QA_IDS` for native tests and inspect the screenshots. Include reopening and the normal category-to-detail route. A nonblank-pixel pass is not an appearance review. Both Android and iOS need appropriate evidence; use dedicated QA devices/simulators, never normal user app storage.
-6. Keep new scenes `authored` until reference, static pose, motion, Android, iOS and production-route checks pass. `verified` is technical review, not user appearance approval. A representative's pass never approves other exercises. Preserve all generator publication gates.
+1. Review actual equipment and demonstrations; reuse relevant observations in `docs/qa/forms_expansion_2026-09-16/reference_review.md`. Record new evidence in the task QA note, distinguishing facts, chosen dimensions and unknowns. Only then set `equipmentReference`.
+2. Review start/intermediate/end poses and a complete motion loop before repeated packaging. Numeric palm-anchor checks are not visual/anatomical certification.
+3. Export, check camera metadata, pack affected IDs, regenerate Dart and run relevant tests. Common checks may be reused only for unchanged code/assets; subsequent changes invalidate affected results.
+4. Review appropriate Android and iOS evidence and the normal category-to-detail route on dedicated QA devices. Never use normal user app storage. Nonblank pixels are not appearance approval.
+5. Keep scenes `authored` until reference, pose, motion, both OSes and production-route checks pass. A representative's pass never approves other scenes. Preserve generator publication gates; `verified` is not user approval.
 
-## Commands
+## Preview-only (implemented; real Blender validation pending)
 
-Run from the repository root with the installed official Blender executable. Use a task-specific working directory outside app assets; do not mix new exports with stale GLBs. Commands are pipeline stages, not a sequence to rerun after every parameter tweak.
+Run from the repository root using the installed Blender executable:
 
 ```sh
-Blender --background --factory-startup --python-exit-code 1 --python tool/exercise_forms/author_forms.py -- --ids exercise_id --output /tmp/form-work --preview
-python3 tool/exercise_forms/pack_assets.py /tmp/form-work --ids exercise_id
+Blender --background --factory-startup --python-exit-code 1 --python tool/exercise_forms/author_forms.py -- --ids low_row,dy_row --output /tmp/musclemory-preview --preview-only
+```
+
+`--preview-only` renders start/mid/end (frames 1/24/47, 420px, 6 Cycles samples) in a fresh `preview-*` subdirectory outside the repository. It still evaluates all 97 motion frames and existing joint/contact checks. Outputs are images, camera/metric data and a per-scene `.preview.json` report written only after all three images exist. No GLB, `.blend`, production recipe/chunk or generated Dart is written. Partial runs have no success report; do not treat older directories as current evidence or feed previews to packing. Static images do not replace full loop/native review.
+
+`--preview` and `--preview-only` are mutually exclusive. Without the new option, existing GLB export is retained; `--preview` additionally saves `.blend` and two 700px endpoint images as before.
+
+## Export and targeted packing
+
+Use a separate task-specific export directory, never a stale mixed folder. These are stages, not commands to repeat after every parameter tweak:
+
+```sh
+Blender --background --factory-startup --python-exit-code 1 --python tool/exercise_forms/author_forms.py -- --ids low_row --output /tmp/form-export --preview
+python3 tool/exercise_forms/pack_assets.py /tmp/form-export --ids low_row
 python3 tool/exercise_forms/generate_catalog.py
 flutter analyze
 flutter test
 ```
 
-### Targeted packing (implemented)
+Packer `--ids` processes only selected filenames, not catalog approval. Omit it for legacy all-source behavior. Invalid/missing selections fail before writes. Identical recipes are not rewritten; global shared-chunk validation still includes all recipes. Optional `--prune` only removes unreferenced hash-named chunks after validation; use at a completed batch, not every edit. JSON reports selected/updated/unchanged recipes and capacity, not token savings.
 
-`--ids low_row,dy_row` packs only those GLBs; omitting it processes all source-folder GLBs as before. Empty, duplicate, path-like or missing selections fail before writes, never fall back to all. The source directory must exist. IDs select filenames, not catalog approval.
+## Native full/light modes (implemented; Flutter/device validation pending)
 
-Identical recipes are not rewritten; source and shared-chunk checks still run. All recipes count toward global references/hash checks. Optional `--prune` removes only unreferenced hash-named chunks after validation, never source art or another scene's referenced chunks. Prune at a completed batch, not every edit.
+Full remains the default, retaining the existing sequence and playback checklist. `FORM_QA_IDS` narrows scope; deliberate repeated IDs still test reopening in full mode.
 
-JSON retains capacity fields and adds `selected_recipes`, `updated_recipes` (IDs), `unchanged_recipes`: write counts, not saved tokens or quality approval.
+Light mode requires explicit IDs and `FORM_QA_BASELINE`, a reference to valid full checks for unchanged shared behavior on that OS. This reference is a caller declaration, not automatically verified evidence. Light automatically opens, checks visible geometry, disposes and reopens every selected ID. It omits four motion captures, pause/resume and half-speed testing; pose/motion review and the separate production-route test are still required. Duplicate light IDs, unknown IDs, missing assets and invalid modes are rejected. Neither mode edits review flags or grants publication approval.
 
-Packer tests use only temporary synthetic assets and Python's standard library:
+The existing guarded wrapper forwards the options to the actual build. Example (replace the evidence reference and QA device ID):
 
 ```sh
-python3 -m unittest discover -s tool/exercise_forms/tests -p 'test_*.py'
+MUSCLEMORY_QA_TARGET=integration_test/exercise_form_expansion_test.dart \
+FORM_QA_MODE=light FORM_QA_IDS=dy_row FORM_QA_BASELINE='QA note for unchanged full checks' \
+./tool/verify_workout_lifecycle.sh ios QA_DEVICE_ID
 ```
 
-### Native scope and logs
+Repeat on the dedicated Android emulator with its ID and matching baseline. Use full mode for new mechanisms or affected common behavior. Do not bypass device-name guards or build-success checks; the wrapper still runs analysis and unit tests. `reportData.formQa` and `QA_FORM_PLAN`/`QA_FORM_RESULT` record mode, declared evidence, completed sessions, pass/fail and omissions. On failure inspect actual errors and surrounding logs. Keep complete logs outside tracked assets and summarize first; never hide nonzero exits. Use original images for detailed contact review.
 
-Use `--dart-define=FORM_QA_IDS=id1,id2,id1` for selected scenes/reopening. Full playback still runs per ID; lightweight mode is pending. Select relevant regressions for variants; broaden affected-family coverage for shared changes.
+## Validation and remaining work
 
-Keep full logs outside tracked assets. First report IDs, changed outputs, pass/fail, unrun checks and log paths; inspect actual errors and surrounding logs on failure. Never hide nonzero exits or treat partial output as success. Reuse existing commands, not new orchestration. Start/intermediate/end comparisons support review; use original images for contacts and a loop for motion, retaining required evidence.
-
-## Pending tooling — not implemented
-
-Do not start these tasks merely because this file was read; implement only when they are the current request.
-
-- **Preview-only:** opt-in `--preview-only`, lower-cost start/intermediate/end views before export. No GLB, `.blend`, production recipe/chunk or generated-Dart writes; separate output from production so stale exports cannot be used. Keep joint/contact checks and final loop review. Preserve normal export behavior without the option.
-- **Lightweight native mode:** explicit full/light modes and IDs, full by default; reject invalid values. Use full checks on representatives and lighter display/reopen checks only for compatible variants with valid unchanged shared evidence. Record omissions, retain per-scene pose/motion and both-OS evidence, keep the route test separate and never auto-set review flags. Preserve QA-device/build-success guards.
-- **Authoring cache:** defer until repetition warrants it. Future keys must cover parameters, athlete/rig, authoring/painting/export code, Blender version/settings; reuse only intact successful outputs. Invalidate affected output and stale approval after changes. No generation-cache skip exists today.
-
-For the preview/light-mode task, verify one existing representative and a compatible variant without new production assets. Prove preview-only produces no production exports, full mode retains checks and light mode cannot bypass publication gates. No new exercise batches, athlete rebuild, renderer replacement, `main.dart`/widget-test split or unrelated refactor. If Blender/native execution is unavailable, leave those checks pending and report the limitation, not completion.
+- Python control tests: `python3 -m unittest discover -s tool/exercise_forms/tests -p 'test_*.py'`. Preview tests mock Blender; wrapper tests use fake external commands and no devices.
+- Plan tests: `flutter test test/form_qa_plan_test.dart`. These test selection/reporting, not native rendering.
+- At implementation on 2026-09-19, 21 new Python tests and shell syntax checks passed. The 10 new Flutter plan tests, actual Blender rendering and native full/light runs were not executable in the editing environment. Validate low_row (full) and compatible dy_row (light) on both QA OSes, and draft preview output, before relying on the new modes. No production assets/statuses were changed.
+- Authoring cache remains deferred. Future reuse must validate inputs, rig, scripts, Blender/settings and output integrity; no generation-cache skip exists today. Do not start unrelated tooling or backlog tasks merely by reading this file.
 
 ## Assets and rights
 
-Reuse `art/bench_press/bench_press.blend` and retain its license/provenance documentation. Equipment is original procedural geometry informed by demonstrations, not packaged manufacturer photographs, logos, videos or CAD.
-
-App assets contain `.form.json` recipes and immutable SHA-256-addressed binary chunks. Identical binary data shares chunks; the runtime reconstructs only the selected scene. Source `.blend`, previews and duplicate raw GLBs stay outside the app bundle. Logical model/animation/equipment IDs allow future delivery changes, but download delivery is not implemented.
+Reuse `art/bench_press/bench_press.blend` with license/provenance documentation. Equipment is original procedural geometry; do not package manufacturer photos, logos, videos or CAD. `.form.json` recipes reference immutable SHA-256-addressed binary chunks; the runtime reconstructs the selected scene. Editable sources/previews/duplicate GLBs stay outside the app bundle. Download delivery is not implemented.
 
 ## Candidate route verification
 
-After reference, static pose, motion and both native-platform checks, run
-`python3 tool/exercise_forms/generate_catalog.py --review-candidates low_row,dy_row`
-to temporarily enable only those authored candidates. Run
-`integration_test/exercise_form_route_test.dart` with matching `FORM_QA_IDS` via
-the normal category picker/detail screen. Always restore the normal generated
-catalog with an EXIT trap. This does not change source review status. Set
-`productionRoute` and `verified` in the source only after actual route success.
-Never ship a generated catalog marked `TEMPORARY QA CANDIDATES`.
+After reference, pose, motion and both native-platform checks, temporarily enable authored candidates with `python3 tool/exercise_forms/generate_catalog.py --review-candidates low_row,dy_row`. Run `integration_test/exercise_form_route_test.dart` with matching `FORM_QA_IDS` through the normal picker/detail screen. Always restore the normal catalog with an EXIT trap. Set source `productionRoute`/`verified` only after actual route success. Never ship `TEMPORARY QA CANDIDATES` output.

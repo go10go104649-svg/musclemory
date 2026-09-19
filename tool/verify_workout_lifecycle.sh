@@ -19,15 +19,29 @@ case "$qa_platform" in
     ;;
   *) echo 'Platform must be ios or android' >&2; exit 2 ;;
 esac
+qa_defines=()
+qa_mode=${FORM_QA_MODE-full}
+case "$qa_mode" in
+  full|light) ;;
+  *) echo 'FORM_QA_MODE must be full or light.' >&2; exit 2 ;;
+esac
+if [[ "$qa_mode" == light ]]; then
+  [[ "$qa_target" == integration_test/exercise_form_expansion_test.dart && -n "${FORM_QA_IDS-}" && -n "${FORM_QA_BASELINE-}" ]] || {
+    echo 'Light mode requires the form expansion target, explicit IDs and baseline evidence.' >&2; exit 2;
+  }
+fi
+if [[ "$qa_target" == integration_test/exercise_form_expansion_test.dart ]]; then
+  qa_defines=("--dart-define=FORM_QA_MODE=$qa_mode" "--dart-define=FORM_QA_IDS=${FORM_QA_IDS-}" "--dart-define=FORM_QA_BASELINE=${FORM_QA_BASELINE-}")
+fi
 "$qa_flutter" analyze
 "$qa_flutter" test
 case "$qa_platform" in
   ios)
-    "$qa_flutter" build ios --simulator --debug --target="$qa_target"
+    "$qa_flutter" build ios --simulator --debug --target="$qa_target" ${qa_defines[@]+"${qa_defines[@]}"}
     qa_binary=build/ios/iphonesimulator/Runner.app
     ;;
   android)
-    "$qa_flutter" build apk --debug --target-platform=android-arm64 --target="$qa_target"
+    "$qa_flutter" build apk --debug --target-platform=android-arm64 --target="$qa_target" ${qa_defines[@]+"${qa_defines[@]}"}
     qa_binary=build/app/outputs/flutter-apk/app-debug.apk
     ;;
   *) echo 'Platform must be ios or android' >&2; exit 2 ;;
