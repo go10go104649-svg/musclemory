@@ -57,7 +57,13 @@ void main() {
       'Incline Fly Machine',
     );
     await tester.pumpAndSettle();
-    expect(find.text('Incline Fly Machine'), findsOneWidget);
+    // Match the result label, not the search field's EditableText.
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is Text && widget.data == 'Incline Fly Machine',
+      ),
+      findsOneWidget,
+    );
     final workout = WorkoutRecord(
       date: DateTime.now(),
       sets: const [

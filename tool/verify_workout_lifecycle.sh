@@ -15,7 +15,7 @@ case "$qa_platform" in
     ;;
   android)
     qa_name=$("${ANDROID_HOME:?Set ANDROID_HOME}/platform-tools/adb" -s "$qa_device" emu avd name | head -1 | tr -d '\r')
-    [[ "$qa_name" == musclemory_qa ]] || { echo 'Use the dedicated musclemory_qa emulator.' >&2; exit 2; }
+    [[ "$qa_name" == musclemory_qa || "$qa_name" == MUSCLEMORY_Batch_QA ]] || { echo 'Use the dedicated musclemory_qa or MUSCLEMORY_Batch_QA emulator.' >&2; exit 2; }
     ;;
   *) echo 'Platform must be ios or android' >&2; exit 2 ;;
 esac

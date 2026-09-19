@@ -49,6 +49,8 @@ def select_sources(source, ids=None):
     """Validate an explicit selection before creating or modifying outputs."""
     if not source.is_dir():
         raise ValueError(f'Source directory does not exist: {source}')
+    if (source / '.musclemory-preview-only').exists():
+        raise ValueError('Preview-only output cannot be packed; use production exports')
     if ids is None:
         return sorted(source.glob('*.glb'))
     names = [name.strip() for name in ids.split(',')]
