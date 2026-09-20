@@ -4559,6 +4559,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   DateTime? _restEndsAt;
   int _inputRevision = 0;
   final _numericFocus = <WorkoutSet, List<FocusNode>>{};
+  late final _numericPad = _NumericPadController(() => _numericOrder);
 
   List<FocusNode> _nodesFor(WorkoutSet set) =>
       _numericFocus.putIfAbsent(set, () => [FocusNode(), FocusNode()]);
@@ -4649,6 +4650,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     _restTimer?.cancel();
     unawaited(RestNotificationService.cancel());
     _noteController.dispose();
+    _numericPad.dispose();
     for (final nodes in _numericFocus.values) {
       for (final node in nodes) {
         node.dispose();
@@ -5178,7 +5180,13 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     return PopScope<WorkoutRecord>(
       canPop: _allowPop,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) unawaited(_confirmLeave());
+        if (!didPop) {
+          if (_numericPad.active != null) {
+            FocusManager.instance.primaryFocus?.unfocus();
+          } else {
+            unawaited(_confirmLeave());
+          }
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -5232,217 +5240,221 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
             const SizedBox(width: 8),
           ],
         ),
-        body: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-            children: [
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: ListTile(
-                  key: const Key('workoutDateButton'),
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xFFE9F4D1),
-                    child: Icon(Icons.calendar_today_rounded),
-                  ),
-                  title: const Text(
-                    'トレーニング日',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF6C746D)),
-                  ),
-                  subtitle: Text(
-                    workoutDateLabel(_workoutDate),
-                    style: const TextStyle(
-                      color: Color(0xFF101820),
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  trailing: const Icon(Icons.edit_calendar_outlined),
-                  onTap: _selectWorkoutDate,
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (!widget.isEditing &&
-                  WorkoutUiPreference.completionCheckEnabled &&
-                  RestTimerPreference.enabled) ...[
-                Container(
-                  key: const Key('restTimerBanner'),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.fromLTRB(16, 12, 10, 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF101820),
+        bottomNavigationBar: _WorkoutNumericKeypad(controller: _numericPad),
+        body: _NumericPadScope(
+          controller: _numericPad,
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.timer_outlined,
-                        color: Color(0xFFC7F36B),
+                  child: ListTile(
+                    key: const Key('workoutDateButton'),
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFE9F4D1),
+                      child: Icon(Icons.calendar_today_rounded),
+                    ),
+                    title: const Text(
+                      'トレーニング日',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF6C746D)),
+                    ),
+                    subtitle: Text(
+                      workoutDateLabel(_workoutDate),
+                      style: const TextStyle(
+                        color: Color(0xFF101820),
+                        fontWeight: FontWeight.w900,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          '休憩  ${_restRemaining > 0 ? _restLabel : _configuredRestLabel}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
+                    ),
+                    trailing: const Icon(Icons.edit_calendar_outlined),
+                    onTap: _selectWorkoutDate,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (!widget.isEditing &&
+                    WorkoutUiPreference.completionCheckEnabled &&
+                    RestTimerPreference.enabled) ...[
+                  Container(
+                    key: const Key('restTimerBanner'),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 10, 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF101820),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.timer_outlined,
+                          color: Color(0xFFC7F36B),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            '休憩  ${_restRemaining > 0 ? _restLabel : _configuredRestLabel}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (_restEndsAt != null) {
+                              _startRestTimer(_restRemaining + 30);
+                            } else {
+                              setState(
+                                () => _restRemaining =
+                                    (_restRemaining > 0
+                                        ? _restRemaining
+                                        : RestTimerPreference.seconds) +
+                                    30,
+                              );
+                            }
+                          },
+                          child: const Text('+30秒'),
+                        ),
+                        TextButton(
+                          key: Key(
+                            _restEndsAt != null
+                                ? 'stopRestTimerButton'
+                                : 'startRestTimerButton',
+                          ),
+                          onPressed: _restEndsAt != null
+                              ? _pauseRest
+                              : _resumeRest,
+                          child: SizedBox(
+                            width: 64,
+                            child: Center(
+                              child: Text(_restEndsAt != null ? 'ストップ' : '開始'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                if (_exercises.isEmpty) ...[
+                  Container(
+                    key: const Key('emptyWorkoutExercises'),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 28,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: const Color(0xFFE0E4DE)),
+                    ),
+                    child: const Column(
+                      children: [
+                        Icon(
+                          Icons.fitness_center_rounded,
+                          size: 34,
+                          color: Color(0xFF777F78),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          '種目はまだありません',
+                          style: TextStyle(
+                            fontSize: 16,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (_restEndsAt != null) {
-                            _startRestTimer(_restRemaining + 30);
-                          } else {
-                            setState(
-                              () => _restRemaining =
-                                  (_restRemaining > 0
-                                      ? _restRemaining
-                                      : RestTimerPreference.seconds) +
-                                  30,
-                            );
-                          }
-                        },
-                        child: const Text('+30秒'),
-                      ),
-                      TextButton(
-                        key: Key(
-                          _restEndsAt != null
-                              ? 'stopRestTimerButton'
-                              : 'startRestTimerButton',
+                        SizedBox(height: 6),
+                        Text(
+                          '下の「種目を追加」から選んでください',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Color(0xFF777F78)),
                         ),
-                        onPressed: _restEndsAt != null
-                            ? _pauseRest
-                            : _resumeRest,
-                        child: SizedBox(
-                          width: 64,
-                          child: Center(
-                            child: Text(_restEndsAt != null ? 'ストップ' : '開始'),
-                          ),
-                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                // Keep numeric fields mounted across cards for keyboard traversal.
+                Column(
+                  children: List.generate(
+                    _exercises.length,
+                    (exerciseIndex) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: ExerciseInputCard(
+                        key: ValueKey((
+                          _exercises[exerciseIndex],
+                          _inputRevision,
+                        )),
+                        numericNodes: _nodesFor,
+                        nextNumeric: _nextNumeric,
+                        exerciseIndex: exerciseIndex,
+                        exercise: _exercises[exerciseIndex],
+                        history: widget.history,
+                        onAddSet: () => _addSet(exerciseIndex),
+                        onRemoveSet: (setIndex) =>
+                            _removeSet(exerciseIndex, setIndex),
+                        onRemove: () => _removeExercise(exerciseIndex),
+                        onToggleSet: (setIndex) =>
+                            _toggleSet(exerciseIndex, setIndex),
+                        onApplyPrevious: (sets) =>
+                            _applyPreviousSets(exerciseIndex, sets),
+                        onSetAllCompleted: (completed) =>
+                            _setAllSetsCompleted(exerciseIndex, completed),
+                        onValuesChanged: _saveDraft,
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ],
-              if (_exercises.isEmpty) ...[
-                Container(
-                  key: const Key('emptyWorkoutExercises'),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 28,
+                SizedBox(
+                  height: 54,
+                  child: FilledButton.icon(
+                    key: const Key('addExerciseButton'),
+                    onPressed: _addExercise,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF101820),
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text(
+                      '種目を追加',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
                   ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: const Color(0xFFE0E4DE)),
                   ),
-                  child: const Column(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.fitness_center_rounded,
-                        size: 34,
-                        color: Color(0xFF777F78),
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        '種目はまだありません',
+                      const Text(
+                        'トレーニングメモ',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
-                      SizedBox(height: 6),
-                      Text(
-                        '下の「種目を追加」から選んでください',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xFF777F78)),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _noteController,
+                        maxLines: 3,
+                        maxLength: 200,
+                        decoration: const InputDecoration(
+                          hintText: 'フォームや体調などをメモ',
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ],
-              // Keep numeric fields mounted across cards for keyboard traversal.
-              Column(
-                children: List.generate(
-                  _exercises.length,
-                  (exerciseIndex) => Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: ExerciseInputCard(
-                      key: ValueKey((
-                        _exercises[exerciseIndex],
-                        _inputRevision,
-                      )),
-                      numericNodes: _nodesFor,
-                      nextNumeric: _nextNumeric,
-                      exerciseIndex: exerciseIndex,
-                      exercise: _exercises[exerciseIndex],
-                      history: widget.history,
-                      onAddSet: () => _addSet(exerciseIndex),
-                      onRemoveSet: (setIndex) =>
-                          _removeSet(exerciseIndex, setIndex),
-                      onRemove: () => _removeExercise(exerciseIndex),
-                      onToggleSet: (setIndex) =>
-                          _toggleSet(exerciseIndex, setIndex),
-                      onApplyPrevious: (sets) =>
-                          _applyPreviousSets(exerciseIndex, sets),
-                      onSetAllCompleted: (completed) =>
-                          _setAllSetsCompleted(exerciseIndex, completed),
-                      onValuesChanged: _saveDraft,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 54,
-                child: FilledButton.icon(
-                  key: const Key('addExerciseButton'),
-                  onPressed: _addExercise,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF101820),
-                    foregroundColor: Colors.white,
-                  ),
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text(
-                    '種目を追加',
-                    style: TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'トレーニングメモ',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _noteController,
-                      maxLines: 3,
-                      maxLength: 200,
-                      decoration: const InputDecoration(
-                        hintText: 'フォームや体調などをメモ',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -7987,6 +7999,251 @@ class NumericLeadingZeroFormatter extends TextInputFormatter {
   }
 }
 
+class _NumericPadScope extends InheritedWidget {
+  const _NumericPadScope({required this.controller, required super.child});
+  final _NumericPadController controller;
+  @override
+  bool updateShouldNotify(_NumericPadScope oldWidget) =>
+      controller != oldWidget.controller;
+}
+
+class _NumericPadController extends ChangeNotifier {
+  _NumericPadController(this.order);
+  final List<FocusNode> Function() order;
+  _ValueBoxState? active;
+  bool _disposed = false;
+  bool _queued = false;
+  bool _reveal = false;
+  void _refresh({bool reveal = false}) {
+    if (_disposed) return;
+    _reveal = _reveal || reveal;
+    if (_queued) return;
+    _queued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _queued = false;
+      if (_disposed) return;
+      notifyListeners();
+      final shouldReveal = _reveal;
+      _reveal = false;
+      if (shouldReveal) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final target = active;
+          if (!_disposed && target != null && target.mounted) {
+            Scrollable.ensureVisible(target.context, alignment: 0.4);
+          }
+        });
+      }
+    });
+  }
+
+  void activate(_ValueBoxState field) {
+    if (_disposed) return;
+    active = field;
+    _refresh(reveal: true);
+  }
+
+  void deactivate(_ValueBoxState field) {
+    if (active != field) return;
+    active = null;
+    _refresh();
+  }
+
+  void move(int direction) {
+    final field = active;
+    if (field == null || !field.mounted) return;
+    final nodes = order();
+    final index = nodes.indexOf(field._focus);
+    final next = index + direction;
+    if (index >= 0 && next >= 0 && next < nodes.length) {
+      nodes[next].requestFocus();
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    active = null;
+    super.dispose();
+  }
+}
+
+class _WorkoutNumericKeypad extends StatelessWidget {
+  const _WorkoutNumericKeypad({required this.controller});
+  final _NumericPadController controller;
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: controller,
+    builder: (context, _) {
+      final field = controller.active;
+      if (field == null || !field.mounted) return const SizedBox.shrink();
+      final order = controller.order();
+      final index = order.indexOf(field._focus);
+      final last = index == order.length - 1;
+      Widget key(
+        String text,
+        String id,
+        VoidCallback? action, {
+        bool accent = false,
+        bool secondary = false,
+      }) => Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(3),
+          child: SizedBox(
+            height: 46,
+            child: TextButton(
+              key: Key('numericKey$id'),
+              onPressed: action,
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                backgroundColor: accent
+                    ? const Color(0xFFB32635)
+                    : secondary
+                    ? const Color(0xFFCDD6E0)
+                    : Colors.white,
+                disabledBackgroundColor: secondary
+                    ? const Color(0xFFDCE2E8)
+                    : Colors.white,
+                foregroundColor: accent
+                    ? Colors.white
+                    : const Color(0xFF101820),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              child: Text(text),
+            ),
+          ),
+        ),
+      );
+      Widget digit(String value) => key(
+        value == 'delete' ? '⌫' : value,
+        value,
+        value == '.' && !field.widget.allowDecimal
+            ? null
+            : () => field._edit(value),
+      );
+      return TextFieldTapRegion(
+        child: Focus(
+          canRequestFocus: false,
+          descendantsAreFocusable: false,
+          child: Material(
+            color: const Color(0xFFE8EBE5),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                key: const Key('workoutNumericKeypad'),
+                padding: const EdgeInsets.fromLTRB(7, 0, 7, 5),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: 36,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '${field.widget.stepLabel} 入力中',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            key: const Key('closeNumericKeypad'),
+                            padding: EdgeInsets.zero,
+                            tooltip: 'キーパッドを閉じる',
+                            onPressed: () => field._focus.unfocus(),
+                            icon: const Icon(
+                              Icons.keyboard_hide_outlined,
+                              size: 22,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Column(
+                            children: [
+                              for (final row in [
+                                ['1', '2', '3'],
+                                ['4', '5', '6'],
+                                ['7', '8', '9'],
+                                ['.', '0', 'delete'],
+                              ])
+                                Row(children: row.map(digit).toList()),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            children: [
+                              for (final step in [1, 5])
+                                Row(
+                                  children: [
+                                    key(
+                                      '−$step',
+                                      'minus$step',
+                                      () => field._step(-step),
+                                      secondary: true,
+                                    ),
+                                    key(
+                                      '+$step',
+                                      'plus$step',
+                                      () => field._step(step),
+                                      secondary: true,
+                                    ),
+                                  ],
+                                ),
+                              Row(
+                                children: [
+                                  key(
+                                    '前へ',
+                                    'previous',
+                                    index > 0
+                                        ? () => controller.move(-1)
+                                        : null,
+                                    secondary: true,
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  key(
+                                    last ? '完了' : '次へ',
+                                    'next',
+                                    last
+                                        ? () => field._focus.unfocus()
+                                        : () => controller.move(1),
+                                    accent: true,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
 class ValueBox extends StatefulWidget {
   const ValueBox({
     super.key,
@@ -8019,9 +8276,80 @@ class _ValueBoxState extends State<ValueBox> {
       ? formatWeight(widget.value.toDouble())
       : '${widget.value}';
 
+  _NumericPadController? _pad;
+  late final FocusNode _localFocus = FocusNode();
+  FocusNode get _focus => widget.focusNode ?? _localFocus;
+  bool get _usesPad => widget.stepLabel != null && _pad != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(_focusChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _pad = context
+        .dependOnInheritedWidgetOfExactType<_NumericPadScope>()
+        ?.controller;
+  }
+
+  void _focusChanged() {
+    if (_usesPad) {
+      if (_focus.hasFocus) {
+        _pad!.activate(this);
+      } else {
+        _pad!.deactivate(this);
+      }
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _edit(String key) {
+    final old = _controller.value;
+    final selection = old.selection.isValid
+        ? old.selection
+        : TextSelection.collapsed(offset: old.text.length);
+    var start = selection.start;
+    final end = selection.end;
+    var insert = key;
+    if (key == 'delete') {
+      insert = '';
+      if (start == end && start > 0) start--;
+    } else if (key == '.') {
+      if (!widget.allowDecimal) return;
+      if (start == 0) insert = '0.';
+    }
+    final text = old.text.replaceRange(start, end, insert);
+    if (!(widget.allowDecimal
+            ? RegExp(r'^\d*([.,]\d{0,2})?$')
+            : RegExp(r'^\d*$'))
+        .hasMatch(text)) {
+      return;
+    }
+    final next = const NumericLeadingZeroFormatter().formatEditUpdate(
+      old,
+      TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: start + insert.length),
+      ),
+    );
+    _controller.value = next;
+    widget.onChanged(
+      widget.allowDecimal
+          ? parseWeight(next.text)
+          : int.tryParse(next.text) ?? 0,
+    );
+  }
+
   @override
   void didUpdateWidget(ValueBox oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.focusNode != widget.focusNode) {
+      (oldWidget.focusNode ?? _localFocus).removeListener(_focusChanged);
+      _focus.addListener(_focusChanged);
+    }
     if (oldWidget.value != widget.value &&
         parseWeight(_controller.text) != widget.value) {
       _controller.value = TextEditingValue(
@@ -8033,6 +8361,9 @@ class _ValueBoxState extends State<ValueBox> {
 
   @override
   void dispose() {
+    _pad?.deactivate(this);
+    _focus.removeListener(_focusChanged);
+    _localFocus.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -8056,15 +8387,13 @@ class _ValueBoxState extends State<ValueBox> {
   Widget build(BuildContext context) {
     final input = TextFormField(
       controller: _controller,
-      focusNode: widget.focusNode,
-      keyboardType: TextInputType.numberWithOptions(
-        decimal: widget.allowDecimal,
-        // iOS number/decimal pads have no return key. Use its numeric-first
-        // punctuation keyboard for these fields; formatters still reject signs.
-        signed:
-            widget.stepLabel != null &&
-            Theme.of(context).platform == TargetPlatform.iOS,
-      ),
+      focusNode: _focus,
+      keyboardType: _usesPad
+          ? TextInputType.none
+          : TextInputType.numberWithOptions(decimal: widget.allowDecimal),
+      onTap: () {
+        if (_usesPad) _pad!.activate(this);
+      },
       textInputAction: widget.onNext == null
           ? TextInputAction.done
           : TextInputAction.next,
@@ -8099,7 +8428,18 @@ class _ValueBoxState extends State<ValueBox> {
       decoration: InputDecoration(
         isDense: true,
         filled: true,
-        fillColor: const Color(0xFFF4F5F0),
+        fillColor: _usesPad && _focus.hasFocus
+            ? const Color(0xFFFFE9E9)
+            : const Color(0xFFF4F5F0),
+        focusedBorder: _usesPad
+            ? OutlineInputBorder(
+                borderRadius: BorderRadius.circular(11),
+                borderSide: const BorderSide(
+                  color: Color(0xFFB32635),
+                  width: 2,
+                ),
+              )
+            : null,
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(11),
@@ -8107,31 +8447,7 @@ class _ValueBoxState extends State<ValueBox> {
         ),
       ),
     );
-    if (widget.stepLabel == null) return input;
-    return Column(
-      children: [
-        input,
-        Row(
-          children: [
-            for (final delta in [-5, 5])
-              Expanded(
-                child: Semantics(
-                  label: '${widget.stepLabel} ${delta > 0 ? '+' : ''}$delta',
-                  child: TextButton(
-                    onPressed: () => _step(delta),
-                    style: TextButton.styleFrom(
-                      minimumSize: const Size(0, 40),
-                      padding: EdgeInsets.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(delta > 0 ? '+5' : '−5'),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ],
-    );
+    return input;
   }
 }
 

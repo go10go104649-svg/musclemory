@@ -76,26 +76,35 @@ void main() {
       'weightField0_2',
       'repsField0_2',
     ]) {
-      t
-          .state<EditableTextState>(input(key))
-          .performAction(TextInputAction.next);
+      expect(t.widget<EditableText>(input(key)).focusNode.hasFocus, true);
+      await t.tap(find.byKey(const Key('numericKeynext')));
       await t.pumpAndSettle();
     }
     final last = t.widget<EditableText>(input('repsField1_1'));
     expect(last.focusNode.hasFocus, true);
     expect(last.textInputAction, TextInputAction.done);
     await captures.capture(binding, 'numeric_last_keyboard');
-    t
-        .state<EditableTextState>(input('repsField1_1'))
-        .performAction(TextInputAction.done);
+    await t.tap(find.byKey(const Key('numericKeyprevious')));
     await t.pumpAndSettle();
-    final plus = find.descendant(
-      of: find.byKey(const Key('weightField0_1')),
-      matching: find.text('+5'),
+    expect(
+      t.widget<EditableText>(input('repsField0_2')).focusNode.hasFocus,
+      true,
     );
-    await t.ensureVisible(plus);
+    await t.tap(find.byKey(const Key('numericKeynext')));
     await t.pumpAndSettle();
-    await t.tap(plus);
+    await t.tap(find.byKey(const Key('numericKeynext')));
+    await t.pumpAndSettle();
+    expect(find.byKey(const Key('workoutNumericKeypad')), findsNothing);
+    await Scrollable.ensureVisible(
+      t.element(input('weightField0_1')),
+      alignment: 0.4,
+    );
+    await t.pumpAndSettle();
+    await t.tap(input('weightField0_1'));
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const Key('numericKeyplus5')));
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const Key('closeNumericKeypad')));
     await t.pumpAndSettle();
     final prefs = await SharedPreferences.getInstance();
     final draft =
