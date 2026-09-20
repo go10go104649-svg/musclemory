@@ -12,6 +12,13 @@ class ExerciseFormDefinition {
   String get category => _value['category']! as String;
   String get modelId => _value['modelId']! as String;
   String get animationId => _value['animationId']! as String;
+  String get equipmentLabel => _value['equipmentLabel'] as String? ?? 'マシン';
+  List<String> get tags => (_value['tags'] as List? ?? const []).cast<String>();
+  String get distanceUnit => _value['distanceUnit'] as String? ?? 'km';
+  List<String>? get recordFields =>
+      (_value['recordFields'] as List?)?.cast<String>();
+  double? get startWeight => (_value['startWeight'] as num?)?.toDouble();
+  int? get startReps => (_value['startReps'] as num?)?.toInt();
   String get equipmentId => _value['equipmentId']! as String;
   String get gripType => _value['gripType']! as String;
   String get movementVariant => _value['movementVariant']! as String;
@@ -33,6 +40,7 @@ class ExerciseFormDefinition {
       secondaryMuscles.map(_muscleLabel).toList();
   static String _muscleLabel(String id) {
     if (id == 'erectorSpinae') return '脊柱起立筋';
+    if (id == 'lateralDeltoid') return '三角筋中部';
     return MuscleRegion.values.firstWhere((muscle) => muscle.name == id).label;
   }
 
@@ -54,21 +62,47 @@ class ExerciseFormCatalog {
   static final Map<String, ExerciseFormDefinition> byId = {
     for (final item in entries) item.exerciseId: item,
   };
-  static final Map<String, ExerciseFormDefinition> _byName = {
-    for (final item in entries)
-      for (final name in [item.exerciseName, ...item.aliases]) name: item,
-  };
-  static ExerciseFormDefinition? forName(String name) => _byName[name];
+
+  /// Names and aliases may be ambiguous. Only an explicit ID selects a variant.
+  static final Map<String, List<ExerciseFormDefinition>> byName = _indexNames();
+  static Map<String, List<ExerciseFormDefinition>> _indexNames() {
+    final result = <String, List<ExerciseFormDefinition>>{};
+    for (final entry in entries) {
+      for (final name in {entry.exerciseName, ...entry.aliases}) {
+        result.putIfAbsent(name, () => []).add(entry);
+      }
+    }
+    return Map.unmodifiable(
+      result.map(
+        (k, v) => MapEntry(k, List<ExerciseFormDefinition>.unmodifiable(v)),
+      ),
+    );
+  }
+
+  static ExerciseFormDefinition? forName(String name) {
+    final matches = byName[name];
+    return matches?.length == 1 ? matches!.single : null;
+  }
+
+  static ExerciseFormDefinition? resolve(String? id, String legacyName) =>
+      id != null ? byId[id] : forName(legacyName);
 }
 
-// Leave persisted names, favorites and grouping keys unchanged.
-String exerciseDisplayName(String storedName, {String languageCode = 'ja'}) =>
-    languageCode == 'en' &&
-        ExerciseFormCatalog.forName(storedName)?.englishName != null
-    ? ExerciseFormCatalog.forName(storedName)!.englishName!
-    : storedName == '懸垂'
-    ? 'チンニング'
-    : storedName;
+String exerciseIdentity(String? id, String legacyName) =>
+    id != null && id.isNotEmpty ? 'id:$id' : 'legacy:$legacyName';
 
-bool usesAdditionalWeight(String storedName) =>
-    ExerciseFormCatalog.forName(storedName)?.loadMode == 'additional';
+String exerciseDisplayName(
+  String storedName, {
+  String? exerciseId,
+  String languageCode = 'ja',
+}) {
+  final form = ExerciseFormCatalog.resolve(exerciseId, storedName);
+  if (languageCode == 'en' && form?.englishName != null) {
+    return form!.englishName!;
+  }
+  return storedName == '懸垂' ? 'チンニング' : storedName;
+}
+
+bool usesAdditionalWeight(String storedName, {String? exerciseId}) =>
+    ExerciseFormCatalog.resolve(exerciseId, storedName)?.loadMode ==
+    'additional';

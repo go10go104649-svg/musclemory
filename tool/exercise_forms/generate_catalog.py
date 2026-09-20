@@ -8,13 +8,17 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--review-candidates', default='', help='Temporary QA catalog; restore with a normal generation after testing')
 args = parser.parse_args()
 candidates = set(filter(None, args.review_candidates.split(',')))
-ids, names = set(), set()
+ids = set()
 for item in source['exercises']:
     assert item['exerciseId'] not in ids
     ids.add(item['exerciseId'])
-    for name in [item['exerciseName'], *item['aliases']]:
-        assert name not in names, name
-        names.add(name)
+    assert item['exerciseId'] and isinstance(item['exerciseName'], str)
+    assert len(item['aliases']) == len(set(item['aliases']))
+    assert item['recordType'] in ['weightReps', 'bodyweightReps', 'timed', 'cardio', 'distance', 'loadedDistance']
+    assert item['equipmentLabel'] and isinstance(item['tags'], list)
+    assert item.get('distanceUnit', 'km') in ['m', 'km']
+    if item['status'] == 'planned':
+        assert item['assetPath'] is None
     assert 0 < item['animationSpeed'] <= 2
     assert 0 < item['rangeOfMotion'] <= 1
     assert item['status'] in ['planned', 'authored', 'verified']

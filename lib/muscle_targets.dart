@@ -1,3 +1,5 @@
+import 'exercise_form_catalog.dart';
+
 enum MuscleRegion {
   pectoralisMajor('大胸筋', [
     'pectoralis_major_l',
@@ -165,7 +167,20 @@ const exerciseMuscleProfiles = <String, ExerciseMuscleProfile>{
   ),
 };
 
-ExerciseMuscleProfile muscleProfileForExercise(String name, String bodyPart) {
+ExerciseMuscleProfile muscleProfileForExercise(
+  String name,
+  String bodyPart, {
+  String? exerciseId,
+}) {
+  final form = exerciseId == null ? null : ExerciseFormCatalog.byId[exerciseId];
+  if (form != null) {
+    List<MuscleRegion> regions(List<String> ids) =>
+        MuscleRegion.values.where((m) => ids.contains(m.name)).toList();
+    return ExerciseMuscleProfile(
+      primary: regions(form.primaryMuscles),
+      secondary: regions(form.secondaryMuscles),
+    );
+  }
   return exerciseMuscleProfiles[name] ??
       switch (bodyPart) {
         '胸' => const ExerciseMuscleProfile(

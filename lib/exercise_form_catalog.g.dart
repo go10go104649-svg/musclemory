@@ -45,7 +45,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 0,
     "status": "verified",
-    "assetPath": "assets/models/bench_press.glb"
+    "assetPath": "assets/models/bench_press.glb",
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Bench Press",
+    "distanceUnit": "km",
+    "startWeight": 40.0,
+    "startReps": 10
   },
   {
     "exerciseId": "incline_dumbbell_press",
@@ -92,7 +98,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 0,
     "status": "verified",
-    "assetPath": "assets/models/incline_dumbbell_press.glb"
+    "assetPath": "assets/models/incline_dumbbell_press.glb",
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Incline Dumbbell Press",
+    "distanceUnit": "km",
+    "startWeight": 20.0,
+    "startReps": 10
   },
   {
     "exerciseId": "incline_barbell_press",
@@ -144,7 +156,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Incline Barbell Press",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "flat_dumbbell_press",
@@ -196,7 +212,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Flat Dumbbell Press",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "chest_press",
@@ -248,7 +268,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Chest Press",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "pec_fly",
@@ -300,7 +324,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Pec Fly",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "cable_fly",
@@ -352,7 +380,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ケーブル",
+    "tags": [],
+    "englishName": "Cable Fly",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "dips",
@@ -404,7 +436,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "bodyweight",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "自重",
+    "tags": [],
+    "englishName": "Dips",
+    "distanceUnit": "km",
+    "startWeight": 0.0,
+    "startReps": 10
   },
   {
     "exerciseId": "push_up",
@@ -458,7 +496,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "bodyweight",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "自重",
+    "tags": [],
+    "englishName": "Push Up",
+    "distanceUnit": "km",
+    "startWeight": 0.0,
+    "startReps": 10
   },
   {
     "exerciseId": "incline_press_machine",
@@ -534,7 +578,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Incline Press Machine",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "decline_fly_machine",
@@ -597,7 +645,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Decline Fly Machine",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "decline_press_machine",
@@ -673,7 +725,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Decline Press Machine",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "lat_pulldown",
@@ -739,7 +795,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Lat Pulldown",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "mag_narrow",
@@ -807,7 +867,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Mag Narrow",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "mag_medium",
@@ -875,7 +939,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Mag Medium",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "mag_wide",
@@ -943,7 +1011,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Mag Wide",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "chin_up",
@@ -1008,7 +1080,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "自重",
+    "tags": [],
+    "englishName": "Chin Up",
+    "distanceUnit": "km",
+    "startWeight": 0.0,
+    "startReps": 10
   },
   {
     "exerciseId": "assisted_chin_up",
@@ -1071,7 +1149,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Assisted Chin Up",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "seated_row",
@@ -1125,7 +1207,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Seated Row",
+    "distanceUnit": "km",
+    "startWeight": 30.0,
+    "startReps": 10
   },
   {
     "exerciseId": "bent_over_row",
@@ -1179,7 +1267,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Bent Over Row",
+    "distanceUnit": "km",
+    "startWeight": 30.0,
+    "startReps": 10
   },
   {
     "exerciseId": "one_arm_dumbbell_row",
@@ -1231,7 +1325,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "One Arm Dumbbell Row",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "deadlift",
@@ -1285,7 +1383,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Deadlift",
+    "distanceUnit": "km",
+    "startWeight": 50.0,
+    "startReps": 10
   },
   {
     "exerciseId": "t_bar_row",
@@ -1337,7 +1441,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "T Bar Row",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "straight_arm_pulldown",
@@ -1389,7 +1497,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ケーブル",
+    "tags": [],
+    "englishName": "Straight Arm Pulldown",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "dy_row",
@@ -1485,7 +1597,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": true
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Dy Row",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "low_row",
@@ -1561,7 +1677,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": true
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Low Row",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "linear_row",
@@ -1636,7 +1756,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": false
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Linear Row",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "high_row",
@@ -1733,7 +1857,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": true
-    }
+    },
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "High Row",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "cable_row",
@@ -1785,7 +1913,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 1,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ケーブル",
+    "tags": [],
+    "englishName": "Cable Row",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "back_extension",
@@ -1851,7 +1983,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "android": true,
       "ios": true,
       "productionRoute": true
-    }
+    },
+    "equipmentLabel": "ローマンチェア",
+    "tags": [],
+    "englishName": "Back Extension",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "shoulder_press",
@@ -1901,7 +2037,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Shoulder Press",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "dumbbell_shoulder_press",
@@ -1951,7 +2091,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Dumbbell Shoulder Press",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "military_press",
@@ -2001,7 +2145,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 1,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Military Press",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "lateral_raise",
@@ -2051,7 +2199,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Lateral Raise",
+    "distanceUnit": "km",
+    "startWeight": 5.0,
+    "startReps": 10
   },
   {
     "exerciseId": "front_raise",
@@ -2101,7 +2255,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Front Raise",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "rear_raise",
@@ -2151,7 +2309,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Rear Raise",
+    "distanceUnit": "km",
+    "startWeight": 5.0,
+    "startReps": 10
   },
   {
     "exerciseId": "rear_delt",
@@ -2201,7 +2365,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 1,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Rear Delt",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "face_pull",
@@ -2251,7 +2419,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ケーブル",
+    "tags": [],
+    "englishName": "Face Pull",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "upright_row",
@@ -2301,7 +2473,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Upright Row",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "barbell_curl",
@@ -2351,7 +2527,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Barbell Curl",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "dumbbell_curl",
@@ -2403,7 +2583,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Dumbbell Curl",
+    "distanceUnit": "km",
+    "startWeight": 10.0,
+    "startReps": 10
   },
   {
     "exerciseId": "hammer_curl",
@@ -2453,7 +2639,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Hammer Curl",
+    "distanceUnit": "km",
+    "startWeight": 8.0,
+    "startReps": 10
   },
   {
     "exerciseId": "preacher_curl",
@@ -2503,7 +2695,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Preacher Curl",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "cable_curl",
@@ -2553,7 +2749,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ケーブル",
+    "tags": [],
+    "englishName": "Cable Curl",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "triceps_pushdown",
@@ -2600,7 +2800,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ケーブル",
+    "tags": [],
+    "englishName": "Triceps Pushdown",
+    "distanceUnit": "km",
+    "startWeight": 15.0,
+    "startReps": 10
   },
   {
     "exerciseId": "french_press",
@@ -2647,7 +2853,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "French Press",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "skull_crusher",
@@ -2694,7 +2904,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Skull Crusher",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "overhead_triceps_extension",
@@ -2741,7 +2955,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ケーブル",
+    "tags": [],
+    "englishName": "Overhead Triceps Extension",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "barbell_squat",
@@ -2795,7 +3013,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Barbell Squat",
+    "distanceUnit": "km",
+    "startWeight": 40.0,
+    "startReps": 10
   },
   {
     "exerciseId": "hack_squat",
@@ -2847,7 +3071,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Hack Squat",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "leg_press",
@@ -2899,7 +3127,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Leg Press",
+    "distanceUnit": "km",
+    "startWeight": 60.0,
+    "startReps": 10
   },
   {
     "exerciseId": "bulgarian_split_squat",
@@ -2951,7 +3185,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Bulgarian Split Squat",
+    "distanceUnit": "km",
+    "startWeight": 10.0,
+    "startReps": 10
   },
   {
     "exerciseId": "lunge",
@@ -3003,7 +3243,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ダンベル",
+    "tags": [],
+    "englishName": "Lunge",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "leg_extension",
@@ -3055,7 +3299,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Leg Extension",
+    "distanceUnit": "km",
+    "startWeight": 25.0,
+    "startReps": 10
   },
   {
     "exerciseId": "leg_curl",
@@ -3102,7 +3352,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Leg Curl",
+    "distanceUnit": "km",
+    "startWeight": 20.0,
+    "startReps": 10
   },
   {
     "exerciseId": "romanian_deadlift",
@@ -3156,7 +3412,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Romanian Deadlift",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "hip_thrust",
@@ -3206,7 +3466,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "フリーウェイト",
+    "tags": [],
+    "englishName": "Hip Thrust",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "hip_abduction",
@@ -3253,7 +3517,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Hip Abduction",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "hip_adduction",
@@ -3300,7 +3568,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Hip Adduction",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "calf_raise",
@@ -3347,7 +3619,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Calf Raise",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "crunch",
@@ -3397,7 +3673,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "bodyweight",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "自重",
+    "tags": [],
+    "englishName": "Crunch",
+    "distanceUnit": "km",
+    "startWeight": 0.0,
+    "startReps": 15
   },
   {
     "exerciseId": "abdominal_crunch",
@@ -3447,7 +3729,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "englishName": "Abdominal Crunch",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "leg_raise",
@@ -3497,7 +3783,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "bodyweight",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "自重",
+    "tags": [],
+    "englishName": "Leg Raise",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "hanging_leg_raise",
@@ -3547,7 +3837,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "bodyweight",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "自重",
+    "tags": [],
+    "englishName": "Hanging Leg Raise",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "cable_crunch",
@@ -3597,7 +3891,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "ケーブル",
+    "tags": [],
+    "englishName": "Cable Crunch",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "plank",
@@ -3647,7 +3945,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "external",
     "priority": 2,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "自重",
+    "tags": [],
+    "englishName": "Plank",
+    "distanceUnit": "km",
+    "startWeight": 0.0,
+    "startReps": 60
   },
   {
     "exerciseId": "ab_wheel",
@@ -3697,7 +4001,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "loadMode": "bodyweight",
     "priority": 1,
     "status": "planned",
-    "assetPath": null
+    "assetPath": null,
+    "equipmentLabel": "アブローラー",
+    "tags": [],
+    "englishName": "Ab Wheel",
+    "distanceUnit": "km"
   },
   {
     "exerciseId": "incline_fly_machine",
@@ -3760,6 +4068,5785 @@ const List<Map<String, Object?>> exerciseFormData = [
       "ios": false,
       "productionRoute": false
     },
-    "englishName": "Incline Fly Machine"
+    "englishName": "Incline Fly Machine",
+    "equipmentLabel": "マシン",
+    "tags": [],
+    "distanceUnit": "km"
+  },
+  {
+    "exerciseId": "dumbbell_fly",
+    "exerciseName": "ダンベルフライ",
+    "englishName": "Dumbbell Fly",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "胸",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "dumbbell_fly",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "dumbbell_fly",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "startWeight": 10.0,
+    "startReps": 10
+  },
+  {
+    "exerciseId": "sit_up",
+    "exerciseName": "シットアップ",
+    "englishName": "Sit Up",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "tags": [
+      "腹筋",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "sit_up",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "sit_up",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "startWeight": 0.0,
+    "startReps": 15
+  },
+  {
+    "exerciseId": "side_plank",
+    "exerciseName": "サイドプランク",
+    "englishName": "Side Plank",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "timed",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "obliques"
+    ],
+    "secondaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "tags": [
+      "腹筋",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "side_plank",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "side_plank",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "startWeight": 0.0,
+    "startReps": 45
+  },
+  {
+    "exerciseId": "wall_sit",
+    "exerciseName": "ウォールシット",
+    "englishName": "Wall Sit",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "timed",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "secondaryMuscles": [
+      "gluteus"
+    ],
+    "tags": [
+      "脚",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "wall_sit",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "wall_sit",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "startWeight": 0.0,
+    "startReps": 60
+  },
+  {
+    "exerciseId": "treadmill",
+    "exerciseName": "トレッドミル",
+    "englishName": "Treadmill",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "treadmill",
+    "equipmentLabel": "マシン",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "calves"
+    ],
+    "secondaryMuscles": [
+      "gluteus"
+    ],
+    "tags": [
+      "有酸素",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "treadmill",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "treadmill",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "speed",
+      "incline"
+    ],
+    "startWeight": 1.0,
+    "startReps": 10
+  },
+  {
+    "exerciseId": "exercise_bike",
+    "exerciseName": "エアロバイク",
+    "englishName": "Exercise Bike",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "exercise_bike",
+    "equipmentLabel": "マシン",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "calves"
+    ],
+    "tags": [
+      "有酸素",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "exercise_bike",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "exercise_bike",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "speed",
+      "resistance"
+    ],
+    "startWeight": 1.0,
+    "startReps": 10
+  },
+  {
+    "exerciseId": "cross_trainer",
+    "exerciseName": "クロストレーナー",
+    "englishName": "Cross Trainer",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "cross_trainer",
+    "equipmentLabel": "マシン",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "有酸素",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cross_trainer",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cross_trainer",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "resistance"
+    ],
+    "startWeight": 1.0,
+    "startReps": 10
+  },
+  {
+    "exerciseId": "stair_climber",
+    "exerciseName": "ステアクライマー",
+    "englishName": "Stair Climber",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "stair_climber",
+    "equipmentLabel": "マシン",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "calves"
+    ],
+    "tags": [
+      "有酸素",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "stair_climber",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "stair_climber",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "resistance",
+      "speed"
+    ],
+    "startWeight": 1.0,
+    "startReps": 10
+  },
+  {
+    "exerciseId": "rowing_machine",
+    "exerciseName": "ローイングマシン",
+    "englishName": "Rowing Machine",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "rowing_machine",
+    "equipmentLabel": "マシン",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "gluteus"
+    ],
+    "tags": [
+      "有酸素",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "rowing_machine",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "rowing_machine",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "pace"
+    ],
+    "startWeight": 1.0,
+    "startReps": 10
+  },
+  {
+    "exerciseId": "running",
+    "exerciseName": "ランニング",
+    "englishName": "Running",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "distance",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "calves"
+    ],
+    "secondaryMuscles": [
+      "gluteus"
+    ],
+    "tags": [
+      "有酸素",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "running",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "running",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "speed",
+      "pace"
+    ],
+    "startWeight": 0.0,
+    "startReps": 30
+  },
+  {
+    "exerciseId": "walking",
+    "exerciseName": "ウォーキング",
+    "englishName": "Walking",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "distance",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "calves"
+    ],
+    "secondaryMuscles": [
+      "gluteus"
+    ],
+    "tags": [
+      "有酸素",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "walking",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "walking",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "speed",
+      "pace"
+    ],
+    "startWeight": 0.0,
+    "startReps": 30
+  },
+  {
+    "exerciseId": "cycling",
+    "exerciseName": "サイクリング",
+    "englishName": "Cycling",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "cycling",
+    "equipmentLabel": "マシン",
+    "recordType": "distance",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "calves"
+    ],
+    "tags": [
+      "有酸素",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cycling",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cycling",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "speed",
+      "pace"
+    ],
+    "startWeight": 0.0,
+    "startReps": 30
+  },
+  {
+    "exerciseId": "decline_barbell_press",
+    "exerciseName": "デクラインベンチプレス",
+    "englishName": "Decline Barbell Press",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid",
+      "triceps"
+    ],
+    "tags": [
+      "胸",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "decline_barbell_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "decline_barbell_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "smith_bench_press",
+    "exerciseName": "スミスマシンベンチプレス",
+    "englishName": "Smith Bench Press",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "smith_machine",
+    "equipmentLabel": "スミスマシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid",
+      "triceps"
+    ],
+    "tags": [
+      "胸",
+      "スミスマシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "smith_bench_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "smith_bench_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "smith_incline_press",
+    "exerciseName": "スミスマシンインクラインベンチプレス",
+    "englishName": "Smith Incline Press",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "smith_machine",
+    "equipmentLabel": "スミスマシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid",
+      "triceps"
+    ],
+    "tags": [
+      "胸",
+      "スミスマシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "smith_incline_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "smith_incline_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "smith_decline_press",
+    "exerciseName": "スミスマシンデクラインベンチプレス",
+    "englishName": "Smith Decline Press",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "smith_machine",
+    "equipmentLabel": "スミスマシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid",
+      "triceps"
+    ],
+    "tags": [
+      "胸",
+      "スミスマシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "smith_decline_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "smith_decline_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "decline_dumbbell_press",
+    "exerciseName": "デクラインダンベルプレス",
+    "englishName": "Decline Dumbbell Press",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid",
+      "triceps"
+    ],
+    "tags": [
+      "胸",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "decline_dumbbell_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "decline_dumbbell_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "incline_dumbbell_fly",
+    "exerciseName": "インクラインダンベルフライ",
+    "englishName": "Incline Dumbbell Fly",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "胸",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "incline_dumbbell_fly",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "incline_dumbbell_fly",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "decline_dumbbell_fly",
+    "exerciseName": "デクラインダンベルフライ",
+    "englishName": "Decline Dumbbell Fly",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "胸",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "decline_dumbbell_fly",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "decline_dumbbell_fly",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "low_cable_fly",
+    "exerciseName": "ローケーブルフライ",
+    "englishName": "Low Cable Fly",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "胸",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "low_cable_fly",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "low_cable_fly",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "high_cable_fly",
+    "exerciseName": "ハイケーブルフライ",
+    "englishName": "High Cable Fly",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "胸",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "high_cable_fly",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "high_cable_fly",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "single_arm_cable_fly",
+    "exerciseName": "ワンハンドケーブルフライ",
+    "englishName": "Single Arm Cable Fly",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid",
+      "obliques"
+    ],
+    "tags": [
+      "胸",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "single_arm_cable_fly",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "single_arm_cable_fly",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "plate_loaded_chest_press",
+    "exerciseName": "チェストプレス",
+    "englishName": "Chest Press",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "plate_loaded_chest_press",
+    "equipmentLabel": "プレートロード",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid",
+      "triceps"
+    ],
+    "tags": [
+      "胸",
+      "プレートロード"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "plate_loaded_chest_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "plate_loaded_chest_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "selectorized_incline_chest_press",
+    "exerciseName": "インクラインチェストプレス",
+    "englishName": "Incline Chest Press",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "selectorized_incline_chest_press",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid",
+      "triceps"
+    ],
+    "tags": [
+      "胸",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "selectorized_incline_chest_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "selectorized_incline_chest_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "plate_loaded_incline_chest_press",
+    "exerciseName": "インクラインチェストプレス",
+    "englishName": "Incline Chest Press",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "plate_loaded_incline_chest_press",
+    "equipmentLabel": "プレートロード",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid",
+      "triceps"
+    ],
+    "tags": [
+      "胸",
+      "プレートロード"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "plate_loaded_incline_chest_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "plate_loaded_incline_chest_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "weighted_dip",
+    "exerciseName": "加重ディップス",
+    "englishName": "Weighted Dip",
+    "category": "胸",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "weightReps",
+    "loadMode": "additional",
+    "primaryMuscles": [
+      "pectoralisMajor",
+      "triceps"
+    ],
+    "secondaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "胸",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "weighted_dip",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "weighted_dip",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "rack_pull",
+    "exerciseName": "ラックプル",
+    "englishName": "Rack Pull",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "erectorSpinae",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "trapezius",
+      "forearms"
+    ],
+    "tags": [
+      "背中",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "rack_pull",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "rack_pull",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "snatch_grip_deadlift",
+    "exerciseName": "スナッチグリップデッドリフト",
+    "englishName": "Snatch Grip Deadlift",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "gluteus",
+      "hamstrings",
+      "erectorSpinae"
+    ],
+    "secondaryMuscles": [
+      "quadriceps",
+      "trapezius",
+      "forearms"
+    ],
+    "tags": [
+      "背中",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "snatch_grip_deadlift",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "snatch_grip_deadlift",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "pendlay_row",
+    "exerciseName": "ペンドレイロウ",
+    "englishName": "Pendlay Row",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "posteriorDeltoid",
+      "erectorSpinae"
+    ],
+    "tags": [
+      "背中",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "pendlay_row",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "pendlay_row",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "chest_supported_dumbbell_row",
+    "exerciseName": "チェストサポートダンベルロー",
+    "englishName": "Chest Supported Dumbbell Row",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "posteriorDeltoid"
+    ],
+    "tags": [
+      "背中",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "chest_supported_dumbbell_row",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "chest_supported_dumbbell_row",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "chest_supported_tbar_row",
+    "exerciseName": "チェストサポートTバーロー",
+    "englishName": "Chest Supported Tbar Row",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "chest_supported_tbar_row",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "posteriorDeltoid"
+    ],
+    "tags": [
+      "背中",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "chest_supported_tbar_row",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "chest_supported_tbar_row",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "seal_row",
+    "exerciseName": "シールロー",
+    "englishName": "Seal Row",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "posteriorDeltoid"
+    ],
+    "tags": [
+      "背中",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "seal_row",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "seal_row",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "inverted_row",
+    "exerciseName": "インバーテッドロー",
+    "englishName": "Inverted Row",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "posteriorDeltoid"
+    ],
+    "tags": [
+      "背中",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "inverted_row",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "inverted_row",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "neutral_grip_lat_pulldown",
+    "exerciseName": "ニュートラルグリップラットプルダウン",
+    "englishName": "Neutral Grip Lat Pulldown",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "neutral_grip_lat_pulldown",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "trapezius"
+    ],
+    "tags": [
+      "背中",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "neutral_grip_lat_pulldown",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "neutral_grip_lat_pulldown",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "reverse_grip_lat_pulldown",
+    "exerciseName": "リバースグリップラットプルダウン",
+    "englishName": "Reverse Grip Lat Pulldown",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "reverse_grip_lat_pulldown",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "trapezius"
+    ],
+    "tags": [
+      "背中",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "reverse_grip_lat_pulldown",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "reverse_grip_lat_pulldown",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "single_arm_lat_pulldown",
+    "exerciseName": "ワンハンドラットプルダウン",
+    "englishName": "Single Arm Lat Pulldown",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "single_arm_lat_pulldown",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "trapezius"
+    ],
+    "tags": [
+      "背中",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "single_arm_lat_pulldown",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "single_arm_lat_pulldown",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "plate_loaded_lat_pulldown",
+    "exerciseName": "ラットプルダウン",
+    "englishName": "Lat Pulldown",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "plate_loaded_lat_pulldown",
+    "equipmentLabel": "プレートロード",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "trapezius"
+    ],
+    "tags": [
+      "背中",
+      "プレートロード"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "plate_loaded_lat_pulldown",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "plate_loaded_lat_pulldown",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "plate_loaded_seated_row",
+    "exerciseName": "シーテッドロー",
+    "englishName": "Seated Row",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "plate_loaded_seated_row",
+    "equipmentLabel": "プレートロード",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "posteriorDeltoid"
+    ],
+    "tags": [
+      "背中",
+      "プレートロード"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "plate_loaded_seated_row",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "plate_loaded_seated_row",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "iso_lateral_row",
+    "exerciseName": "アイソラテラルロー",
+    "englishName": "Iso Lateral Row",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "iso_lateral_row",
+    "equipmentLabel": "プレートロード",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "posteriorDeltoid"
+    ],
+    "tags": [
+      "背中",
+      "プレートロード"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "iso_lateral_row",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "iso_lateral_row",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "kneeling_lat_pulldown",
+    "exerciseName": "ニーリングラットプルダウン",
+    "englishName": "Kneeling Lat Pulldown",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "rectusAbdominis"
+    ],
+    "tags": [
+      "背中",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "kneeling_lat_pulldown",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "kneeling_lat_pulldown",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "dumbbell_pullover",
+    "exerciseName": "ダンベルプルオーバー",
+    "englishName": "Dumbbell Pullover",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "triceps"
+    ],
+    "tags": [
+      "背中",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "dumbbell_pullover",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "dumbbell_pullover",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "cable_pullover",
+    "exerciseName": "ケーブルプルオーバー",
+    "englishName": "Cable Pullover",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "pectoralisMajor"
+    ],
+    "tags": [
+      "背中",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cable_pullover",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cable_pullover",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "machine_pullover",
+    "exerciseName": "プルオーバーマシン",
+    "englishName": "Machine Pullover",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "machine_pullover",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "pectoralisMajor",
+      "triceps"
+    ],
+    "tags": [
+      "背中",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "machine_pullover",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "machine_pullover",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "weighted_chin_up",
+    "exerciseName": "加重チンニング",
+    "englishName": "Weighted Chin Up",
+    "category": "背中",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "weightReps",
+    "loadMode": "additional",
+    "primaryMuscles": [
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "tags": [
+      "背中",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "weighted_chin_up",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "weighted_chin_up",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "plate_loaded_shoulder_press",
+    "exerciseName": "ショルダープレス",
+    "englishName": "Shoulder Press",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "plate_loaded_shoulder_press",
+    "equipmentLabel": "プレートロード",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "secondaryMuscles": [
+      "triceps"
+    ],
+    "tags": [
+      "肩",
+      "プレートロード"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "plate_loaded_shoulder_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "plate_loaded_shoulder_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "smith_shoulder_press",
+    "exerciseName": "スミスマシンショルダープレス",
+    "englishName": "Smith Shoulder Press",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "smith_machine",
+    "equipmentLabel": "スミスマシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "secondaryMuscles": [
+      "triceps"
+    ],
+    "tags": [
+      "肩",
+      "スミスマシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "smith_shoulder_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "smith_shoulder_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "arnold_press",
+    "exerciseName": "アーノルドプレス",
+    "englishName": "Arnold Press",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "secondaryMuscles": [
+      "triceps"
+    ],
+    "tags": [
+      "肩",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "arnold_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "arnold_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "landmine_press",
+    "exerciseName": "ランドマインプレス",
+    "englishName": "Landmine Press",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "landmine",
+    "equipmentLabel": "ランドマイン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "anteriorDeltoid",
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "triceps"
+    ],
+    "tags": [
+      "肩",
+      "ランドマイン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "landmine_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "landmine_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "single_arm_landmine_press",
+    "exerciseName": "ワンハンドランドマインプレス",
+    "englishName": "Single Arm Landmine Press",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "landmine",
+    "equipmentLabel": "ランドマイン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "anteriorDeltoid",
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "obliques"
+    ],
+    "tags": [
+      "肩",
+      "ランドマイン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "single_arm_landmine_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "single_arm_landmine_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "cable_shoulder_press",
+    "exerciseName": "ケーブルショルダープレス",
+    "englishName": "Cable Shoulder Press",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "secondaryMuscles": [
+      "triceps"
+    ],
+    "tags": [
+      "肩",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cable_shoulder_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cable_shoulder_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "machine_lateral_raise",
+    "exerciseName": "マシンサイドレイズ",
+    "englishName": "Machine Lateral Raise",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "machine_lateral_raise",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "lateralDeltoid"
+    ],
+    "secondaryMuscles": [
+      "trapezius"
+    ],
+    "tags": [
+      "肩",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "machine_lateral_raise",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "machine_lateral_raise",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "cable_lateral_raise",
+    "exerciseName": "ケーブルサイドレイズ",
+    "englishName": "Cable Lateral Raise",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "lateralDeltoid"
+    ],
+    "secondaryMuscles": [
+      "trapezius"
+    ],
+    "tags": [
+      "肩",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cable_lateral_raise",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cable_lateral_raise",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "single_arm_cable_lateral_raise",
+    "exerciseName": "ワンハンドケーブルサイドレイズ",
+    "englishName": "Single Arm Cable Lateral Raise",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "lateralDeltoid"
+    ],
+    "secondaryMuscles": [
+      "trapezius"
+    ],
+    "tags": [
+      "肩",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "single_arm_cable_lateral_raise",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "single_arm_cable_lateral_raise",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "cable_front_raise",
+    "exerciseName": "ケーブルフロントレイズ",
+    "englishName": "Cable Front Raise",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "secondaryMuscles": [
+      "pectoralisMajor"
+    ],
+    "tags": [
+      "肩",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cable_front_raise",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cable_front_raise",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "cable_rear_delt_fly",
+    "exerciseName": "ケーブルリアデルトフライ",
+    "englishName": "Cable Rear Delt Fly",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "posteriorDeltoid"
+    ],
+    "secondaryMuscles": [
+      "trapezius"
+    ],
+    "tags": [
+      "肩",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cable_rear_delt_fly",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cable_rear_delt_fly",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "dumbbell_shrug",
+    "exerciseName": "ダンベルシュラッグ",
+    "englishName": "Dumbbell Shrug",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "tags": [
+      "肩",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "dumbbell_shrug",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "dumbbell_shrug",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "barbell_shrug",
+    "exerciseName": "バーベルシュラッグ",
+    "englishName": "Barbell Shrug",
+    "category": "肩",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "tags": [
+      "肩",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "barbell_shrug",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "barbell_shrug",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "ez_bar_curl",
+    "exerciseName": "EZバーカール",
+    "englishName": "Ez Bar Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "ez_bar",
+    "equipmentLabel": "EZバー",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "tags": [
+      "腕",
+      "EZバー"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "ez_bar_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "ez_bar_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "incline_dumbbell_curl",
+    "exerciseName": "インクラインダンベルカール",
+    "englishName": "Incline Dumbbell Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "tags": [
+      "腕",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "incline_dumbbell_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "incline_dumbbell_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "concentration_curl",
+    "exerciseName": "コンセントレーションカール",
+    "englishName": "Concentration Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "tags": [
+      "腕",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "concentration_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "concentration_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "spider_curl",
+    "exerciseName": "スパイダーカール",
+    "englishName": "Spider Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "tags": [
+      "腕",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "spider_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "spider_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "reverse_curl",
+    "exerciseName": "リバースカール",
+    "englishName": "Reverse Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "forearms"
+    ],
+    "secondaryMuscles": [
+      "biceps"
+    ],
+    "tags": [
+      "腕",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "reverse_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "reverse_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "cable_hammer_curl",
+    "exerciseName": "ケーブルハンマーカール",
+    "englishName": "Cable Hammer Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腕",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cable_hammer_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cable_hammer_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "machine_arm_curl",
+    "exerciseName": "マシンアームカール",
+    "englishName": "Machine Arm Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "machine_arm_curl",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "tags": [
+      "腕",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "machine_arm_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "machine_arm_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "machine_preacher_curl",
+    "exerciseName": "プリーチャーカール",
+    "englishName": "Preacher Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "machine_preacher_curl",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "tags": [
+      "腕",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "machine_preacher_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "machine_preacher_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "bayesian_curl",
+    "exerciseName": "ベイジアンカール",
+    "englishName": "Bayesian Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "tags": [
+      "腕",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "bayesian_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "bayesian_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "zottman_curl",
+    "exerciseName": "ゾットマンカール",
+    "englishName": "Zottman Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腕",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "zottman_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "zottman_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "close_grip_bench_press",
+    "exerciseName": "ナローベンチプレス",
+    "englishName": "Close Grip Bench Press",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [
+      "pectoralisMajor",
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "腕",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "close_grip_bench_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "close_grip_bench_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "jm_press",
+    "exerciseName": "JMプレス",
+    "englishName": "Jm Press",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [
+      "pectoralisMajor",
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "腕",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "jm_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "jm_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "single_arm_pushdown",
+    "exerciseName": "ワンハンドプッシュダウン",
+    "englishName": "Single Arm Pushdown",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腕",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "single_arm_pushdown",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "single_arm_pushdown",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "reverse_grip_pushdown",
+    "exerciseName": "リバースグリッププッシュダウン",
+    "englishName": "Reverse Grip Pushdown",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腕",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "reverse_grip_pushdown",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "reverse_grip_pushdown",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "straight_bar_pushdown",
+    "exerciseName": "ストレートバープッシュダウン",
+    "englishName": "Straight Bar Pushdown",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腕",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "straight_bar_pushdown",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "straight_bar_pushdown",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "rope_pushdown",
+    "exerciseName": "ローププッシュダウン",
+    "englishName": "Rope Pushdown",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腕",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "rope_pushdown",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "rope_pushdown",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "machine_triceps_extension",
+    "exerciseName": "マシントライセプスエクステンション",
+    "englishName": "Machine Triceps Extension",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "machine_triceps_extension",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腕",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "machine_triceps_extension",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "machine_triceps_extension",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "triceps_kickback",
+    "exerciseName": "トライセプスキックバック",
+    "englishName": "Triceps Kickback",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [
+      "posteriorDeltoid"
+    ],
+    "tags": [
+      "腕",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "triceps_kickback",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "triceps_kickback",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "wrist_curl",
+    "exerciseName": "リストカール",
+    "englishName": "Wrist Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "forearms"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腕",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "wrist_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "wrist_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "reverse_wrist_curl",
+    "exerciseName": "リバースリストカール",
+    "englishName": "Reverse Wrist Curl",
+    "category": "腕",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "forearms"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腕",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "reverse_wrist_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "reverse_wrist_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "front_squat",
+    "exerciseName": "フロントスクワット",
+    "englishName": "Front Squat",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "rectusAbdominis",
+      "erectorSpinae"
+    ],
+    "tags": [
+      "脚",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "front_squat",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "front_squat",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "goblet_squat",
+    "exerciseName": "ゴブレットスクワット",
+    "englishName": "Goblet Squat",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "tags": [
+      "脚",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "goblet_squat",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "goblet_squat",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "smith_squat",
+    "exerciseName": "スミスマシンスクワット",
+    "englishName": "Smith Squat",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "smith_machine",
+    "equipmentLabel": "スミスマシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "スミスマシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "smith_squat",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "smith_squat",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "pendulum_squat",
+    "exerciseName": "ペンデュラムスクワット",
+    "englishName": "Pendulum Squat",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "pendulum_squat",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "pendulum_squat",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "pendulum_squat",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "belt_squat",
+    "exerciseName": "ベルトスクワット",
+    "englishName": "Belt Squat",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "belt_squat",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "belt_squat",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "belt_squat",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "sumo_deadlift",
+    "exerciseName": "スモウデッドリフト",
+    "englishName": "Sumo Deadlift",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "gluteus",
+      "quadriceps",
+      "adductors"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "erectorSpinae",
+      "forearms"
+    ],
+    "tags": [
+      "脚",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "sumo_deadlift",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "sumo_deadlift",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "trap_bar_deadlift",
+    "exerciseName": "トラップバーデッドリフト",
+    "englishName": "Trap Bar Deadlift",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "trap_bar",
+    "equipmentLabel": "トラップバー",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "erectorSpinae",
+      "forearms"
+    ],
+    "tags": [
+      "脚",
+      "トラップバー"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "trap_bar_deadlift",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "trap_bar_deadlift",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "split_squat",
+    "exerciseName": "スプリットスクワット",
+    "englishName": "Split Squat",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "split_squat",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "split_squat",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "smith_bulgarian_split_squat",
+    "exerciseName": "スミスマシンブルガリアンスクワット",
+    "englishName": "Smith Bulgarian Split Squat",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "smith_machine",
+    "equipmentLabel": "スミスマシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "スミスマシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "smith_bulgarian_split_squat",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "smith_bulgarian_split_squat",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "reverse_lunge",
+    "exerciseName": "リバースランジ",
+    "englishName": "Reverse Lunge",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "reverse_lunge",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "reverse_lunge",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "walking_lunge",
+    "exerciseName": "ウォーキングランジ",
+    "englishName": "Walking Lunge",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "walking_lunge",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "walking_lunge",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "step_up",
+    "exerciseName": "ステップアップ",
+    "englishName": "Step Up",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "step_up",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "step_up",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "horizontal_leg_press",
+    "exerciseName": "ホリゾンタルレッグプレス",
+    "englishName": "Horizontal Leg Press",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "horizontal_leg_press",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "horizontal_leg_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "horizontal_leg_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "single_leg_press",
+    "exerciseName": "シングルレッグプレス",
+    "englishName": "Single Leg Press",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "single_leg_press",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "single_leg_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "single_leg_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "lying_leg_curl",
+    "exerciseName": "ライイングレッグカール",
+    "englishName": "Lying Leg Curl",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "lying_leg_curl",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "hamstrings"
+    ],
+    "secondaryMuscles": [
+      "calves"
+    ],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "lying_leg_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "lying_leg_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "seated_leg_curl",
+    "exerciseName": "シーテッドレッグカール",
+    "englishName": "Seated Leg Curl",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "seated_leg_curl",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "hamstrings"
+    ],
+    "secondaryMuscles": [
+      "calves"
+    ],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "seated_leg_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "seated_leg_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "standing_leg_curl",
+    "exerciseName": "スタンディングレッグカール",
+    "englishName": "Standing Leg Curl",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "standing_leg_curl",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "hamstrings"
+    ],
+    "secondaryMuscles": [
+      "calves"
+    ],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "standing_leg_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "standing_leg_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "nordic_hamstring_curl",
+    "exerciseName": "ノルディックハムストリングカール",
+    "englishName": "Nordic Hamstring Curl",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "hamstrings"
+    ],
+    "secondaryMuscles": [
+      "calves"
+    ],
+    "tags": [
+      "脚",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "nordic_hamstring_curl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "nordic_hamstring_curl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "good_morning",
+    "exerciseName": "グッドモーニング",
+    "englishName": "Good Morning",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "barbell",
+    "equipmentLabel": "フリーウェイト",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "hamstrings",
+      "gluteus",
+      "erectorSpinae"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "脚",
+      "フリーウェイト"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "good_morning",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "good_morning",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "single_leg_rdl",
+    "exerciseName": "シングルレッグルーマニアンデッドリフト",
+    "englishName": "Single Leg Romanian Deadlift",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "hamstrings",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "erectorSpinae"
+    ],
+    "tags": [
+      "脚",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "single_leg_rdl",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "single_leg_rdl",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "glute_bridge",
+    "exerciseName": "グルートブリッジ",
+    "englishName": "Glute Bridge",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "glute_bridge",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "glute_bridge",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "machine_hip_thrust",
+    "exerciseName": "ヒップスラスト",
+    "englishName": "Hip Thrust",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "machine_hip_thrust",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "machine_hip_thrust",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "machine_hip_thrust",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "cable_pull_through",
+    "exerciseName": "ケーブルプルスルー",
+    "englishName": "Cable Pull Through",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "gluteus",
+      "hamstrings"
+    ],
+    "secondaryMuscles": [
+      "erectorSpinae"
+    ],
+    "tags": [
+      "脚",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cable_pull_through",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cable_pull_through",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "glute_kickback_machine",
+    "exerciseName": "グルートキックバック",
+    "englishName": "Glute Kickback Machine",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "glute_kickback_machine",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "glute_kickback_machine",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "glute_kickback_machine",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "cable_glute_kickback",
+    "exerciseName": "ケーブルグルートキックバック",
+    "englishName": "Cable Glute Kickback",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "tags": [
+      "脚",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cable_glute_kickback",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cable_glute_kickback",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "standing_calf_raise",
+    "exerciseName": "スタンディングカーフレイズ",
+    "englishName": "Standing Calf Raise",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "standing_calf_raise",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "calves"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "standing_calf_raise",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "standing_calf_raise",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "seated_calf_raise",
+    "exerciseName": "シーテッドカーフレイズ",
+    "englishName": "Seated Calf Raise",
+    "category": "脚",
+    "aliases": [],
+    "equipmentId": "seated_calf_raise",
+    "equipmentLabel": "マシン",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "calves"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "脚",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "seated_calf_raise",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "seated_calf_raise",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "decline_sit_up",
+    "exerciseName": "デクラインシットアップ",
+    "englishName": "Decline Sit Up",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "tags": [
+      "腹筋",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "decline_sit_up",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "decline_sit_up",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "weighted_crunch",
+    "exerciseName": "ウェイテッドクランチ",
+    "englishName": "Weighted Crunch",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "additional",
+    "primaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "tags": [
+      "腹筋",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "weighted_crunch",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "weighted_crunch",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "reverse_crunch",
+    "exerciseName": "リバースクランチ",
+    "englishName": "Reverse Crunch",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "tags": [
+      "腹筋",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "reverse_crunch",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "reverse_crunch",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "bicycle_crunch",
+    "exerciseName": "バイシクルクランチ",
+    "englishName": "Bicycle Crunch",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "rectusAbdominis",
+      "obliques"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腹筋",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "bicycle_crunch",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "bicycle_crunch",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "russian_twist",
+    "exerciseName": "ロシアンツイスト",
+    "englishName": "Russian Twist",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "dumbbell",
+    "equipmentLabel": "ダンベル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "obliques"
+    ],
+    "secondaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "tags": [
+      "腹筋",
+      "ダンベル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "russian_twist",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "russian_twist",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "cable_woodchop",
+    "exerciseName": "ケーブルウッドチョップ",
+    "englishName": "Cable Woodchop",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "obliques"
+    ],
+    "secondaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "tags": [
+      "腹筋",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "cable_woodchop",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "cable_woodchop",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "pallof_press",
+    "exerciseName": "パロフプレス",
+    "englishName": "Pallof Press",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "cable",
+    "equipmentLabel": "ケーブル",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "obliques",
+      "rectusAbdominis"
+    ],
+    "secondaryMuscles": [],
+    "tags": [
+      "腹筋",
+      "ケーブル"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "pallof_press",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "pallof_press",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "hanging_knee_raise",
+    "exerciseName": "ハンギングニーレイズ",
+    "englishName": "Hanging Knee Raise",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "secondaryMuscles": [
+      "obliques",
+      "forearms"
+    ],
+    "tags": [
+      "腹筋",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "hanging_knee_raise",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "hanging_knee_raise",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "captain_chair_leg_raise",
+    "exerciseName": "キャプテンズチェアレッグレイズ",
+    "englishName": "Captain Chair Leg Raise",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "tags": [
+      "腹筋",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "captain_chair_leg_raise",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "captain_chair_leg_raise",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "dead_bug",
+    "exerciseName": "デッドバグ",
+    "englishName": "Dead Bug",
+    "category": "腹筋",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "bodyweightReps",
+    "loadMode": "bodyweight",
+    "primaryMuscles": [
+      "rectusAbdominis"
+    ],
+    "secondaryMuscles": [
+      "obliques"
+    ],
+    "tags": [
+      "腹筋",
+      "自重"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "dead_bug",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "dead_bug",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
+  },
+  {
+    "exerciseId": "assault_bike",
+    "exerciseName": "アサルトバイク",
+    "englishName": "Assault Bike",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "assault_bike",
+    "equipmentLabel": "マシン",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "anteriorDeltoid"
+    ],
+    "tags": [
+      "有酸素",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "assault_bike",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "assault_bike",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "speed",
+      "resistance"
+    ]
+  },
+  {
+    "exerciseId": "spin_bike",
+    "exerciseName": "スピンバイク",
+    "englishName": "Spin Bike",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "spin_bike",
+    "equipmentLabel": "マシン",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "calves"
+    ],
+    "tags": [
+      "有酸素",
+      "マシン"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "spin_bike",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "spin_bike",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "speed",
+      "resistance"
+    ]
+  },
+  {
+    "exerciseId": "jump_rope",
+    "exerciseName": "縄跳び",
+    "englishName": "Jump Rope",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "rope",
+    "equipmentLabel": "ロープ",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "calves"
+    ],
+    "secondaryMuscles": [
+      "quadriceps",
+      "forearms"
+    ],
+    "tags": [
+      "有酸素",
+      "ロープ"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "jump_rope",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "jump_rope",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration"
+    ]
+  },
+  {
+    "exerciseId": "battle_rope",
+    "exerciseName": "バトルロープ",
+    "englishName": "Battle Rope",
+    "category": "有酸素",
+    "aliases": [],
+    "equipmentId": "rope",
+    "equipmentLabel": "ロープ",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "anteriorDeltoid"
+    ],
+    "secondaryMuscles": [
+      "rectusAbdominis",
+      "forearms"
+    ],
+    "tags": [
+      "有酸素",
+      "ロープ"
+    ],
+    "distanceUnit": "km",
+    "movementVariant": "battle_rope",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "battle_rope",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration"
+    ]
+  },
+  {
+    "exerciseId": "hyrox_ski_erg",
+    "exerciseName": "スキーエルゴ",
+    "englishName": "SkiErg",
+    "category": "HYROX",
+    "aliases": [],
+    "equipmentId": "hyrox_ski_erg",
+    "equipmentLabel": "マシン",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "triceps"
+    ],
+    "secondaryMuscles": [
+      "rectusAbdominis",
+      "gluteus"
+    ],
+    "tags": [
+      "HYROX",
+      "マシン",
+      "全身",
+      "背中",
+      "体幹"
+    ],
+    "distanceUnit": "m",
+    "movementVariant": "hyrox_ski_erg",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "hyrox_ski_erg",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "pace"
+    ]
+  },
+  {
+    "exerciseId": "hyrox_sled_push",
+    "exerciseName": "スレッドプッシュ",
+    "englishName": "Sled Push",
+    "category": "HYROX",
+    "aliases": [],
+    "equipmentId": "sled",
+    "equipmentLabel": "スレッド",
+    "recordType": "loadedDistance",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "calves",
+      "triceps"
+    ],
+    "tags": [
+      "HYROX",
+      "スレッド",
+      "全身",
+      "脚",
+      "臀部"
+    ],
+    "distanceUnit": "m",
+    "movementVariant": "hyrox_sled_push",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "hyrox_sled_push",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "weight",
+      "distance",
+      "duration"
+    ]
+  },
+  {
+    "exerciseId": "hyrox_sled_pull",
+    "exerciseName": "スレッドプル",
+    "englishName": "Sled Pull",
+    "category": "HYROX",
+    "aliases": [],
+    "equipmentId": "sled",
+    "equipmentLabel": "スレッド",
+    "recordType": "loadedDistance",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "latissimusDorsi",
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "forearms"
+    ],
+    "tags": [
+      "HYROX",
+      "スレッド",
+      "全身",
+      "背中",
+      "脚",
+      "臀部"
+    ],
+    "distanceUnit": "m",
+    "movementVariant": "hyrox_sled_pull",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "hyrox_sled_pull",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "weight",
+      "distance",
+      "duration"
+    ]
+  },
+  {
+    "exerciseId": "hyrox_burpee_broad_jump",
+    "exerciseName": "バーピーブロードジャンプ",
+    "englishName": "Burpee Broad Jump",
+    "category": "HYROX",
+    "aliases": [],
+    "equipmentId": "bodyweight",
+    "equipmentLabel": "自重",
+    "recordType": "distance",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus",
+      "pectoralisMajor"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "rectusAbdominis"
+    ],
+    "tags": [
+      "HYROX",
+      "自重",
+      "全身",
+      "脚",
+      "臀部",
+      "胸"
+    ],
+    "distanceUnit": "m",
+    "movementVariant": "hyrox_burpee_broad_jump",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "hyrox_burpee_broad_jump",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance"
+    ]
+  },
+  {
+    "exerciseId": "hyrox_rowing",
+    "exerciseName": "ローイング",
+    "englishName": "Rowing",
+    "category": "HYROX",
+    "aliases": [],
+    "equipmentId": "hyrox_rowing",
+    "equipmentLabel": "マシン",
+    "recordType": "cardio",
+    "loadMode": "none",
+    "primaryMuscles": [
+      "quadriceps",
+      "latissimusDorsi"
+    ],
+    "secondaryMuscles": [
+      "gluteus",
+      "biceps"
+    ],
+    "tags": [
+      "HYROX",
+      "マシン",
+      "全身",
+      "脚",
+      "背中"
+    ],
+    "distanceUnit": "m",
+    "movementVariant": "hyrox_rowing",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "hyrox_rowing",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "duration",
+      "distance",
+      "pace"
+    ]
+  },
+  {
+    "exerciseId": "hyrox_farmers_carry",
+    "exerciseName": "ファーマーズキャリー",
+    "englishName": "Farmers Carry",
+    "category": "HYROX",
+    "aliases": [],
+    "equipmentId": "kettlebell",
+    "equipmentLabel": "ケトルベル",
+    "recordType": "loadedDistance",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "forearms",
+      "trapezius"
+    ],
+    "secondaryMuscles": [
+      "rectusAbdominis",
+      "gluteus"
+    ],
+    "tags": [
+      "HYROX",
+      "ケトルベル",
+      "全身",
+      "腕",
+      "体幹"
+    ],
+    "distanceUnit": "m",
+    "movementVariant": "hyrox_farmers_carry",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "hyrox_farmers_carry",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "weight",
+      "distance",
+      "duration"
+    ]
+  },
+  {
+    "exerciseId": "hyrox_sandbag_lunge",
+    "exerciseName": "サンドバッグランジ",
+    "englishName": "Sandbag Lunge",
+    "category": "HYROX",
+    "aliases": [],
+    "equipmentId": "sandbag",
+    "equipmentLabel": "サンドバッグ",
+    "recordType": "loadedDistance",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "rectusAbdominis"
+    ],
+    "tags": [
+      "HYROX",
+      "サンドバッグ",
+      "全身",
+      "脚",
+      "臀部"
+    ],
+    "distanceUnit": "m",
+    "movementVariant": "hyrox_sandbag_lunge",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "hyrox_sandbag_lunge",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {},
+    "recordFields": [
+      "weight",
+      "distance",
+      "duration"
+    ]
+  },
+  {
+    "exerciseId": "hyrox_wall_ball",
+    "exerciseName": "ウォールボール",
+    "englishName": "Wall Ball",
+    "category": "HYROX",
+    "aliases": [],
+    "equipmentId": "wall_ball",
+    "equipmentLabel": "ボール",
+    "recordType": "weightReps",
+    "loadMode": "external",
+    "primaryMuscles": [
+      "quadriceps",
+      "gluteus",
+      "anteriorDeltoid"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "rectusAbdominis"
+    ],
+    "tags": [
+      "HYROX",
+      "ボール",
+      "全身",
+      "脚",
+      "臀部",
+      "体幹"
+    ],
+    "distanceUnit": "m",
+    "movementVariant": "hyrox_wall_ball",
+    "status": "planned",
+    "assetPath": null,
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "hyrox_wall_ball",
+    "gripType": "unspecified",
+    "cameraPreset": "studio_oblique",
+    "cameraAngle": [
+      2.8,
+      2.5,
+      3.4
+    ],
+    "cameraTarget": [
+      0,
+      0.95,
+      0
+    ],
+    "cameraScale": 1.35,
+    "cameraDistance": 5.06,
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {}
   }
 ];

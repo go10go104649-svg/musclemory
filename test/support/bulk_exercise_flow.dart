@@ -34,6 +34,8 @@ Future<void> verifyBulkExerciseFlow(
   await tester.tap(find.byKey(const Key('startWorkoutButton')));
   await tester.pumpAndSettle();
   Future<void> openMenu() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.byKey(const Key('addExerciseButton')),
       300,
@@ -106,7 +108,7 @@ Future<void> verifyBulkExerciseFlow(
   await tester.ensureVisible(find.byKey(const Key('exerciseCategory胸')));
   await tester.tap(find.byKey(const Key('exerciseCategory胸')));
   await tester.pumpAndSettle();
-  await tester.tap(find.byKey(const Key('selectExerciseチェストプレス')));
+  await tester.tap(find.byKey(const Key('selectExercisechest_press')));
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('addSelectedExercises')));
   await tester.pumpAndSettle();

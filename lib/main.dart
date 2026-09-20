@@ -35,7 +35,8 @@ enum ExerciseRecordType {
   bodyweightReps,
   timed,
   cardio,
-  distance;
+  distance,
+  loadedDistance;
 
   static ExerciseRecordType fromName(String? value) => values.firstWhere(
     (type) => type.name == value,
@@ -48,12 +49,15 @@ enum ExerciseRecordType {
     ExerciseRecordType.timed => '時間',
     ExerciseRecordType.cardio => '有酸素',
     ExerciseRecordType.distance => '時間・距離',
+    ExerciseRecordType.loadedDistance => '重量・距離',
   };
 }
 
 extension ExerciseRecordTypeUi on ExerciseRecordType {
   bool get usesSets =>
-      this != ExerciseRecordType.cardio && this != ExerciseRecordType.distance;
+      this != ExerciseRecordType.cardio &&
+      this != ExerciseRecordType.distance &&
+      this != ExerciseRecordType.loadedDistance;
 }
 
 ExerciseRecordType inferRecordType({
@@ -79,10 +83,12 @@ ExerciseRecordType recordTypeForExerciseName(
 }) {
   for (final item in [
     ...CustomExercisePreference.exercises,
-    ...exerciseTemplates,
+    ..._legacyExerciseTemplates,
   ]) {
     if (item.name == name) return item.recordType;
   }
+  final form = ExerciseFormCatalog.forName(name);
+  if (form != null) return ExerciseRecordType.fromName(form.recordType);
   return inferRecordType(name: name, bodyPart: bodyPart, equipment: equipment);
 }
 
@@ -893,7 +899,7 @@ class RecentMenusCard extends StatelessWidget {
     final signatures = <String>{};
     final menus = <WorkoutRecord>[];
     for (final workout in history) {
-      final signature = workout.exerciseNames.join('|');
+      final signature = workout.exerciseGroups.keys.join('|');
       if (signatures.add(signature)) menus.add(workout);
       if (menus.length == 3) break;
     }
@@ -1244,6 +1250,9 @@ class _SavedMenuManagementPageState extends State<SavedMenuManagementPage> {
 
 RecordedSet _initialRecordedSet(ExerciseTemplate template) => RecordedSet(
   exerciseName: template.name,
+  exerciseId: template.exerciseId,
+  equipment: template.equipment,
+  distanceUnit: template.distanceUnit,
   bodyPart: template.bodyPart,
   recordType: template.recordType,
   weight: template.recordType == ExerciseRecordType.weightReps
@@ -1308,7 +1317,7 @@ class _MenuExerciseOrderPageState extends State<_MenuExerciseOrderPage> {
               itemBuilder: (context, index) {
                 final exercise = _exercises[index].template;
                 return Card(
-                  key: ValueKey('menuOrder${exercise.name}'),
+                  key: ValueKey('menuOrder${exercise.identity}'),
                   child: ListTile(
                     leading: const Icon(Icons.drag_handle_rounded),
                     title: Text(exerciseDisplayName(exercise.name)),
@@ -2001,7 +2010,7 @@ int countPersonalBests(List<WorkoutRecord> history, DateTime since) {
     final workoutBest = <String, double>{};
     for (final set in workout.sets) {
       workoutBest.update(
-        set.exerciseName,
+        set.identity,
         (value) => set.weight > value ? set.weight : value,
         ifAbsent: () => set.weight,
       );
@@ -3619,11 +3628,18 @@ class _ExerciseProgressPageState extends State<ExerciseProgressPage> {
 
   List<String> get _exerciseNames {
     final names = widget.history
-        .expand((workout) => workout.exerciseNames)
+        .expand((workout) => workout.exerciseGroups.keys)
         .toSet()
         .toList();
     names.sort();
     return names;
+  }
+
+  String _labelForIdentity(String key) {
+    final set = widget.history
+        .expand((w) => w.sets)
+        .firstWhere((s) => s.identity == key);
+    return '${exerciseDisplayName(set.exerciseName, exerciseId: set.exerciseId)}${set.equipment.isEmpty ? '' : ' ・ ${set.equipment}'}';
   }
 
   @override
@@ -3636,7 +3652,7 @@ class _ExerciseProgressPageState extends State<ExerciseProgressPage> {
     final points = <_ExerciseProgressPoint>[];
     for (final workout in widget.history.reversed) {
       final sets = workout.sets
-          .where((set) => set.exerciseName == _selectedExercise)
+          .where((set) => set.identity == _selectedExercise)
           .toList();
       if (sets.isEmpty) continue;
       final bestWeight = sets.fold<double>(
@@ -3693,7 +3709,7 @@ class _ExerciseProgressPageState extends State<ExerciseProgressPage> {
                 .map(
                   (name) => DropdownMenuItem(
                     value: name,
-                    child: Text(exerciseDisplayName(name)),
+                    child: Text(_labelForIdentity(name)),
                   ),
                 )
                 .toList(),
@@ -4238,10 +4254,8 @@ class WorkoutDetailPage extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 22),
-          ...workout.exerciseNames.map((name) {
-            final sets = workout.sets
-                .where((set) => set.exerciseName == name)
-                .toList();
+          ...workout.exerciseGroups.values.map((sets) {
+            final name = sets.first.exerciseName;
             return Card(
               margin: const EdgeInsets.only(bottom: 14),
               shape: RoundedRectangleBorder(
@@ -4261,7 +4275,7 @@ class WorkoutDetailPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      sets.first.bodyPart,
+                      '${sets.first.bodyPart}${sets.first.equipment.isEmpty ? '' : ' ・ ${sets.first.equipment}'}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF777F78),
@@ -4552,8 +4566,8 @@ class _WorkoutSharePageState extends State<WorkoutSharePage> {
 }
 
 List<Widget> _exerciseShareRows(WorkoutRecord workout) {
-  return workout.exerciseNames.map((name) {
-    final sets = workout.sets.where((set) => set.exerciseName == name).toList();
+  return workout.exerciseGroups.values.map((sets) {
+    final name = sets.first.exerciseName;
     final type = sets.first.recordType;
     final best = type == ExerciseRecordType.weightReps
         ? sets.reduce((a, b) => b.weight > a.weight ? b : a)
@@ -4564,7 +4578,8 @@ List<Widget> _exerciseShareRows(WorkoutRecord workout) {
       ExerciseRecordType.timed =>
         '${best.displaySummary}  /  ${sets.length} セット',
       ExerciseRecordType.cardio ||
-      ExerciseRecordType.distance => best.displaySummary,
+      ExerciseRecordType.distance ||
+      ExerciseRecordType.loadedDistance => best.displaySummary,
     };
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -4989,7 +5004,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   }
 
   Future<void> _addExercise() async {
-    final existingNames = _exercises.map((item) => item.name).toSet();
+    final existingIdentities = _exercises.map((item) => item.identity).toSet();
     final menus = await WorkoutTemplatePreference.load();
     if (!mounted) return;
     final selected = await showModalBottomSheet<List<ExerciseSelection>>(
@@ -5003,7 +5018,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         child: FractionallySizedBox(
           heightFactor: 0.82,
           child: ExercisePickerSheet(
-            existingNames: existingNames,
+            existingIdentities: existingIdentities,
             menus: menus,
           ),
         ),
@@ -5011,9 +5026,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     );
     if (selected == null || selected.isEmpty || !mounted) return;
     setState(() {
-      final names = _exercises.map((item) => item.name).toSet();
+      final names = _exercises.map((item) => item.identity).toSet();
       for (final item in selected) {
-        if (!names.add(item.template.name)) continue;
+        if (!names.add(item.template.identity)) continue;
         if (item.savedSets == null) {
           _exercises.add(_exerciseFromTemplate(item.template));
         } else {
@@ -5095,6 +5110,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
           .map(
             (exercise) => {
               'name': exercise.name,
+              if (exercise.exerciseId != null)
+                'exerciseId': exercise.exerciseId,
+              'distanceUnit': exercise.distanceUnit,
               'bodyPart': exercise.bodyPart,
               'equipment': exercise.equipment,
               'recordType': exercise.recordType.name,
@@ -5125,6 +5143,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   WorkoutExercise _exerciseFromDraft(Map<String, dynamic> json) {
     return WorkoutExercise(
       name: json['name'] as String,
+      exerciseId: json['exerciseId'] as String?,
+      distanceUnit: json['distanceUnit'] as String? ?? 'km',
       bodyPart: json['bodyPart'] as String,
       equipment: json['equipment'] as String,
       recordType: json['recordType'] == null
@@ -5546,6 +5566,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               set.completed)
             RecordedSet(
               exerciseName: exercise.name,
+              exerciseId: exercise.exerciseId,
+              equipment: exercise.equipment,
+              distanceUnit: exercise.distanceUnit,
               bodyPart: exercise.bodyPart,
               recordType: exercise.recordType,
               weight: set.weight,
@@ -5670,31 +5693,44 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   List<String> _personalBestExercises(List<RecordedSet> completedSets) {
     final names = completedSets
         .where((set) => set.recordType == ExerciseRecordType.weightReps)
-        .map((set) => set.exerciseName)
+        .map((set) => set.identity)
         .toSet();
-    return names.where((name) {
-      final currentBest = completedSets
-          .where((set) => set.exerciseName == name)
-          .fold<double>(
-            0,
-            (best, set) => set.weight > best ? set.weight : best,
-          );
-      final previousBest = widget.history
-          .expand((workout) => workout.sets)
-          .where((set) => set.exerciseName == name)
-          .fold<double>(
-            0,
-            (best, set) => set.weight > best ? set.weight : best,
-          );
-      return currentBest > previousBest;
-    }).toList();
+    return names
+        .where((name) {
+          final currentBest = completedSets
+              .where((set) => set.identity == name)
+              .fold<double>(
+                0,
+                (best, set) => set.weight > best ? set.weight : best,
+              );
+          final previousBest = widget.history
+              .expand((workout) => workout.sets)
+              .where((set) => set.identity == name)
+              .fold<double>(
+                0,
+                (best, set) => set.weight > best ? set.weight : best,
+              );
+          return currentBest > previousBest;
+        })
+        .map(
+          (key) => completedSets
+              .firstWhere((set) => set.identity == key)
+              .exerciseName,
+        )
+        .toList();
   }
 
   WorkoutExercise _exerciseFromTemplate(ExerciseTemplate template) {
-    final previousSets = latestSetsForExercise(widget.history, template.name);
+    final previousSets = latestSetsForExercise(
+      widget.history,
+      template.name,
+      exerciseId: template.exerciseId,
+    );
     if (previousSets.isNotEmpty) {
       return WorkoutExercise(
         name: template.name,
+        exerciseId: template.exerciseId,
+        distanceUnit: template.distanceUnit,
         bodyPart: template.bodyPart,
         equipment: template.equipment,
         recordType: template.recordType,
@@ -5703,6 +5739,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     }
     return WorkoutExercise(
       name: template.name,
+      exerciseId: template.exerciseId,
+      distanceUnit: template.distanceUnit,
       bodyPart: template.bodyPart,
       equipment: template.equipment,
       recordType: template.recordType,
@@ -5729,16 +5767,24 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   static List<WorkoutExercise> _exercisesFrom(
     WorkoutRecord workout, {
     required bool completed,
-  }) => workout.exerciseNames.map((name) {
-    final recordedSets = workout.sets
-        .where((set) => set.exerciseName == name)
-        .toList();
-    final template = exerciseTemplates.where((item) => item.name == name);
+  }) => workout.exerciseGroups.values.map((recordedSets) {
+    final first = recordedSets.first;
+    final legacy = _legacyExerciseTemplates.where(
+      (item) => item.name == first.exerciseName,
+    );
     return WorkoutExercise(
-      name: name,
-      bodyPart: recordedSets.first.bodyPart,
-      equipment: template.isEmpty ? 'フリーウェイト' : template.first.equipment,
-      recordType: recordedSets.first.recordType,
+      name: first.exerciseName,
+      exerciseId: first.exerciseId,
+      distanceUnit: first.distanceUnit,
+      bodyPart: first.bodyPart,
+      equipment: first.equipment.isNotEmpty
+          ? first.equipment
+          : first.exerciseId != null
+          ? ExerciseFormCatalog.byId[first.exerciseId]?.equipmentLabel ?? 'カスタム'
+          : legacy.isNotEmpty
+          ? legacy.first.equipment
+          : 'フリーウェイト',
+      recordType: first.recordType,
       sets: recordedSets
           .map((set) => _workoutSetFromRecorded(set)..completed = completed)
           .toList(),
@@ -5783,8 +5829,10 @@ class SavedWorkoutTemplate {
   final String name;
   final List<RecordedSet> sets;
 
-  List<String> get exerciseNames =>
-      sets.map((set) => set.exerciseName).toSet().toList(growable: false);
+  Map<String, List<RecordedSet>> get exerciseGroups => groupRecordedSets(sets);
+  List<String> get exerciseNames => exerciseGroups.values
+      .map((group) => group.first.exerciseName)
+      .toList(growable: false);
 
   WorkoutRecord toWorkoutRecord() =>
       WorkoutRecord(date: DateTime.now(), sets: sets);
@@ -5930,6 +5978,8 @@ class MuscleMemoryBackup {
 class ExerciseTemplate {
   const ExerciseTemplate({
     required this.name,
+    this.exerciseId,
+    this.distanceUnit = 'km',
     required this.bodyPart,
     required this.equipment,
     required this.startWeight,
@@ -5938,15 +5988,59 @@ class ExerciseTemplate {
   });
 
   final String name;
+  final String? exerciseId;
+  final String distanceUnit;
+  String get identity => exerciseIdentity(exerciseId, name);
   final String bodyPart;
   final String equipment;
   final double startWeight;
   final int startReps;
   final ExerciseRecordType recordType;
 
+  String get displayEquipment => equipment;
+  ExerciseFormDefinition? get definition =>
+      exerciseId == null ? null : ExerciseFormCatalog.byId[exerciseId];
+  List<String> get tags => definition?.tags ?? const [];
+  bool matchesQuery(String query) => [
+    name,
+    definition?.englishName ?? '',
+    definition?.category ?? '',
+    ...?definition?.aliases,
+    equipment,
+    bodyPart,
+    ...tags,
+  ].any((value) => value.toLowerCase().contains(query.toLowerCase()));
+  ExerciseTemplate withId(String id) => ExerciseTemplate(
+    exerciseId: id,
+    name: name,
+    bodyPart: bodyPart,
+    equipment: equipment,
+    distanceUnit: distanceUnit,
+    startWeight: startWeight,
+    startReps: startReps,
+    recordType: recordType,
+  );
+  factory ExerciseTemplate.fromForm(ExerciseFormDefinition form) =>
+      ExerciseTemplate(
+        exerciseId: form.exerciseId,
+        name: form.exerciseName,
+        bodyPart: form.category == '腹筋' ? '腹' : form.category,
+        equipment: form.equipmentLabel,
+        distanceUnit: form.distanceUnit,
+        startWeight:
+            form.startWeight ??
+            (form.loadMode == 'external' && form.recordType == 'weightReps'
+                ? 10
+                : 0),
+        startReps: form.startReps ?? 10,
+        recordType: ExerciseRecordType.fromName(form.recordType),
+      );
+
   factory ExerciseTemplate.fromJson(Map<String, dynamic> json) =>
       ExerciseTemplate(
         name: json['name'] as String,
+        exerciseId: json['exerciseId'] as String?,
+        distanceUnit: json['distanceUnit'] as String? ?? 'km',
         bodyPart: json['bodyPart'] as String,
         equipment: json['equipment'] as String? ?? 'カスタム',
         startWeight: (json['startWeight'] as num?)?.toDouble() ?? 10,
@@ -5979,6 +6073,8 @@ class ExerciseTemplate {
     'equipment': equipment,
     'startWeight': startWeight,
     'startReps': startReps,
+    if (exerciseId != null) 'exerciseId': exerciseId,
+    'distanceUnit': distanceUnit,
     'recordType': recordType.name,
   };
 }
@@ -6003,75 +6099,100 @@ class CustomExercisePreference {
     }
   }
 
+  static String _signature(ExerciseTemplate e) => jsonEncode([
+    e.name.trim().toLowerCase(),
+    e.equipment.trim().toLowerCase(),
+  ]);
+
+  static bool containsDefinition(
+    ExerciseTemplate exercise, {
+    String? excludingId,
+  }) => [...exerciseTemplates, ...exercises].any(
+    (e) =>
+        (excludingId == null || e.exerciseId != excludingId) &&
+        _signature(e) == _signature(exercise),
+  );
+
+  // Compatibility entrypoint for older callers. New editors check name + equipment.
+  static bool containsName(String name, {String? excludingName}) =>
+      [...exerciseTemplates, ...exercises].any(
+        (e) =>
+            e.name != excludingName &&
+            e.name.toLowerCase() == name.trim().toLowerCase(),
+      );
+
   static Future<bool> add(ExerciseTemplate exercise) async {
-    if (containsName(exercise.name)) return false;
+    if (containsDefinition(exercise) ||
+        exercises.any((e) => e.identity == exercise.identity)) {
+      return false;
+    }
     await replaceAll([...exercises, exercise]);
     return true;
   }
 
-  static bool containsName(String name, {String? excludingName}) {
-    final normalized = name.trim().toLowerCase();
-    return exerciseTemplates.any(
-          (item) =>
-              item.name.toLowerCase() == normalized &&
-              excludingName?.trim().toLowerCase() != normalized,
-        ) ||
-        exercises.any(
-          (item) =>
-              item.name != excludingName &&
-              item.name.toLowerCase() == normalized,
-        );
-  }
-
   static Future<bool> update(
-    String originalName,
+    String originalIdentity,
     ExerciseTemplate exercise,
   ) async {
-    if (containsName(exercise.name, excludingName: originalName)) return false;
-    final updated = exercises
-        .map((item) => item.name == originalName ? exercise : item)
+    final matches = exercises
+        .where(
+          (e) =>
+              e.identity == originalIdentity ||
+              e.exerciseId == originalIdentity,
+        )
         .toList();
-    if (!exercises.any((item) => item.name == originalName)) return false;
-    await replaceAll(updated);
+    // Old callers may supply a name, but ambiguous names must never select the first row.
+    final candidates = matches.isNotEmpty
+        ? matches
+        : exercises.where((e) => e.name == originalIdentity).toList();
+    if (candidates.length != 1) return false;
+    final original = candidates.single;
+    final id = original.exerciseId ?? legacyCustomExerciseId(original);
+    final updated = exercise.withId(id);
+    if (exercises.any(
+      (e) =>
+          e.identity != original.identity &&
+          _signature(e) == _signature(updated),
+    )) {
+      return false;
+    }
+    await replaceAll(
+      exercises
+          .map((e) => e.identity == original.identity ? updated : e)
+          .toList(),
+    );
     return true;
   }
 
-  static Future<void> remove(ExerciseTemplate exercise) async {
-    await replaceAll(
-      exercises.where((item) => item.name != exercise.name).toList(),
-    );
-  }
+  static Future<void> remove(ExerciseTemplate exercise) async => replaceAll(
+    exercises.where((e) => e.identity != exercise.identity).toList(),
+  );
 
   static Future<void> replaceAll(List<ExerciseTemplate> updated) async {
     final unique = <String, ExerciseTemplate>{};
-    for (final exercise in updated) {
-      final name = exercise.name.trim();
-      if (name.isEmpty ||
-          _legacyExerciseTemplates.any(
-            (item) => item.name.toLowerCase() == name.toLowerCase(),
-          )) {
-        continue;
-      }
-      unique.putIfAbsent(
-        name.toLowerCase(),
-        () => ExerciseTemplate(
-          name: name,
-          bodyPart: exercise.bodyPart,
-          equipment: exercise.equipment,
-          startWeight: exercise.startWeight,
-          startReps: exercise.startReps,
-          recordType: exercise.recordType,
-        ),
-      );
+    for (final source in updated) {
+      if (source.name.trim().isEmpty) continue;
+      final exercise = source.exerciseId == null
+          ? source.withId(legacyCustomExerciseId(source))
+          : source;
+      unique.putIfAbsent(exercise.identity, () => exercise);
     }
-    exercises = unique.values.toList();
+    final result = unique.values.toList();
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(
       _storageKey,
-      jsonEncode(exercises.map((item) => item.toJson()).toList()),
+      jsonEncode(result.map((e) => e.toJson()).toList()),
     );
+    exercises = result;
   }
 }
+
+// Deterministic, collision-free ID for legacy custom definitions. Re-reading the
+// same backup produces the same ID without rewriting any name-only history.
+String legacyCustomExerciseId(ExerciseTemplate e) =>
+    'custom_legacy_${base64Url.encode(utf8.encode(jsonEncode([e.name, e.bodyPart, e.equipment]))).replaceAll('=', '')}';
+String newCustomExerciseId() =>
+    'custom_${DateTime.now().microsecondsSinceEpoch}_${math.Random.secure().nextInt(1 << 32).toRadixString(16)}';
 
 const _legacyExerciseTemplates = [
   ExerciseTemplate(
@@ -6317,30 +6438,11 @@ const _legacyExerciseTemplates = [
   ),
 ];
 
-// Keep legacy names as persistence keys; new forms use catalog identifiers.
-final exerciseTemplates = <ExerciseTemplate>[
-  ..._legacyExerciseTemplates,
-  for (final form in ExerciseFormCatalog.entries)
-    if (!_legacyExerciseTemplates.any(
-      (e) => ExerciseFormCatalog.forName(e.name)?.exerciseId == form.exerciseId,
-    ))
-      ExerciseTemplate(
-        name: form.exerciseName,
-        bodyPart: form.category == '腹筋' ? '腹' : form.category,
-        equipment: form.equipmentId.contains('dumbbell')
-            ? 'ダンベル'
-            : form.equipmentId.contains('barbell')
-            ? 'フリーウェイト'
-            : form.loadMode == 'bodyweight'
-            ? '自重'
-            : 'マシン',
-        startWeight:
-            form.loadMode == 'external' && form.recordType == 'weightReps'
-            ? 10
-            : 0,
-        recordType: ExerciseRecordType.fromName(form.recordType),
-      ),
-];
+// Only catalog entries appear in the new picker. Legacy definitions remain for
+// reading name-only records and drafts; they are never assigned a variant ID.
+final exerciseTemplates = ExerciseFormCatalog.entries
+    .map(ExerciseTemplate.fromForm)
+    .toList(growable: false);
 
 class ExerciseSelection {
   const ExerciseSelection(this.template, {this.savedSets});
@@ -6351,9 +6453,12 @@ class ExerciseSelection {
 class ExercisePickerSheet extends StatefulWidget {
   const ExercisePickerSheet({
     super.key,
-    required this.existingNames,
+    this.existingIdentities = const {},
+    this.existingNames = const {},
     this.menus = const [],
   });
+  final Set<String> existingIdentities;
+  // Compatibility for old name-only callers; never use names for ID variants.
   final Set<String> existingNames;
   final List<SavedWorkoutTemplate> menus;
   @override
@@ -6361,7 +6466,7 @@ class ExercisePickerSheet extends StatefulWidget {
 }
 
 class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
-  static const _categories = ['胸', '背中', '肩', '腕', '脚', '腹', '有酸素'];
+  static const _categories = ['胸', '背中', '肩', '腕', '脚', '腹', '有酸素', 'HYROX'];
   String _query = '';
   String? _selectedCategory;
   String? _recentCustomName;
@@ -6378,11 +6483,10 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
   final List<String> _order = [];
   String _categoryLabel(String category) => category == '腹' ? '腹筋' : category;
   List<ExerciseTemplate> get _catalog => <String, ExerciseTemplate>{
-    for (final item in exerciseTemplates) item.name.toLowerCase(): item,
+    for (final item in exerciseTemplates) item.identity: item,
     // A formerly custom exercise keeps its saved recording settings when a
     // later release adds a built-in exercise with the same name.
-    for (final item in CustomExercisePreference.exercises)
-      item.name.toLowerCase(): item,
+    for (final item in CustomExercisePreference.exercises) item.identity: item,
   }.values.toList();
 
   List<ExerciseSelection> get _source {
@@ -6392,17 +6496,18 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
           .map((e) => ExerciseSelection(e))
           .toList();
     }
-    return _menu!.exerciseNames.map((name) {
-      final sets = _menu!.sets.where((s) => s.exerciseName == name).toList();
-      final known = _catalog.where((e) => e.name == name);
+    return _menu!.exerciseGroups.values.map((sets) {
       final first = sets.first;
+      final known = _catalog.where((e) => e.identity == first.identity);
       return ExerciseSelection(
         known.isNotEmpty
             ? known.first
             : ExerciseTemplate(
-                name: name,
+                exerciseId: first.exerciseId,
+                name: first.exerciseName,
                 bodyPart: first.bodyPart,
-                equipment: 'マイメニュー',
+                equipment: first.equipment.isEmpty ? 'マイメニュー' : first.equipment,
+                distanceUnit: first.distanceUnit,
                 startWeight: first.weight,
                 startReps: first.reps,
                 recordType: first.recordType,
@@ -6412,18 +6517,24 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     }).toList();
   }
 
+  bool _alreadyAdded(ExerciseTemplate item) =>
+      widget.existingIdentities.contains(item.identity) ||
+      (item.exerciseId == null && widget.existingNames.contains(item.name));
+
   void _rememberOrder() {
     for (final item in _source) {
-      if (!_order.contains(item.template.name)) _order.add(item.template.name);
+      if (!_order.contains(item.template.identity)) {
+        _order.add(item.template.identity);
+      }
     }
   }
 
   void _toggle(ExerciseSelection item) {
-    if (widget.existingNames.contains(item.template.name)) return;
+    if (_alreadyAdded(item.template)) return;
     setState(() {
       _rememberOrder();
-      if (_selected.remove(item.template.name) == null) {
-        _selected[item.template.name] = item;
+      if (_selected.remove(item.template.identity) == null) {
+        _selected[item.template.identity] = item;
       }
     });
   }
@@ -6434,18 +6545,15 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     final filtered = _source.where((item) {
       final e = item.template;
       final query = _query.toLowerCase();
-      return exerciseDisplayName(e.name).toLowerCase().contains(query) ||
-          e.name.toLowerCase().contains(query) ||
-          (ExerciseFormCatalog.forName(e.name)?.englishName
-                  ?.toLowerCase()
-                  .contains(query) ??
-              false) ||
-          e.bodyPart.contains(query) ||
-          e.equipment.toLowerCase().contains(query);
+      return e.matchesQuery(query) ||
+          exerciseDisplayName(
+            e.name,
+            exerciseId: e.exerciseId,
+          ).toLowerCase().contains(query);
     }).toList();
     // Keep a newly created exercise visible even as the catalog grows.
     final recent = filtered.indexWhere(
-      (item) => item.template.name == _recentCustomName,
+      (item) => item.template.identity == _recentCustomName,
     );
     if (recent > 0) filtered.insert(0, filtered.removeAt(recent));
     return SafeArea(
@@ -6506,17 +6614,12 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 key: const Key('selectAllExercises'),
-                onPressed:
-                    filtered.any(
-                      (e) => !widget.existingNames.contains(e.template.name),
-                    )
+                onPressed: filtered.any((e) => !_alreadyAdded(e.template))
                     ? () => setState(() {
                         _rememberOrder();
                         for (final item in filtered) {
-                          if (!widget.existingNames.contains(
-                            item.template.name,
-                          )) {
-                            _selected[item.template.name] = item;
+                          if (!_alreadyAdded(item.template)) {
+                            _selected[item.template.identity] = item;
                           }
                         }
                       })
@@ -6559,16 +6662,17 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                 ] else
                   ...filtered.map((item) {
                     final e = item.template;
-                    final added = widget.existingNames.contains(e.name);
+                    final added = _alreadyAdded(e);
                     return ListTile(
-                      key: ValueKey('selectExercise${e.name}'),
+                      key: ValueKey('selectExercise${e.exerciseId ?? e.name}'),
                       leading: Checkbox(
-                        value: added || _selected.containsKey(e.name),
+                        value: added || _selected.containsKey(e.identity),
                         onChanged: added ? null : (_) => _toggle(item),
                       ),
                       title: Text(
                         exerciseDisplayName(
                           e.name,
+                          exerciseId: e.exerciseId,
                           languageCode: Localizations.localeOf(context)
                               .languageCode,
                         ),
@@ -6580,7 +6684,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                       trailing: Tooltip(
                         message: '使う筋肉を見る',
                         child: TextButton.icon(
-                          key: Key('exerciseMuscles${e.name}'),
+                          key: Key('exerciseMuscles${e.exerciseId ?? e.name}'),
                           onPressed: () => _showExerciseMuscles(e),
                           icon: const Icon(Icons.view_in_ar_rounded, size: 18),
                           label: const Text('3D'),
@@ -6646,18 +6750,15 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     if (category == null) return;
     final created = await showDialog<ExerciseTemplate>(
       context: context,
-      builder: (_) => _ExerciseEditorDialog(
-        fixedBodyPart: category,
-        additionalReservedNames: widget.existingNames,
-      ),
+      builder: (_) => _ExerciseEditorDialog(fixedBodyPart: category),
     );
     if (created == null) return;
     final added = await CustomExercisePreference.add(created);
     if (mounted && added) {
       setState(() {
-        _recentCustomName = created.name;
-        _selected[created.name] = ExerciseSelection(created);
-        _order.add(created.name);
+        _recentCustomName = created.identity;
+        _selected[created.identity] = ExerciseSelection(created);
+        _order.add(created.identity);
         _selectedCategory = created.bodyPart;
         _query = '';
       });
@@ -6685,13 +6786,20 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final profile = muscleProfileForExercise(exercise.name, exercise.bodyPart);
-    final form = ExerciseFormCatalog.forName(exercise.name);
-    final primaryLabels = form?.available == true
-        ? form!.primaryMuscleLabels
+    final profile = muscleProfileForExercise(
+      exercise.name,
+      exercise.bodyPart,
+      exerciseId: exercise.exerciseId,
+    );
+    final form = ExerciseFormCatalog.resolve(
+      exercise.exerciseId,
+      exercise.name,
+    );
+    final primaryLabels = form != null
+        ? form.primaryMuscleLabels
         : profile.primary.map((muscle) => muscle.label).toList();
-    final secondaryLabels = form?.available == true
-        ? form!.secondaryMuscleLabels
+    final secondaryLabels = form != null
+        ? form.secondaryMuscleLabels
         : profile.secondary.map((muscle) => muscle.label).toList();
     final scores = <MuscleRegion, double>{
       for (final muscle in profile.primary) muscle: 1,
@@ -6702,11 +6810,12 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          if (ExerciseFormView.supports(exercise.name) &&
+          if ((form?.available == true) &&
               (Platform.isIOS || Platform.isAndroid))
             ExerciseFormView(
-              key: ValueKey(exercise.name),
+              key: ValueKey(exercise.identity),
               exerciseName: exercise.name,
+              definition: form,
             )
           else
             Container(
@@ -6766,7 +6875,7 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
           ],
           const SizedBox(height: 16),
           Text(
-            ExerciseFormView.supports(exercise.name)
+            (form?.available == true)
                 ? '濃い赤がメインターゲット、薄い赤が補助的に使う筋肉です。対象筋の説明で、筋活動の実測値ではありません。'
                 : '濃い赤がメインターゲット、薄い赤が補助的に使う筋肉です。前面・側面・背面を切り替えて確認できます。',
             style: const TextStyle(color: Color(0xFF666D68)),
@@ -6803,7 +6912,10 @@ class _CustomExerciseManagementPageState
       builder: (_) => _ExerciseEditorDialog(initial: exercise),
     );
     if (updated == null) return;
-    final saved = await CustomExercisePreference.update(exercise.name, updated);
+    final saved = await CustomExercisePreference.update(
+      exercise.identity,
+      updated,
+    );
     if (mounted && saved) {
       setState(() {});
       ScaffoldMessenger.of(context)
@@ -6921,21 +7033,18 @@ class _CustomExerciseManagementPageState
 }
 
 class _ExerciseEditorDialog extends StatefulWidget {
-  const _ExerciseEditorDialog({
-    this.initial,
-    this.fixedBodyPart,
-    this.additionalReservedNames = const {},
-  });
+  const _ExerciseEditorDialog({this.initial, this.fixedBodyPart});
 
   final ExerciseTemplate? initial;
   final String? fixedBodyPart;
-  final Set<String> additionalReservedNames;
 
   @override
   State<_ExerciseEditorDialog> createState() => _ExerciseEditorDialogState();
 }
 
 class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
+  late final String _exerciseId =
+      widget.initial?.exerciseId ?? newCustomExerciseId();
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _weightController;
@@ -6944,11 +7053,12 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
   late String _equipment;
   late ExerciseRecordType _recordType;
 
-  static const _bodyParts = ['胸', '背中', '脚', '肩', '腕', '腹', '有酸素'];
+  static const _bodyParts = ['胸', '背中', '脚', '肩', '腕', '腹', '有酸素', 'HYROX'];
   static const _equipmentOptions = [
     'フリーウェイト',
     'ダンベル',
     'マシン',
+    'プレートロード',
     'ケーブル',
     '自重',
     'カスタム',
@@ -6961,6 +7071,7 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
       ExerciseRecordType.bodyweightReps,
       ExerciseRecordType.cardio,
     ];
+    if (_bodyPart == 'HYROX') return ExerciseRecordType.values;
     final initialType = widget.initial?.recordType;
     if (initialType != null && !visible.contains(initialType)) {
       return [...visible, initialType];
@@ -7003,17 +7114,16 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
   String? _validateName(String? value) {
     final name = value?.trim() ?? '';
     if (name.isEmpty) return '種目名を入力してください';
-    final isAdditionalDuplicate = widget.additionalReservedNames.any(
-      (item) =>
-          item != widget.initial?.name &&
-          item.toLowerCase() == name.toLowerCase(),
-    );
-    if (isAdditionalDuplicate ||
-        CustomExercisePreference.containsName(
-          name,
-          excludingName: widget.initial?.name,
-        )) {
-      return '同じ名前の種目があります';
+    if (CustomExercisePreference.containsDefinition(
+      ExerciseTemplate(
+        name: name,
+        bodyPart: _bodyPart,
+        equipment: _equipment,
+        startWeight: 0,
+      ),
+      excludingId: widget.initial?.exerciseId,
+    )) {
+      return '同じ名前・器具の種目があります';
     }
     return null;
   }
@@ -7023,6 +7133,9 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
     Navigator.pop(
       context,
       ExerciseTemplate(
+        exerciseId: _exerciseId,
+        distanceUnit:
+            widget.initial?.distanceUnit ?? (_bodyPart == 'HYROX' ? 'm' : 'km'),
         name: _nameController.text.trim(),
         bodyPart: _bodyPart,
         equipment: _equipment,
@@ -7172,6 +7285,8 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
 class WorkoutExercise {
   WorkoutExercise({
     required this.name,
+    this.exerciseId,
+    this.distanceUnit = 'km',
     required this.bodyPart,
     required this.equipment,
     required this.recordType,
@@ -7179,6 +7294,9 @@ class WorkoutExercise {
   });
 
   final String name;
+  final String? exerciseId;
+  final String distanceUnit;
+  String get identity => exerciseIdentity(exerciseId, name);
   final String bodyPart;
   final String equipment;
   final ExerciseRecordType recordType;
@@ -7217,7 +7335,11 @@ class ExerciseInputCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final previousSets = latestSetsForExercise(history, exercise.name);
+    final previousSets = latestSetsForExercise(
+      history,
+      exercise.name,
+      exerciseId: exercise.exerciseId,
+    );
     final completedCount = exercise.sets.where((set) => set.completed).length;
     final allCompleted = completedCount == exercise.sets.length;
     final previousText = previousSets.isEmpty
@@ -7336,7 +7458,10 @@ class ExerciseInputCard extends StatelessWidget {
                   ),
               ],
             ),
-          if (usesAdditionalWeight(exercise.name))
+          if (usesAdditionalWeight(
+            exercise.name,
+            exerciseId: exercise.exerciseId,
+          ))
             const Padding(
               padding: EdgeInsets.only(bottom: 8),
               child: Text('追加重量（kg）・自重のみは0', style: TextStyle(fontSize: 12)),
@@ -7360,6 +7485,8 @@ class ExerciseInputCard extends StatelessWidget {
               set: set,
               recordType: exercise.recordType,
               exerciseName: exercise.name,
+              exerciseId: exercise.exerciseId,
+              distanceUnit: exercise.distanceUnit,
               showCompletionCheck:
                   WorkoutUiPreference.completionCheckEnabled &&
                   exercise.recordType.usesSets,
@@ -7437,11 +7564,16 @@ class WorkoutDraftSummary {
       final exercises = json['exercises'] as List<dynamic>;
       if (exercises.isEmpty) return null;
       final names = <String>[];
+      final identities = <String>{};
       var sets = 0;
       for (final item in exercises) {
         final exercise = item as Map<String, dynamic>;
         final name = exercise['name'] as String?;
-        if (name != null && name.isNotEmpty && !names.contains(name)) {
+        if (name != null &&
+            name.isNotEmpty &&
+            identities.add(
+              exerciseIdentity(exercise['exerciseId'] as String?, name),
+            )) {
           names.add(name);
         }
         sets += (exercise['sets'] as List<dynamic>? ?? const []).length;
@@ -7509,6 +7641,9 @@ class WorkoutSet {
 class RecordedSet {
   const RecordedSet({
     this.exerciseName = 'ベンチプレス',
+    this.exerciseId,
+    this.distanceUnit = 'km',
+    this.equipment = '',
     this.bodyPart = '胸',
     this.recordType = ExerciseRecordType.weightReps,
     required this.weight,
@@ -7523,6 +7658,10 @@ class RecordedSet {
   });
 
   final String exerciseName;
+  final String? exerciseId;
+  final String distanceUnit;
+  final String equipment;
+  String get identity => exerciseIdentity(exerciseId, exerciseName);
   final String bodyPart;
   final ExerciseRecordType recordType;
   final double weight;
@@ -7537,31 +7676,57 @@ class RecordedSet {
 
   bool get hasRequiredValues => switch (recordType) {
     ExerciseRecordType.weightReps =>
-      (weight > 0 || (weight == 0 && usesAdditionalWeight(exerciseName))) &&
+      (weight > 0 ||
+              (weight == 0 &&
+                  usesAdditionalWeight(
+                    exerciseName,
+                    exerciseId: exerciseId,
+                  ))) &&
           reps > 0,
     ExerciseRecordType.bodyweightReps => reps > 0,
     ExerciseRecordType.timed => durationSeconds > 0,
-    ExerciseRecordType.cardio =>
-      durationSeconds > 0 &&
-          (exerciseName == 'ステアクライマー'
-              ? resistanceLevel > 0 || speedKmh > 0
-              : distanceKm > 0),
+    ExerciseRecordType.loadedDistance => weight >= 0 && distanceKm > 0,
+    ExerciseRecordType.cardio => _hasActivityValues,
     ExerciseRecordType.distance => durationSeconds > 0 && distanceKm > 0,
   };
 
+  bool get _hasActivityValues {
+    if (durationSeconds <= 0) return false;
+    final fields = ExerciseFormCatalog.byId[exerciseId]?.recordFields;
+    if (fields != null && !fields.contains('distance')) {
+      if (fields.contains('resistance') || fields.contains('speed')) {
+        return resistanceLevel > 0 || speedKmh > 0;
+      }
+      return true; // Duration-only activities such as jump rope.
+    }
+    return exerciseName == 'ステアクライマー'
+        ? resistanceLevel > 0 || speedKmh > 0
+        : distanceKm > 0;
+  }
+
   String get displaySummary => switch (recordType) {
     ExerciseRecordType.weightReps =>
-      usesAdditionalWeight(exerciseName)
+      usesAdditionalWeight(exerciseName, exerciseId: exerciseId)
           ? '${weight == 0 ? '自重' : '+${formatWeight(weight)} kg'} × $reps 回'
           : '${formatWeight(weight)} kg × $reps 回',
     ExerciseRecordType.bodyweightReps => '$reps 回',
     ExerciseRecordType.timed => '${formatDurationSeconds(durationSeconds)} 保持',
-    ExerciseRecordType.cardio || ExerciseRecordType.distance => activitySummary,
+    ExerciseRecordType.cardio ||
+    ExerciseRecordType.distance ||
+    ExerciseRecordType.loadedDistance => activitySummary,
   };
 
   String get activitySummary {
-    final values = <String>[formatDurationSeconds(durationSeconds)];
-    if (distanceKm > 0) values.add('${formatWeight(distanceKm)} km');
+    final values = <String>[
+      if (recordType == ExerciseRecordType.loadedDistance)
+        '${formatWeight(weight)} kg',
+      if (durationSeconds > 0) formatDurationSeconds(durationSeconds),
+    ];
+    if (distanceKm > 0) {
+      values.add(
+        '${formatWeight(distanceUnit == 'm' ? distanceKm * 1000 : distanceKm)} $distanceUnit',
+      );
+    }
     if (speedKmh > 0) values.add('${formatWeight(speedKmh)} km/h');
     if (inclinePercent > 0) values.add('傾斜 ${formatWeight(inclinePercent)}%');
     if (resistanceLevel > 0) {
@@ -7575,6 +7740,9 @@ class RecordedSet {
 
   factory RecordedSet.fromJson(Map<String, dynamic> json) => RecordedSet(
     exerciseName: json['exerciseName'] as String? ?? 'ベンチプレス',
+    exerciseId: json['exerciseId'] as String?,
+    distanceUnit: json['distanceUnit'] as String? ?? 'km',
+    equipment: json['equipment'] as String? ?? '',
     bodyPart: json['bodyPart'] as String? ?? '胸',
     recordType: json['recordType'] == null
         ? recordTypeForExerciseName(
@@ -7596,6 +7764,9 @@ class RecordedSet {
   Map<String, dynamic> toJson() => {
     'exerciseName': exerciseName,
     'bodyPart': bodyPart,
+    if (exerciseId != null) 'exerciseId': exerciseId,
+    'distanceUnit': distanceUnit,
+    if (equipment.isNotEmpty) 'equipment': equipment,
     'recordType': recordType.name,
     'weight': weight,
     'reps': reps,
@@ -7622,7 +7793,18 @@ List<ExerciseTemplate> decodeExerciseTemplates(Object? source) {
   return source
       .map(ExerciseTemplate.tryFromJson)
       .whereType<ExerciseTemplate>()
+      .map(
+        (e) => e.exerciseId == null ? e.withId(legacyCustomExerciseId(e)) : e,
+      )
       .toList(growable: false);
+}
+
+Map<String, List<RecordedSet>> groupRecordedSets(Iterable<RecordedSet> sets) {
+  final groups = <String, List<RecordedSet>>{};
+  for (final set in sets) {
+    groups.putIfAbsent(set.identity, () => []).add(set);
+  }
+  return groups;
 }
 
 class WorkoutRecord {
@@ -7640,8 +7822,10 @@ class WorkoutRecord {
   final String? gymName;
   final String note;
 
-  List<String> get exerciseNames =>
-      sets.map((set) => set.exerciseName).toSet().toList(growable: false);
+  Map<String, List<RecordedSet>> get exerciseGroups => groupRecordedSets(sets);
+  List<String> get exerciseNames => exerciseGroups.values
+      .map((group) => group.first.exerciseName)
+      .toList(growable: false);
 
   List<String> get bodyParts =>
       sets.map((set) => set.bodyPart).toSet().toList(growable: false);
@@ -7740,16 +7924,18 @@ List<WorkoutRecord> sortWorkoutsNewestFirst(Iterable<WorkoutRecord> workouts) =>
 
 List<RecordedSet> latestSetsForExercise(
   Iterable<WorkoutRecord> workouts,
-  String exerciseName,
-) {
+  String exerciseName, {
+  String? exerciseId,
+}) {
+  final identity = exerciseIdentity(exerciseId, exerciseName);
   WorkoutRecord? latest;
   for (final workout in workouts) {
-    if (!workout.sets.any((set) => set.exerciseName == exerciseName)) continue;
+    if (!workout.sets.any((set) => set.identity == identity)) continue;
     if (latest == null || workout.date.isAfter(latest.date)) latest = workout;
   }
   if (latest == null) return [];
   return latest.sets
-      .where((set) => set.exerciseName == exerciseName)
+      .where((set) => set.identity == identity)
       .toList(growable: false);
 }
 
@@ -7800,6 +7986,8 @@ class SetRow extends StatelessWidget {
     required this.set,
     required this.recordType,
     required this.exerciseName,
+    this.exerciseId,
+    this.distanceUnit = 'km',
     required this.onWeightChanged,
     required this.onRepsChanged,
     required this.onDurationChanged,
@@ -7824,6 +8012,8 @@ class SetRow extends StatelessWidget {
   final WorkoutSet set;
   final ExerciseRecordType recordType;
   final String exerciseName;
+  final String? exerciseId;
+  final String distanceUnit;
   final ValueChanged<double> onWeightChanged;
   final ValueChanged<int> onRepsChanged;
   final ValueChanged<int> onDurationChanged;
@@ -7842,6 +8032,9 @@ class SetRow extends StatelessWidget {
       return _ActivityInputGrid(
         fieldPrefix: fieldPrefix,
         exerciseName: exerciseName,
+        exerciseId: exerciseId,
+        distanceUnit: distanceUnit,
+        onWeightChanged: onWeightChanged,
         recordType: recordType,
         set: set,
         onDurationChanged: onDurationChanged,
@@ -7943,8 +8136,11 @@ class _ActivityInputGrid extends StatelessWidget {
   const _ActivityInputGrid({
     required this.fieldPrefix,
     required this.exerciseName,
+    this.exerciseId,
+    this.distanceUnit = 'km',
     required this.recordType,
     required this.set,
+    required this.onWeightChanged,
     required this.onDurationChanged,
     required this.onDistanceChanged,
     required this.onSpeedChanged,
@@ -7955,8 +8151,11 @@ class _ActivityInputGrid extends StatelessWidget {
 
   final String fieldPrefix;
   final String exerciseName;
+  final String? exerciseId;
+  final String distanceUnit;
   final ExerciseRecordType recordType;
   final WorkoutSet set;
+  final ValueChanged<double> onWeightChanged;
   final ValueChanged<int> onDurationChanged;
   final ValueChanged<double> onDistanceChanged;
   final ValueChanged<double> onSpeedChanged;
@@ -7966,22 +8165,36 @@ class _ActivityInputGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showDistance = exerciseName != 'ステアクライマー';
+    final fields = ExerciseFormCatalog.byId[exerciseId]?.recordFields;
+    final showDistance =
+        fields?.contains('distance') ?? (exerciseName != 'ステアクライマー');
     final showSpeed =
-        exerciseName == 'トレッドミル' ||
-        exerciseName == 'エアロバイク' ||
-        recordType == ExerciseRecordType.distance;
-    final showIncline = exerciseName == 'トレッドミル';
+        fields?.contains('speed') ??
+        (exerciseName == 'トレッドミル' ||
+            exerciseName == 'エアロバイク' ||
+            recordType == ExerciseRecordType.distance);
+    final showIncline =
+        fields?.contains('incline') ?? (exerciseName == 'トレッドミル');
     final showResistance =
-        exerciseName == 'エアロバイク' ||
-        exerciseName == 'クロストレーナー' ||
-        exerciseName == 'ステアクライマー';
+        fields?.contains('resistance') ??
+        (exerciseName == 'エアロバイク' ||
+            exerciseName == 'クロストレーナー' ||
+            exerciseName == 'ステアクライマー');
     final showPace =
-        exerciseName == 'ローイングマシン' || recordType == ExerciseRecordType.distance;
+        fields?.contains('pace') ??
+        (exerciseName == 'ローイングマシン' ||
+            recordType == ExerciseRecordType.distance);
     return Wrap(
       spacing: 10,
       runSpacing: 10,
       children: [
+        if (recordType == ExerciseRecordType.loadedDistance)
+          _MetricInput(
+            key: Key('loadedWeightField$fieldPrefix'),
+            label: '重量（kg）',
+            value: set.weight,
+            onChanged: onWeightChanged,
+          ),
         _MetricInput(
           key: Key('durationField$fieldPrefix'),
           label: '時間（分）',
@@ -7991,9 +8204,10 @@ class _ActivityInputGrid extends StatelessWidget {
         if (showDistance)
           _MetricInput(
             key: Key('distanceField$fieldPrefix'),
-            label: '距離（km）',
-            value: set.distanceKm,
-            onChanged: onDistanceChanged,
+            label: '距離（$distanceUnit）',
+            value: distanceUnit == 'm' ? set.distanceKm * 1000 : set.distanceKm,
+            onChanged: (value) =>
+                onDistanceChanged(distanceUnit == 'm' ? value / 1000 : value),
           ),
         if (showSpeed)
           _MetricInput(

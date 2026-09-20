@@ -406,9 +406,15 @@ void main() {
             startWeight: 10,
           ),
         ),
-        isFalse,
+        isTrue,
       );
 
+      await CustomExercisePreference.remove(
+        CustomExercisePreference.exercises.firstWhere(
+          (e) => e.name == 'ベンチプレス',
+        ),
+      );
+      final originalId = CustomExercisePreference.exercises.single.exerciseId;
       const updated = ExerciseTemplate(
         name: 'ケーブルプレス改',
         bodyPart: '肩',
@@ -420,7 +426,10 @@ void main() {
       expect(CustomExercisePreference.exercises.single.name, 'ケーブルプレス改');
       expect(CustomExercisePreference.exercises.single.startWeight, 17.5);
 
-      await CustomExercisePreference.remove(updated);
+      expect(CustomExercisePreference.exercises.single.exerciseId, originalId);
+      await CustomExercisePreference.remove(
+        CustomExercisePreference.exercises.single,
+      );
       CustomExercisePreference.exercises = [];
       await CustomExercisePreference.load();
       expect(CustomExercisePreference.exercises, isEmpty);
@@ -1329,7 +1338,9 @@ void main() {
     expect(find.byType(HistoryCard), findsNWidgets(2));
   });
 
-  testWidgets('removing home summaries preserves history detail', (tester) async {
+  testWidgets('removing home summaries preserves history detail', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -1627,8 +1638,18 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('exerciseCategory胸')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('ベンチプレス'));
-    await tester.tap(find.text('ダンベルフライ'));
+    await tester.tap(find.byKey(const Key('selectExercisebench_press')));
+    await tester.enterText(
+      find.byKey(const Key('exerciseSearchField')),
+      'ダンベルフライ',
+    );
+    await tester.pumpAndSettle();
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(
+      find.byKey(const Key('selectExercisedumbbell_fly')),
+    );
+    await tester.tap(find.byKey(const Key('selectExercisedumbbell_fly')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('addSelectedExercises')));
     await tester.pumpAndSettle();
