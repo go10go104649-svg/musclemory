@@ -2886,7 +2886,6 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
                     label: '総vol.',
                   ),
                 ],
-              
               ),
             ),
           ),
@@ -4559,6 +4558,38 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   int _restRevision = 0;
   DateTime? _restEndsAt;
   int _inputRevision = 0;
+  final _numericFocus = <WorkoutSet, List<FocusNode>>{};
+
+  List<FocusNode> _nodesFor(WorkoutSet set) =>
+      _numericFocus.putIfAbsent(set, () => [FocusNode(), FocusNode()]);
+
+  List<FocusNode> get _numericOrder => [
+    for (final exercise in _exercises)
+      for (final set in exercise.sets) ...[
+        if (exercise.recordType == ExerciseRecordType.weightReps)
+          _nodesFor(set)[0],
+        if (exercise.recordType == ExerciseRecordType.weightReps ||
+            exercise.recordType == ExerciseRecordType.bodyweightReps)
+          _nodesFor(set)[1],
+      ],
+  ];
+
+  VoidCallback? _nextNumeric(FocusNode node) {
+    final order = _numericOrder;
+    final index = order.indexOf(node);
+    if (index < 0 || index == order.length - 1) return null;
+    return () {
+      final current = _numericOrder;
+      final index = current.indexOf(node);
+      if (index < 0 || index + 1 >= current.length) return;
+      final next = current[index + 1];
+      next.requestFocus();
+      if (next.context != null) {
+        Scrollable.ensureVisible(next.context!, alignment: 0.35);
+      }
+    };
+  }
+
   bool _allowPop = false;
   bool _leaveDialogOpen = false;
   bool _workoutTimerStopped = false;
@@ -4618,6 +4649,11 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     _restTimer?.cancel();
     unawaited(RestNotificationService.cancel());
     _noteController.dispose();
+    for (final nodes in _numericFocus.values) {
+      for (final node in nodes) {
+        node.dispose();
+      }
+    }
     super.dispose();
   }
 
@@ -5179,10 +5215,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               onPressed: _completeWorkout,
               style: OutlinedButton.styleFrom(
                 foregroundColor: const Color(0xFF101820),
-                side: const BorderSide(
-                  color: Color(0xFF101820),
-                  width: 1.5,
-                ),
+                side: const BorderSide(color: Color(0xFF101820), width: 1.5),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 8,
@@ -5193,9 +5226,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               ),
               child: Text(
                 widget.isEditing ? '保存' : '完了',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.w800),
               ),
             ),
             const SizedBox(width: 8),
@@ -5334,26 +5365,34 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                   ),
                 ),
               ],
-              ...List.generate(
-                _exercises.length,
-                (exerciseIndex) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: ExerciseInputCard(
-                    key: ValueKey('exercise_${_inputRevision}_$exerciseIndex'),
-                    exerciseIndex: exerciseIndex,
-                    exercise: _exercises[exerciseIndex],
-                    history: widget.history,
-                    onAddSet: () => _addSet(exerciseIndex),
-                    onRemoveSet: (setIndex) =>
-                        _removeSet(exerciseIndex, setIndex),
-                    onRemove: () => _removeExercise(exerciseIndex),
-                    onToggleSet: (setIndex) =>
-                        _toggleSet(exerciseIndex, setIndex),
-                    onApplyPrevious: (sets) =>
-                        _applyPreviousSets(exerciseIndex, sets),
-                    onSetAllCompleted: (completed) =>
-                        _setAllSetsCompleted(exerciseIndex, completed),
-                    onValuesChanged: _saveDraft,
+              // Keep numeric fields mounted across cards for keyboard traversal.
+              Column(
+                children: List.generate(
+                  _exercises.length,
+                  (exerciseIndex) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: ExerciseInputCard(
+                      key: ValueKey((
+                        _exercises[exerciseIndex],
+                        _inputRevision,
+                      )),
+                      numericNodes: _nodesFor,
+                      nextNumeric: _nextNumeric,
+                      exerciseIndex: exerciseIndex,
+                      exercise: _exercises[exerciseIndex],
+                      history: widget.history,
+                      onAddSet: () => _addSet(exerciseIndex),
+                      onRemoveSet: (setIndex) =>
+                          _removeSet(exerciseIndex, setIndex),
+                      onRemove: () => _removeExercise(exerciseIndex),
+                      onToggleSet: (setIndex) =>
+                          _toggleSet(exerciseIndex, setIndex),
+                      onApplyPrevious: (sets) =>
+                          _applyPreviousSets(exerciseIndex, sets),
+                      onSetAllCompleted: (completed) =>
+                          _setAllSetsCompleted(exerciseIndex, completed),
+                      onValuesChanged: _saveDraft,
+                    ),
                   ),
                 ),
               ),
@@ -7072,8 +7111,12 @@ class ExerciseInputCard extends StatelessWidget {
     required this.onApplyPrevious,
     required this.onSetAllCompleted,
     required this.onValuesChanged,
+    this.numericNodes,
+    this.nextNumeric,
   });
 
+  final List<FocusNode> Function(WorkoutSet)? numericNodes;
+  final VoidCallback? Function(FocusNode)? nextNumeric;
   final int exerciseIndex;
   final WorkoutExercise exercise;
   final List<WorkoutRecord> history;
@@ -7206,7 +7249,13 @@ class ExerciseInputCard extends StatelessWidget {
           const SizedBox(height: 8),
           ...List.generate(exercise.sets.length, (setIndex) {
             final set = exercise.sets[setIndex];
+            final nodes = numericNodes?.call(set);
             return SetRow(
+              key: ObjectKey(set),
+              weightFocus: nodes?[0],
+              repsFocus: nodes?[1],
+              nextWeight: nodes == null ? null : nextNumeric?.call(nodes[0]),
+              nextReps: nodes == null ? null : nextNumeric?.call(nodes[1]),
               number: setIndex + 1,
               fieldPrefix: '${exerciseIndex}_',
               set: set,
@@ -7663,8 +7712,14 @@ class SetRow extends StatelessWidget {
     required this.onToggle,
     required this.onDelete,
     this.showCompletionCheck = true,
+    this.weightFocus,
+    this.repsFocus,
+    this.nextWeight,
+    this.nextReps,
   });
 
+  final FocusNode? weightFocus, repsFocus;
+  final VoidCallback? nextWeight, nextReps;
   final int number;
   final String fieldPrefix;
   final WorkoutSet set;
@@ -7714,6 +7769,10 @@ class SetRow extends StatelessWidget {
               child: ValueBox(
                 key: Key('weightField$fieldPrefix$number'),
                 value: set.weight,
+                stepLabel: 'KG',
+                focusNode: weightFocus,
+                onNext: nextWeight,
+                normalizeZeros: true,
                 allowDecimal: true,
                 onChanged: (value) => onWeightChanged(value.toDouble()),
               ),
@@ -7726,6 +7785,10 @@ class SetRow extends StatelessWidget {
               child: ValueBox(
                 key: Key('repsField$fieldPrefix$number'),
                 value: set.reps,
+                stepLabel: 'REPS',
+                focusNode: repsFocus,
+                onNext: nextReps,
+                normalizeZeros: true,
                 onChanged: (value) => onRepsChanged(value.toInt()),
               ),
             ),
@@ -7898,42 +7961,139 @@ class _MetricInput extends StatelessWidget {
   }
 }
 
-class ValueBox extends StatelessWidget {
+/// Normalize only the integer prefix, keeping selection relative to removed digits.
+class NumericLeadingZeroFormatter extends TextInputFormatter {
+  const NumericLeadingZeroFormatter();
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (!newValue.composing.isCollapsed) return newValue;
+    final match = RegExp(r'^0+(?=\d)').firstMatch(newValue.text);
+    if (match == null) return newValue;
+    final removed = match.end;
+    int offset(int value) => value < 0
+        ? value
+        : (value - removed).clamp(0, newValue.text.length - removed);
+    return newValue.copyWith(
+      text: newValue.text.substring(removed),
+      selection: TextSelection(
+        baseOffset: offset(newValue.selection.baseOffset),
+        extentOffset: offset(newValue.selection.extentOffset),
+      ),
+      composing: TextRange.empty,
+    );
+  }
+}
+
+class ValueBox extends StatefulWidget {
   const ValueBox({
     super.key,
     required this.value,
     required this.onChanged,
     this.allowDecimal = false,
+    this.normalizeZeros = false,
+    this.stepLabel,
+    this.focusNode,
+    this.onNext,
   });
 
   final num value;
   final ValueChanged<num> onChanged;
   final bool allowDecimal;
+  final bool normalizeZeros;
+  final String? stepLabel;
+  final FocusNode? focusNode;
+  final VoidCallback? onNext;
+
+  @override
+  State<ValueBox> createState() => _ValueBoxState();
+}
+
+class _ValueBoxState extends State<ValueBox> {
+  late final TextEditingController _controller = TextEditingController(
+    text: _text,
+  );
+  String get _text => widget.allowDecimal
+      ? formatWeight(widget.value.toDouble())
+      : '${widget.value}';
+
+  @override
+  void didUpdateWidget(ValueBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value &&
+        parseWeight(_controller.text) != widget.value) {
+      _controller.value = TextEditingValue(
+        text: _text,
+        selection: TextSelection.collapsed(offset: _text.length),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _step(int delta) {
+    final current = widget.allowDecimal
+        ? parseWeight(_controller.text)
+        : int.tryParse(_controller.text) ?? 0;
+    final next = (current + delta).clamp(0, double.maxFinite);
+    final text = widget.allowDecimal
+        ? formatWeight(next.toDouble())
+        : '${next.toInt()}';
+    _controller.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+    widget.onChanged(next);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      initialValue: allowDecimal ? formatWeight(value.toDouble()) : '$value',
-      keyboardType: TextInputType.numberWithOptions(decimal: allowDecimal),
-      textInputAction: TextInputAction.done,
+    final input = TextFormField(
+      controller: _controller,
+      focusNode: widget.focusNode,
+      keyboardType: TextInputType.numberWithOptions(
+        decimal: widget.allowDecimal,
+        // iOS number/decimal pads have no return key. Use its numeric-first
+        // punctuation keyboard for these fields; formatters still reject signs.
+        signed:
+            widget.stepLabel != null &&
+            Theme.of(context).platform == TargetPlatform.iOS,
+      ),
+      textInputAction: widget.onNext == null
+          ? TextInputAction.done
+          : TextInputAction.next,
+      onEditingComplete: () {
+        if (widget.onNext != null) {
+          widget.onNext!();
+        } else {
+          FocusScope.of(context).unfocus();
+        }
+      },
       textAlign: TextAlign.center,
       inputFormatters: [
-        if (allowDecimal)
+        if (widget.allowDecimal)
           TextInputFormatter.withFunction((oldValue, newValue) {
             final valid = RegExp(r'^\d*([\.,]\d{0,2})?$');
             return valid.hasMatch(newValue.text) ? newValue : oldValue;
           })
         else
           FilteringTextInputFormatter.digitsOnly,
+        if (widget.normalizeZeros) const NumericLeadingZeroFormatter(),
       ],
       onChanged: (text) {
-        final parsed = allowDecimal
+        final parsed = widget.allowDecimal
             ? parseWeight(text)
             : int.tryParse(text) ?? 0;
-        onChanged(parsed);
+        widget.onChanged(parsed);
       },
-      onSaved: (text) => onChanged(
-        allowDecimal ? parseWeight(text) : int.tryParse(text ?? '') ?? 0,
+      onSaved: (text) => widget.onChanged(
+        widget.allowDecimal ? parseWeight(text) : int.tryParse(text ?? '') ?? 0,
       ),
       style: const TextStyle(fontWeight: FontWeight.w800),
       decoration: InputDecoration(
@@ -7946,6 +8106,31 @@ class ValueBox extends StatelessWidget {
           borderSide: BorderSide.none,
         ),
       ),
+    );
+    if (widget.stepLabel == null) return input;
+    return Column(
+      children: [
+        input,
+        Row(
+          children: [
+            for (final delta in [-5, 5])
+              Expanded(
+                child: Semantics(
+                  label: '${widget.stepLabel} ${delta > 0 ? '+' : ''}$delta',
+                  child: TextButton(
+                    onPressed: () => _step(delta),
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, 40),
+                      padding: EdgeInsets.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(delta > 0 ? '+5' : '−5'),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }
