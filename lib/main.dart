@@ -1435,9 +1435,10 @@ class HomeHeader extends StatelessWidget {
               Text(
                 appDisplayName,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  fontSize: 26,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 2.1,
-                  color: const Color(0xFF6C746D),
+                  color: const Color(0xFF101820),
                 ),
               ),
             ],
@@ -2866,14 +2867,14 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
                   StatItem(
                     value: '${monthWorkouts.length}',
                     unit: '回',
-                    label: 'トレーニング',
+                    label: 'トレーニング数',
                   ),
                   Container(
                     width: 1,
                     height: 46,
                     color: const Color(0xFFE4E7E1),
                   ),
-                  StatItem(value: '$setCount', unit: '組', label: 'セット'),
+                  StatItem(value: '$setCount', unit: 'セット', label: 'セット数'),
                   Container(
                     width: 1,
                     height: 46,
@@ -2882,9 +2883,10 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
                   StatItem(
                     value: formatVolumeKg(volume),
                     unit: 'kg',
-                    label: 'ボリューム',
+                    label: '総vol.',
                   ),
                 ],
+              
               ),
             ),
           ),
@@ -4368,7 +4370,7 @@ class _WorkoutSharePageState extends State<WorkoutSharePage> {
                 child: RepaintBoundary(
                   key: _previewKey,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.zero,
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -5172,12 +5174,28 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                 onPressed: _deleteWorkoutDraft,
                 icon: const Icon(Icons.delete_outline_rounded),
               ),
-            TextButton(
+            OutlinedButton(
               key: const Key('completeWorkoutButton'),
               onPressed: _completeWorkout,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF101820),
+                side: const BorderSide(
+                  color: Color(0xFF101820),
+                  width: 1.5,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               child: Text(
                 widget.isEditing ? '保存' : '完了',
-                style: const TextStyle(fontWeight: FontWeight.w800),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
             const SizedBox(width: 8),
