@@ -2883,7 +2883,7 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
                   StatItem(
                     value: formatVolumeKg(volume),
                     unit: 'kg',
-                    label: '総vol.',
+                    label: '総ボリューム',
                   ),
                 ],
               ),
@@ -4047,6 +4047,83 @@ void _showDeletedWorkoutUndo(
     );
 }
 
+class _WorkoutDetailSummary extends StatelessWidget {
+  const _WorkoutDetailSummary({required this.workout});
+  final WorkoutRecord workout;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = <(String, String)>[
+      ('種目数', '${workout.exerciseNames.length} 種目'),
+      (
+        'セット数',
+        '${workout.sets.where((set) => set.recordType.usesSets).length} セット',
+      ),
+      ('総ボリューム', '${formatVolumeKg(workout.volume)} kg'),
+      if (WorkoutUiPreference.workoutDurationEnabled &&
+          workout.durationLabel.isNotEmpty)
+        ('トレーニング時間', workout.durationLabel),
+    ];
+    return Container(
+      key: const Key('workoutDetailSummary'),
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Row(
+        children: [
+          for (var index = 0; index < items.length; index++) ...[
+            if (index > 0)
+              Container(width: 1, height: 46, color: const Color(0xFFE4E7E1)),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      key: Key('detailSummaryValue${items[index].$1}'),
+                      height: 28,
+                      width: double.infinity,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          items[index].$2,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: const TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF101820),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        items[index].$1,
+                        maxLines: 1,
+                        softWrap: false,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF777F78),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class WorkoutDetailPage extends StatelessWidget {
   const WorkoutDetailPage({
     super.key,
@@ -4136,10 +4213,7 @@ class WorkoutDetailPage extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 10),
-          Text(
-            workout.summaryLabel,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
-          ),
+          _WorkoutDetailSummary(workout: workout),
           if (workout.note.isNotEmpty) ...[
             const SizedBox(height: 16),
             Container(
@@ -5222,8 +5296,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               key: const Key('completeWorkoutButton'),
               onPressed: _completeWorkout,
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF101820),
-                side: const BorderSide(color: Color(0xFF101820), width: 1.5),
+                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xFF426B83),
+                side: const BorderSide(color: Color(0xFF426B83), width: 1.5),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 8,
@@ -7157,37 +7232,49 @@ class ExerciseInputCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      exerciseDisplayName(exercise.name),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
+          Container(
+            key: Key('exerciseInputHeader$exerciseIndex'),
+            padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFC7F36B),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        exerciseDisplayName(exercise.name),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Color(0xFF101820),
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      '${exercise.bodyPart} ・ ${exercise.equipment}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF777F78),
+                      const SizedBox(height: 3),
+                      Text(
+                        '${exercise.bodyPart} ・ ${exercise.equipment}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF101820),
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+                if (onRemove != null)
+                  IconButton(
+                    tooltip: '種目を削除',
+                    onPressed: onRemove,
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: Color(0xFF101820),
                     ),
-                  ],
-                ),
-              ),
-              if (onRemove != null)
-                IconButton(
-                  tooltip: '種目を削除',
-                  onPressed: onRemove,
-                  icon: const Icon(Icons.close_rounded),
-                ),
-            ],
+                  ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           Container(
