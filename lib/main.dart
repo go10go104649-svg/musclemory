@@ -354,7 +354,218 @@ class MuscleMemoryApp extends StatelessWidget {
           color: Colors.white,
         ),
       ),
-      home: const HomeShell(),
+      home: const _OnboardingGate(),
+    );
+  }
+}
+
+class OnboardingPreference {
+  OnboardingPreference._();
+
+  static const _completedKey = 'onboarding_completed';
+
+  static Future<bool> load() async {
+    final preferences = await SharedPreferences.getInstance();
+    return preferences.getBool(_completedKey) ?? false;
+  }
+
+  static Future<void> complete() async {
+    final preferences = await SharedPreferences.getInstance();
+    if (!await preferences.setBool(_completedKey, true)) {
+      throw StateError('Onboarding could not be saved');
+    }
+  }
+}
+
+class _OnboardingGate extends StatefulWidget {
+  const _OnboardingGate();
+
+  @override
+  State<_OnboardingGate> createState() => _OnboardingGateState();
+}
+
+class _OnboardingGateState extends State<_OnboardingGate> {
+  late final Future<bool> _completed = OnboardingPreference.load();
+  bool _finished = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_finished) return const HomeShell();
+    return FutureBuilder<bool>(
+      future: _completed,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.data == true) return const HomeShell();
+        return _OnboardingPage(
+          onFinished: () => setState(() => _finished = true),
+        );
+      },
+    );
+  }
+}
+
+class _OnboardingPage extends StatefulWidget {
+  const _OnboardingPage({required this.onFinished});
+
+  final VoidCallback onFinished;
+
+  @override
+  State<_OnboardingPage> createState() => _OnboardingPageState();
+}
+
+class _OnboardingPageState extends State<_OnboardingPage> {
+  static const _slides = [
+    (
+      icon: Icons.fitness_center_rounded,
+      title: 'トレーニングを記録',
+      body: '種目・重量・回数・セットをかんたんに記録。'
+          '\n利用するジムや場所を選べます。未登録の場所も追加できます。',
+    ),
+    (
+      icon: Icons.insights_rounded,
+      title: '成長を可視化',
+      body: '履歴と筋肉ヒートマップで、積み重ねを振り返りましょう。'
+          '\n対応種目の3Dフォームガイドで動きも確認できます。',
+    ),
+    (
+      icon: Icons.qr_code_rounded,
+      title: 'Trainerと連携',
+      body: '今後対応予定：Trainerが表示するQRコードを読み取り、接続。'
+          '\nメニューやトレーニング情報を共有できるようになる予定です。',
+    ),
+    (
+      icon: Icons.cloud_outlined,
+      title: 'アカウントでデータを引き継ぐ',
+      body: '機種変更や別端末での利用に備えて。'
+          '\nアカウントを使うクラウドバックアップで、データを引き継げます。'
+          '\nクラウド機能はPremium限定です。',
+    ),
+  ];
+  final _controller = PageController();
+  int _page = 0;
+  bool _saving = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _move(int page) {
+    _controller.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+    );
+  }
+
+  Future<void> _finish() async {
+    setState(() => _saving = true);
+    try {
+      await OnboardingPreference.complete();
+      if (mounted) widget.onFinished();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('保存できませんでした。もう一度お試しください。')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: const Key('onboarding'),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                controller: _controller,
+                physics: _saving ? const NeverScrollableScrollPhysics() : null,
+                itemCount: _slides.length,
+                onPageChanged: (page) => setState(() => _page = page),
+                itemBuilder: (context, index) {
+                  final slide = _slides[index];
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        const Text('MUSCLEMORY'),
+                        const SizedBox(height: 28),
+                        CircleAvatar(
+                          radius: 52,
+                          backgroundColor: const Color(0xFFC7F36B),
+                          child: Icon(slide.icon, size: 48),
+                        ),
+                        const SizedBox(height: 28),
+                        Text(
+                          slide.title,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Text(
+                          slide.body,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16, height: 1.7),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              child: Column(
+                children: [
+                  Text(
+                    '${_page + 1} / ${_slides.length}',
+                    key: const Key('onboardingIndicator'),
+                    semanticsLabel: '全4ページ中${_page + 1}ページ目',
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          key: const Key('onboardingBack'),
+                          onPressed: _page == 0 || _saving
+                              ? null
+                              : () => _move(_page - 1),
+                          child: const Text('戻る'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton(
+                          key: const Key('onboardingNext'),
+                          onPressed: _saving
+                              ? null
+                              : _page == 3
+                              ? _finish
+                              : () => _move(_page + 1),
+                          child: Text(_page == 3 ? 'はじめる' : '次へ'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -27,6 +27,7 @@ Future<void> verifyBulkExerciseFlow(
     ],
   );
   SharedPreferences.setMockInitialValues({
+    'onboarding_completed': true,
     'workout_templates': jsonEncode([menu.toJson()]),
   });
   await tester.pumpWidget(const MuscleMemoryApp());

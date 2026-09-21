@@ -129,7 +129,7 @@ void main() {
   testWidgets('home removes summaries without removing saved workouts', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'onboarding_completed': true});
     await tester.pumpWidget(const MuscleMemoryApp());
     await tester.pumpAndSettle();
     expect(find.byType(WeeklySummary), findsNothing);
@@ -157,6 +157,7 @@ void main() {
       ),
     );
     SharedPreferences.setMockInitialValues({
+      'onboarding_completed': true,
       'rest_timer_enabled': true,
       'rest_timer_seconds': 30,
       'completion_check_enabled': true,

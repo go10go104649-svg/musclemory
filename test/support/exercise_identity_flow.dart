@@ -9,7 +9,7 @@ Future<void> verifyIdentityFlow(
   WidgetTester t, {
   Future<void> Function(String)? screenshot,
 }) async {
-  SharedPreferences.setMockInitialValues({});
+  SharedPreferences.setMockInitialValues({'onboarding_completed': true});
   CustomExercisePreference.exercises = [];
   await t.pumpWidget(const MuscleMemoryApp());
   await t.pumpAndSettle();

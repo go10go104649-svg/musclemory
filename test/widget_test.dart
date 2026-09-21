@@ -8,7 +8,87 @@ import 'package:muscle_memory/body_weight.dart';
 import 'package:muscle_memory/muscle_targets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+void _setExistingUserPreferences(Map<String, Object> values) {
+  SharedPreferences.setMockInitialValues({
+    'onboarding_completed': true,
+    ...values,
+  });
+}
+
 void main() {
+  testWidgets('onboarding completes only at the last page and stays completed', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'selected_gym': '自宅'});
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('onboarding')), findsOneWidget);
+    expect(find.text('トレーニングを記録'), findsOneWidget);
+    expect(find.byType(HomeShell), findsNothing);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getBool('onboarding_completed'), isNull);
+    await tester.tap(find.byKey(const Key('onboardingNext')));
+    await tester.pumpAndSettle();
+    expect(find.text('成長を可視化'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('onboardingBack')));
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 4'), findsOneWidget);
+
+    // Closing before completion must not persist the flag.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 4'), findsOneWidget);
+    for (var page = 2; page <= 4; page++) {
+      await tester.tap(find.byKey(const Key('onboardingNext')));
+      await tester.pumpAndSettle();
+      expect(find.text('$page / 4'), findsOneWidget);
+      expect(preferences.getBool('onboarding_completed'), isNull);
+    }
+    expect(find.text('はじめる'), findsOneWidget);
+    await tester.tap(find.text('はじめる'));
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeShell), findsOneWidget);
+    expect(preferences.getBool('onboarding_completed'), isTrue);
+    expect(preferences.getString('selected_gym'), '自宅');
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeShell), findsOneWidget);
+    expect(find.byKey(const Key('onboarding')), findsNothing);
+  });
+
+  testWidgets('onboarding completed preference opens HomeShell directly', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'onboarding_completed': true});
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeShell), findsOneWidget);
+    expect(find.byKey(const Key('onboarding')), findsNothing);
+  });
+
+  testWidgets('onboarding fits a small screen and supports swiping', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(320, 480);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    for (var page = 1; page <= 4; page++) {
+      expect(find.text('$page / 4'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      if (page < 4) {
+        await tester.drag(find.byType(PageView), const Offset(-300, 0));
+        await tester.pumpAndSettle();
+      }
+    }
+    expect(await OnboardingPreference.load(), isFalse);
+  });
+
   testWidgets(
     'hidden body model is released while its selected angle survives',
     (tester) async {
@@ -279,7 +359,7 @@ void main() {
   testWidgets('custom exercise is created from and inherits its category', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await CustomExercisePreference.load();
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1;
@@ -314,7 +394,7 @@ void main() {
   });
 
   test('workout UI preferences persist', () async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await WorkoutUiPreference.load();
     expect(WorkoutUiPreference.completionCheckEnabled, isTrue);
     expect(WorkoutUiPreference.workoutTimerEnabled, isTrue);
@@ -339,7 +419,7 @@ void main() {
   test(
     'legacy timer settings migrate to one training duration value',
     () async {
-      SharedPreferences.setMockInitialValues({
+      _setExistingUserPreferences({
         'workout_timer_enabled': false,
         'workout_duration_enabled': true,
       });
@@ -355,7 +435,7 @@ void main() {
   );
 
   test('custom exercises persist between sessions', () async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await CustomExercisePreference.load();
     await CustomExercisePreference.add(
       const ExerciseTemplate(
@@ -376,7 +456,7 @@ void main() {
   test(
     'custom exercises reject duplicates and support update and removal',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      _setExistingUserPreferences({});
       await CustomExercisePreference.load();
       const exercise = ExerciseTemplate(
         name: 'ケーブルプレス',
@@ -437,7 +517,7 @@ void main() {
   );
 
   test('custom gyms persist without standard or duplicate names', () async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await CustomGymPreference.load();
 
     expect(await CustomGymPreference.add('中央体育館'), isTrue);
@@ -472,7 +552,7 @@ void main() {
       equipment: 'カスタム',
       startWeight: 12.5,
     );
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'workout_templates': jsonEncode([
         validMenu.toJson(),
         {'name': '', 'sets': []},
@@ -690,7 +770,7 @@ void main() {
   });
 
   testWidgets('app opens when saved history is corrupted', (tester) async {
-    SharedPreferences.setMockInitialValues({'workout_history': 'broken json'});
+    _setExistingUserPreferences({'workout_history': 'broken json'});
 
     await tester.pumpWidget(const MuscleMemoryApp());
     await tester.pumpAndSettle();
@@ -702,7 +782,7 @@ void main() {
   testWidgets('custom exercises can be created edited deleted and restored', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await CustomExercisePreference.load();
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1;
@@ -779,7 +859,7 @@ void main() {
   testWidgets('custom gyms can be created edited deleted and restored', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await CustomGymPreference.load();
     String? selectedGym = '中央体育館';
     tester.view.physicalSize = const Size(800, 1200);
@@ -842,7 +922,7 @@ void main() {
   testWidgets('profile display name persists and empty values reset it', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
 
     Future<void> openProfile() async {
       await tester.pumpWidget(const MuscleMemoryApp());
@@ -914,7 +994,7 @@ void main() {
   testWidgets('profile sections are ordered and backup tools open separately', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await WorkoutUiPreference.load();
     tester.view.physicalSize = const Size(800, 1800);
     tester.view.devicePixelRatio = 1;
@@ -962,7 +1042,7 @@ void main() {
   testWidgets(
     'training settings are grouped and rest timer depends on checks',
     (tester) async {
-      SharedPreferences.setMockInitialValues({
+      _setExistingUserPreferences({
         'completion_check_enabled': false,
         'workout_timer_enabled': true,
         'workout_duration_enabled': true,
@@ -1042,7 +1122,7 @@ void main() {
   testWidgets('previously selected custom gym is migrated for reuse', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({'selected_gym': '以前の体育館'});
+    _setExistingUserPreferences({'selected_gym': '以前の体育館'});
     CustomGymPreference.gyms = [];
 
     await tester.pumpWidget(const MuscleMemoryApp());
@@ -1056,7 +1136,7 @@ void main() {
   testWidgets('saved custom gyms appear in the location picker', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'custom_gyms': jsonEncode(['中央体育館', '会社のジム']),
     });
     await CustomGymPreference.load();
@@ -1094,7 +1174,7 @@ void main() {
   testWidgets('location settings chooses a usual place without adding there', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'custom_gyms': jsonEncode(['中央体育館']),
     });
     await CustomGymPreference.load();
@@ -1437,7 +1517,7 @@ void main() {
         ),
       ],
     );
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'workout_history': jsonEncode([workout.toJson()]),
     });
     await tester.pumpWidget(const MuscleMemoryApp());
@@ -1488,7 +1568,7 @@ void main() {
   });
 
   testWidgets('an existing workout date can be changed', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     final workout = WorkoutRecord(
       date: DateTime(2025, 3, 15, 19, 30),
       durationSeconds: 120,
@@ -1551,7 +1631,7 @@ void main() {
         },
       ],
     });
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       activeWorkoutDraftStorageKey: encodedDraft,
     });
     final workout = WorkoutRecord(
@@ -1582,7 +1662,7 @@ void main() {
   });
 
   test('saved workout templates persist', () async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await WorkoutTemplatePreference.save([
       const SavedWorkoutTemplate(
         name: '胸の日',
@@ -1631,7 +1711,7 @@ void main() {
         ),
       ],
     );
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     var saved = <SavedWorkoutTemplate>[chest, legs];
     tester.view.physicalSize = const Size(800, 1200);
     tester.view.devicePixelRatio = 1;
@@ -1743,7 +1823,7 @@ void main() {
   testWidgets('previous sets can be applied and completed together', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     final initial = WorkoutRecord(
       date: DateTime(2025, 1, 1),
       sets: const [
@@ -1854,7 +1934,7 @@ void main() {
   testWidgets('new workout starts empty and supports adding sets', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     tester.view.physicalSize = const Size(800, 1200);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -1906,7 +1986,7 @@ void main() {
   testWidgets('an empty draft from any app version becomes a fresh workout', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       activeWorkoutDraftStorageKey: jsonEncode({
         'startedAt': DateTime.now()
             .subtract(const Duration(minutes: 10))
@@ -1930,7 +2010,7 @@ void main() {
   testWidgets('disabled workout UI hides checks and timer but still saves', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'completion_check_enabled': false,
       'workout_timer_enabled': false,
       'workout_duration_enabled': false,
@@ -1967,7 +2047,7 @@ void main() {
   testWidgets('active workout can be deleted without leaving a draft', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     WorkoutUiPreference.completionCheckEnabled = true;
     WorkoutUiPreference.workoutTimerEnabled = true;
     await tester.pumpWidget(const MuscleMemoryApp());
@@ -2012,7 +2092,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await tester.pumpWidget(const MuscleMemoryApp());
     await tester.pumpAndSettle();
 
@@ -2083,7 +2163,7 @@ void main() {
   });
 
   testWidgets('completed workout appears in history', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await tester.pumpWidget(const MuscleMemoryApp());
     await tester.pumpAndSettle();
 
@@ -2151,7 +2231,7 @@ void main() {
         ),
       ],
     );
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'workout_history': jsonEncode([workout.toJson()]),
     });
     tester.view.physicalSize = const Size(800, 1200);
@@ -2208,7 +2288,7 @@ void main() {
         ),
       ],
     );
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'workout_templates': jsonEncode([template.toJson()]),
     });
     tester.view.physicalSize = const Size(800, 1000);
@@ -2255,7 +2335,7 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(SystemChannels.platform, null);
     });
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'rest_timer_enabled': false,
       'rest_timer_seconds': 60,
     });
@@ -2279,7 +2359,7 @@ void main() {
     expect(find.byKey(const Key('restTimerBanner')), findsNothing);
 
     await tester.pumpWidget(const SizedBox());
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'rest_timer_enabled': true,
       'rest_timer_seconds': 1,
     });
@@ -2314,7 +2394,7 @@ void main() {
   testWidgets('workout draft is saved and leaving asks for confirmation', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setExistingUserPreferences({});
     await RestTimerPreference.load();
     await tester.pumpWidget(const MuscleMemoryApp());
     await tester.pumpAndSettle();
@@ -2378,7 +2458,7 @@ void main() {
   testWidgets('saved menu start protects a draft and starts with today', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       activeWorkoutDraftStorageKey: jsonEncode({
         'date': DateTime.now().toIso8601String(),
         'note': '',
@@ -2471,7 +2551,7 @@ void main() {
   testWidgets('repeating from history protects the active draft', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       activeWorkoutDraftStorageKey: jsonEncode({
         'date': DateTime.now().toIso8601String(),
         'note': '残したいメモ',
@@ -2555,7 +2635,7 @@ void main() {
           },
         ],
       });
-      SharedPreferences.setMockInitialValues({
+      _setExistingUserPreferences({
         activeWorkoutDraftStorageKey: draft,
       });
       await tester.pumpWidget(const MuscleMemoryApp());
@@ -2577,7 +2657,7 @@ void main() {
   testWidgets('removing the final set freezes time including after undo', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       activeWorkoutDraftStorageKey: jsonEncode({
         'elapsedSeconds': 123,
         'timerStopped': false,
@@ -2617,7 +2697,7 @@ void main() {
 
   testWidgets('resumed draft keeps its elapsed time', (tester) async {
     final startedAt = DateTime.now().subtract(const Duration(minutes: 5));
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       activeWorkoutDraftStorageKey: jsonEncode({
         'startedAt': startedAt.toIso8601String(),
         'date': DateTime.now().toIso8601String(),
@@ -2783,7 +2863,7 @@ void main() {
   testWidgets('body weight trend appears on home but not history', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({
+    _setExistingUserPreferences({
       'body_weight_entries': jsonEncode([
         BodyWeightEntry(
           id: 'home-weight',
@@ -2803,7 +2883,7 @@ void main() {
   });
 
   testWidgets('contact form is available from profile', (tester) async {
-    SharedPreferences.setMockInitialValues(const {});
+    _setExistingUserPreferences(const {});
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -2825,7 +2905,7 @@ void main() {
   });
 
   testWidgets('weekly goal UI is removed', (tester) async {
-    SharedPreferences.setMockInitialValues(const {});
+    _setExistingUserPreferences(const {});
     await tester.pumpWidget(const MuscleMemoryApp());
     await tester.pumpAndSettle();
     expect(find.text('1週間の目標'), findsNothing);
