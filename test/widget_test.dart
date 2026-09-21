@@ -538,6 +538,7 @@ void main() {
     const assets = {
       '胸': 'chest', '背中': 'back', '肩': 'shoulders',
       '腕': 'arms', '脚': 'legs', '腹': 'abs',
+      '有酸素': 'cardio', 'HYROX': 'hyrox',
     };
     for (final entry in assets.entries) {
       final image = tester.widget<Image>(find.descendant(
@@ -546,13 +547,6 @@ void main() {
       ));
       expect((image.image as AssetImage).assetName,
           'assets/category_muscles/${entry.value}.png');
-    }
-    for (final category in ['有酸素', 'HYROX']) {
-      final mark = find.byKey(Key('bodyPartIllustration$category'));
-      expect(find.descendant(of: mark, matching: find.byIcon(Icons.directions_run_rounded)), findsOneWidget);
-      expect(find.descendant(of: mark, matching: find.byIcon(category == '有酸素'
-          ? Icons.monitor_heart_outlined : Icons.fitness_center_rounded)), findsOneWidget);
-      expect(find.descendant(of: mark, matching: find.byType(Image)), findsNothing);
     }
     await openExerciseCategory(tester, '有酸素');
     expect(find.text('有酸素の種目'), findsOneWidget);

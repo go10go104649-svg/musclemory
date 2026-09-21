@@ -1,3 +1,5 @@
+import 'support/bulk_exercise_flow.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muscle_memory/body_part_illustration.dart';
@@ -7,6 +9,7 @@ void main() {
   testWidgets(
     'small picker wraps heading and opens scrolled category at the top',
     (tester) async {
+      SharedPreferences.setMockInitialValues({});
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -30,13 +33,13 @@ void main() {
       await tester.scrollUntilVisible(
         legs,
         180,
-        scrollable: find.byType(Scrollable).last,
+        scrollable: exercisePickerScrollable(),
       );
       await tester.pumpAndSettle();
       await tester.tap(legs);
       await tester.pumpAndSettle();
       expect(find.text('脚の種目'), findsOneWidget);
-      expect(find.text('スクワット'), findsOneWidget);
+      expect(find.byKey(const Key('exerciseSearchField')), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -49,7 +52,7 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        final categories = [...BodyPartIllustration.assets.keys, '有酸素'];
+        final categories = BodyPartIllustration.assets.keys.toList();
         final selected = <String>[];
         await tester.pumpWidget(
           MaterialApp(
@@ -79,7 +82,7 @@ void main() {
         final heights = <double>{};
         for (final category in categories) {
           final card = find.byKey(Key('exerciseCategory$category'));
-          await tester.ensureVisible(card);
+          await tester.scrollUntilVisible(card, 150, scrollable: find.byType(Scrollable));
           await tester.pumpAndSettle();
           expect(tester.takeException(), isNull);
           heights.add(tester.getSize(card).height);
@@ -93,8 +96,12 @@ void main() {
           );
           expect(
             find.descendant(of: art, matching: find.byType(Image)),
-            category == '有酸素' ? findsNothing : findsOneWidget,
+            findsOneWidget,
           );
+          final image = tester.widget<Image>(find.descendant(of: art, matching: find.byType(Image)));
+          expect((image.image as AssetImage).assetName,
+              'assets/category_muscles/${BodyPartIllustration.assets[category]}.png');
+          expect(find.descendant(of: art, matching: find.byType(Icon)), findsNothing);
           await tester.tap(card);
         }
         expect(selected, categories);

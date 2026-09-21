@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Body-part renders and original standard-icon marks for activity categories.
+/// Consistent human renders for body-part and activity categories.
 class BodyPartIllustration extends StatelessWidget {
   const BodyPartIllustration({super.key, required this.category});
   final String category;
@@ -11,6 +11,8 @@ class BodyPartIllustration extends StatelessWidget {
     '腕': 'arms',
     '脚': 'legs',
     '腹': 'abs',
+    '有酸素': 'cardio',
+    'HYROX': 'hyrox',
   };
   @override
   Widget build(BuildContext context) {
@@ -22,9 +24,7 @@ class BodyPartIllustration extends StatelessWidget {
       child: ExcludeSemantics(
         child: SizedBox.expand(
           key: Key('bodyPartIllustration$category'),
-          child: category == '有酸素' || category == 'HYROX'
-              ? _ActivityCategoryMark(isHyrox: category == 'HYROX')
-              : asset == null
+          child: asset == null
               ? const Icon(
                   Icons.monitor_heart_outlined,
                   size: 46,
@@ -39,49 +39,6 @@ class BodyPartIllustration extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ActivityCategoryMark extends StatelessWidget {
-  const _ActivityCategoryMark({required this.isHyrox});
-
-  final bool isHyrox;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: FittedBox(
-      fit: BoxFit.scaleDown,
-      child: SizedBox(
-        width: 80,
-        height: 88,
-        child: Stack(
-          children: [
-            Positioned(
-              left: 0,
-              top: 4,
-              child: Icon(
-                isHyrox
-                    ? Icons.fitness_center_rounded
-                    : Icons.directions_run_rounded,
-                size: 62,
-                color: const Color(0xFFD4162A),
-              ),
-            ),
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Icon(
-                isHyrox
-                    ? Icons.directions_run_rounded
-                    : Icons.monitor_heart_outlined,
-                size: 30,
-                color: const Color(0xFF263238),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
 }
 
 class BodyPartCategoryCard extends StatelessWidget {
