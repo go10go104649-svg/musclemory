@@ -868,6 +868,12 @@ class _HomeShellState extends State<HomeShell> {
     await BodyWeightPreference.save(updated);
   }
 
+  Future<void> _deleteBodyWeight(BodyWeightEntry entry) async {
+    final updated = _bodyWeights.where((item) => item.id != entry.id).toList();
+    await BodyWeightPreference.save(updated);
+    if (mounted) setState(() => _bodyWeights = updated);
+  }
+
   Future<void> _replaceWorkout(
     DateTime originalDate,
     WorkoutRecord workout,
@@ -1045,6 +1051,7 @@ class _HomeShellState extends State<HomeShell> {
         onWorkoutUpdated: _replaceWorkout,
         onWorkoutDeleted: _deleteWorkout,
         onBodyWeightSaved: _saveBodyWeight,
+        onBodyWeightDeleted: _deleteBodyWeight,
         workoutTemplates: _workoutTemplates,
         onTemplateSaved: _saveWorkoutTemplate,
         onTemplateDeleted: _deleteWorkoutTemplate,
@@ -1133,6 +1140,7 @@ class DashboardPage extends StatelessWidget {
     required this.onWorkoutUpdated,
     required this.onWorkoutDeleted,
     this.onBodyWeightSaved,
+    this.onBodyWeightDeleted,
     required this.workoutTemplates,
     required this.onTemplateSaved,
     required this.onTemplateDeleted,
@@ -1149,6 +1157,7 @@ class DashboardPage extends StatelessWidget {
   final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
   final Future<void> Function(BodyWeightEntry)? onBodyWeightSaved;
+  final Future<void> Function(BodyWeightEntry)? onBodyWeightDeleted;
   final List<SavedWorkoutTemplate> workoutTemplates;
   final Future<void> Function(SavedWorkoutTemplate) onTemplateSaved;
   final Future<void> Function(SavedWorkoutTemplate) onTemplateDeleted;
@@ -1197,6 +1206,7 @@ class DashboardPage extends StatelessWidget {
             BodyWeightTrendSection(
               entries: bodyWeights,
               onSaved: onBodyWeightSaved!,
+              onDeleted: onBodyWeightDeleted,
             ),
           ],
         ],
@@ -3405,10 +3415,12 @@ class BodyWeightTrendSection extends StatefulWidget {
     super.key,
     required this.entries,
     required this.onSaved,
+    this.onDeleted,
   });
 
   final List<BodyWeightEntry> entries;
   final Future<void> Function(BodyWeightEntry) onSaved;
+  final Future<void> Function(BodyWeightEntry)? onDeleted;
 
   @override
   State<BodyWeightTrendSection> createState() => _BodyWeightTrendSectionState();
@@ -3418,10 +3430,22 @@ class _BodyWeightTrendSectionState extends State<BodyWeightTrendSection> {
   BodyWeightPeriod _period = BodyWeightPeriod.oneMonth;
   String? _selectedId;
 
+  @override
+  void didUpdateWidget(covariant BodyWeightTrendSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_selectedId != null &&
+        !widget.entries.any((entry) => entry.id == _selectedId)) {
+      _selectedId = null;
+    }
+  }
+
   Future<void> _edit([BodyWeightEntry? initial]) async {
     final result = await showDialog<BodyWeightEntry>(
       context: context,
-      builder: (_) => BodyWeightEditorDialog(initial: initial),
+      builder: (_) => BodyWeightEditorDialog(
+        initial: initial,
+        onDeleted: widget.onDeleted,
+      ),
     );
     if (result == null) return;
     await widget.onSaved(result);
@@ -3626,9 +3650,10 @@ String _bodyWeightLabel(double value) {
 }
 
 class BodyWeightEditorDialog extends StatefulWidget {
-  const BodyWeightEditorDialog({super.key, this.initial});
+  const BodyWeightEditorDialog({super.key, this.initial, this.onDeleted});
 
   final BodyWeightEntry? initial;
+  final Future<void> Function(BodyWeightEntry)? onDeleted;
 
   @override
   State<BodyWeightEditorDialog> createState() => _BodyWeightEditorDialogState();
@@ -3638,6 +3663,7 @@ class _BodyWeightEditorDialogState extends State<BodyWeightEditorDialog> {
   late DateTime _date;
   late final TextEditingController _controller;
   String? _error;
+  bool _deleting = false;
 
   @override
   void initState() {
@@ -3678,7 +3704,48 @@ class _BodyWeightEditorDialogState extends State<BodyWeightEditorDialog> {
     });
   }
 
+  Future<void> _delete() async {
+    if (_deleting || widget.initial == null || widget.onDeleted == null) return;
+    setState(() => _deleting = true);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('この体重記録を削除しますか？'),
+        actions: [
+          TextButton(
+            key: const Key('cancelDeleteBodyWeightButton'),
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('キャンセル'),
+          ),
+          TextButton(
+            key: const Key('confirmDeleteBodyWeightButton'),
+            style: TextButton.styleFrom(foregroundColor: const Color(0xFFB3261E)),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('削除'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    if (confirmed != true) {
+      setState(() => _deleting = false);
+      return;
+    }
+    try {
+      await widget.onDeleted!(widget.initial!);
+      if (mounted) Navigator.pop(context);
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _deleting = false;
+          _error = '削除できませんでした。もう一度お試しください。';
+        });
+      }
+    }
+  }
+
   void _save() {
+    if (_deleting) return;
     final weight = double.tryParse(
       _controller.text.trim().replaceAll(',', '.'),
     );
@@ -3729,13 +3796,20 @@ class _BodyWeightEditorDialogState extends State<BodyWeightEditorDialog> {
         ],
       ),
       actions: [
+        if (widget.initial != null && widget.onDeleted != null)
+          TextButton(
+            key: const Key('deleteBodyWeightButton'),
+            onPressed: _deleting ? null : _delete,
+            style: TextButton.styleFrom(foregroundColor: const Color(0xFFB3261E)),
+            child: const Text('削除'),
+          ),
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: _deleting ? null : () => Navigator.pop(context),
           child: const Text('キャンセル'),
         ),
         FilledButton(
           key: const Key('saveBodyWeightButton'),
-          onPressed: _save,
+          onPressed: _deleting ? null : _save,
           child: const Text('保存'),
         ),
       ],

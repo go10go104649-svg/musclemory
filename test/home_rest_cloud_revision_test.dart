@@ -35,6 +35,9 @@ void main() {
                 valueListenable: entries,
                 builder: (_, value, _) => BodyWeightTrendSection(
                   entries: value,
+                  onDeleted: (entry) async => entries.value = [
+                    for (final old in entries.value) if (old.id != entry.id) old,
+                  ],
                   onSaved: (entry) async => entries.value = [
                     for (final old in value) old.id == entry.id ? entry : old,
                   ],
@@ -67,6 +70,52 @@ void main() {
       expect(entries.value.last.weightKg, 87.5);
       expect(find.textContaining('87.5 kg'), findsOneWidget);
       expect(entries.value.first.weightKg, 80);
+      Future<void> deleteOpenedEntry() async {
+        await tester.tap(find.byKey(const Key('deleteBodyWeightButton')));
+        await tester.pumpAndSettle();
+        expect(find.text('この体重記録を削除しますか？'), findsOneWidget);
+        await tester.tap(find.byKey(const Key('confirmDeleteBodyWeightButton')));
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.byKey(const Key('editBodyWeightw11')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('deleteBodyWeightButton')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('deleteBodyWeightButton')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('cancelDeleteBodyWeightButton')));
+      await tester.pumpAndSettle();
+      expect(entries.value, hasLength(12));
+      expect(find.byKey(const Key('bodyWeightField')), findsOneWidget);
+      await deleteOpenedEntry();
+      expect(entries.value, hasLength(11));
+      expect(find.byKey(const Key('editBodyWeightw10')), findsOneWidget);
+      expect(find.byKey(const Key('bodyWeightField')), findsNothing);
+      // Select and delete an older graph point, keeping the latest unchanged.
+      final chart = find.byKey(const Key('bodyWeightChart'));
+      await tester.tapAt(tester.getTopLeft(chart) + const Offset(46, 100));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(
+        of: find.byKey(const Key('selectedBodyWeight')),
+        matching: find.text('編集'),
+      ));
+      await tester.pumpAndSettle();
+      await deleteOpenedEntry();
+      expect(entries.value.any((e) => e.id == 'w0'), isFalse);
+      expect(entries.value, hasLength(10));
+      final updatedPainter = tester.widget<CustomPaint>(find.descendant(
+        of: chart, matching: find.byType(CustomPaint),
+      )).painter! as BodyWeightChartPainter;
+      expect(updatedPainter.entries, hasLength(10));
+      expect(updatedPainter.selectedId, isNull);
+      expect(find.byKey(const Key('selectedBodyWeight')), findsNothing);
+      while (entries.value.isNotEmpty) {
+        await tester.tap(find.byKey(Key('editBodyWeight${entries.value.last.id}')));
+        await tester.pumpAndSettle();
+        await deleteOpenedEntry();
+      }
+      expect(find.byKey(const Key('bodyWeightChart')), findsNothing);
+      expect(find.text('体重を記録するとグラフが表示されます'), findsOneWidget);
+
       expect(tester.takeException(), isNull);
     },
   );

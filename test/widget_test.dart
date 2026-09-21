@@ -2938,6 +2938,7 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('addBodyWeightButton')));
     await tester.pumpAndSettle();
+    expect(find.byKey(const Key('deleteBodyWeightButton')), findsNothing);
     await tester.enterText(find.byKey(const Key('bodyWeightField')), '82.5');
     await tester.tap(find.byKey(const Key('saveBodyWeightButton')));
     await tester.pumpAndSettle();
@@ -3009,6 +3010,32 @@ void main() {
 
     expect(find.byKey(const Key('shareVolumeToggle')), findsNothing);
     expect(find.byKey(const Key('shareDurationToggle')), findsNothing);
+  });
+
+  testWidgets('body weight deletion persists without changing workout history', (tester) async {
+    final history = jsonEncode([
+      WorkoutRecord(date: DateTime(2026, 9, 1), sets: const [
+        RecordedSet(weight: 50, reps: 8, completed: true),
+      ]).toJson(),
+    ]);
+    _setExistingUserPreferences({'workout_history': history});
+    await BodyWeightPreference.save([
+      BodyWeightEntry(id: 'delete-me', recordedAt: DateTime.now(), weightKg: 80),
+    ]);
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    final edit = find.byKey(const Key('editBodyWeightdelete-me'));
+    await tester.scrollUntilVisible(edit, 200);
+    await tester.tap(edit);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('deleteBodyWeightButton')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('confirmDeleteBodyWeightButton')));
+    await tester.pumpAndSettle();
+    expect(await BodyWeightPreference.load(), isEmpty);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('workout_history'), history);
+    expect(find.text('体重を記録するとグラフが表示されます'), findsOneWidget);
   });
 
   testWidgets('body weight trend appears on home but not history', (
