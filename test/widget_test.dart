@@ -110,7 +110,7 @@ void main() {
     await tester.pumpWidget(const MuscleMemoryApp());
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('onboarding')), findsOneWidget);
-    expect(find.text('トレーニングを記録'), findsOneWidget);
+    expect(find.text('ジムと一緒にトレーニングを記録'), findsOneWidget);
     expect(find.byType(HomeShell), findsNothing);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getBool('onboarding_completed'), isNull);
@@ -177,6 +177,16 @@ void main() {
     await tester.pumpAndSettle();
     for (var page = 1; page <= 4; page++) {
       expect(find.text('$page / 4'), findsOneWidget);
+      if (page == 1) {
+        expect(find.text('ジムと一緒にトレーニングを記録'), findsOneWidget);
+        expect(
+          find.textContaining('今後は店舗のマシン情報と連動し、そのジムで使えるマシンや種目を探しやすくする予定です。'),
+          findsOneWidget,
+        );
+      } else if (page == 3) {
+        expect(find.textContaining('招待QRコードをMUSCLEMORYで読み取れます。'), findsOneWidget);
+        expect(find.textContaining('共有は今後対応予定です。'), findsOneWidget);
+      }
       expect(tester.takeException(), isNull);
       if (page < 4) {
         await tester.drag(find.byType(PageView), const Offset(-300, 0));

@@ -606,9 +606,10 @@ class _OnboardingPageState extends State<_OnboardingPage> {
   static const _slides = [
     (
       icon: Icons.fitness_center_rounded,
-      title: 'トレーニングを記録',
+      title: 'ジムと一緒にトレーニングを記録',
       body: '種目・重量・回数・セットをかんたんに記録。'
-          '\n利用するジムや場所を選べます。未登録の場所も追加できます。',
+          '\nジムを選んで、その日の場所も記録。未登録の場所も追加できます。'
+          '\n今後は店舗のマシン情報と連動し、そのジムで使えるマシンや種目を探しやすくする予定です。',
     ),
     (
       icon: Icons.insights_rounded,
@@ -619,8 +620,8 @@ class _OnboardingPageState extends State<_OnboardingPage> {
     (
       icon: Icons.qr_code_rounded,
       title: 'Trainerと連携',
-      body: '今後対応予定：Trainerが表示するQRコードを読み取り、接続。'
-          '\nメニューやトレーニング情報を共有できるようになる予定です。',
+      body: 'Trainerが表示する招待QRコードをMUSCLEMORYで読み取れます。'
+          '\nTrainerとの接続や、メニュー・トレーニング情報の共有は今後対応予定です。',
     ),
     (
       icon: Icons.cloud_outlined,
