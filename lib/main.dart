@@ -1173,12 +1173,7 @@ class DashboardPage extends StatelessWidget {
             const SizedBox(height: 14),
           ],
           StartWorkoutCard(
-            gymName: selectedGym,
             buttonLabel: workoutDraft == null ? 'トレーニングを始める' : '新しいトレーニングを始める',
-            onSelectGym: () async {
-              final selected = await showGymPicker(context, selectedGym);
-              if (selected != null) onGymChanged(selected);
-            },
             onPressed: () async {
               await _startWorkout(context);
             },
@@ -1886,14 +1881,10 @@ class HomeHeader extends StatelessWidget {
 class StartWorkoutCard extends StatelessWidget {
   const StartWorkoutCard({
     super.key,
-    required this.gymName,
-    required this.onSelectGym,
     required this.onPressed,
     this.buttonLabel = 'トレーニングを始める',
   });
 
-  final String? gymName;
-  final VoidCallback onSelectGym;
   final VoidCallback onPressed;
   final String buttonLabel;
 
@@ -1908,46 +1899,6 @@ class StartWorkoutCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              InkWell(
-                borderRadius: BorderRadius.circular(99),
-                onTap: onSelectGym,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 11,
-                    vertical: 7,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.location_on_outlined,
-                        size: 15,
-                        color: Colors.white70,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        gymName ?? '店舗を選択',
-                        style: const TextStyle(color: Colors.white70),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Spacer(),
-              const Icon(
-                Icons.fitness_center_rounded,
-                color: Color(0xFFC7F36B),
-                size: 30,
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
           Text(
             '次の1セットが、\n成長の記録になる。',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -5524,61 +5475,6 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _editExerciseEquipment(int index) async {
-    final exercise = _exercises[index];
-    var equipment = exercise.equipment;
-    FocusScope.of(context).unfocus();
-    final selected = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('器具を変更'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(exerciseDisplayName(exercise.name)),
-              Text('現在の器具：${exercise.equipment}'),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                key: const Key('exerciseEquipmentField'),
-                initialValue: equipment,
-                isExpanded: true,
-                decoration: const InputDecoration(labelText: '器具'),
-                items: {
-                  ...exerciseEquipmentOptions,
-                  exercise.equipment,
-                }.map((value) => DropdownMenuItem(
-                  value: value,
-                  child: Text(value, overflow: TextOverflow.ellipsis),
-                )).toList(),
-                onChanged: (value) {
-                  if (value != null) equipment = value;
-                },
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('キャンセル'),
-          ),
-          FilledButton(
-            key: const Key('saveExerciseEquipment'),
-            onPressed: () => Navigator.pop(dialogContext, equipment),
-            child: const Text('保存'),
-          ),
-        ],
-      ),
-    );
-    if (!mounted || selected == null || selected == exercise.equipment) return;
-    final currentIndex = _exercises.indexOf(exercise);
-    if (currentIndex < 0) return;
-    setState(() => _exercises[currentIndex] = exercise.withEquipment(selected));
-    await _saveDraft();
-  }
-
   Future<void> _selectWorkoutGym() async {
     final selected = await showGymPicker(context, _gymName);
     if (!mounted || selected == null || selected == _gymName) return;
@@ -5775,23 +5671,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         appBar: AppBar(
           backgroundColor: const Color(0xFFF4F5F0),
           leading: BackButton(onPressed: _confirmLeave),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.isEditing ? '記録を修正' : 'トレーニング',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-              ),
-              Text(
-                key: const Key('workoutElapsedLabel'),
-                widget.isEditing
-                    ? '${!WorkoutUiPreference.workoutDurationEnabled || widget.initialWorkout!.durationLabel.isEmpty ? '記録済み' : widget.initialWorkout!.durationLabel} ・ ${_gymName ?? '店舗未選択'}'
-                    : WorkoutUiPreference.workoutTimerEnabled
-                    ? '$_elapsedLabel ・ ${_gymName ?? '店舗未選択'}'
-                    : _gymName ?? '店舗未選択',
-                style: const TextStyle(fontSize: 11, color: Color(0xFF777F78)),
-              ),
-            ],
+          title: Text(
+            widget.isEditing ? '記録を修正' : 'トレーニング',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
           ),
           actions: [
             if (!widget.isEditing)
@@ -5833,10 +5715,11 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
               children: [
                 Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: ListTile(
+                  key: const Key('workoutInfoCard'),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  child: Column(
+                    children: [
+                  ListTile(
                     key: const Key('workoutDateButton'),
                     leading: const CircleAvatar(
                       backgroundColor: Color(0xFFE9F4D1),
@@ -5856,13 +5739,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                     trailing: const Icon(Icons.edit_calendar_outlined),
                     onTap: _selectWorkoutDate,
                   ),
-                ),
-                const SizedBox(height: 16),
-                Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: ListTile(
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
                     key: const Key('workoutGymButton'),
                     leading: const CircleAvatar(
                       backgroundColor: Color(0xFFE9F4D1),
@@ -5884,6 +5762,20 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                     trailing: const Icon(Icons.edit_location_alt_outlined),
                     onTap: _selectWorkoutGym,
                   ),
+                      if (WorkoutUiPreference.workoutTimerEnabled ||
+                          (widget.isEditing && WorkoutUiPreference.workoutDurationEnabled))
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          child: Text(
+                            widget.isEditing
+                                ? widget.initialWorkout!.durationLabel
+                                : _elapsedLabel,
+                            key: const Key('workoutElapsedLabel'),
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF777F78)),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 if (!widget.isEditing &&
@@ -5892,24 +5784,24 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                   Container(
                     key: const Key('restTimerBanner'),
                     margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.fromLTRB(16, 12, 10, 12),
+                    padding: const EdgeInsets.fromLTRB(12, 4, 6, 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF101820),
+                      color: const Color(0xFFEFF2EA),
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Row(
                       children: [
                         const Icon(
                           Icons.timer_outlined,
-                          color: Color(0xFFC7F36B),
+                          color: Color(0xFF83AD30),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             '休憩  ${_restRemaining > 0 ? _restLabel : _configuredRestLabel}',
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
+                              color: Color(0xFF101820),
+                              fontSize: 16,
                               fontWeight: FontWeight.w900,
                             ),
                           ),
@@ -5930,7 +5822,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                           },
                           child: const Text('+30秒'),
                         ),
-                        TextButton(
+                        IconButton(
                           key: Key(
                             _restEndsAt != null
                                 ? 'stopRestTimerButton'
@@ -5939,12 +5831,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                           onPressed: _restEndsAt != null
                               ? _pauseRest
                               : _resumeRest,
-                          child: SizedBox(
-                            width: 64,
-                            child: Center(
-                              child: Text(_restEndsAt != null ? 'ストップ' : '開始'),
-                            ),
-                          ),
+                          tooltip: _restEndsAt != null ? '一時停止' : '開始・再開',
+                          icon: Icon(_restEndsAt != null
+                              ? Icons.pause_rounded : Icons.play_arrow_rounded),
                         ),
                       ],
                     ),
@@ -6008,7 +5897,6 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                         onRemoveSet: (setIndex) =>
                             _removeSet(exerciseIndex, setIndex),
                         onRemove: () => _removeExercise(exerciseIndex),
-                        onEditEquipment: () => _editExerciseEquipment(exerciseIndex),
                         onToggleSet: (setIndex) =>
                             _toggleSet(exerciseIndex, setIndex),
                         onApplyPrevious: (sets) =>
@@ -6518,20 +6406,6 @@ class ExerciseTemplate {
   String get displayEquipment => equipment;
   ExerciseFormDefinition? get definition =>
       exerciseId == null ? null : ExerciseFormCatalog.byId[exerciseId];
-  ExerciseFormDefinition? get equipmentForm {
-    bool matches(ExerciseFormDefinition form) =>
-        form.equipmentLabel == equipment &&
-        (form.category == '腹筋' ? '腹' : form.category) == bodyPart &&
-        form.recordType == recordType.name &&
-        form.distanceUnit == distanceUnit;
-    final original = ExerciseFormCatalog.resolve(exerciseId, name);
-    if (original != null && matches(original)) return original;
-    final candidates = (ExerciseFormCatalog.byName[name] ?? const <ExerciseFormDefinition>[])
-        .where((form) => form.exerciseName == name && matches(form))
-        .toList();
-    return candidates.length == 1 ? candidates.single : null;
-  }
-
   List<String> get tags => definition?.tags ?? const [];
   bool matchesQuery(String query) => [
     name,
@@ -7323,7 +7197,7 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
       exercise.bodyPart,
       exerciseId: exercise.exerciseId,
     );
-    final form = exercise.equipmentForm;
+    final form = ExerciseFormCatalog.resolve(exercise.exerciseId, exercise.name);
     final primaryLabels = form != null
         ? form.primaryMuscleLabels
         : profile.primary.map((muscle) => muscle.label).toList();
@@ -7833,15 +7707,6 @@ class WorkoutExercise {
   final ExerciseRecordType recordType;
   final List<WorkoutSet> sets;
 
-  WorkoutExercise withEquipment(String value) => WorkoutExercise(
-    name: name,
-    exerciseId: exerciseId,
-    distanceUnit: distanceUnit,
-    bodyPart: bodyPart,
-    equipment: value,
-    recordType: recordType,
-    sets: sets,
-  );
 
 }
 
@@ -7858,7 +7723,6 @@ class ExerciseInputCard extends StatelessWidget {
     required this.onApplyPrevious,
     required this.onSetAllCompleted,
     required this.onValuesChanged,
-    this.onEditEquipment,
     this.numericNodes,
     this.nextNumeric,
   });
@@ -7871,7 +7735,6 @@ class ExerciseInputCard extends StatelessWidget {
   final VoidCallback onAddSet;
   final ValueChanged<int> onRemoveSet;
   final VoidCallback? onRemove;
-  final VoidCallback? onEditEquipment;
   final ValueChanged<int> onToggleSet;
   final ValueChanged<List<RecordedSet>> onApplyPrevious;
   final ValueChanged<bool> onSetAllCompleted;
@@ -7930,13 +7793,6 @@ class ExerciseInputCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (onEditEquipment != null)
-                  IconButton(
-                    key: Key('editExerciseEquipment$exerciseIndex'),
-                    tooltip: '器具を変更',
-                    onPressed: onEditEquipment,
-                    icon: const Icon(Icons.edit_outlined, color: Color(0xFF101820)),
-                  ),
                 if (onRemove != null)
                   IconButton(
                     tooltip: '種目を削除',
@@ -9377,6 +9233,12 @@ class CustomGymPreference {
   }
 }
 
+Future<String?> _addCustomGym(BuildContext context) async {
+  final name = await _showCustomGymDialog(context);
+  if (name == null) return null;
+  return await CustomGymPreference.add(name) ? name : null;
+}
+
 Future<String?> showGymPicker(BuildContext context, String? currentGym) {
   final gyms = [
     ...standardGyms,
@@ -9400,6 +9262,15 @@ Future<String?> showGymPicker(BuildContext context, String? currentGym) {
               'トレーニング場所',
               style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
             ),
+          ),
+          ListTile(
+            key: const Key('addWorkoutGymButton'),
+            leading: const Icon(Icons.add_rounded),
+            title: const Text('場所を追加'),
+            onTap: () async {
+              final name = await _addCustomGym(context);
+              if (name != null && context.mounted) Navigator.pop(context, name);
+            },
           ),
           ...gyms.map(
             (gym) => ListTile(
@@ -9541,10 +9412,8 @@ class _CustomGymManagementPageState extends State<CustomGymManagementPage> {
   }
 
   Future<void> _add() async {
-    final name = await _showCustomGymDialog(context);
-    if (name == null) return;
-    final added = await CustomGymPreference.add(name);
-    if (!mounted || !added) return;
+    final name = await _addCustomGym(context);
+    if (!mounted || name == null) return;
     setState(() {});
     await _notifyChanged();
   }

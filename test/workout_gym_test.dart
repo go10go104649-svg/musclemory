@@ -109,6 +109,62 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('workout information, gym addition and compact rest controls', (tester) async {
+    CustomGymPreference.gyms = [];
+    WorkoutUiPreference.completionCheckEnabled = true;
+    RestTimerPreference.enabled = true;
+    RestTimerPreference.seconds = 60;
+    final original = WorkoutRecord(date: DateTime(2026, 9, 1), sets: sets);
+    await tester.pumpWidget(MaterialApp(home: WorkoutPage(
+      gymName: '自宅', initialWorkout: original,
+    )));
+    await tester.pumpAndSettle();
+    final card = find.byKey(const Key('workoutInfoCard'));
+    expect(find.descendant(of: card, matching: find.byKey(const Key('workoutDateButton'))), findsOneWidget);
+    expect(find.descendant(of: card, matching: find.byKey(const Key('workoutGymButton'))), findsOneWidget);
+    expect(find.descendant(of: find.byType(AppBar), matching: find.text('自宅')), findsNothing);
+    expect(find.descendant(of: find.byType(AppBar), matching: find.byKey(const Key('workoutElapsedLabel'))), findsNothing);
+    await tester.tap(find.byKey(const Key('workoutGymButton')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('addWorkoutGymButton')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('customGymNameField')), '今回のジム');
+    await tester.tap(find.byKey(const Key('saveCustomGymButton')));
+    await tester.pumpAndSettle();
+    expect(gymLabel('今回のジム'), findsOneWidget);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('selected_gym'), '自宅');
+    await CustomGymPreference.load();
+    expect(CustomGymPreference.gyms, contains('今回のジム'));
+    expect(jsonDecode(preferences.getString(activeWorkoutDraftStorageKey)!)['gymName'], '今回のジム');
+    expect(find.byKey(const Key('editExerciseEquipment0')), findsNothing);
+    expect(find.byTooltip('種目を削除'), findsOneWidget);
+    final rest = find.byKey(const Key('restTimerBanner'));
+    expect(find.descendant(of: rest, matching: find.byType(IconButton)), findsOneWidget);
+    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+    await tester.tap(find.byKey(const Key('startRestTimerButton')));
+    await tester.pump();
+    expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
+    await tester.tap(find.byKey(const Key('stopRestTimerButton')));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 10));
+    expect(find.text('休憩  01:00'), findsOneWidget);
+    await tester.tap(find.text('+30秒'));
+    await tester.pump();
+    expect(find.text('休憩  01:30'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('startRestTimerButton')));
+    await tester.pump();
+    expect(find.text('休憩  01:30'), findsOneWidget);
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(
+      body: StartWorkoutCard(onPressed: _noop),
+    )));
+    await tester.pumpAndSettle();
+    expect(find.text('トレーニングを始める'), findsOneWidget);
+    expect(find.byIcon(Icons.location_on_outlined), findsNothing);
+    expect(find.text('店舗を選択'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('workout gym null in an edited record stays unselected', (tester) async {
     await tester.pumpWidget(MaterialApp(home: WorkoutPage(
       gymName: '自宅', isEditing: true,
@@ -119,3 +175,5 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 }
+
+void _noop() {}

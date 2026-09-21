@@ -1739,7 +1739,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('2025年3月15日'), findsOneWidget);
-    expect(find.textContaining('2分 ・'), findsOneWidget);
+    expect(find.text('2分'), findsOneWidget);
     final recordedTimer = tester
         .widget<Text>(find.byKey(const Key('workoutElapsedLabel')))
         .data;

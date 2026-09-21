@@ -35,10 +35,12 @@ void main() {
       expect(muscleProfileForExercise(template.name, '胸').primary, [
         MuscleRegion.pectoralisMajor,
       ]);
-      expect(
-        exerciseTemplates.where((e) => e.name == 'インクラインダンベルフライ'),
-        isEmpty,
+      final dumbbellFly = exerciseTemplates.singleWhere(
+        (e) => e.name == 'インクラインダンベルフライ',
       );
+      expect(template.equipment, 'マシン');
+      expect(dumbbellFly.equipment, 'ダンベル');
+      expect(dumbbellFly.identity, isNot(template.identity));
     },
   );
   testWidgets('incline fly English search and sharing use the same master', (
