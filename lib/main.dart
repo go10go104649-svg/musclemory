@@ -5523,6 +5523,61 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _editExerciseEquipment(int index) async {
+    final exercise = _exercises[index];
+    var equipment = exercise.equipment;
+    FocusScope.of(context).unfocus();
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('器具を変更'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(exerciseDisplayName(exercise.name)),
+              Text('現在の器具：${exercise.equipment}'),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                key: const Key('exerciseEquipmentField'),
+                initialValue: equipment,
+                isExpanded: true,
+                decoration: const InputDecoration(labelText: '器具'),
+                items: {
+                  ...exerciseEquipmentOptions,
+                  exercise.equipment,
+                }.map((value) => DropdownMenuItem(
+                  value: value,
+                  child: Text(value, overflow: TextOverflow.ellipsis),
+                )).toList(),
+                onChanged: (value) {
+                  if (value != null) equipment = value;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('キャンセル'),
+          ),
+          FilledButton(
+            key: const Key('saveExerciseEquipment'),
+            onPressed: () => Navigator.pop(dialogContext, equipment),
+            child: const Text('保存'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || selected == null || selected == exercise.equipment) return;
+    final currentIndex = _exercises.indexOf(exercise);
+    if (currentIndex < 0) return;
+    setState(() => _exercises[currentIndex] = exercise.withEquipment(selected));
+    await _saveDraft();
+  }
+
   Future<void> _selectWorkoutGym() async {
     final selected = await showGymPicker(context, _gymName);
     if (!mounted || selected == null || selected == _gymName) return;
@@ -5940,7 +5995,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                       padding: const EdgeInsets.only(bottom: 16),
                       child: ExerciseInputCard(
                         key: ValueKey((
-                          _exercises[exerciseIndex],
+                          _exercises[exerciseIndex].sets,
                           _inputRevision,
                         )),
                         numericNodes: _nodesFor,
@@ -5952,6 +6007,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                         onRemoveSet: (setIndex) =>
                             _removeSet(exerciseIndex, setIndex),
                         onRemove: () => _removeExercise(exerciseIndex),
+                        onEditEquipment: () => _editExerciseEquipment(exerciseIndex),
                         onToggleSet: (setIndex) =>
                             _toggleSet(exerciseIndex, setIndex),
                         onApplyPrevious: (sets) =>
@@ -6461,6 +6517,20 @@ class ExerciseTemplate {
   String get displayEquipment => equipment;
   ExerciseFormDefinition? get definition =>
       exerciseId == null ? null : ExerciseFormCatalog.byId[exerciseId];
+  ExerciseFormDefinition? get equipmentForm {
+    bool matches(ExerciseFormDefinition form) =>
+        form.equipmentLabel == equipment &&
+        (form.category == '腹筋' ? '腹' : form.category) == bodyPart &&
+        form.recordType == recordType.name &&
+        form.distanceUnit == distanceUnit;
+    final original = ExerciseFormCatalog.resolve(exerciseId, name);
+    if (original != null && matches(original)) return original;
+    final candidates = (ExerciseFormCatalog.byName[name] ?? const <ExerciseFormDefinition>[])
+        .where((form) => form.exerciseName == name && matches(form))
+        .toList();
+    return candidates.length == 1 ? candidates.single : null;
+  }
+
   List<String> get tags => definition?.tags ?? const [];
   bool matchesQuery(String query) => [
     name,
@@ -7252,10 +7322,7 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
       exercise.bodyPart,
       exerciseId: exercise.exerciseId,
     );
-    final form = ExerciseFormCatalog.resolve(
-      exercise.exerciseId,
-      exercise.name,
-    );
+    final form = exercise.equipmentForm;
     final primaryLabels = form != null
         ? form.primaryMuscleLabels
         : profile.primary.map((muscle) => muscle.label).toList();
@@ -7515,16 +7582,7 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
   late ExerciseRecordType _recordType;
 
   static const _bodyParts = ['胸', '背中', '脚', '肩', '腕', '腹', '有酸素', 'HYROX'];
-  static const _equipmentOptions = [
-    'フリーウェイト',
-    'ダンベル',
-    'マシン',
-    'プレートロード',
-    'ケーブル',
-    '自重',
-    'カスタム',
-    'その他',
-  ];
+
 
   List<ExerciseRecordType> get _editableRecordTypes {
     const visible = [
@@ -7554,7 +7612,7 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
     _bodyPart = widget.fixedBodyPart ?? initial?.bodyPart ?? '胸';
     _equipment = initial == null
         ? 'マシン'
-        : _equipmentOptions.contains(initial.equipment)
+        : exerciseEquipmentOptions.contains(initial.equipment)
         ? initial.equipment
         : 'その他';
     _recordType =
@@ -7658,7 +7716,7 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
                 key: const Key('customExerciseEquipmentField'),
                 initialValue: _equipment,
                 decoration: const InputDecoration(labelText: '器具'),
-                items: _equipmentOptions
+                items: exerciseEquipmentOptions
                     .map(
                       (equipment) => DropdownMenuItem(
                         value: equipment,
@@ -7743,6 +7801,17 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
   }
 }
 
+const exerciseEquipmentOptions = [
+    'フリーウェイト',
+    'ダンベル',
+    'マシン',
+    'プレートロード',
+    'ケーブル',
+    '自重',
+    'カスタム',
+    'その他',
+  ];
+
 class WorkoutExercise {
   WorkoutExercise({
     required this.name,
@@ -7762,6 +7831,17 @@ class WorkoutExercise {
   final String equipment;
   final ExerciseRecordType recordType;
   final List<WorkoutSet> sets;
+
+  WorkoutExercise withEquipment(String value) => WorkoutExercise(
+    name: name,
+    exerciseId: exerciseId,
+    distanceUnit: distanceUnit,
+    bodyPart: bodyPart,
+    equipment: value,
+    recordType: recordType,
+    sets: sets,
+  );
+
 }
 
 class ExerciseInputCard extends StatelessWidget {
@@ -7777,6 +7857,7 @@ class ExerciseInputCard extends StatelessWidget {
     required this.onApplyPrevious,
     required this.onSetAllCompleted,
     required this.onValuesChanged,
+    this.onEditEquipment,
     this.numericNodes,
     this.nextNumeric,
   });
@@ -7789,6 +7870,7 @@ class ExerciseInputCard extends StatelessWidget {
   final VoidCallback onAddSet;
   final ValueChanged<int> onRemoveSet;
   final VoidCallback? onRemove;
+  final VoidCallback? onEditEquipment;
   final ValueChanged<int> onToggleSet;
   final ValueChanged<List<RecordedSet>> onApplyPrevious;
   final ValueChanged<bool> onSetAllCompleted;
@@ -7847,6 +7929,13 @@ class ExerciseInputCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (onEditEquipment != null)
+                  IconButton(
+                    key: Key('editExerciseEquipment$exerciseIndex'),
+                    tooltip: '器具を変更',
+                    onPressed: onEditEquipment,
+                    icon: const Icon(Icons.edit_outlined, color: Color(0xFF101820)),
+                  ),
                 if (onRemove != null)
                   IconButton(
                     tooltip: '種目を削除',
