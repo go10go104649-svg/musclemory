@@ -5055,6 +5055,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   late DateTime _startedAt;
   late DateTime _workoutDate;
+  String? _gymName;
   Timer? _timer;
   Timer? _restTimer;
   Duration _elapsed = Duration.zero;
@@ -5121,6 +5122,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _gymName = widget.isEditing
+        ? widget.initialWorkout?.gymName
+        : widget.gymName;
     _startedAt = DateTime.now();
     _workoutDate = widget.isEditing
         ? widget.initialWorkout!.date
@@ -5469,7 +5473,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
           .map((item) => _exerciseFromDraft(item as Map<String, dynamic>))
           .toList();
       final timerStopped = draft['timerStopped'] as bool? ?? false;
-      if (exercises.isEmpty) {
+      if (exercises.isEmpty &&
+          (draft['gymName'] is! String ||
+              (draft['gymName'] as String).trim().isEmpty)) {
         await preferences.remove(activeWorkoutDraftStorageKey);
         return;
       }
@@ -5495,6 +5501,10 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         _exercises
           ..clear()
           ..addAll(exercises);
+        if (draft.containsKey('gymName')) {
+          final gym = draft['gymName'];
+          if (gym == null || gym is String) _gymName = gym as String?;
+        }
         _noteController.text = draft['note'] as String? ?? '';
         final savedDate = draft['date'] as String?;
         if (savedDate != null) _workoutDate = DateTime.parse(savedDate);
@@ -5513,6 +5523,13 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _selectWorkoutGym() async {
+    final selected = await showGymPicker(context, _gymName);
+    if (!mounted || selected == null || selected == _gymName) return;
+    setState(() => _gymName = selected);
+    await _saveDraft();
+  }
+
   Future<void> _saveDraft() async {
     if (widget.isEditing || _restoringDraft || _draftStore.isClosed) return;
     final encodedDraft = jsonEncode({
@@ -5521,6 +5538,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       'timerStopped': _workoutTimerStopped,
       'date': _workoutDate.toIso8601String(),
       'note': _noteController.text,
+      'gymName': _gymName,
       'exercises': _exercises
           .map(
             (exercise) => {
@@ -5711,10 +5729,10 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               Text(
                 key: const Key('workoutElapsedLabel'),
                 widget.isEditing
-                    ? '${!WorkoutUiPreference.workoutDurationEnabled || widget.initialWorkout!.durationLabel.isEmpty ? '記録済み' : widget.initialWorkout!.durationLabel} ・ ${widget.gymName ?? '店舗未選択'}'
+                    ? '${!WorkoutUiPreference.workoutDurationEnabled || widget.initialWorkout!.durationLabel.isEmpty ? '記録済み' : widget.initialWorkout!.durationLabel} ・ ${_gymName ?? '店舗未選択'}'
                     : WorkoutUiPreference.workoutTimerEnabled
-                    ? '$_elapsedLabel ・ ${widget.gymName ?? '店舗未選択'}'
-                    : widget.gymName ?? '店舗未選択',
+                    ? '$_elapsedLabel ・ ${_gymName ?? '店舗未選択'}'
+                    : _gymName ?? '店舗未選択',
                 style: const TextStyle(fontSize: 11, color: Color(0xFF777F78)),
               ),
             ],
@@ -5781,6 +5799,34 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                     ),
                     trailing: const Icon(Icons.edit_calendar_outlined),
                     onTap: _selectWorkoutDate,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: ListTile(
+                    key: const Key('workoutGymButton'),
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFE9F4D1),
+                      child: Icon(Icons.location_on_outlined),
+                    ),
+                    title: const Text(
+                      'トレーニング場所',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF6C746D)),
+                    ),
+                    subtitle: Text(
+                      _gymName ?? '未選択',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF101820),
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.edit_location_alt_outlined),
+                    onTap: _selectWorkoutGym,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -6032,7 +6078,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
           : WorkoutUiPreference.workoutDurationEnabled
           ? finalElapsed.inSeconds
           : 0,
-      gymName: widget.gymName,
+      gymName: _gymName,
       note: _noteController.text.trim(),
     );
     showDialog<void>(
