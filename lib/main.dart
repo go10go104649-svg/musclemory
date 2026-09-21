@@ -2559,18 +2559,29 @@ class _BodyMapPageState extends State<BodyMapPage> {
   }
 }
 
+enum MuscleMannequinAngle {
+  front('正面'),
+  side('側面'),
+  back('背面');
+
+  const MuscleMannequinAngle(this.label);
+  final String label;
+}
+
 class MuscleMannequinView extends StatefulWidget {
   const MuscleMannequinView({
     super.key,
     required this.scores,
     this.fallbackBodyPartCounts = const {},
     this.active = true,
+    this.showAngleControls = true,
   });
 
   /// Relative muscle intensities in [0, 1]; independent of period length.
   final Map<MuscleRegion, double> scores;
   final Map<String, int> fallbackBodyPartCounts;
   final bool active;
+  final bool showAngleControls;
 
   @override
   State<MuscleMannequinView> createState() => _MuscleMannequinViewState();
@@ -2579,6 +2590,7 @@ class MuscleMannequinView extends StatefulWidget {
 class _MuscleMannequinViewState extends State<MuscleMannequinView> {
   final _controller = Interactive3dController();
   bool _ready = false;
+  MuscleMannequinAngle _angle = MuscleMannequinAngle.front;
 
   List<MaterialOverride> get _materialOverrides {
     return [
@@ -2609,9 +2621,29 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
   Widget build(BuildContext context) {
     // IndexedStack keeps tab state, but a hidden platform view must be disposed.
     if (!widget.active) return const SizedBox.expand();
+    final angleControl = Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: SegmentedButton<MuscleMannequinAngle>(
+        key: const Key('muscleMannequinAngle'),
+        showSelectedIcon: false,
+        style: SegmentedButton.styleFrom(
+          foregroundColor: Colors.white70,
+          selectedForegroundColor: const Color(0xFF101820),
+          selectedBackgroundColor: const Color(0xFFC7F36B),
+          visualDensity: VisualDensity.compact,
+        ),
+        segments: [
+          for (final angle in MuscleMannequinAngle.values)
+            ButtonSegment(value: angle, label: Text(angle.label)),
+        ],
+        selected: {_angle},
+        onSelectionChanged: (selection) => setState(() => _angle = selection.single),
+      ),
+    );
     if (Platform.isIOS || Platform.isAndroid) {
       return Column(
         children: [
+          if (widget.showAngleControls) angleControl,
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(18),
@@ -2621,8 +2653,7 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
                 modelPath: 'assets/models/body_tab.glb',
                 formAnimation: true,
                 animationPlaying: false,
-                // Preserve the existing initial framing without angle controls.
-                bodyViewAngle: 0,
+                bodyViewAngle: _angle.index,
                 onModelReady: () {
                   if (!mounted || !widget.active) return;
                   _ready = true;
@@ -2646,6 +2677,7 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
     final maximum = widget.fallbackBodyPartCounts.values.fold<int>(1, math.max);
     return Column(
       children: [
+        if (widget.showAngleControls) angleControl,
         Expanded(
           child: Center(
             child: CustomPaint(
@@ -7383,6 +7415,7 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: MuscleMannequinView(
+                showAngleControls: false,
                 scores: scores,
                 fallbackBodyPartCounts: {exercise.bodyPart: 1},
               ),

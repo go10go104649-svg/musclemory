@@ -199,22 +199,32 @@ void main() {
   });
 
   testWidgets(
-    'hidden body model is released without angle controls',
+    'hidden body model is released and retains the selected angle',
     (tester) async {
       Future<void> show(bool active) => tester.pumpWidget(
         MaterialApp(home: Scaffold(
           body: MuscleMannequinView(scores: const {}, active: active),
         )),
       );
+      var expected = MuscleMannequinAngle.front;
       for (final active in [false, true, false, true]) {
         await show(active);
         await tester.pumpAndSettle();
         expect(find.byKey(const Key('bodyMannequinFallback')),
             active ? findsOneWidget : findsNothing);
         expect(find.byKey(const Key('body-tab-continuous')), findsNothing);
-        expect(find.byKey(const Key('muscleMannequinAngle')), findsNothing);
-        expect(find.text('側面'), findsNothing);
-        expect(find.text('背面'), findsNothing);
+        final control = find.byKey(const Key('muscleMannequinAngle'));
+        expect(control, active ? findsOneWidget : findsNothing);
+        for (final angle in MuscleMannequinAngle.values) {
+          expect(find.text(angle.label), active ? findsOneWidget : findsNothing);
+        }
+        if (active) {
+          expect(tester.widget<SegmentedButton<MuscleMannequinAngle>>(control).selected, {expected});
+          await tester.tap(find.text('背面'));
+          await tester.pumpAndSettle();
+          expected = MuscleMannequinAngle.back;
+          expect(tester.widget<SegmentedButton<MuscleMannequinAngle>>(control).selected, {expected});
+        }
       }
     },
   );
@@ -963,20 +973,30 @@ void main() {
     expect(find.text('3D筋肉マネキン'), findsOneWidget);
     expect(find.byKey(const Key('muscleModel3D')), findsOneWidget);
 
+    final control = find.byKey(const Key('muscleMannequinAngle'));
+    Set<MuscleMannequinAngle> selected() =>
+        tester.widget<SegmentedButton<MuscleMannequinAngle>>(control).selected;
+    expect(selected(), {MuscleMannequinAngle.front});
+    await tester.tap(find.text('背面'));
+    await tester.pumpAndSettle();
+    expect(selected(), {MuscleMannequinAngle.back});
     await tester.tap(find.byKey(const Key('musclePeriodmonth')));
     await tester.pumpAndSettle();
     expect(find.text('1ヶ月 ・ 1セット'), findsOneWidget);
+    expect(selected(), {MuscleMannequinAngle.back});
     expect(find.text('3方向表示'), findsNothing);
-    expect(find.text('側面'), findsNothing);
-    expect(find.text('背面'), findsNothing);
-    expect(find.byKey(const Key('muscleMannequinAngle')), findsNothing);
-    expect(find.byKey(const Key('bodyMannequinFallback')), findsOneWidget);
+    await tester.tap(find.text('側面'));
+    await tester.pumpAndSettle();
+    expect(selected(), {MuscleMannequinAngle.side});
     await tester.tap(find.byKey(const Key('musclePeriodweek')));
     await tester.pumpAndSettle();
     expect(find.text('1週間 ・ 0セット'), findsOneWidget);
+    expect(selected(), {MuscleMannequinAngle.side});
+    expect(find.byKey(const Key('muscleModel3D')), findsOneWidget);
     expect(find.byKey(const Key('bodyMannequinFallback')), findsOneWidget);
     await tester.tap(find.byKey(const Key('musclePeriodmonth')));
     await tester.pumpAndSettle();
+    expect(selected(), {MuscleMannequinAngle.side});
 
     await tester.scrollUntilVisible(
       find.byKey(const Key('muscleCount背中')),
