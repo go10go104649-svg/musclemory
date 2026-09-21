@@ -7236,7 +7236,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                           key: ValueKey(
                             'selectExercise${e.exerciseId ?? e.name}',
                           ),
-                          selected: !added && _selected.containsKey(e.identity),
+                          selected: added || _selected.containsKey(e.identity),
                           selectedTileColor: const Color(0xFFE9F4D1),
                           selectedColor: const Color(0xFF101820),
                           leading: IconButton(
@@ -8015,13 +8015,44 @@ class ExerciseInputCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        exerciseDisplayName(exercise.name),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Color(0xFF101820),
-                          fontWeight: FontWeight.w900,
-                        ),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final name = exerciseDisplayName(exercise.name);
+                          const baseStyle = TextStyle(
+                            color: Color(0xFF101820),
+                            fontWeight: FontWeight.w900,
+                          );
+                          var fontSize = 16.0;
+                          for (final size in [18.0, 17.0, 16.0]) {
+                            final painter = TextPainter(
+                              text: TextSpan(
+                                text: name,
+                                style: DefaultTextStyle.of(context).style.merge(
+                                  baseStyle.copyWith(fontSize: size),
+                                ),
+                              ),
+                              textDirection: Directionality.of(context),
+                              textScaler: MediaQuery.textScalerOf(context),
+                              locale: Localizations.maybeLocaleOf(context),
+                              maxLines: 1,
+                              ellipsis: '…',
+                            )..layout(maxWidth: constraints.maxWidth);
+                            final fits = !painter.didExceedMaxLines;
+                            painter.dispose();
+                            if (fits) {
+                              fontSize = size;
+                              break;
+                            }
+                          }
+                          return Text(
+                            name,
+                            key: Key('exerciseInputTitle$exerciseIndex'),
+                            maxLines: 1,
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                            style: baseStyle.copyWith(fontSize: fontSize),
+                          );
+                        },
                       ),
                       const SizedBox(height: 3),
                       Text(

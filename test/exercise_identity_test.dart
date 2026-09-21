@@ -365,7 +365,8 @@ void main() {
       expect(t.widget<ListTile>(machine).onTap, isNull);
       expect(t.widget<ListTile>(plate).selected, false);
       expect(t.widget<ListTile>(plate).onTap, isNotNull);
-      expect(t.widget<ListTile>(machine).selected, false);
+      expect(t.widget<ListTile>(machine).selected, true);
+      expect(t.widget<ListTile>(machine).selectedTileColor, const Color(0xFFE9F4D1));
       await tapVisible(t, const Key('favoriteExerciseid:shoulder_press'));
       expect(await ExerciseFavoritePreference.load(), contains('id:shoulder_press'));
       expect(find.text('0種目選択中'), findsOneWidget);

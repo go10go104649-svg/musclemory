@@ -18,12 +18,12 @@ WorkoutDetailPage detailPage(WorkoutRecord record) => WorkoutDetailPage(
   onWorkoutUpdated: (_, _) async {},
   onWorkoutDeleted: (_) async => false,
 );
-Widget headerFixture() => MaterialApp(
+Widget headerFixture({List<String> names = const ['ベンチプレス', 'ショルダープレス']}) => MaterialApp(
   home: Scaffold(
     body: SingleChildScrollView(
       child: Column(
         children: [
-          for (final (index, name) in [(0, 'ベンチプレス'), (1, 'ショルダープレス')])
+          for (final (index, name) in names.indexed)
             ExerciseInputCard(
               exerciseIndex: index,
               exercise: WorkoutExercise(
@@ -114,6 +114,45 @@ void main() {
     expect(find.byType(FittedBox), findsNWidgets(8));
     expect(t.takeException(), isNull);
   });
+  for (final width in [320.0, 400.0]) {
+    testWidgets('exercise header titles stay on one line at $width px', (t) async {
+      t.view.physicalSize = Size(width, 900);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.resetPhysicalSize);
+      addTearDown(t.view.resetDevicePixelRatio);
+      double? removeRight;
+      for (final name in ['ベンチプレス', 'インクラインダンベルフライ',
+        'インクラインダンベルプレス・とても長いカスタムトレーニング種目名']) {
+        await t.pumpWidget(headerFixture(names: [name]));
+        await t.pumpAndSettle();
+        final titleFinder = find.byKey(const Key('exerciseInputTitle0'));
+        final title = t.widget<Text>(titleFinder);
+        expect(title.maxLines, 1);
+        expect(title.softWrap, false);
+        expect(title.overflow, TextOverflow.ellipsis);
+        expect(title.style!.fontSize, inInclusiveRange(16, 18));
+        if (name == 'ベンチプレス') expect(title.style!.fontSize, 18);
+        if (name.contains('とても長い')) expect(title.style!.fontSize, 16);
+        final painter = TextPainter(
+          text: TextSpan(text: title.data, style: DefaultTextStyle.of(t.element(titleFinder)).style.merge(title.style)),
+          textDirection: TextDirection.ltr,
+          maxLines: 1,
+          ellipsis: '…',
+        )..layout(maxWidth: t.getSize(titleFinder).width);
+        if (name.contains('とても長い')) expect(painter.didExceedMaxLines, isTrue);
+        expect(painter.computeLineMetrics(), hasLength(1));
+        painter.dispose();
+        final remove = find.byTooltip('種目を削除');
+        expect(remove, findsOneWidget);
+        removeRight ??= t.getRect(remove).right;
+        expect(t.getRect(remove).right, removeRight);
+        expect(t.getRect(titleFinder).right, lessThanOrEqualTo(t.getRect(remove).left));
+        expect(find.text('胸 ・ フリーウェイト'), findsOneWidget);
+        expect(t.takeException(), isNull);
+      }
+    });
+  }
+
   testWidgets(
     'only exercise headers are lime with readable text and remove icons',
     (t) async {
