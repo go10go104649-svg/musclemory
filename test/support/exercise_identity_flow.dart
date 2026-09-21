@@ -1,4 +1,5 @@
 import 'legal_consent_fixture.dart';
+import 'bulk_exercise_flow.dart' show exercisePickerScrollable;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -19,12 +20,7 @@ Future<void> verifyIdentityFlow(
       await t.scrollUntilVisible(
         find.byKey(key),
         250,
-        scrollable: find
-            .descendant(
-              of: find.byType(ExercisePickerSheet),
-              matching: find.byType(Scrollable),
-            )
-            .first,
+        scrollable: exercisePickerScrollable(),
       );
     }
     await t.ensureVisible(find.byKey(key));
