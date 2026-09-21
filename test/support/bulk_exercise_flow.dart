@@ -1,3 +1,4 @@
+import 'legal_consent_fixture.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ Future<void> verifyBulkExerciseFlow(
   );
   SharedPreferences.setMockInitialValues({
     'onboarding_completed': true,
+    'legal_consent': acceptedLegalConsentJson,
     'workout_templates': jsonEncode([menu.toJson()]),
   });
   await tester.pumpWidget(const MuscleMemoryApp());

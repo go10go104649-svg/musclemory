@@ -1,3 +1,4 @@
+import 'legal_consent_fixture.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ Future<void> verifyIdentityFlow(
   WidgetTester t, {
   Future<void> Function(String)? screenshot,
 }) async {
-  SharedPreferences.setMockInitialValues({'onboarding_completed': true});
+  SharedPreferences.setMockInitialValues({'onboarding_completed': true, 'legal_consent': acceptedLegalConsentJson});
   CustomExercisePreference.exercises = [];
   await t.pumpWidget(const MuscleMemoryApp());
   await t.pumpAndSettle();

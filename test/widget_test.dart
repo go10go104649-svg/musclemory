@@ -1,3 +1,4 @@
+import 'support/legal_consent_fixture.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -11,11 +12,97 @@ import 'package:shared_preferences/shared_preferences.dart';
 void _setExistingUserPreferences(Map<String, Object> values) {
   SharedPreferences.setMockInitialValues({
     'onboarding_completed': true,
+    'legal_consent': acceptedLegalConsentJson,
     ...values,
   });
 }
 
 void main() {
+  test('legal consent validates confirmations and document versions', () async {
+    SharedPreferences.setMockInitialValues({});
+    await expectLater(
+      LegalConsentPreference.accept(over16: false, terms: true, privacy: true),
+      throwsStateError,
+    );
+    expect(await LegalConsentPreference.load(), isFalse);
+    await LegalConsentPreference.accept(over16: true, terms: true, privacy: true);
+    expect(await LegalConsentPreference.load(), isTrue);
+    final preferences = await SharedPreferences.getInstance();
+    final data = jsonDecode(preferences.getString('legal_consent')!) as Map<String, dynamic>;
+    expect(data['over16'], isTrue);
+    expect(data['accepted'], isTrue);
+    expect(DateTime.tryParse(data['acceptedAt'] as String), isNotNull);
+    expect(data['termsVersion'], LegalDocuments.termsVersion);
+    expect(data['privacyVersion'], LegalDocuments.privacyVersion);
+    for (final field in ['termsVersion', 'privacyVersion']) {
+      await preferences.setString('legal_consent', jsonEncode({...data, field: 'old'}));
+      expect(await LegalConsentPreference.load(), isFalse);
+    }
+    await preferences.setString('legal_consent', 'invalid');
+    expect(await LegalConsentPreference.load(), isFalse);
+  });
+
+  testWidgets('legal consent requires all checks and fits a small screen', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'onboarding_completed': true});
+    tester.view.physicalSize = const Size(320, 480);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('legalConsent')), findsOneWidget);
+    expect(find.byKey(const Key('onboarding')), findsNothing);
+    final scrollable = find.descendant(
+      of: find.byKey(const Key('legalConsent')),
+      matching: find.byType(Scrollable),
+    );
+    Future<void> scrollTo(Finder target) async {
+      // Start at the top so lazy children can be found in either direction.
+      final position = tester.state<ScrollableState>(scrollable).position;
+      while (position.pixels > position.minScrollExtent) {
+        await tester.drag(scrollable, const Offset(0, 400));
+        await tester.pumpAndSettle();
+      }
+      await tester.scrollUntilVisible(target, 150, scrollable: scrollable);
+      await tester.pumpAndSettle();
+    }
+
+    final button = find.byKey(const Key('acceptLegalConsent'));
+    await scrollTo(button);
+    expect(tester.widget<FilledButton>(button).onPressed, isNull);
+    for (final key in ['openTerms', 'openPrivacy']) {
+      await scrollTo(find.byKey(Key(key)));
+      await tester.tap(find.byKey(Key(key)));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('正式版公開前の暫定内容'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+    }
+    for (final key in ['confirmOver16', 'confirmTerms', 'confirmPrivacy']) {
+      await scrollTo(find.byKey(Key(key)));
+      await tester.tap(find.byKey(Key(key)));
+      await tester.pumpAndSettle();
+      await scrollTo(button);
+      if (key != 'confirmPrivacy') {
+        expect(tester.widget<FilledButton>(button).onPressed, isNull);
+      }
+      expect(tester.takeException(), isNull);
+    }
+    expect(tester.widget<FilledButton>(button).onPressed, isNotNull);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeShell), findsOneWidget);
+    expect(await LegalConsentPreference.load(), isTrue);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeShell), findsOneWidget);
+    expect(find.byKey(const Key('legalConsent')), findsNothing);
+  });
+
   testWidgets('onboarding completes only at the last page and stays completed', (
     tester,
   ) async {
@@ -48,6 +135,16 @@ void main() {
     expect(find.text('はじめる'), findsOneWidget);
     await tester.tap(find.text('はじめる'));
     await tester.pumpAndSettle();
+    expect(find.byKey(const Key('legalConsent')), findsOneWidget);
+    expect(find.byType(HomeShell), findsNothing);
+    for (final key in ['confirmOver16', 'confirmTerms', 'confirmPrivacy']) {
+      await tester.ensureVisible(find.byKey(Key(key)));
+      await tester.tap(find.byKey(Key(key)));
+      await tester.pumpAndSettle();
+    }
+    await tester.ensureVisible(find.byKey(const Key('acceptLegalConsent')));
+    await tester.tap(find.byKey(const Key('acceptLegalConsent')));
+    await tester.pumpAndSettle();
     expect(find.byType(HomeShell), findsOneWidget);
     expect(preferences.getBool('onboarding_completed'), isTrue);
     expect(preferences.getString('selected_gym'), '自宅');
@@ -61,7 +158,7 @@ void main() {
   testWidgets('onboarding completed preference opens HomeShell directly', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({'onboarding_completed': true});
+    SharedPreferences.setMockInitialValues({'onboarding_completed': true, 'legal_consent': acceptedLegalConsentJson});
     await tester.pumpWidget(const MuscleMemoryApp());
     await tester.pumpAndSettle();
     expect(find.byType(HomeShell), findsOneWidget);

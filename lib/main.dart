@@ -377,6 +377,190 @@ class OnboardingPreference {
   }
 }
 
+// Provisional documents: replace content AND versions before formal publication.
+class LegalDocuments {
+  static const termsVersion = 'provisional-1';
+  static const privacyVersion = 'provisional-1';
+  static const terms = '正式版公開前の暫定内容です。\n\n'
+      '現在、正式な利用規約を準備しています。本ページは正式な利用規約ではありません。'
+      '\n正式版の公開後に、内容をご確認のうえ改めて同意をお願いします。';
+  static const privacy = '正式版公開前の暫定内容です。\n\n'
+      '現在、正式なプライバシーポリシーを準備しています。本ページは正式なポリシーではありません。'
+      '\n正式版の公開後に、内容をご確認のうえ改めて同意をお願いします。';
+}
+
+class LegalConsentPreference {
+  LegalConsentPreference._();
+
+  static const _key = 'legal_consent';
+
+  static Future<bool> load() async {
+    final preferences = await SharedPreferences.getInstance();
+    try {
+      final data = jsonDecode(preferences.getString(_key) ?? 'null');
+      return data is Map &&
+          data['accepted'] == true &&
+          data['over16'] == true &&
+          data['termsVersion'] == LegalDocuments.termsVersion &&
+          data['privacyVersion'] == LegalDocuments.privacyVersion &&
+          data['acceptedAt'] is String &&
+          DateTime.tryParse(data['acceptedAt'] as String) != null;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<void> accept({
+    required bool over16,
+    required bool terms,
+    required bool privacy,
+  }) async {
+    if (!over16 || !terms || !privacy) {
+      throw StateError('All confirmations are required');
+    }
+    final preferences = await SharedPreferences.getInstance();
+    // One write keeps the acceptance, timestamp and versions together.
+    final saved = await preferences.setString(_key, jsonEncode({
+      'accepted': true,
+      'over16': true,
+      'acceptedAt': DateTime.now().toUtc().toIso8601String(),
+      'termsVersion': LegalDocuments.termsVersion,
+      'privacyVersion': LegalDocuments.privacyVersion,
+    }));
+    if (!saved) throw StateError('Consent could not be saved');
+  }
+}
+
+class _LegalConsentGate extends StatefulWidget {
+  const _LegalConsentGate();
+
+  @override
+  State<_LegalConsentGate> createState() => _LegalConsentGateState();
+}
+
+class _LegalConsentGateState extends State<_LegalConsentGate> {
+  late final Future<bool> _accepted = LegalConsentPreference.load();
+  bool _finished = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_finished) return const HomeShell();
+    return FutureBuilder<bool>(
+      future: _accepted,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        if (snapshot.data == true) return const HomeShell();
+        return _LegalConsentPage(
+          onFinished: () => setState(() => _finished = true),
+        );
+      },
+    );
+  }
+}
+
+class _LegalConsentPage extends StatefulWidget {
+  const _LegalConsentPage({required this.onFinished});
+  final VoidCallback onFinished;
+
+  @override
+  State<_LegalConsentPage> createState() => _LegalConsentPageState();
+}
+
+class _LegalConsentPageState extends State<_LegalConsentPage> {
+  bool _over16 = false;
+  bool _terms = false;
+  bool _privacy = false;
+  bool _saving = false;
+
+  void _openDocument(String title, String content) {
+    Navigator.of(context).push<void>(MaterialPageRoute(
+      builder: (_) => Scaffold(
+        appBar: AppBar(title: Text(title)),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Text(content, style: const TextStyle(fontSize: 16, height: 1.7)),
+        ),
+      ),
+    ));
+  }
+
+  Future<void> _save() async {
+    setState(() => _saving = true);
+    try {
+      await LegalConsentPreference.accept(
+        over16: _over16, terms: _terms, privacy: _privacy,
+      );
+      if (mounted) widget.onFinished();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('保存できませんでした。もう一度お試しください。')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: const Key('legalConsent'),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(24),
+          children: [
+            const Icon(Icons.fact_check_outlined, size: 56, color: Color(0xFF6B8E23)),
+            const SizedBox(height: 20),
+            const Text('ご利用の前に', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 12),
+            const Text('内容をご確認のうえ、3項目すべてにチェックしてください。'),
+            const SizedBox(height: 12),
+            const Text('利用規約・プライバシーポリシーは正式版公開前の暫定内容です。正式版公開時には改めて確認をお願いします。'),
+            TextButton(
+              key: const Key('openTerms'),
+              onPressed: () => _openDocument('利用規約', LegalDocuments.terms),
+              child: const Text('利用規約を読む'),
+            ),
+            TextButton(
+              key: const Key('openPrivacy'),
+              onPressed: () => _openDocument('プライバシーポリシー', LegalDocuments.privacy),
+              child: const Text('プライバシーポリシーを読む'),
+            ),
+            CheckboxListTile(
+              key: const Key('confirmOver16'),
+              contentPadding: EdgeInsets.zero,
+              title: const Text('私は16歳以上です'),
+              value: _over16,
+              onChanged: _saving ? null : (value) => setState(() => _over16 = value!),
+            ),
+            CheckboxListTile(
+              key: const Key('confirmTerms'),
+              contentPadding: EdgeInsets.zero,
+              title: const Text('利用規約に同意します'),
+              value: _terms,
+              onChanged: _saving ? null : (value) => setState(() => _terms = value!),
+            ),
+            CheckboxListTile(
+              key: const Key('confirmPrivacy'),
+              contentPadding: EdgeInsets.zero,
+              title: const Text('プライバシーポリシーに同意します'),
+              value: _privacy,
+              onChanged: _saving ? null : (value) => setState(() => _privacy = value!),
+            ),
+            const SizedBox(height: 20),
+            FilledButton(
+              key: const Key('acceptLegalConsent'),
+              onPressed: _over16 && _terms && _privacy && !_saving ? _save : null,
+              child: const Text('同意してはじめる'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _OnboardingGate extends StatefulWidget {
   const _OnboardingGate();
 
@@ -390,7 +574,7 @@ class _OnboardingGateState extends State<_OnboardingGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (_finished) return const HomeShell();
+    if (_finished) return const _LegalConsentGate();
     return FutureBuilder<bool>(
       future: _completed,
       builder: (context, snapshot) {
@@ -399,7 +583,7 @@ class _OnboardingGateState extends State<_OnboardingGate> {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        if (snapshot.data == true) return const HomeShell();
+        if (snapshot.data == true) return const _LegalConsentGate();
         return _OnboardingPage(
           onFinished: () => setState(() => _finished = true),
         );
