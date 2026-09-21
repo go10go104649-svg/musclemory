@@ -3,6 +3,8 @@ Run with Blender --background --python tool/render_activity_categories.py.
 Only writes cardio.png and hyrox.png; existing models and renders are untouched.
 """
 import pathlib
+import argparse
+import sys
 import bpy
 from mathutils import Vector, Matrix
 
@@ -20,7 +22,28 @@ def pose(rig, name, direction):
     pb.matrix = matrix
     bpy.context.view_layer.update()
 
-for category in ['cardio', 'hyrox']:
+def pose_hand_grip(rig, side, strength):
+    """Curl fingers in their local frame, preserving the wrist/arm alignment."""
+    for finger in ['index', 'middle', 'ring', 'pinky']:
+        for segment, bend in [('01', .75), ('02', 1.10), ('03', .70)]:
+            name = f'{finger}_{segment}_{side}'
+            if name in rig.pose.bones:
+                bone = rig.pose.bones[name]
+                bone.rotation_mode = 'XYZ'
+                bone.rotation_euler.x = bend * strength
+    for segment in ['02', '03']:
+        name = f'thumb_{segment}_{side}'
+        if name in rig.pose.bones:
+            bone = rig.pose.bones[name]
+            bone.rotation_mode = 'XYZ'
+            bone.rotation_euler.x = .35 * strength
+    bpy.context.view_layer.update()
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--category', choices=['cardio', 'hyrox'])
+args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
+
+for category in ([args.category] if args.category else ['cardio', 'hyrox']):
     bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'art/bench_press/bench_press.blend'))
     human = bpy.data.objects['Athlete']
     rig = bpy.data.objects['Athlete.rig']
@@ -47,22 +70,31 @@ for category in ['cardio', 'hyrox']:
         poly.use_smooth = True
     if category == 'cardio':
         directions = {
-            'thigh_l': (.03, -.32, -.27), 'calf_l': (.01, .10, -.42),
+            'thigh_l': (.03, -.36, -.23), 'calf_l': (.01, .10, -.42),
             'thigh_r': (-.02, .30, -.30), 'calf_r': (-.01, .31, .24),
-            'upperarm_l': (.05, .15, -.20), 'lowerarm_l': (.01, -.22, -.02),
+            # Left leg leads: left elbow swings behind, hand stays near the hip.
+            'upperarm_l': (.04, .22, -.15), 'lowerarm_l': (.01, -.13, -.22),
             'upperarm_r': (-.04, -.16, -.19), 'lowerarm_r': (0, -.18, .17),
         }
     else:
         directions = {
-            'thigh_l': (.01, -.13, -.39), 'calf_l': (0, .03, -.43),
-            'thigh_r': (-.01, .12, -.40), 'calf_r': (0, .06, -.42),
+            'thigh_l': (.01, -.23, -.36), 'calf_l': (0, .04, -.43),
+            'thigh_r': (-.01, .22, -.36), 'calf_r': (0, .14, -.40),
             'upperarm_l': (.07, 0, -.24), 'lowerarm_l': (.01, -.01, -.27),
             'upperarm_r': (-.07, 0, -.24), 'lowerarm_r': (-.01, -.01, -.27),
         }
     for name, direction in directions.items():
         pose(rig, name, direction)
     for side in ['l', 'r']:
-        pose(rig, 'foot_' + side, (0, -.14, -.03))
+        # The recovery foot follows the trailing shin rather than pointing
+        # forward at an unnatural ankle angle.
+        direction = (0, .11, -.06) if category == 'cardio' and side == 'r' else (0, -.14, -.03)
+        pose(rig, 'foot_' + side, direction)
+    if category == 'cardio':
+        for side in ['l', 'r']:
+            forearm = rig.pose.bones['lowerarm_' + side]
+            pose(rig, 'hand_' + side, forearm.tail - forearm.head)
+            pose_hand_grip(rig, side, .75)
     if category == 'hyrox':
         for side, sign in [('l', 1), ('r', -1)]:
             pose(rig, 'hand_' + side, (0, 0, -.10))
@@ -105,7 +137,7 @@ for category in ['cardio', 'hyrox']:
         light.data.shape = 'DISK'
         light.data.size = size
         aim(light, (0, 0, 1))
-    bpy.ops.object.camera_add(location=(3, -5, 2.1) if category == 'cardio' else (1.8, -6, 1.7))
+    bpy.ops.object.camera_add(location=(5, 0, .88) if category == 'cardio' else (3, -5, 1.7))
     camera = bpy.context.object
     camera.data.type = 'ORTHO'
     camera.data.ortho_scale = 2.30
