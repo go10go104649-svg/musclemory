@@ -839,6 +839,78 @@ void main() {
     expect(CustomGymPreference.gyms, ['市民スポーツセンター']);
   });
 
+  testWidgets('profile display name persists and empty values reset it', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+
+    Future<void> openProfile() async {
+      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.person_outline_rounded));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> saveName(String name) async {
+      await tester.tap(find.byKey(const Key('editProfileDisplayName')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('profileDisplayNameField')),
+        name,
+      );
+      await tester.tap(find.byKey(const Key('saveProfileDisplayName')));
+      await tester.pumpAndSettle();
+    }
+
+    String? shownName() => tester
+        .widget<Text>(find.byKey(const Key('profileDisplayName')))
+        .data;
+
+    await openProfile();
+    expect(shownName(), 'MUSCLEMORYユーザー');
+    await saveName('  トレーニング太郎  ');
+    expect(shownName(), 'トレーニング太郎');
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('profile_display_name'), 'トレーニング太郎');
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    await openProfile();
+    expect(shownName(), 'トレーニング太郎');
+    await tester.tap(find.byKey(const Key('editProfileDisplayName')));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextFormField>(
+        find.byKey(const Key('profileDisplayNameField')),
+      ).initialValue,
+      'トレーニング太郎',
+    );
+    await tester.enterText(
+      find.byKey(const Key('profileDisplayNameField')),
+      '保存しない名前',
+    );
+    await tester.tap(find.text('キャンセル'));
+    await tester.pumpAndSettle();
+    expect(shownName(), 'トレーニング太郎');
+    expect(preferences.getString('profile_display_name'), 'トレーニング太郎');
+
+    await saveName('');
+    expect(shownName(), 'MUSCLEMORYユーザー');
+    expect(preferences.getString('profile_display_name'), '');
+    await saveName('別の名前');
+    await saveName('  　 ');
+    expect(shownName(), 'MUSCLEMORYユーザー');
+    expect(preferences.getString('profile_display_name'), '');
+
+    await saveName(List.filled(30, '長い表示名').join());
+    expect(tester.takeException(), isNull);
+    final nameText = tester.widget<Text>(
+      find.byKey(const Key('profileDisplayName')),
+    );
+    expect(nameText.maxLines, 2);
+    expect(nameText.overflow, TextOverflow.ellipsis);
+  });
+
   testWidgets('profile sections are ordered and backup tools open separately', (
     tester,
   ) async {
@@ -853,6 +925,11 @@ void main() {
     await tester.tap(find.byIcon(Icons.person_outline_rounded));
     await tester.pumpAndSettle();
 
+    expect(find.text('MUSCLEMORYユーザー'), findsOneWidget);
+    expect(find.byKey(const Key('editProfileDisplayName')), findsOneWidget);
+    expect(find.byKey(const Key('trainingSettingsButton')), findsOneWidget);
+    expect(find.byKey(const Key('contactButton')), findsOneWidget);
+    expect(find.byKey(const Key('appAboutButton')), findsOneWidget);
     expect(find.byKey(const Key('locationSettingsButton')), findsOneWidget);
     expect(find.text('いつもの場所'), findsOneWidget);
     expect(find.text('カスタム場所'), findsNothing);

@@ -252,6 +252,25 @@ class RestTimerPreference {
   }
 }
 
+class ProfilePreference {
+  ProfilePreference._();
+
+  static const _displayNameKey = 'profile_display_name';
+  static const defaultDisplayName = 'MUSCLEMORYユーザー';
+
+  static Future<String> load() async {
+    final preferences = await SharedPreferences.getInstance();
+    return (preferences.getString(_displayNameKey) ?? '').trim();
+  }
+
+  static Future<void> setDisplayName(String value) async {
+    final preferences = await SharedPreferences.getInstance();
+    if (!await preferences.setString(_displayNameKey, value.trim())) {
+      throw StateError('Display name could not be saved');
+    }
+  }
+}
+
 class WorkoutUiPreference {
   WorkoutUiPreference._();
 
@@ -9253,6 +9272,137 @@ class CloudBackupSection extends StatelessWidget {
   );
 }
 
+class _ProfileNameCard extends StatefulWidget {
+  const _ProfileNameCard();
+
+  @override
+  State<_ProfileNameCard> createState() => _ProfileNameCardState();
+}
+
+class _ProfileNameCardState extends State<_ProfileNameCard> {
+  String _name = '';
+  bool _loaded = false;
+  bool _editing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final name = await ProfilePreference.load();
+      if (!mounted) return;
+      setState(() {
+        _name = name;
+        _loaded = true;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loaded = true);
+    }
+  }
+
+  Future<void> _edit() async {
+    setState(() => _editing = true);
+    var value = _name;
+    final result = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('表示名を編集'),
+        content: TextFormField(
+          key: const Key('profileDisplayNameField'),
+          initialValue: _name,
+          autofocus: true,
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(
+            labelText: '表示名（任意）',
+            hintText: ProfilePreference.defaultDisplayName,
+          ),
+          onChanged: (text) => value = text,
+          onFieldSubmitted: (text) => Navigator.pop(dialogContext, text),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('キャンセル'),
+          ),
+          FilledButton(
+            key: const Key('saveProfileDisplayName'),
+            onPressed: () => Navigator.pop(dialogContext, value),
+            child: const Text('保存'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    if (result != null) {
+      try {
+        await ProfilePreference.setDisplayName(result);
+        if (!mounted) return;
+        setState(() => _name = result.trim());
+      } catch (_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('表示名を保存できませんでした。もう一度お試しください。')),
+        );
+      }
+    }
+    if (mounted) setState(() => _editing = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          children: [
+            const CircleAvatar(
+              radius: 28,
+              backgroundColor: Color(0xFFC7F36B),
+              child: Icon(Icons.person_rounded, size: 30),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _name.isEmpty ? ProfilePreference.defaultDisplayName : _name,
+                    key: const Key('profileDisplayName'),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  const Text(
+                    '今日の1セットを積み上げよう',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: Color(0xFF777F78)),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              key: const Key('editProfileDisplayName'),
+              tooltip: '表示名を編集',
+              onPressed: _loaded && !_editing ? _edit : null,
+              icon: const Icon(Icons.edit_outlined),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ProfilePage extends StatelessWidget {
   const ProfilePage({
     super.key,
@@ -9309,48 +9459,7 @@ class ProfilePage extends StatelessWidget {
             style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 22),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(22),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.all(18),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Color(0xFFC7F36B),
-                    child: Icon(Icons.person_rounded, size: 30),
-                  ),
-                  SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'MUSCLEMORYユーザー',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          '今日の1セットを積み上げよう',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF777F78),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          const _ProfileNameCard(),
           _sectionTitle('トレーニング設定'),
           _trainingSettingsCard(context),
           _sectionTitle('その他設定'),
