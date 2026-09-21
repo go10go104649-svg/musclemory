@@ -13,6 +13,7 @@ class SupabaseConfig {
   static const authRedirectUrl = 'musclemory://login-callback/';
 
   static bool initialized = false;
+  static LocalStorage? authStorage;
   static Object? initializationError;
 
   static String get key =>
@@ -43,7 +44,16 @@ class SupabaseConfig {
 
     try {
       validate(url: projectUrl, apiKey: key);
-      await Supabase.initialize(url: projectUrl, publishableKey: key);
+      // Preserve the SDK's existing session key; retain access for verified erasure.
+      authStorage = SharedPreferencesLocalStorage(
+        persistSessionKey:
+            'sb-${Uri.parse(projectUrl).host.split('.').first}-auth-token',
+      );
+      await Supabase.initialize(
+        url: projectUrl,
+        publishableKey: key,
+        authOptions: FlutterAuthClientOptions(localStorage: authStorage),
+      );
       initialized = true;
     } catch (error) {
       initializationError = error;

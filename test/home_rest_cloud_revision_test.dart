@@ -1,8 +1,11 @@
 import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:muscle_memory/config/supabase_config.dart';
 import 'package:muscle_memory/services/account_auth_service.dart';
+
 import 'support/legal_consent_fixture.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,6 +23,17 @@ class _FakeAccountAuth implements AccountAuthService {
   int signIns = 0, signUps = 0, signOuts = 0;
   bool registrationSession = false;
   bool rejectSignIn = false;
+  int deletions = 0;
+  Completer<void>? deletion;
+  bool rejectDeletion = false;
+  @override
+  Future<void> deleteAccount() async {
+    deletions++;
+    await deletion?.future;
+    if (rejectDeletion) throw const AuthException('削除できませんでした');
+    await signOut();
+  }
+
   int googleSignIns = 0;
   Completer<void>? googleLaunch;
   Object? googleError;
@@ -62,6 +76,86 @@ class _FakeAccountAuth implements AccountAuthService {
 }
 
 void main() {
+  for (final email in ['google@example.com', 'mail@example.com']) {
+    testWidgets('delete confirmation preserves local history: $email', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({'workout_history': '["saved"]'});
+      final auth = _FakeAccountAuth()..signedIn(email);
+      addTearDown(auth.events.close);
+      var syncs = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CloudAccountPage(
+            historyCount: 1,
+            auth: auth,
+            onSyncRequested: () async {
+              syncs++;
+              return 0;
+            },
+          ),
+        ),
+      );
+      final delete = find.byKey(const Key('accountDeleteButton'));
+      await tester.tap(delete);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('この端末のトレーニング記録は残ります。'), findsOneWidget);
+      await tester.tap(find.text('キャンセル'));
+      await tester.pumpAndSettle();
+      expect(auth.deletions, 0);
+      expect(auth.isSignedIn, isTrue);
+      auth.deletion = Completer<void>();
+      await tester.tap(delete);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('accountDeleteConfirmButton')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(auth.deletions, 1);
+      expect(tester.widget<TextButton>(delete).onPressed, isNull);
+      auth.deletion!.complete();
+      await tester.pumpAndSettle();
+      expect(auth.isSignedIn, isFalse);
+      expect(delete, findsNothing);
+      expect(find.byKey(const Key('accountEmailField')), findsOneWidget);
+      expect(
+        (await SharedPreferences.getInstance()).getString('workout_history'),
+        '["saved"]',
+      );
+      expect(syncs, 0);
+      expect(SupabaseSyncService.canUseCloud, isFalse);
+    });
+  }
+
+  testWidgets('failed deletion keeps account available for retry', (
+    tester,
+  ) async {
+    final auth = _FakeAccountAuth()
+      ..signedIn('mail@example.com')
+      ..rejectDeletion = true;
+    addTearDown(auth.events.close);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CloudAccountPage(
+          historyCount: 0,
+          auth: auth,
+          onSyncRequested: () async => 0,
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const Key('accountDeleteButton')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('accountDeleteConfirmButton')));
+    await tester.pumpAndSettle();
+    expect(auth.isSignedIn, isTrue);
+    expect(find.text('削除できませんでした'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextButton>(find.byKey(const Key('accountDeleteButton')))
+          .onPressed,
+      isNotNull,
+    );
+  });
+
   testWidgets('callback errors are handled and a later login recovers', (
     tester,
   ) async {

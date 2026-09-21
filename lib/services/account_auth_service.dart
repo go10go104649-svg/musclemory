@@ -13,15 +13,20 @@ abstract class AccountAuthService {
   /// True when registration immediately creates a session.
   Future<bool> signUp(String email, String password);
   Future<void> signOut();
+  Future<void> deleteAccount();
   Future<void> signInWithGoogle();
 }
 
 class SupabaseAccountAuthService implements AccountAuthService {
-  SupabaseAccountAuthService._(this._client);
+  SupabaseAccountAuthService(this._client, this._storage);
+  final LocalStorage _storage;
   final SupabaseClient _client;
 
   static AccountAuthService? configured() => SupabaseConfig.initialized
-      ? SupabaseAccountAuthService._(Supabase.instance.client)
+      ? SupabaseAccountAuthService(
+          Supabase.instance.client,
+          SupabaseConfig.authStorage!,
+        )
       : null;
 
   @override
@@ -56,6 +61,39 @@ class SupabaseAccountAuthService implements AccountAuthService {
       throw const AuthException('Googleログイン画面を開けませんでした');
     }
     // Browser launch is not authentication; the callback updates auth state.
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    if (_client.auth.currentSession == null) {
+      throw const AuthException('ログインし直してからお試しください。');
+    }
+    try {
+      final response = await _client.functions.invoke('delete-account');
+      if (response.status != 200 ||
+          response.data is! Map ||
+          response.data['deleted'] != true) {
+        throw const AuthException('削除を確認できませんでした。');
+      }
+    } catch (_) {
+      // Never report success or erase the local session on an ambiguous response.
+      throw const AuthException('削除の完了を確認できませんでした。接続を確認して再度お試しください。');
+    }
+    try {
+      try {
+        await _client.auth.signOut(scope: SignOutScope.local);
+      } catch (_) {
+        // The SDK clears memory before its remote logout request. The Auth user
+        // is already deleted, so a remote logout failure must not block erasure.
+        if (_client.auth.currentSession != null) rethrow;
+      }
+      await _storage.removePersistedSession();
+      if (await _storage.hasAccessToken()) {
+        throw StateError('Session remains');
+      }
+    } catch (_) {
+      throw const AuthException('アカウントは削除されましたが、端末のログイン情報を消去できませんでした。');
+    }
   }
 
   @override

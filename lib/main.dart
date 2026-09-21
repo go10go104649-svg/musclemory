@@ -10764,6 +10764,7 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
   late final AccountAuthService? _auth;
   StreamSubscription<void>? _authSubscription;
   bool _busy = false;
+  bool _confirmingDeletion = false;
   String? _message;
 
   @override
@@ -10846,6 +10847,46 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
   Future<void> _signOut() => _run(() async {
     await _auth!.signOut();
     _message = 'ログアウトしました';
+  });
+
+  Future<void> _deleteAccount() => _run(() async {
+    final email = _auth!.email;
+    _confirmingDeletion = true;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('アカウントを削除しますか？'),
+        content: Text(
+          '${email ?? ''}\n\n'
+          'アカウントとクラウド上のトレーニング記録を削除します。'
+          'この操作は取り消せません。\n\n'
+          'この端末のトレーニング記録は残ります。',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('キャンセル'),
+          ),
+          TextButton(
+            key: const Key('accountDeleteConfirmButton'),
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('削除する'),
+          ),
+        ],
+      ),
+    );
+    _confirmingDeletion = false;
+    if (confirmed != true || !mounted) return;
+    setState(() {});
+    if (!_auth.isSignedIn || _auth.email != email) {
+      _message = 'ログイン状態が変わりました。もう一度お試しください。';
+      return;
+    }
+    await _auth.deleteAccount();
+    _message = 'アカウントを削除しました。この端末のトレーニング記録は残っています。';
   });
 
   Future<void> _sync() => _run(() async {
@@ -10941,8 +10982,16 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
               onPressed: _busy ? null : _signOut,
               child: const Text('ログアウト'),
             ),
+            TextButton(
+              key: const Key('accountDeleteButton'),
+              onPressed: _busy ? null : _deleteAccount,
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text('アカウントを削除'),
+            ),
           ],
-          if (_busy) ...[
+          if (_busy && !_confirmingDeletion) ...[
             const SizedBox(height: 16),
             const Center(child: CircularProgressIndicator()),
           ],
