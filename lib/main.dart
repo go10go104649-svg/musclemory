@@ -1,3 +1,4 @@
+import 'trainer_qr_page.dart';
 import 'exercise_form_catalog.dart';
 import 'body_tab_colors.dart';
 
@@ -9857,6 +9858,19 @@ class ProfilePage extends StatelessWidget {
           const _ProfileNameCard(),
           _sectionTitle('トレーニング設定'),
           _trainingSettingsCard(context),
+          _sectionTitle('Trainer連携'),
+          Card(
+            child: ListTile(
+              key: const Key('trainerQrButton'),
+              leading: const Icon(Icons.qr_code_scanner_rounded),
+              title: const Text('Trainerと連携'),
+              subtitle: const Text('招待QRコードを読み取る'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context).push<void>(
+                MaterialPageRoute(builder: (_) => const TrainerQrPage()),
+              ),
+            ),
+          ),
           _sectionTitle('その他設定'),
           Card(
             clipBehavior: Clip.antiAlias,

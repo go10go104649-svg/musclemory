@@ -26,6 +26,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Trainerの招待QRコードを読み取るためにカメラを使用します。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>SNS共有用の画像に使用する写真を選ぶため、写真ライブラリへアクセスします。</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

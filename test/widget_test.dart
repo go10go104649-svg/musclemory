@@ -1105,6 +1105,7 @@ void main() {
     expect(find.text('MUSCLEMORYユーザー'), findsOneWidget);
     expect(find.byKey(const Key('editProfileDisplayName')), findsOneWidget);
     expect(find.byKey(const Key('trainingSettingsButton')), findsOneWidget);
+    expect(find.byKey(const Key('trainerQrButton')), findsOneWidget);
     expect(find.byKey(const Key('contactButton')), findsOneWidget);
     expect(find.byKey(const Key('appAboutButton')), findsOneWidget);
     expect(find.byKey(const Key('locationSettingsButton')), findsOneWidget);
@@ -1124,6 +1125,15 @@ void main() {
     final backupY = tester.getTopLeft(find.text('バックアップ・データ管理').first).dy;
     expect(trainingY, lessThan(otherY));
     expect(otherY, lessThan(backupY));
+
+    await tester.tap(find.byKey(const Key('trainerQrButton')));
+    // The native camera remains initializing in a widget-test environment.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const Key('trainerQrPage')), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
 
     await tester.ensureVisible(
       find.byKey(const Key('backupDataManagementButton')),

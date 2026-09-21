@@ -1,0 +1,159 @@
+import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+
+import 'trainer_invite_qr.dart';
+
+typedef TrainerScannerBuilder = Widget Function(
+  BuildContext context,
+  ValueChanged<String> onDetected,
+);
+
+class TrainerQrPage extends StatefulWidget {
+  const TrainerQrPage({super.key, this.scannerBuilder});
+
+  // Allows result handling to be tested without a physical camera.
+  final TrainerScannerBuilder? scannerBuilder;
+
+  @override
+  State<TrainerQrPage> createState() => _TrainerQrPageState();
+}
+
+class _TrainerQrPageState extends State<TrainerQrPage> {
+  TrainerInviteQr? _invite;
+  bool _invalid = false;
+
+  void _detect(String raw) {
+    if (!mounted || _invite != null) return;
+    final invite = TrainerInviteQr.parse(raw);
+    if (invite != null) {
+      // Removing MobileScanner stops and disposes its internally owned camera.
+      setState(() {
+        _invite = invite;
+        _invalid = false;
+      });
+    } else if (!_invalid) {
+      // A persistent message avoids repeated alerts for the same invalid QR.
+      setState(() => _invalid = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: const Key('trainerQrPage'),
+      appBar: AppBar(title: const Text('Trainerと連携')),
+      body: SafeArea(
+        child: _invite != null
+            ? SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Icon(Icons.check_circle_outline, size: 64),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Trainer招待QRを読み取りました',
+                      key: Key('trainerInviteRecognized'),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      '招待情報を認識しました。\n'
+                      '招待の有効性はまだ確認していません。\n'
+                      '実際のTrainer接続は今後のアップデートで対応します。',
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton(
+                      key: const Key('closeTrainerInvite'),
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('閉じる'),
+                    ),
+                  ],
+                ),
+              )
+            : Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text('TrainerのQRコードを読み取ってください'),
+                  ),
+                  Expanded(
+                    child:
+                        widget.scannerBuilder?.call(context, _detect) ??
+                        MobileScanner(
+                          // With no external controller, the scanner owns camera
+                          // disposal and background/resume lifecycle handling.
+                          onDetect: (capture) {
+                            for (final barcode in capture.barcodes) {
+                              if (barcode.format == BarcodeFormat.qrCode &&
+                                  barcode.rawValue != null) {
+                                _detect(barcode.rawValue!);
+                                if (_invite != null) break;
+                              }
+                            }
+                          },
+                          placeholderBuilder: (_) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorBuilder: (_, _) =>
+                              const TrainerCameraUnavailable(),
+                          overlayBuilder: (context, constraints) =>
+                              IgnorePointer(
+                                child: Center(
+                                  child: SizedBox.square(
+                                    dimension:
+                                        constraints.biggest.shortestSide * 0.7,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: const Color(0xFFC7F36B),
+                                          width: 3,
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                        ),
+                  ),
+                  if (_invalid)
+                    const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Trainer用のQRコードではありません。別のQRコードを読み取ってください。',
+                        key: Key('invalidTrainerQr'),
+                        style: TextStyle(color: Color(0xFFB3261E)),
+                      ),
+                    ),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
+class TrainerCameraUnavailable extends StatelessWidget {
+  const TrainerCameraUnavailable({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const ColoredBox(
+      color: Color(0xFFF4F5F0),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Icon(Icons.no_photography_outlined, size: 48),
+            SizedBox(height: 16),
+            Text('カメラを利用できません'),
+            SizedBox(height: 12),
+            Text('端末設定でMUSCLEMORYのカメラ権限を確認してください。上部の戻るボタンでマイページへ戻れます。'),
+          ],
+        ),
+      ),
+    );
+  }
+}
