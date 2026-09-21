@@ -62,6 +62,44 @@ class _FakeAccountAuth implements AccountAuthService {
 }
 
 void main() {
+  testWidgets('callback errors are handled and a later login recovers', (
+    tester,
+  ) async {
+    final auth = _FakeAccountAuth();
+    addTearDown(auth.events.close);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CloudAccountPage(
+          historyCount: 0,
+          auth: auth,
+          onSyncRequested: () async => throw StateError('Unexpected sync'),
+        ),
+      ),
+    );
+    final google = find.byKey(const Key('accountGoogleSignInButton'));
+    await tester.tap(google);
+    await tester.pumpAndSettle();
+    for (final error in [
+      const AuthException('sensitive SDK detail'),
+      StateError('sensitive SDK detail'),
+    ]) {
+      auth.events.addError(error, StackTrace.current);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('ログイン状態を確認できませんでした。もう一度お試しください。'), findsOneWidget);
+      expect(find.textContaining('sensitive SDK detail'), findsNothing);
+      expect(tester.widget<OutlinedButton>(google).onPressed, isNotNull);
+    }
+    auth.signedIn('google@example.com');
+    await tester.pumpAndSettle();
+    expect(find.text('google@example.com'), findsOneWidget);
+    expect(find.text('ログイン状態を確認できませんでした。もう一度お試しください。'), findsNothing);
+    expect(google, findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpAndSettle();
+    expect(auth.events.hasListener, isFalse);
+  });
+
   testWidgets('Google launch waits for auth callback without Premium or sync', (
     tester,
   ) async {

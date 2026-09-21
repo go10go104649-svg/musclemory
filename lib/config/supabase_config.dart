@@ -20,10 +20,29 @@ class SupabaseConfig {
 
   static bool get isConfigured => projectUrl.isNotEmpty && key.isNotEmpty;
 
+  /// Checks build-time values without including them in error messages.
+  /// The server still validates whether the key belongs to the project.
+  static void validate({required String url, required String apiKey}) {
+    final uri = Uri.tryParse(url);
+    if (uri == null ||
+        !const {'http', 'https'}.contains(uri.scheme) ||
+        uri.host.isEmpty) {
+      throw const FormatException('SUPABASE_URLの設定を確認してください');
+    }
+    final publishable = RegExp(r'^sb_publishable_[A-Za-z0-9_-]+$');
+    final legacyJwt = RegExp(
+      r'^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$',
+    );
+    if (!publishable.hasMatch(apiKey) && !legacyJwt.hasMatch(apiKey)) {
+      throw const FormatException('Supabaseの公開キーの設定を確認してください');
+    }
+  }
+
   static Future<void> initialize() async {
     if (!isConfigured) return;
 
     try {
+      validate(url: projectUrl, apiKey: key);
       await Supabase.initialize(url: projectUrl, publishableKey: key);
       initialized = true;
     } catch (error) {

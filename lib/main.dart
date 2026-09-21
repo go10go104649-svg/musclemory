@@ -10756,6 +10756,8 @@ class CloudAccountPage extends StatefulWidget {
 }
 
 class _CloudAccountPageState extends State<CloudAccountPage> {
+  static const _authStateErrorMessage =
+      'ログイン状態を確認できませんでした。もう一度お試しください。';
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -10768,11 +10770,24 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
   void initState() {
     super.initState();
     _auth = widget.auth ?? SupabaseAccountAuthService.configured();
-    _authSubscription = _auth?.changes.listen((_) {
-      if (!mounted) return;
-      _passwordController.clear();
-      setState(() {});
-    });
+    _authSubscription = _auth?.changes.listen(
+      (_) {
+        if (!mounted) return;
+        _passwordController.clear();
+        setState(() {
+          if (_message == _authStateErrorMessage) _message = null;
+        });
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (!mounted) return;
+        // Callback errors arrive after the browser launch Future completes.
+        // Do not expose raw SDK errors, which may include connection values.
+        setState(() {
+          _busy = false;
+          _message = _authStateErrorMessage;
+        });
+      },
+    );
   }
 
   @override
