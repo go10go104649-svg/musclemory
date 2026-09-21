@@ -7760,7 +7760,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "category": "脚",
     "aliases": [],
     "equipmentId": "belt_squat",
-    "equipmentLabel": "マシン",
+    "equipmentLabel": "プレートロード",
     "recordType": "weightReps",
     "loadMode": "external",
     "primaryMuscles": [
@@ -7772,7 +7772,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "tags": [
       "脚",
-      "マシン"
+      "プレートロード"
     ],
     "distanceUnit": "km",
     "movementVariant": "belt_squat",

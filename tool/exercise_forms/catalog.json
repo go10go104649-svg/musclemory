@@ -7761,7 +7761,7 @@
       "category": "脚",
       "aliases": [],
       "equipmentId": "belt_squat",
-      "equipmentLabel": "マシン",
+      "equipmentLabel": "プレートロード",
       "recordType": "weightReps",
       "loadMode": "external",
       "primaryMuscles": [
@@ -7773,7 +7773,7 @@
       ],
       "tags": [
         "脚",
-        "マシン"
+        "プレートロード"
       ],
       "distanceUnit": "km",
       "movementVariant": "belt_squat",
