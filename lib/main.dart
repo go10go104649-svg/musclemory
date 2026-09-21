@@ -25,6 +25,7 @@ import 'body_weight.dart';
 import 'bench_press_form.dart';
 import 'muscle_targets.dart';
 import 'services/supabase_sync_service.dart';
+import 'services/account_auth_service.dart';
 import 'services/workout_draft_store.dart';
 
 const activeWorkoutDraftStorageKey = 'active_workout_draft';
@@ -10141,6 +10142,23 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 22),
           const _ProfileNameCard(),
+          Card(
+            child: ListTile(
+              key: const Key('accountButton'),
+              leading: const Icon(Icons.manage_accounts_outlined),
+              title: const Text('アカウント'),
+              subtitle: const Text('メールで登録・ログイン'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (_) => CloudAccountPage(
+                    historyCount: history.length,
+                    onSyncRequested: onSyncRequested,
+                  ),
+                ),
+              ),
+            ),
+          ),
           _sectionTitle('トレーニング設定'),
           _trainingSettingsCard(context),
           _sectionTitle('Trainer連携'),
@@ -10726,35 +10744,52 @@ class CloudAccountPage extends StatefulWidget {
     super.key,
     required this.historyCount,
     required this.onSyncRequested,
+    this.auth,
   });
 
   final int historyCount;
   final Future<int> Function() onSyncRequested;
+  final AccountAuthService? auth;
 
   @override
   State<CloudAccountPage> createState() => _CloudAccountPageState();
 }
 
 class _CloudAccountPageState extends State<CloudAccountPage> {
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  late final AccountAuthService? _auth;
+  StreamSubscription<void>? _authSubscription;
   bool _busy = false;
   String? _message;
 
   @override
+  void initState() {
+    super.initState();
+    _auth = widget.auth ?? SupabaseAccountAuthService.configured();
+    _authSubscription = _auth?.changes.listen((_) {
+      if (!mounted) return;
+      _passwordController.clear();
+      setState(() {});
+    });
+  }
+
+  @override
   void dispose() {
+    _authSubscription?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _run(Future<void> Function() action) async {
+    if (_busy || _auth == null) return;
     setState(() {
       _busy = true;
       _message = null;
     });
     try {
-      SupabaseSyncService.requirePremium();
       await action();
     } on AuthException catch (error) {
       _message = error.message;
@@ -10765,94 +10800,121 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
     }
   }
 
-  Future<void> _signIn() => _run(() async {
-    await Supabase.instance.client.auth.signInWithPassword(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
+  Future<void> _signIn() async {
+    if (!_formKey.currentState!.validate()) return;
+    await _run(() async {
+      await _auth!.signIn(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+      if (mounted) _passwordController.clear();
+      _message = 'ログインしました';
+    });
+  }
+
+  Future<void> _signUp() async {
+    if (!_formKey.currentState!.validate()) return;
+    await _run(() async {
+      final hasSession = await _auth!.signUp(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+      if (mounted) _passwordController.clear();
+      _message = hasSession
+          ? 'アカウントを作成しました'
+          : '確認メールを送りました。メールを開いて登録を完了してください。';
+    });
+  }
+
+  Future<void> _signOut() => _run(() async {
+    await _auth!.signOut();
+    _message = 'ログアウトしました';
+  });
+
+  Future<void> _sync() => _run(() async {
+    // Entitlement is checked only for cloud operations, never authentication.
+    SupabaseSyncService.requirePremium();
+    if (!_auth!.isSignedIn) return;
     final count = await widget.onSyncRequested();
     _message = '$count件の記録を同期しました';
   });
 
-  Future<void> _signUp() => _run(() async {
-    final response = await Supabase.instance.client.auth.signUp(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
-    _message = response.session == null
-        ? '確認メールを送りました。メールを開いて登録を完了してください。'
-        : 'アカウントを作成しました';
-  });
-
-  Future<void> _signOut() => _run(() async {
-    await Supabase.instance.client.auth.signOut();
-    _message = 'ログアウトしました';
-  });
+  Widget _emailForm() => Form(
+    key: _formKey,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextFormField(
+          key: const Key('accountEmailField'),
+          controller: _emailController,
+          enabled: !_busy,
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          autocorrect: false,
+          decoration: const InputDecoration(
+            labelText: 'メールアドレス',
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) {
+            final email = value?.trim() ?? '';
+            if (email.isEmpty) return 'メールアドレスを入力してください';
+            if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
+              return 'メールアドレスの形式を確認してください';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          key: const Key('accountPasswordField'),
+          controller: _passwordController,
+          enabled: !_busy,
+          obscureText: true,
+          autocorrect: false,
+          enableSuggestions: false,
+          decoration: const InputDecoration(
+            labelText: 'パスワード（6文字以上）',
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) =>
+              (value?.length ?? 0) < 6 ? 'パスワードは6文字以上で入力してください' : null,
+        ),
+        const SizedBox(height: 18),
+        FilledButton(
+          key: const Key('accountSignInButton'),
+          onPressed: _busy ? null : _signIn,
+          child: const Text('ログイン'),
+        ),
+        TextButton(
+          key: const Key('accountSignUpButton'),
+          onPressed: _busy ? null : _signUp,
+          child: const Text('新規アカウント作成'),
+        ),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
-    if (!SupabaseSyncService.canUseCloud) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('クラウドバックアップ')),
-        body: const CloudBackupSection(premium: false),
-      );
-    }
-    final signedIn = SupabaseSyncService.isSignedIn;
+    final signedIn = _auth?.isSignedIn ?? false;
     return Scaffold(
-      appBar: AppBar(title: const Text('クラウド同期')),
+      appBar: AppBar(title: const Text('アカウント')),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text(
-            signedIn ? 'Supabaseにログイン中' : 'アカウントで同期',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '端末内の${widget.historyCount}件の記録を、同じアカウントの端末で使えるようにします。',
-            style: const TextStyle(color: Color(0xFF6C746D), height: 1.5),
-          ),
-          const SizedBox(height: 24),
-          if (!signedIn) ...[
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                labelText: 'メールアドレス',
-                border: OutlineInputBorder(),
-              ),
+          if (_auth == null)
+            const Text('現在アカウント機能を利用できません')
+          else if (!signedIn)
+            _emailForm()
+          else ...[
+            const Text(
+              'ログイン中',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'パスワード（6文字以上）',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 18),
-            FilledButton(
-              onPressed: _busy ? null : _signIn,
-              child: const Text('ログインして同期'),
-            ),
+            const SizedBox(height: 8),
+            Text(_auth.email ?? '', key: const Key('accountSignedInEmail')),
             TextButton(
-              onPressed: _busy ? null : _signUp,
-              child: const Text('新しいアカウントを作る'),
-            ),
-          ] else ...[
-            FilledButton.icon(
-              onPressed: _busy
-                  ? null
-                  : () => _run(() async {
-                      final count = await widget.onSyncRequested();
-                      _message = '$count件の記録を同期しました';
-                    }),
-              icon: const Icon(Icons.sync_rounded),
-              label: const Text('今すぐ同期'),
-            ),
-            TextButton(
+              key: const Key('accountSignOutButton'),
               onPressed: _busy ? null : _signOut,
               child: const Text('ログアウト'),
             ),
@@ -10865,6 +10927,11 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
             const SizedBox(height: 16),
             Text(_message!, textAlign: TextAlign.center),
           ],
+          const SizedBox(height: 24),
+          CloudBackupSection(
+            premium: SupabaseSyncService.canUseCloud,
+            onOpen: signedIn && !_busy ? _sync : null,
+          ),
         ],
       ),
     );

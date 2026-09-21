@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:muscle_memory/config/supabase_config.dart';
+import 'package:muscle_memory/services/account_auth_service.dart';
 import 'support/legal_consent_fixture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +11,228 @@ import 'package:muscle_memory/main.dart';
 import 'package:muscle_memory/services/supabase_sync_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class _FakeAccountAuth implements AccountAuthService {
+  final events = StreamController<void>.broadcast();
+  @override
+  bool isSignedIn = false;
+  @override
+  String? email;
+  int signIns = 0, signUps = 0, signOuts = 0;
+  bool registrationSession = false;
+  bool rejectSignIn = false;
+  @override
+  Stream<void> get changes => events.stream;
+  void signedIn(String value) {
+    isSignedIn = true;
+    email = value;
+    events.add(null);
+  }
+
+  @override
+  Future<void> signIn(String email, String password) async {
+    signIns++;
+    if (rejectSignIn) throw const AuthException('認証できませんでした');
+    signedIn(email);
+  }
+
+  @override
+  Future<bool> signUp(String email, String password) async {
+    signUps++;
+    if (registrationSession) signedIn(email);
+    return registrationSession;
+  }
+
+  @override
+  Future<void> signOut() async {
+    signOuts++;
+    isSignedIn = false;
+    email = null;
+    events.add(null);
+  }
+}
+
 void main() {
+  testWidgets(
+    'account is accessible from profile without configuration or Premium',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({
+        'onboarding_completed': true,
+        'legal_consent': acceptedLegalConsentJson,
+      });
+      expect(SupabaseConfig.initialized, isFalse);
+      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.person_outline_rounded));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('accountButton')));
+      await tester.pumpAndSettle();
+      expect(find.text('アカウント'), findsOneWidget);
+      expect(find.text('現在アカウント機能を利用できません'), findsOneWidget);
+      expect(find.byKey(const Key('accountEmailField')), findsNothing);
+      expect(
+        tester
+            .widget<FilledButton>(find.byKey(const Key('cloudBackupButton')))
+            .onPressed,
+        isNull,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('account validates credentials without calling authentication', (
+    tester,
+  ) async {
+    final auth = _FakeAccountAuth();
+    addTearDown(auth.events.close);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CloudAccountPage(
+          historyCount: 0,
+          onSyncRequested: () async => throw StateError('Unexpected sync'),
+          auth: auth,
+        ),
+      ),
+    );
+    for (final button in ['accountSignInButton', 'accountSignUpButton']) {
+      await tester.enterText(find.byKey(const Key('accountEmailField')), '');
+      await tester.enterText(
+        find.byKey(const Key('accountPasswordField')),
+        '12345',
+      );
+      await tester.tap(find.byKey(Key(button)));
+      await tester.pumpAndSettle();
+      expect(find.text('メールアドレスを入力してください'), findsOneWidget);
+      expect(find.text('パスワードは6文字以上で入力してください'), findsOneWidget);
+      await tester.enterText(
+        find.byKey(const Key('accountEmailField')),
+        'not-an-email',
+      );
+      await tester.tap(find.byKey(Key(button)));
+      await tester.pumpAndSettle();
+      expect(find.text('メールアドレスの形式を確認してください'), findsOneWidget);
+    }
+    expect(auth.signIns, 0);
+    expect(auth.signUps, 0);
+  });
+
+  testWidgets(
+    'account login logout and external auth events never unlock or sync cloud',
+    (tester) async {
+      final auth = _FakeAccountAuth();
+      addTearDown(auth.events.close);
+      var syncs = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CloudAccountPage(
+            historyCount: 1,
+            onSyncRequested: () async {
+              syncs++;
+              return 1;
+            },
+            auth: auth,
+          ),
+        ),
+      );
+      expect(SupabaseSyncService.canUseCloud, isFalse);
+      await tester.enterText(
+        find.byKey(const Key('accountEmailField')),
+        ' user@example.com ',
+      );
+      await tester.enterText(
+        find.byKey(const Key('accountPasswordField')),
+        'secret123',
+      );
+      await tester.tap(find.byKey(const Key('accountSignInButton')));
+      await tester.pumpAndSettle();
+      expect(auth.signIns, 1);
+      expect(find.text('user@example.com'), findsOneWidget);
+      expect(find.text('ログインしました'), findsOneWidget);
+      expect(find.byKey(const Key('accountEmailField')), findsNothing);
+      expect(SupabaseSyncService.canUseCloud, isFalse);
+      expect(
+        tester
+            .widget<FilledButton>(find.byKey(const Key('cloudBackupButton')))
+            .onPressed,
+        isNull,
+      );
+      expect(syncs, 0);
+      await tester.tap(find.byKey(const Key('accountSignOutButton')));
+      await tester.pumpAndSettle();
+      expect(auth.signOuts, 1);
+      expect(find.text('ログアウトしました'), findsOneWidget);
+      expect(find.byKey(const Key('accountEmailField')), findsOneWidget);
+      auth.signedIn('external@example.com');
+      await tester.pumpAndSettle();
+      expect(find.text('external@example.com'), findsOneWidget);
+      auth.signedIn('refreshed@example.com');
+      await tester.pumpAndSettle();
+      expect(find.text('refreshed@example.com'), findsOneWidget);
+      await auth.signOut();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('accountEmailField')), findsOneWidget);
+      auth.rejectSignIn = true;
+      await tester.enterText(
+        find.byKey(const Key('accountPasswordField')),
+        'secret123',
+      );
+      await tester.tap(find.byKey(const Key('accountSignInButton')));
+      await tester.pumpAndSettle();
+      expect(find.text('認証できませんでした'), findsOneWidget);
+      expect(syncs, 0);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpAndSettle();
+      expect(auth.events.hasListener, isFalse);
+      auth.signedIn('disposed@example.com');
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  for (final session in [false, true]) {
+    testWidgets('account registration without Premium session=$session', (
+      tester,
+    ) async {
+      final auth = _FakeAccountAuth()..registrationSession = session;
+      addTearDown(auth.events.close);
+      var syncs = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CloudAccountPage(
+            historyCount: 0,
+            onSyncRequested: () async {
+              syncs++;
+              return 0;
+            },
+            auth: auth,
+          ),
+        ),
+      );
+      await tester.enterText(
+        find.byKey(const Key('accountEmailField')),
+        'user@example.com',
+      );
+      await tester.enterText(
+        find.byKey(const Key('accountPasswordField')),
+        'secret123',
+      );
+      await tester.tap(find.byKey(const Key('accountSignUpButton')));
+      await tester.pumpAndSettle();
+      expect(auth.signUps, 1);
+      expect(
+        find.text(session ? 'アカウントを作成しました' : '確認メールを送りました。メールを開いて登録を完了してください。'),
+        findsOneWidget,
+      );
+      expect(SupabaseSyncService.canUseCloud, isFalse);
+      expect(syncs, 0);
+      await tester.ensureVisible(find.byKey(const Key('cloudBackupButton')));
+      expect(
+        tester
+            .widget<FilledButton>(find.byKey(const Key('cloudBackupButton')))
+            .onPressed,
+        isNull,
+      );
+    });
+  }
   testWidgets(
     '12 weights stay in graph, only latest row is shown and editable',
     (tester) async {
