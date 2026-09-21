@@ -13,6 +13,7 @@ abstract class AccountAuthService {
   /// True when registration immediately creates a session.
   Future<bool> signUp(String email, String password);
   Future<void> signOut();
+  Future<void> signInWithGoogle();
 }
 
 class SupabaseAccountAuthService implements AccountAuthService {
@@ -42,6 +43,18 @@ class SupabaseAccountAuthService implements AccountAuthService {
       password: password,
     );
     return response.session != null;
+  }
+
+  @override
+  Future<void> signInWithGoogle() async {
+    final launched = await _client.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: SupabaseConfig.authRedirectUrl,
+    );
+    if (!launched) {
+      throw const AuthException('Googleログインを開始できませんでした。もう一度お試しください。');
+    }
+    // Browser launch is not authentication; the callback updates auth state.
   }
 
   @override

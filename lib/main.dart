@@ -10826,6 +10826,8 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
     });
   }
 
+  Future<void> _signInWithGoogle() => _run(() => _auth!.signInWithGoogle());
+
   Future<void> _signOut() => _run(() async {
     await _auth!.signOut();
     _message = 'ログアウトしました';
@@ -10904,9 +10906,15 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
         children: [
           if (_auth == null)
             const Text('現在アカウント機能を利用できません')
-          else if (!signedIn)
-            _emailForm()
-          else ...[
+          else if (!signedIn) ...[
+            OutlinedButton(
+              key: const Key('accountGoogleSignInButton'),
+              onPressed: _busy ? null : _signInWithGoogle,
+              child: const Text('Googleで続ける'),
+            ),
+            const SizedBox(height: 20),
+            _emailForm(),
+          ] else ...[
             const Text(
               'ログイン中',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),

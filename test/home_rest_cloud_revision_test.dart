@@ -20,6 +20,16 @@ class _FakeAccountAuth implements AccountAuthService {
   int signIns = 0, signUps = 0, signOuts = 0;
   bool registrationSession = false;
   bool rejectSignIn = false;
+  int googleSignIns = 0;
+  Completer<void>? googleLaunch;
+  Object? googleError;
+  @override
+  Future<void> signInWithGoogle() async {
+    googleSignIns++;
+    if (googleError != null) throw googleError!;
+    await googleLaunch?.future;
+  }
+
   @override
   Stream<void> get changes => events.stream;
   void signedIn(String value) {
@@ -52,6 +62,79 @@ class _FakeAccountAuth implements AccountAuthService {
 }
 
 void main() {
+  testWidgets('Google launch waits for auth callback without Premium or sync', (
+    tester,
+  ) async {
+    final auth = _FakeAccountAuth()..googleLaunch = Completer<void>();
+    addTearDown(auth.events.close);
+    var syncs = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CloudAccountPage(
+          historyCount: 0,
+          auth: auth,
+          onSyncRequested: () async {
+            syncs++;
+            return 0;
+          },
+        ),
+      ),
+    );
+    final google = find.byKey(const Key('accountGoogleSignInButton'));
+    expect(google, findsOneWidget);
+    await tester.tap(google);
+    await tester.pump();
+    expect(auth.googleSignIns, 1);
+    expect(tester.widget<OutlinedButton>(google).onPressed, isNull);
+    await tester.tap(google);
+    expect(auth.googleSignIns, 1);
+    auth.googleLaunch!.complete();
+    await tester.pumpAndSettle();
+    // Closing/cancelling the browser without a callback leaves login available.
+    expect(find.byKey(const Key('accountEmailField')), findsOneWidget);
+    expect(tester.widget<OutlinedButton>(google).onPressed, isNotNull);
+    expect(find.text('ログインしました'), findsNothing);
+    expect(find.text('通信に失敗しました。接続を確認してください。'), findsNothing);
+    auth.signedIn('google@example.com');
+    await tester.pumpAndSettle();
+    expect(find.text('google@example.com'), findsOneWidget);
+    expect(google, findsNothing);
+    expect(SupabaseSyncService.canUseCloud, isFalse);
+    expect(syncs, 0);
+    expect(
+      tester
+          .widget<FilledButton>(find.byKey(const Key('cloudBackupButton')))
+          .onPressed,
+      isNull,
+    );
+  });
+
+  testWidgets('Google launch errors are shown and can be retried', (
+    tester,
+  ) async {
+    final auth = _FakeAccountAuth()
+      ..googleError = const AuthException('Googleログインを開始できません');
+    addTearDown(auth.events.close);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CloudAccountPage(
+          historyCount: 0,
+          auth: auth,
+          onSyncRequested: () async => 0,
+        ),
+      ),
+    );
+    final google = find.byKey(const Key('accountGoogleSignInButton'));
+    await tester.tap(google);
+    await tester.pumpAndSettle();
+    expect(find.text('Googleログインを開始できません'), findsOneWidget);
+    expect(tester.widget<OutlinedButton>(google).onPressed, isNotNull);
+    auth.googleError = null;
+    await tester.tap(google);
+    await tester.pumpAndSettle();
+    expect(auth.googleSignIns, 2);
+    expect(find.text('Googleログインを開始できません'), findsNothing);
+  });
   testWidgets(
     'account is accessible from profile without configuration or Premium',
     (tester) async {
@@ -68,6 +151,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('アカウント'), findsOneWidget);
       expect(find.text('現在アカウント機能を利用できません'), findsOneWidget);
+      expect(find.byKey(const Key('accountGoogleSignInButton')), findsNothing);
       expect(find.byKey(const Key('accountEmailField')), findsNothing);
       expect(
         tester
@@ -147,6 +231,7 @@ void main() {
       expect(auth.signIns, 1);
       expect(find.text('user@example.com'), findsOneWidget);
       expect(find.text('ログインしました'), findsOneWidget);
+      expect(find.byKey(const Key('accountGoogleSignInButton')), findsNothing);
       expect(find.byKey(const Key('accountEmailField')), findsNothing);
       expect(SupabaseSyncService.canUseCloud, isFalse);
       expect(
