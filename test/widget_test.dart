@@ -197,29 +197,23 @@ void main() {
   });
 
   testWidgets(
-    'hidden body model is released while its selected angle survives',
+    'hidden body model is released without angle controls',
     (tester) async {
       Future<void> show(bool active) => tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: MuscleMannequinView(scores: const {}, active: active),
-          ),
-        ),
+        MaterialApp(home: Scaffold(
+          body: MuscleMannequinView(scores: const {}, active: active),
+        )),
       );
-      await show(false);
-      expect(find.byKey(const Key('muscleMannequinAngle')), findsNothing);
-      await show(true);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('背面'));
-      await tester.pumpAndSettle();
-      await show(false);
-      expect(find.byKey(const Key('muscleMannequinAngle')), findsNothing);
-      await show(true);
-      await tester.pumpAndSettle();
-      final control = tester.widget<SegmentedButton<MuscleMannequinAngle>>(
-        find.byKey(const Key('muscleMannequinAngle')),
-      );
-      expect(control.selected, {MuscleMannequinAngle.back});
+      for (final active in [false, true, false, true]) {
+        await show(active);
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('bodyMannequinFallback')),
+            active ? findsOneWidget : findsNothing);
+        expect(find.byKey(const Key('body-tab-continuous')), findsNothing);
+        expect(find.byKey(const Key('muscleMannequinAngle')), findsNothing);
+        expect(find.text('側面'), findsNothing);
+        expect(find.text('背面'), findsNothing);
+      }
     },
   );
 
@@ -818,25 +812,15 @@ void main() {
     await tester.tap(find.byKey(const Key('musclePeriodmonth')));
     await tester.pumpAndSettle();
     expect(find.text('1ヶ月 ・ 1セット'), findsOneWidget);
-    expect(find.text('3方向表示'), findsOneWidget);
-    expect(find.text('側面'), findsOneWidget);
-    await tester.tap(find.text('背面'));
-    await tester.pumpAndSettle();
-    final angleControl = tester.widget<SegmentedButton<MuscleMannequinAngle>>(
-      find.byKey(const Key('muscleMannequinAngle')),
-    );
-    expect(angleControl.selected, {MuscleMannequinAngle.back});
+    expect(find.text('3方向表示'), findsNothing);
+    expect(find.text('側面'), findsNothing);
+    expect(find.text('背面'), findsNothing);
+    expect(find.byKey(const Key('muscleMannequinAngle')), findsNothing);
+    expect(find.byKey(const Key('bodyMannequinFallback')), findsOneWidget);
     await tester.tap(find.byKey(const Key('musclePeriodweek')));
     await tester.pumpAndSettle();
     expect(find.text('1週間 ・ 0セット'), findsOneWidget);
-    expect(
-      tester
-          .widget<SegmentedButton<MuscleMannequinAngle>>(
-            find.byKey(const Key('muscleMannequinAngle')),
-          )
-          .selected,
-      {MuscleMannequinAngle.back},
-    );
+    expect(find.byKey(const Key('bodyMannequinFallback')), findsOneWidget);
     await tester.tap(find.byKey(const Key('musclePeriodmonth')));
     await tester.pumpAndSettle();
 
@@ -2359,7 +2343,7 @@ void main() {
     expect(find.text('トレーニング履歴'), findsNothing);
     expect(find.byTooltip('カレンダーで見る'), findsNothing);
     expect(find.byTooltip('履歴を検索'), findsOneWidget);
-    expect(find.byTooltip('種目ごとの成長を見る'), findsOneWidget);
+    expect(find.byTooltip('種目ごとの成長を見る'), findsNothing);
 
     final today = DateTime.now();
     await tester.tap(find.byKey(Key('calendarDay${today.day}')));

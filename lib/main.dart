@@ -2504,11 +2504,6 @@ class _BodyMapPageState extends State<BodyMapPage> {
                       ),
                     ),
                     const Spacer(),
-                    const Chip(
-                      avatar: Icon(Icons.threed_rotation_rounded, size: 16),
-                      label: Text('3方向表示'),
-                      visualDensity: VisualDensity.compact,
-                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -2519,10 +2514,6 @@ class _BodyMapPageState extends State<BodyMapPage> {
                     scores: muscleScores,
                     fallbackBodyPartCounts: counts,
                   ),
-                ),
-                const Text(
-                  '前面・側面・背面を切り替えて確認できます',
-                  style: TextStyle(color: Colors.white60, fontSize: 11),
                 ),
               ],
             ),
@@ -2568,15 +2559,6 @@ class _BodyMapPageState extends State<BodyMapPage> {
   }
 }
 
-enum MuscleMannequinAngle {
-  front('前面'),
-  side('側面'),
-  back('背面');
-
-  const MuscleMannequinAngle(this.label);
-  final String label;
-}
-
 class MuscleMannequinView extends StatefulWidget {
   const MuscleMannequinView({
     super.key,
@@ -2595,8 +2577,6 @@ class MuscleMannequinView extends StatefulWidget {
 }
 
 class _MuscleMannequinViewState extends State<MuscleMannequinView> {
-  MuscleMannequinAngle _angle = MuscleMannequinAngle.front;
-
   final _controller = Interactive3dController();
   bool _ready = false;
 
@@ -2629,36 +2609,9 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
   Widget build(BuildContext context) {
     // IndexedStack keeps tab state, but a hidden platform view must be disposed.
     if (!widget.active) return const SizedBox.expand();
-    final controls = SegmentedButton<MuscleMannequinAngle>(
-      key: const Key('muscleMannequinAngle'),
-      segments: MuscleMannequinAngle.values
-          .map((angle) => ButtonSegment(value: angle, label: Text(angle.label)))
-          .toList(),
-      selected: {_angle},
-      showSelectedIcon: false,
-      style: ButtonStyle(
-        visualDensity: VisualDensity.compact,
-        foregroundColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? const Color(0xFF101820)
-              : Colors.white,
-        ),
-        backgroundColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? const Color(0xFFFFD5D5)
-              : const Color(0xFF1A2A34),
-        ),
-        side: const WidgetStatePropertyAll(BorderSide(color: Colors.white24)),
-      ),
-      onSelectionChanged: (selection) =>
-          setState(() => _angle = selection.first),
-    );
-
     if (Platform.isIOS || Platform.isAndroid) {
       return Column(
         children: [
-          controls,
-          const SizedBox(height: 5),
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(18),
@@ -2668,7 +2621,8 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
                 modelPath: 'assets/models/body_tab.glb',
                 formAnimation: true,
                 animationPlaying: false,
-                bodyViewAngle: _angle.index,
+                // Preserve the existing initial framing without angle controls.
+                bodyViewAngle: 0,
                 onModelReady: () {
                   if (!mounted || !widget.active) return;
                   _ready = true;
@@ -2692,16 +2646,14 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
     final maximum = widget.fallbackBodyPartCounts.values.fold<int>(1, math.max);
     return Column(
       children: [
-        controls,
-        const SizedBox(height: 5),
         Expanded(
           child: Center(
             child: CustomPaint(
+              key: const Key('bodyMannequinFallback'),
               size: const Size(210, 300),
               painter: _MuscleBodyPainter(
                 counts: widget.fallbackBodyPartCounts,
                 maximum: maximum,
-                showBack: _angle == MuscleMannequinAngle.back,
               ),
             ),
           ),
@@ -2718,12 +2670,10 @@ class _MuscleBodyPainter extends CustomPainter {
   const _MuscleBodyPainter({
     required this.counts,
     required this.maximum,
-    required this.showBack,
   });
 
   final Map<String, int> counts;
   final int maximum;
-  final bool showBack;
 
   static const _wire = Color(0xFF24F4EE);
   static const _wireDim = Color(0xFF087E8C);
@@ -2964,21 +2914,10 @@ class _MuscleBodyPainter extends CustomPainter {
         Path()..addOval(const Rect.fromLTWH(70, 267, 29, 61)),
         Path()..addOval(const Rect.fromLTWH(131, 267, 29, 61)),
       ],
-      if (showBack)
-        '背中': [
-          Path()
-            ..moveTo(83, 72)
-            ..lineTo(147, 72)
-            ..lineTo(139, 154)
-            ..lineTo(115, 178)
-            ..lineTo(91, 154)
-            ..close(),
-        ]
-      else
-        '胸': [
-          Path()..addOval(const Rect.fromLTWH(80, 74, 34, 52)),
-          Path()..addOval(const Rect.fromLTWH(116, 74, 34, 52)),
-        ],
+      '胸': [
+        Path()..addOval(const Rect.fromLTWH(80, 74, 34, 52)),
+        Path()..addOval(const Rect.fromLTWH(116, 74, 34, 52)),
+      ],
       '腹': [
         Path()..addRRect(const RRect.fromLTRBXY(96, 126, 134, 190, 13, 13)),
       ],
@@ -3056,8 +2995,7 @@ class _MuscleBodyPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _MuscleBodyPainter old) =>
       old.counts != counts ||
-      old.maximum != maximum ||
-      old.showBack != showBack;
+      old.maximum != maximum;
 }
 
 class MonthlyHistoryPage extends StatefulWidget {
@@ -3189,16 +3127,6 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
                 ),
               ),
               icon: const Icon(Icons.search_rounded),
-            ),
-          if (widget.history.isNotEmpty)
-            IconButton(
-              tooltip: '種目ごとの成長を見る',
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => ExerciseProgressPage(history: widget.history),
-                ),
-              ),
-              icon: const Icon(Icons.insights_rounded),
             ),
           const SizedBox(width: 8),
         ],
@@ -7354,7 +7282,7 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
           Text(
             (form?.available == true)
                 ? '濃い赤がメインターゲット、薄い赤が補助的に使う筋肉です。対象筋の説明で、筋活動の実測値ではありません。'
-                : '濃い赤がメインターゲット、薄い赤が補助的に使う筋肉です。前面・側面・背面を切り替えて確認できます。',
+                : '濃い赤がメインターゲット、薄い赤が補助的に使う筋肉です。',
             style: const TextStyle(color: Color(0xFF666D68)),
           ),
         ],
