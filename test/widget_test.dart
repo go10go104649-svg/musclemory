@@ -681,6 +681,22 @@ void main() {
       await tester.pumpAndSettle();
       final badge = find.byKey(Key('exerciseMuscles${exercise.exerciseId ?? exercise.name}'));
       expect(badge, findsOneWidget);
+      expect(tester.getSize(badge), const Size.square(44));
+      final mark = find.descendant(of: badge, matching: find.byWidgetPredicate(
+        (widget) => widget is SizedBox && widget.width == 30 && widget.height == 30,
+      ));
+      expect(tester.getSize(mark), const Size.square(30));
+      final badgeText = tester.widget<Text>(find.descendant(of: badge, matching: find.text('3D')));
+      expect(badgeText.style!.fontSize, 9.5);
+      final row = find.byKey(Key('selectExercise${exercise.exerciseId ?? exercise.name}'));
+      expect(tester.getRect(row).right - tester.getRect(badge).right, closeTo(4, .01));
+      final tile = tester.widget<ListTile>(row);
+      final favorite = find.byKey(Key('favoriteExercise${exercise.identity}'));
+      final title = find.byWidget(tile.title!);
+      expect(tester.getRect(favorite).left - tester.getRect(row).left, closeTo(8, .01));
+      expect(tester.getRect(title).left - tester.getRect(favorite).right, closeTo(8, .01));
+
+
       expect(find.descendant(of: badge, matching: find.byType(TextButton)), findsNothing);
       expect(find.descendant(of: badge, matching: find.text('3D')), findsOneWidget);
       final favoritesBefore = await ExerciseFavoritePreference.load();

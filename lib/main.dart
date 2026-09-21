@@ -7236,6 +7236,8 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                           key: ValueKey(
                             'selectExercise${e.exerciseId ?? e.name}',
                           ),
+                          contentPadding: const EdgeInsetsDirectional.only(start: 8, end: 4),
+                          horizontalTitleGap: 8,
                           selected: added || _selected.containsKey(e.identity),
                           selectedTileColor: const Color(0xFFE9F4D1),
                           selectedColor: const Color(0xFF101820),
@@ -7372,11 +7374,17 @@ class _Exercise3dBadge extends StatelessWidget {
   Widget build(BuildContext context) => IconButton(
     tooltip: '使う筋肉を見る',
     onPressed: onPressed,
-    padding: const EdgeInsets.all(6),
-    constraints: const BoxConstraints.tightFor(width: 48, height: 48),
+    padding: const EdgeInsets.all(7),
+    iconSize: 30,
+    style: IconButton.styleFrom(
+      fixedSize: const Size.square(44),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.standard,
+    ),
+    constraints: const BoxConstraints.tightFor(width: 44, height: 44),
     icon: ExcludeSemantics(
       child: SizedBox.square(
-        dimension: 36,
+        dimension: 30,
         child: CustomPaint(
           painter: const _Exercise3dBadgePainter(),
           child: Align(
@@ -7386,7 +7394,7 @@ class _Exercise3dBadge extends StatelessWidget {
               textScaler: TextScaler.noScaling,
               style: const TextStyle(
                 color: Color(0xFF303A40),
-                fontSize: 11,
+                fontSize: 9.5,
                 fontWeight: FontWeight.w900,
               ),
             ),
