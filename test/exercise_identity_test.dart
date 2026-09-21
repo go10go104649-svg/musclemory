@@ -316,18 +316,15 @@ void main() {
         'ショルダープレス',
       );
       await t.pumpAndSettle();
-      Finder check(String id) => find.descendant(
-        of: find.byKey(Key('selectExercise$id')),
-        matching: find.byType(Checkbox),
-      );
+      Finder check(String id) => find.byKey(Key('selectExercise$id'));
       await tapVisible(t, const Key('selectExerciseshoulder_press'));
-      expect(t.widget<Checkbox>(check('shoulder_press')).value, true);
+      expect(t.widget<ListTile>(check('shoulder_press')).selected, true);
       await tapVisible(
         t,
         const Key('selectExerciseplate_loaded_shoulder_press'),
       );
       expect(
-        t.widget<Checkbox>(check('plate_loaded_shoulder_press')).value,
+        t.widget<ListTile>(check('plate_loaded_shoulder_press')).selected,
         true,
       );
       expect(find.text('2種目選択中'), findsOneWidget);
@@ -335,7 +332,7 @@ void main() {
       await tapVisible(t, const Key('selectExerciseshoulder_press'));
       expect(find.text('1種目選択中'), findsOneWidget);
       expect(
-        t.widget<Checkbox>(check('plate_loaded_shoulder_press')).value,
+        t.widget<ListTile>(check('plate_loaded_shoulder_press')).selected,
         true,
       );
       expect(t.takeException(), isNull);
@@ -363,18 +360,15 @@ void main() {
       );
       await t.pumpAndSettle();
       expect(find.text('Shoulder Press'), findsNWidgets(2));
-      final machine = find.descendant(
-        of: find.byKey(const Key('selectExerciseshoulder_press')),
-        matching: find.byType(Checkbox),
-      );
-      final plate = find.descendant(
-        of: find.byKey(const Key('selectExerciseplate_loaded_shoulder_press')),
-        matching: find.byType(Checkbox),
-      );
-      expect(t.widget<Checkbox>(machine).value, true);
-      expect(t.widget<Checkbox>(machine).onChanged, isNull);
-      expect(t.widget<Checkbox>(plate).value, false);
-      expect(t.widget<Checkbox>(plate).onChanged, isNotNull);
+      final machine = find.byKey(const Key('selectExerciseshoulder_press'));
+      final plate = find.byKey(const Key('selectExerciseplate_loaded_shoulder_press'));
+      expect(t.widget<ListTile>(machine).onTap, isNull);
+      expect(t.widget<ListTile>(plate).selected, false);
+      expect(t.widget<ListTile>(plate).onTap, isNotNull);
+      expect(t.widget<ListTile>(machine).selected, false);
+      await tapVisible(t, const Key('favoriteExerciseid:shoulder_press'));
+      expect(await ExerciseFavoritePreference.load(), contains('id:shoulder_press'));
+      expect(find.text('0種目選択中'), findsOneWidget);
       await tapVisible(
         t,
         const Key('selectExerciseplate_loaded_shoulder_press'),

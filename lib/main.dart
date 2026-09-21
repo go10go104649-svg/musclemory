@@ -6858,6 +6858,29 @@ class ExerciseSelection {
   final List<RecordedSet>? savedSets;
 }
 
+class ExerciseFavoritePreference {
+  ExerciseFavoritePreference._();
+  static const _key = 'favorite_exercise_identities';
+
+  static Future<Set<String>> load() async {
+    final preferences = await SharedPreferences.getInstance();
+    return (preferences.getStringList(_key) ?? const <String>[]).toSet();
+  }
+
+  static Future<void> save(Set<String> identities) async {
+    final preferences = await SharedPreferences.getInstance();
+    if (!await preferences.setStringList(_key, identities.toList()..sort())) {
+      throw StateError('Favorites could not be saved');
+    }
+  }
+}
+
+String exerciseSortKey(String name) => String.fromCharCodes(
+  name.toLowerCase().runes.map(
+    (rune) => rune >= 0x30A1 && rune <= 0x30F6 ? rune - 0x60 : rune,
+  ),
+);
+
 class ExercisePickerSheet extends StatefulWidget {
   const ExercisePickerSheet({
     super.key,
@@ -6877,16 +6900,63 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
   static const _categories = ['胸', '背中', '肩', '腕', '脚', '腹', '有酸素', 'HYROX'];
   String _query = '';
   String? _selectedCategory;
-  String? _recentCustomName;
+  bool _showMenus = false;
+  final _searchController = TextEditingController();
+  Set<String> _favorites = {};
+  bool _favoritesReady = false;
+  bool _savingFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites() async {
+    try {
+      final favorites = await ExerciseFavoritePreference.load();
+      if (mounted) {
+        setState(() {
+          _favorites = favorites;
+          _favoritesReady = true;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('お気に入りを読み込めませんでした。開き直してください。')),
+        );
+      }
+    }
+  }
+
+  Future<void> _toggleFavorite(String identity) async {
+    if (!_favoritesReady || _savingFavorite) return;
+    final updated = {..._favorites};
+    if (!updated.remove(identity)) updated.add(identity);
+    setState(() => _savingFavorite = true);
+    try {
+      await ExerciseFavoritePreference.save(updated);
+      if (mounted) setState(() => _favorites = updated);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('お気に入りを保存できませんでした。')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _savingFavorite = false);
+    }
+  }
   final _listController = ScrollController();
 
   @override
   void dispose() {
     _listController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
-  SavedWorkoutTemplate? _menu;
   final Map<String, ExerciseSelection> _selected = {};
   final List<String> _order = [];
   String _categoryLabel(String category) => category == '腹' ? '腹筋' : category;
@@ -6897,14 +6967,19 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     for (final item in CustomExercisePreference.exercises) item.identity: item,
   }.values.toList();
 
-  List<ExerciseSelection> get _source {
-    if (_menu == null) {
-      return _catalog
-          .where((e) => e.bodyPart == _selectedCategory)
-          .map((e) => ExerciseSelection(e))
+  List<ExerciseSelection> get _source => _showMenus
+      ? <String, ExerciseSelection>{
+          for (final menu in widget.menus)
+            for (final item in _menuItems(menu)) item.template.identity: item,
+          ..._selected,
+        }.values.toList()
+      : _catalog
+          .where((e) => _selectedCategory == null || e.bodyPart == _selectedCategory)
+          .map((e) => _selected[e.identity] ?? ExerciseSelection(e))
           .toList();
-    }
-    return _menu!.exerciseGroups.values.map((sets) {
+
+  List<ExerciseSelection> _menuItems(SavedWorkoutTemplate menu) {
+    return menu.exerciseGroups.values.map((sets) {
       final first = sets.first;
       final known = _catalog.where((e) => e.identity == first.identity);
       return ExerciseSelection(
@@ -6929,27 +7004,35 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
       widget.existingIdentities.contains(item.identity) ||
       (item.exerciseId == null && widget.existingNames.contains(item.name));
 
-  void _rememberOrder() {
-    for (final item in _source) {
-      if (!_order.contains(item.template.identity)) {
-        _order.add(item.template.identity);
-      }
-    }
-  }
-
   void _toggle(ExerciseSelection item) {
     if (_alreadyAdded(item.template)) return;
     setState(() {
-      _rememberOrder();
-      if (_selected.remove(item.template.identity) == null) {
-        _selected[item.template.identity] = item;
+      final identity = item.template.identity;
+      if (_selected.remove(identity) != null) {
+        _order.remove(identity);
+      } else {
+        _selected[identity] = item;
+        _order.add(identity);
+      }
+    });
+  }
+
+  void _selectMenu(SavedWorkoutTemplate menu) {
+    setState(() {
+      for (final item in _menuItems(menu)) {
+        final identity = item.template.identity;
+        if (_alreadyAdded(item.template) || _selected.containsKey(identity)) {
+          continue;
+        }
+        _selected[identity] = item;
+        _order.add(identity);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final browsing = _selectedCategory != null || _menu != null;
+    final browsing = _selectedCategory != null || _showMenus || _query.isNotEmpty;
     final filtered = _source.where((item) {
       final e = item.template;
       final query = _query.toLowerCase();
@@ -6959,11 +7042,15 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
             exerciseId: e.exerciseId,
           ).toLowerCase().contains(query);
     }).toList();
-    // Keep a newly created exercise visible even as the catalog grows.
-    final recent = filtered.indexWhere(
-      (item) => item.template.identity == _recentCustomName,
-    );
-    if (recent > 0) filtered.insert(0, filtered.removeAt(recent));
+    filtered.sort((a, b) {
+      final af = _favorites.contains(a.template.identity);
+      final bf = _favorites.contains(b.template.identity);
+      if (af != bf) return af ? -1 : 1;
+      final name = exerciseSortKey(a.template.name).compareTo(
+        exerciseSortKey(b.template.name),
+      );
+      return name != 0 ? name : a.template.identity.compareTo(b.template.identity);
+    });
     return SafeArea(
       child: Column(
         children: [
@@ -6976,15 +7063,17 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                     key: const Key('backToExerciseCategories'),
                     onPressed: () => setState(() {
                       _selectedCategory = null;
-                      _menu = null;
+                      _showMenus = false;
+                      _searchController.clear();
                       _query = '';
                     }),
                     icon: const Icon(Icons.arrow_back_rounded),
                   ),
                 Expanded(
                   child: Text(
-                    _menu?.name ??
-                        (_selectedCategory == null
+                    _showMenus
+                        ? 'マイメニュー'
+                        : (_selectedCategory == null
                             ? '部位・カテゴリを選択'
                             : '${_categoryLabel(_selectedCategory!)}の種目'),
                     maxLines: 2,
@@ -7005,58 +7094,47 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
               ],
             ),
           ),
-          if (browsing) ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
-                key: ValueKey('exerciseSearchField'),
-                onChanged: (value) => setState(() => _query = value.trim()),
-                decoration: const InputDecoration(
-                  hintText: '種目名・器具で検索',
-                  prefixIcon: Icon(Icons.search_rounded),
-                  border: OutlineInputBorder(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: TextField(
+              controller: _searchController,
+              key: const Key('exerciseSearchField'),
+              onChanged: (value) => setState(() => _query = value.trim()),
+              decoration: InputDecoration(
+                hintText: '種目名・器具で検索',
+                prefixIcon: const Icon(Icons.search_rounded),
+                suffixIcon: _query.isEmpty ? null : IconButton(
+                  key: const Key('clearExerciseSearch'),
+                  tooltip: '検索をクリア',
+                  onPressed: () => setState(() {
+                    _searchController.clear();
+                    _query = '';
+                  }),
+                  icon: const Icon(Icons.close_rounded),
                 ),
+                border: const OutlineInputBorder(),
               ),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                key: const Key('selectAllExercises'),
-                onPressed: filtered.any((e) => !_alreadyAdded(e.template))
-                    ? () => setState(() {
-                        _rememberOrder();
-                        for (final item in filtered) {
-                          if (!_alreadyAdded(item.template)) {
-                            _selected[item.template.identity] = item;
-                          }
-                        }
-                      })
-                    : null,
-                child: Text(_query.isEmpty ? 'すべて選択' : '検索結果をすべて選択'),
-              ),
-            ),
-          ],
+          ),
           Expanded(
             child: ListView(
               controller: _listController,
               key: ValueKey(
-                'exercisePickerList${_menu?.name ?? _selectedCategory}',
+                'exercisePickerList${_showMenus ? 'menus' : _selectedCategory}${_query.isNotEmpty}',
               ),
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
               children: [
                 if (!browsing) ...[
-                  for (final menu in widget.menus)
-                    ListTile(
-                      key: ValueKey('pickMenu${menu.name}'),
+                  Card(
+                    child: ListTile(
+                      key: const Key('exercisePickerMyMenuEntry'),
                       leading: const Icon(Icons.playlist_add_rounded),
-                      title: Text(menu.name),
-                      subtitle: Text('マイメニュー ・ ${menu.exerciseNames.length}種目'),
+                      title: const Text('マイメニュー'),
+                      subtitle: Text('${widget.menus.length}メニュー'),
                       trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => setState(() {
-                        _menu = menu;
-                        _query = '';
-                      }),
+                      onTap: () => setState(() => _showMenus = true),
                     ),
+                  ),
                   ..._categories.map(
                     (category) => BodyPartCategoryCard(
                       category: category,
@@ -7067,15 +7145,38 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                       onTap: () => setState(() => _selectedCategory = category),
                     ),
                   ),
-                ] else
+                ],
+                if (_showMenus) ...[
+                  if (widget.menus.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text('保存したマイメニューはありません'),
+                    ),
+                  for (final menu in widget.menus)
+                    ListTile(
+                      key: ValueKey('pickMenu${menu.name}'),
+                      title: Text(menu.name),
+                      subtitle: Text('${menu.exerciseGroups.length}種目'),
+                      leading: const Icon(Icons.playlist_add_rounded),
+                      onTap: () => _selectMenu(menu),
+                    ),
+                ],
+                if (browsing)
                   ...filtered.map((item) {
                     final e = item.template;
                     final added = _alreadyAdded(e);
                     return ListTile(
                       key: ValueKey('selectExercise${e.exerciseId ?? e.name}'),
-                      leading: Checkbox(
-                        value: added || _selected.containsKey(e.identity),
-                        onChanged: added ? null : (_) => _toggle(item),
+                      selected: !added && _selected.containsKey(e.identity),
+                      selectedTileColor: const Color(0xFFE9F4D1),
+                      selectedColor: const Color(0xFF101820),
+                      leading: IconButton(
+                        key: ValueKey('favoriteExercise${e.identity}'),
+                        tooltip: _favorites.contains(e.identity) ? 'お気に入り解除' : 'お気に入りに追加',
+                        onPressed: !_favoritesReady || _savingFavorite
+                            ? null : () => _toggleFavorite(e.identity),
+                        icon: Icon(_favorites.contains(e.identity)
+                            ? Icons.star_rounded : Icons.star_border_rounded),
                       ),
                       title: Text(
                         exerciseDisplayName(
@@ -7117,16 +7218,6 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                         key: const Key('selectedExerciseCount'),
                       ),
                     ),
-                    TextButton(
-                      key: const Key('clearSelectedExercises'),
-                      onPressed: _selected.isEmpty
-                          ? null
-                          : () => setState(() {
-                              _selected.clear();
-                              _order.clear();
-                            }),
-                      child: const Text('すべて解除'),
-                    ),
                   ],
                 ),
                 SizedBox(
@@ -7164,11 +7255,11 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     final added = await CustomExercisePreference.add(created);
     if (mounted && added) {
       setState(() {
-        _recentCustomName = created.identity;
         _selected[created.identity] = ExerciseSelection(created);
         _order.add(created.identity);
         _selectedCategory = created.bodyPart;
         _query = '';
+        _searchController.clear();
       });
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && _listController.hasClients) {

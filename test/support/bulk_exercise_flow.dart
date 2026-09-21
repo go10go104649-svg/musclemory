@@ -6,6 +6,31 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:muscle_memory/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Scope scrolling to the picker list, excluding its text field's Scrollable.
+Finder exercisePickerScrollable() => find.descendant(
+  of: find.descendant(of: find.byType(ExercisePickerSheet), matching: find.byType(ListView)),
+  matching: find.byType(Scrollable),
+);
+
+Future<void> openExerciseCategory(WidgetTester tester, String category) async {
+  final card = find.byKey(Key('exerciseCategory$category'));
+  await tester.scrollUntilVisible(card, 180, scrollable: exercisePickerScrollable());
+  await tester.tap(card);
+  await tester.pumpAndSettle();
+}
+
+Future<void> selectPickerExercise(WidgetTester tester, String id) async {
+  final exercise = exerciseTemplates.firstWhere((item) => item.exerciseId == id);
+  await tester.enterText(find.byKey(const Key('exerciseSearchField')), exercise.name);
+  await tester.pumpAndSettle();
+  FocusManager.instance.primaryFocus?.unfocus();
+  await tester.pumpAndSettle();
+  final row = find.byKey(Key('selectExercise$id'));
+  await tester.scrollUntilVisible(row, 100, scrollable: exercisePickerScrollable());
+  await tester.tap(row);
+  await tester.pumpAndSettle();
+}
+
 Future<void> verifyBulkExerciseFlow(
   WidgetTester tester, {
   Future<void> Function(String)? screenshot,
@@ -51,32 +76,18 @@ Future<void> verifyBulkExerciseFlow(
     );
     await tester.tap(find.byKey(const Key('addExerciseButton')));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('exercisePickerMyMenuEntry')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('pickMenuまとめて記録')));
     await tester.pumpAndSettle();
   }
 
   await openMenu();
-  for (final name in names.reversed) {
-    await tester.ensureVisible(find.byKey(Key('selectExercise$name')));
-    await tester.tap(find.byKey(Key('selectExercise$name')));
-    await tester.pumpAndSettle();
-  }
   expect(find.text('3種目選択中'), findsOneWidget);
-  await tester.tap(find.byKey(const Key('clearSelectedExercises')));
-  await tester.pumpAndSettle();
-  expect(find.text('0種目選択中'), findsOneWidget);
-  expect(
-    tester
-        .widget<FilledButton>(find.byKey(const Key('addSelectedExercises')))
-        .onPressed,
-    isNull,
-  );
-  await tester.tap(find.byKey(const Key('selectAllExercises')));
-  await tester.pumpAndSettle();
-  await tester.tap(find.byKey(const Key('selectExerciseベンチプレス')));
-  await tester.pumpAndSettle();
-  expect(find.text('2種目選択中'), findsOneWidget);
-  await tester.tap(find.byKey(const Key('selectExerciseベンチプレス')));
+  expect(find.byKey(const Key('clearSelectedExercises')), findsNothing);
+  expect(find.byKey(const Key('selectAllExercises')), findsNothing);
+  // Repeated group selection must not duplicate or reorder saved exercises.
+  await tester.tap(find.byKey(const Key('pickMenuまとめて記録')));
   await tester.pumpAndSettle();
   expect(find.text('3種目選択中'), findsOneWidget);
   await screenshot?.call('three_exercises_selected');
@@ -110,6 +121,8 @@ Future<void> verifyBulkExerciseFlow(
   await tester.pumpAndSettle();
   await tester.ensureVisible(find.byKey(const Key('exerciseCategory胸')));
   await tester.tap(find.byKey(const Key('exerciseCategory胸')));
+  await tester.pumpAndSettle();
+  await tester.enterText(find.byKey(const Key('exerciseSearchField')), 'チェストプレス');
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('selectExercisechest_press')));
   await tester.pumpAndSettle();
