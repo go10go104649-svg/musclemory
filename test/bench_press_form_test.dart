@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:interactive_3d/interactive_3d.dart';
 import 'package:interactive_3d/src/form_model.dart';
 import 'package:muscle_memory/bench_press_form.dart';
+import 'package:muscle_memory/exercise_form_catalog.dart';
 
 void main() {
   test(
@@ -167,7 +168,7 @@ void main() {
   }
 
   testWidgets(
-    'form controls preserve pause and speed across lifecycle changes and dispose the scene',
+    'form controls preserve pause and default speed across lifecycle changes and dispose the scene',
     (tester) async {
       tester.view.physicalSize = const Size(430, 932);
       tester.view.devicePixelRatio = 1;
@@ -188,12 +189,24 @@ void main() {
         (_) async => null,
       );
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
-            body: SingleChildScrollView(child: BenchPressFormView()),
+            appBar: AppBar(title: const Text('ベンチプレス')),
+            body: const SingleChildScrollView(child: BenchPressFormView()),
           ),
         ),
       );
+      final card = find.byKey(const Key('benchPressForm3D'));
+      for (final label in ['ループ再生', '0.5倍速', '1倍速', '1.5倍速', 'ベンチプレス']) {
+        expect(find.descendant(of: card, matching: find.text(label)), findsNothing);
+      }
+      expect(find.byKey(const Key('benchPressPlaybackSpeed')), findsNothing);
+      expect(find.byType(DropdownButton<double>), findsNothing);
+      expect(find.descendant(of: find.byType(AppBar), matching: find.text('ベンチプレス')), findsOneWidget);
+      final playPause = find.byKey(const Key('benchPressPlayPause'));
+      expect(playPause, findsOneWidget);
+      expect(tester.widget<FilledButton>(playPause).onPressed, isNull);
+      final defaultSpeed = ExerciseFormCatalog.forName('ベンチプレス')!.animationSpeed;
       // Exercise the Flutter controls independently from native renderer readiness.
       final native = tester.widget<Interactive3d>(find.byType(Interactive3d));
       native.onModelReady!();
@@ -206,13 +219,9 @@ void main() {
             .animationPlaying,
         isFalse,
       );
-      await tester.tap(find.byKey(const Key('benchPressPlaybackSpeed')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('0.5倍速').last);
-      await tester.pumpAndSettle();
       expect(
         tester.widget<Interactive3d>(find.byType(Interactive3d)).animationSpeed,
-        0.5,
+        defaultSpeed,
       );
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
       await tester.pump();
@@ -242,6 +251,14 @@ void main() {
       );
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pump();
+      expect(
+        tester.widget<Interactive3d>(find.byType(Interactive3d)).animationSpeed,
+        defaultSpeed,
+      );
+      tester.widget<Interactive3d>(find.byType(Interactive3d)).onModelError!('test failure');
+      await tester.pump();
+      expect(tester.widget<FilledButton>(playPause).onPressed, isNull);
+      expect(find.textContaining('3Dフォームを読み込めませんでした'), findsOneWidget);
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
       expect(find.byType(Interactive3d), findsNothing);

@@ -26,7 +26,6 @@ class _BenchPressFormViewState extends State<ExerciseFormView>
   bool _foreground = true;
   bool _ready = false;
   bool _failed = false;
-  double _speed = 1;
 
   @override
   void initState() {
@@ -48,7 +47,6 @@ class _BenchPressFormViewState extends State<ExerciseFormView>
       _ready = false;
       _failed = false;
       _playing = true;
-      _speed = 1;
     }
   }
 
@@ -82,26 +80,13 @@ class _BenchPressFormViewState extends State<ExerciseFormView>
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 18, 18, 4),
-            child: Row(
-              children: [
-                Text(
-                  '3Dフォーム',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                Spacer(),
-                Flexible(
-                  child: Text(
-                    exerciseDisplayName(widget.exerciseName),
-                    maxLines: 2,
-                    textAlign: TextAlign.end,
-                    style: const TextStyle(color: Colors.white60, fontSize: 12),
-                  ),
-                ),
-              ],
+            child: const Text(
+              '3Dフォーム',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
           AspectRatio(
@@ -120,7 +105,7 @@ class _BenchPressFormViewState extends State<ExerciseFormView>
                       backgroundColor: const Color(0xFF111820),
                       formAnimation: true,
                       animationPlaying: _playing && _foreground,
-                      animationSpeed: _speed * form.animationSpeed,
+                      animationSpeed: form.animationSpeed,
                       onModelReady: () {
                         if (mounted) setState(() => _ready = true);
                       },
@@ -165,32 +150,7 @@ class _BenchPressFormViewState extends State<ExerciseFormView>
                   ),
                   label: Text(_playing ? '一時停止' : '再生'),
                 ),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Text(
-                    'ループ再生',
-                    style: TextStyle(color: Colors.white60, fontSize: 12),
-                  ),
-                ),
-                DropdownButtonHideUnderline(
-                  child: DropdownButton<double>(
-                    key: const Key('benchPressPlaybackSpeed'),
-                    value: _speed,
-                    dropdownColor: const Color(0xFF222C35),
-                    iconEnabledColor: Colors.white70,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                    items: const [
-                      DropdownMenuItem(value: 0.5, child: Text('0.5倍速')),
-                      DropdownMenuItem(value: 1, child: Text('1倍速')),
-                      DropdownMenuItem(value: 1.5, child: Text('1.5倍速')),
-                    ],
-                    onChanged: _ready && !_failed
-                        ? (value) {
-                            if (value != null) setState(() => _speed = value);
-                          }
-                        : null,
-                  ),
-                ),
+
               ],
             ),
           ),
