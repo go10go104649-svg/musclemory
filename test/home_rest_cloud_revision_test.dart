@@ -113,7 +113,7 @@ void main() {
     tester,
   ) async {
     final auth = _FakeAccountAuth()
-      ..googleError = const AuthException('Googleログインを開始できません');
+      ..googleError = const AuthException('Googleログイン画面を開けませんでした');
     addTearDown(auth.events.close);
     await tester.pumpWidget(
       MaterialApp(
@@ -127,13 +127,13 @@ void main() {
     final google = find.byKey(const Key('accountGoogleSignInButton'));
     await tester.tap(google);
     await tester.pumpAndSettle();
-    expect(find.text('Googleログインを開始できません'), findsOneWidget);
+    expect(find.text('Googleログイン画面を開けませんでした'), findsOneWidget);
     expect(tester.widget<OutlinedButton>(google).onPressed, isNotNull);
     auth.googleError = null;
     await tester.tap(google);
     await tester.pumpAndSettle();
     expect(auth.googleSignIns, 2);
-    expect(find.text('Googleログインを開始できません'), findsNothing);
+    expect(find.text('Googleログイン画面を開けませんでした'), findsNothing);
   });
   testWidgets(
     'account is accessible from profile without configuration or Premium',

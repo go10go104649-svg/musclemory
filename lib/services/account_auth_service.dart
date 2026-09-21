@@ -50,9 +50,10 @@ class SupabaseAccountAuthService implements AccountAuthService {
     final launched = await _client.auth.signInWithOAuth(
       OAuthProvider.google,
       redirectTo: SupabaseConfig.authRedirectUrl,
+      authScreenLaunchMode: LaunchMode.externalApplication,
     );
     if (!launched) {
-      throw const AuthException('Googleログインを開始できませんでした。もう一度お試しください。');
+      throw const AuthException('Googleログイン画面を開けませんでした');
     }
     // Browser launch is not authentication; the callback updates auth state.
   }
