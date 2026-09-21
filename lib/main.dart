@@ -6933,6 +6933,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
   String _query = '';
   String? _selectedCategory;
   bool _showMenus = false;
+  SavedWorkoutTemplate? _activeMenu;
   final _searchController = TextEditingController();
   Set<String> _favorites = {};
   bool _favoritesReady = false;
@@ -6972,14 +6973,14 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
       if (mounted) setState(() => _favorites = updated);
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('お気に入りを保存できませんでした。')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('お気に入りを保存できませんでした。')));
       }
     } finally {
       if (mounted) setState(() => _savingFavorite = false);
     }
   }
+
   final _listController = ScrollController();
 
   @override
@@ -6999,16 +7000,16 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     for (final item in CustomExercisePreference.exercises) item.identity: item,
   }.values.toList();
 
-  List<ExerciseSelection> get _source => _showMenus
-      ? <String, ExerciseSelection>{
-          for (final menu in widget.menus)
-            for (final item in _menuItems(menu)) item.template.identity: item,
-          ..._selected,
-        }.values.toList()
-      : _catalog
-          .where((e) => _selectedCategory == null || e.bodyPart == _selectedCategory)
-          .map((e) => _selected[e.identity] ?? ExerciseSelection(e))
-          .toList();
+  List<ExerciseSelection> get _source {
+    if (_activeMenu != null) return _menuItems(_activeMenu!);
+    if (_showMenus) return const [];
+    return _catalog
+        .where(
+          (e) => _selectedCategory == null || e.bodyPart == _selectedCategory,
+        )
+        .map((e) => _selected[e.identity] ?? ExerciseSelection(e))
+        .toList();
+  }
 
   List<ExerciseSelection> _menuItems(SavedWorkoutTemplate menu) {
     return menu.exerciseGroups.values.map((sets) {
@@ -7051,6 +7052,9 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
 
   void _selectMenu(SavedWorkoutTemplate menu) {
     setState(() {
+      _activeMenu = menu;
+      _query = '';
+      _searchController.clear();
       for (final item in _menuItems(menu)) {
         final identity = item.template.identity;
         if (_alreadyAdded(item.template) || _selected.containsKey(identity)) {
@@ -7064,7 +7068,17 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final browsing = _selectedCategory != null || _showMenus || _query.isNotEmpty;
+    final menuList = _showMenus && _activeMenu == null;
+    final background =
+        Theme.of(context).bottomSheetTheme.backgroundColor ??
+        Theme.of(context).colorScheme.surface;
+    Widget fixedArea(String key, Widget child) => ColoredBox(
+      key: Key(key),
+      color: background.withAlpha(255),
+      child: child,
+    );
+    final browsing =
+        _selectedCategory != null || _showMenus || _query.isNotEmpty;
     final filtered = _source.where((item) {
       final e = item.template;
       final query = _query.toLowerCase();
@@ -7078,194 +7092,235 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
       final af = _favorites.contains(a.template.identity);
       final bf = _favorites.contains(b.template.identity);
       if (af != bf) return af ? -1 : 1;
-      final name = exerciseSortKey(a.template.name).compareTo(
-        exerciseSortKey(b.template.name),
-      );
-      return name != 0 ? name : a.template.identity.compareTo(b.template.identity);
+      final name = exerciseSortKey(a.template.name)
+          .compareTo(exerciseSortKey(b.template.name));
+      return name != 0
+          ? name
+          : a.template.identity.compareTo(b.template.identity);
     });
     return SafeArea(
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
-            child: Row(
-              children: [
-                if (browsing)
-                  IconButton(
-                    key: const Key('backToExerciseCategories'),
-                    onPressed: () => setState(() {
-                      _selectedCategory = null;
-                      _showMenus = false;
-                      _searchController.clear();
-                      _query = '';
-                    }),
-                    icon: const Icon(Icons.arrow_back_rounded),
-                  ),
-                Expanded(
-                  child: Text(
-                    _showMenus
-                        ? 'マイメニュー'
-                        : (_selectedCategory == null
-                            ? '部位・カテゴリを選択'
-                            : '${_categoryLabel(_selectedCategory!)}の種目'),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 21,
-                      fontWeight: FontWeight.w900,
+          fixedArea(
+            'exercisePickerHeader',
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+              child: Row(
+                children: [
+                  if (browsing)
+                    IconButton(
+                      key: const Key('backToExerciseCategories'),
+                      onPressed: () => setState(() {
+                        if (_activeMenu != null) {
+                          _activeMenu = null;
+                        } else {
+                          _selectedCategory = null;
+                          _showMenus = false;
+                        }
+                        _searchController.clear();
+                        _query = '';
+                      }),
+                      icon: const Icon(Icons.arrow_back_rounded),
+                    ),
+                  Expanded(
+                    child: Text(
+                      _activeMenu?.name ??
+                          (_showMenus
+                              ? 'マイメニュー'
+                              : (_selectedCategory == null
+                                    ? '部位・カテゴリを選択'
+                                    : '${_categoryLabel(_selectedCategory!)}の種目')),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ),
-                ),
-                if (_selectedCategory != null)
-                  IconButton(
-                    key: const Key('addCustomExerciseForCategory'),
-                    tooltip: '${_categoryLabel(_selectedCategory!)}の種目を作る',
-                    onPressed: _createCustomExercise,
-                    icon: const Icon(Icons.add_rounded),
-                  ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: TextField(
-              controller: _searchController,
-              key: const Key('exerciseSearchField'),
-              onChanged: (value) => setState(() => _query = value.trim()),
-              decoration: InputDecoration(
-                hintText: '種目名・器具で検索',
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: _query.isEmpty ? null : IconButton(
-                  key: const Key('clearExerciseSearch'),
-                  tooltip: '検索をクリア',
-                  onPressed: () => setState(() {
-                    _searchController.clear();
-                    _query = '';
-                  }),
-                  icon: const Icon(Icons.close_rounded),
-                ),
-                border: const OutlineInputBorder(),
+                  if (_selectedCategory != null)
+                    IconButton(
+                      key: const Key('addCustomExerciseForCategory'),
+                      tooltip: '${_categoryLabel(_selectedCategory!)}の種目を作る',
+                      onPressed: _createCustomExercise,
+                      icon: const Icon(Icons.add_rounded),
+                    ),
+                ],
               ),
             ),
           ),
+          if (!menuList)
+            fixedArea(
+              'exercisePickerSearchArea',
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: TextField(
+                  controller: _searchController,
+                  key: const Key('exerciseSearchField'),
+                  onChanged: (value) => setState(() => _query = value.trim()),
+                  decoration: InputDecoration(
+                    hintText: '種目名・器具で検索',
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: _query.isEmpty
+                        ? null
+                        : IconButton(
+                            key: const Key('clearExerciseSearch'),
+                            tooltip: '検索をクリア',
+                            onPressed: () => setState(() {
+                              _searchController.clear();
+                              _query = '';
+                            }),
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ),
           Expanded(
-            child: ListView(
-              controller: _listController,
-              key: ValueKey(
-                'exercisePickerList${_showMenus ? 'menus' : _selectedCategory}${_query.isNotEmpty}',
-              ),
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              children: [
-                if (!browsing) ...[
-                  Card(
-                    child: ListTile(
-                      key: const Key('exercisePickerMyMenuEntry'),
-                      leading: const Icon(Icons.playlist_add_rounded),
-                      title: const Text('マイメニュー'),
-                      subtitle: Text('${widget.menus.length}メニュー'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => setState(() => _showMenus = true),
-                    ),
+            child: ClipRect(
+              key: const Key('exercisePickerListClip'),
+              child: Material(
+                color: background.withAlpha(255),
+                child: ListView(
+                  controller: _listController,
+                  key: ValueKey(
+                    'exercisePickerList${_activeMenu?.name ?? (_showMenus ? 'menus' : _selectedCategory)}${_query.isNotEmpty}',
                   ),
-                  ..._categories.map(
-                    (category) => BodyPartCategoryCard(
-                      category: category,
-                      label: _categoryLabel(category),
-                      count: _catalog
-                          .where((e) => e.bodyPart == category)
-                          .length,
-                      onTap: () => setState(() => _selectedCategory = category),
-                    ),
-                  ),
-                ],
-                if (_showMenus) ...[
-                  if (widget.menus.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text('保存したマイメニューはありません'),
-                    ),
-                  for (final menu in widget.menus)
-                    ListTile(
-                      key: ValueKey('pickMenu${menu.name}'),
-                      title: Text(menu.name),
-                      subtitle: Text('${menu.exerciseGroups.length}種目'),
-                      leading: const Icon(Icons.playlist_add_rounded),
-                      onTap: () => _selectMenu(menu),
-                    ),
-                ],
-                if (browsing)
-                  ...filtered.map((item) {
-                    final e = item.template;
-                    final added = _alreadyAdded(e);
-                    return ListTile(
-                      key: ValueKey('selectExercise${e.exerciseId ?? e.name}'),
-                      selected: !added && _selected.containsKey(e.identity),
-                      selectedTileColor: const Color(0xFFE9F4D1),
-                      selectedColor: const Color(0xFF101820),
-                      leading: IconButton(
-                        key: ValueKey('favoriteExercise${e.identity}'),
-                        tooltip: _favorites.contains(e.identity) ? 'お気に入り解除' : 'お気に入りに追加',
-                        onPressed: !_favoritesReady || _savingFavorite
-                            ? null : () => _toggleFavorite(e.identity),
-                        icon: Icon(_favorites.contains(e.identity)
-                            ? Icons.star_rounded : Icons.star_border_rounded),
-                      ),
-                      title: Text(
-                        exerciseDisplayName(
-                          e.name,
-                          exerciseId: e.exerciseId,
-                          languageCode: Localizations.localeOf(context)
-                              .languageCode,
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.w800),
-                      ),
-                      subtitle: Text(
-                        added ? '追加済み' : '${e.bodyPart} ・ ${e.equipment}',
-                      ),
-                      trailing: ExerciseFormCatalog.resolve(e.exerciseId, e.name)?.available == true
-                          ? _Exercise3dBadge(
-                              key: Key('exerciseMuscles${e.exerciseId ?? e.name}'),
-                              onPressed: () => _showExerciseMuscles(e),
-                            )
-                          : null,
-                      onTap: added ? null : () => _toggle(item),
-                    );
-                  }),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                   children: [
-                    Expanded(
-                      child: Text(
-                        '${_selected.length}種目選択中',
-                        key: const Key('selectedExerciseCount'),
+                    if (!browsing) ...[
+                      Card(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        child: ListTile(
+                          key: const Key('exercisePickerMyMenuEntry'),
+                          leading: const Icon(Icons.playlist_add_rounded),
+                          title: const Text('マイメニュー'),
+                          subtitle: Text('${widget.menus.length}メニュー'),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                          onTap: () => setState(() => _showMenus = true),
+                        ),
                       ),
-                    ),
+                      ..._categories.map(
+                        (category) => BodyPartCategoryCard(
+                          category: category,
+                          label: _categoryLabel(category),
+                          count: _catalog
+                              .where((e) => e.bodyPart == category)
+                              .length,
+                          onTap: () =>
+                              setState(() => _selectedCategory = category),
+                        ),
+                      ),
+                    ],
+                    if (menuList) ...[
+                      if (widget.menus.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Text('保存したマイメニューはありません'),
+                        ),
+                      for (final menu in widget.menus)
+                        ListTile(
+                          key: ValueKey('pickMenu${menu.name}'),
+                          title: Text(menu.name),
+                          subtitle: Text('${menu.exerciseGroups.length}種目'),
+                          leading: const Icon(Icons.playlist_add_rounded),
+                          onTap: () => _selectMenu(menu),
+                        ),
+                    ],
+                    if (browsing && !menuList)
+                      ...filtered.map((item) {
+                        final e = item.template;
+                        final added = _alreadyAdded(e);
+                        return ListTile(
+                          key: ValueKey(
+                            'selectExercise${e.exerciseId ?? e.name}',
+                          ),
+                          selected: !added && _selected.containsKey(e.identity),
+                          selectedTileColor: const Color(0xFFE9F4D1),
+                          selectedColor: const Color(0xFF101820),
+                          leading: IconButton(
+                            key: ValueKey('favoriteExercise${e.identity}'),
+                            tooltip: _favorites.contains(e.identity)
+                                ? 'お気に入り解除'
+                                : 'お気に入りに追加',
+                            onPressed: !_favoritesReady || _savingFavorite
+                                ? null
+                                : () => _toggleFavorite(e.identity),
+                            icon: Icon(
+                              _favorites.contains(e.identity)
+                                  ? Icons.star_rounded
+                                  : Icons.star_border_rounded,
+                            ),
+                          ),
+                          title: Text(
+                            exerciseDisplayName(
+                              e.name,
+                              exerciseId: e.exerciseId,
+                              languageCode: Localizations.localeOf(context)
+                                  .languageCode,
+                            ),
+                            style: const TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                          subtitle: Text(
+                            added ? '追加済み' : '${e.bodyPart} ・ ${e.equipment}',
+                          ),
+                          trailing:
+                              ExerciseFormCatalog.resolve(
+                                    e.exerciseId,
+                                    e.name,
+                                  )?.available ==
+                                  true
+                              ? _Exercise3dBadge(
+                                  key: Key(
+                                    'exerciseMuscles${e.exerciseId ?? e.name}',
+                                  ),
+                                  onPressed: () => _showExerciseMuscles(e),
+                                )
+                              : null,
+                          onTap: added ? null : () => _toggle(item),
+                        );
+                      }),
                   ],
                 ),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    key: const Key('addSelectedExercises'),
-                    onPressed: _selected.isEmpty
-                        ? null
-                        : () => Navigator.pop(
-                            context,
-                            _order
-                                .where(_selected.containsKey)
-                                .map((name) => _selected[name]!)
-                                .toList(),
-                          ),
-                    child: const Text('選択した種目を追加'),
+              ),
+            ),
+          ),
+          fixedArea(
+            'exercisePickerFooter',
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${_selected.length}種目選択中',
+                          key: const Key('selectedExerciseCount'),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      key: const Key('addSelectedExercises'),
+                      onPressed: _selected.isEmpty
+                          ? null
+                          : () => Navigator.pop(
+                              context,
+                              _order
+                                  .where(_selected.containsKey)
+                                  .map((name) => _selected[name]!)
+                                  .toList(),
+                            ),
+                      child: const Text('選択した種目を追加'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

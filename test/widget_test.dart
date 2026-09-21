@@ -502,7 +502,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: Scaffold(body: Builder(builder: (context) =>
       TextButton(onPressed: () async {
         result = await Navigator.of(context).push<List<ExerciseSelection>>(MaterialPageRoute(
-          builder: (_) => Scaffold(body: ExercisePickerSheet(menus: [menu, SavedWorkoutTemplate(name: '肩の日2', sets: menu.sets)])),
+          builder: (_) => Scaffold(body: ExercisePickerSheet(menus: [menu, SavedWorkoutTemplate(name: '背中の日', sets: [menu.sets.first, const RecordedSet(exerciseId: 'lat_pulldown', exerciseName: 'ラットプルダウン', bodyPart: '背中', weight: 40, reps: 10, completed: true)])])),
         ));
       }, child: const Text('開く')),
     ))));
@@ -510,20 +510,70 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('肩の日'), findsNothing);
     expect(find.text('2メニュー'), findsOneWidget);
-    await tester.tap(find.byKey(const Key('exercisePickerMyMenuEntry')));
+    final entry = find.byKey(const Key('exercisePickerMyMenuEntry'));
+    expect(entry, findsOneWidget);
+    expect(tester.getTopLeft(find.byKey(const Key('exerciseCategory胸'))).dy -
+        tester.getBottomLeft(entry).dy, greaterThanOrEqualTo(10));
+    await tester.tap(entry);
     await tester.pumpAndSettle();
+    expect(find.byKey(const Key('exerciseSearchField')), findsNothing);
+    expect(find.byKey(const Key('selectExerciseshoulder_press')), findsNothing);
+    expect(find.byKey(const Key('selectExerciselat_pulldown')), findsNothing);
     for (var i = 0; i < 2; i++) {
-      await tester.tap(find.byKey(Key(i == 0 ? 'pickMenu肩の日' : 'pickMenu肩の日2')));
+      await tester.tap(find.byKey(Key(i == 0 ? 'pickMenu肩の日' : 'pickMenu背中の日')));
       await tester.pumpAndSettle();
-      expect(find.text('2種目選択中'), findsOneWidget);
+      expect(find.text(i == 0 ? '2種目選択中' : '3種目選択中'), findsOneWidget);
+      expect(find.byKey(const Key('pickMenu肩の日')), findsNothing);
+      expect(find.byKey(const Key('selectExerciseshoulder_press')), i == 0 ? findsOneWidget : findsNothing);
+      expect(find.byKey(const Key('selectExerciselat_pulldown')), i == 0 ? findsNothing : findsOneWidget);
       expect(result, isNull);
+      // Searching this menu must never bring in exercises from another menu.
+      await tester.enterText(find.byKey(const Key('exerciseSearchField')), i == 0 ? 'ラットプルダウン' : 'マシン');
+      await tester.pumpAndSettle();
+      expect(find.byKey(Key(i == 0 ? 'selectExerciselat_pulldown' : 'selectExerciseshoulder_press')), findsNothing);
+      await tester.tap(find.byKey(const Key('backToExerciseCategories')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('pickMenu肩の日')), findsOneWidget);
+      expect(find.byKey(const Key('selectExerciseplate_loaded_shoulder_press')), findsNothing);
     }
+    await tester.tap(find.byKey(const Key('backToExerciseCategories')));
+    await tester.pumpAndSettle();
+    expect(entry, findsOneWidget);
+    expect(find.text('3種目選択中'), findsOneWidget);
     await tester.tap(find.byKey(const Key('addSelectedExercises')));
     await tester.pumpAndSettle();
-    expect(result!.map((e) => e.template.exerciseId), ['plate_loaded_shoulder_press', 'shoulder_press']);
+    expect(result!.map((e) => e.template.exerciseId), ['plate_loaded_shoulder_press', 'shoulder_press', 'lat_pulldown']);
     expect(result!.first.savedSets!.single.weight, 25);
     expect(result!.first.savedSets!.single.reps, 8);
     expect(result!.first.savedSets!.single.completed, true);
+  });
+
+  testWidgets('exercise picker clips selected ink below opaque fixed areas', (tester) async {
+    _setExistingUserPreferences({});
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: ExercisePickerSheet())));
+    await tester.pumpAndSettle();
+    await openExerciseCategory(tester, '胸');
+    await selectPickerExercise(tester, 'bench_press');
+    final row = find.byKey(const Key('selectExercisebench_press'));
+    expect(tester.widget<ListTile>(row).selected, isTrue);
+    expect(tester.widget<ListTile>(row).selectedTileColor, const Color(0xFFE9F4D1));
+    for (final key in ['exercisePickerHeader', 'exercisePickerSearchArea', 'exercisePickerFooter']) {
+      expect(tester.widget<ColoredBox>(find.byKey(Key(key))).color.a, 1);
+    }
+    final clip = find.byKey(const Key('exercisePickerListClip'));
+    expect(tester.widget<ClipRect>(clip).clipBehavior, Clip.hardEdge);
+    // Ink must paint on a Material INSIDE the clip, not on the bottom sheet.
+    final material = find.ancestor(of: row, matching: find.byType(Material)).first;
+    expect(find.descendant(of: clip, matching: material), findsOneWidget);
+    await tester.tap(find.byKey(const Key('clearExerciseSearch')));
+    await tester.pumpAndSettle();
+    await tester.drag(exercisePickerScrollable(), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(clip).dy,
+        greaterThanOrEqualTo(tester.getBottomLeft(find.byKey(const Key('exercisePickerSearchArea'))).dy));
+    expect(tester.getBottomLeft(clip).dy,
+        lessThanOrEqualTo(tester.getTopLeft(find.byKey(const Key('exercisePickerFooter'))).dy));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('exercise picker selects a category before searching exercises', (
