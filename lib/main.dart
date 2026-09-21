@@ -10761,6 +10761,8 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordConfirmationController = TextEditingController();
+  bool _isSignUp = false;
   late final AccountAuthService? _auth;
   StreamSubscription<void>? _authSubscription;
   bool _busy = false;
@@ -10775,7 +10777,9 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
       (_) {
         if (!mounted) return;
         _passwordController.clear();
+        _passwordConfirmationController.clear();
         setState(() {
+          if (_auth.isSignedIn) _isSignUp = false;
           if (_message == _authStateErrorMessage) _message = null;
         });
       },
@@ -10796,6 +10800,7 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
     _authSubscription?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
+    _passwordConfirmationController.dispose();
     super.dispose();
   }
 
@@ -10816,6 +10821,19 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
     }
   }
 
+  void _toggleAuthMode() {
+    if (_busy) return;
+    final email = _emailController.text;
+    _formKey.currentState?.reset();
+    _emailController.text = email;
+    _passwordController.clear();
+    _passwordConfirmationController.clear();
+    setState(() {
+      _isSignUp = !_isSignUp;
+      _message = null;
+    });
+  }
+
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
     await _run(() async {
@@ -10823,7 +10841,10 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
         _emailController.text.trim(),
         _passwordController.text,
       );
-      if (mounted) _passwordController.clear();
+      if (mounted) {
+        _passwordController.clear();
+        _passwordConfirmationController.clear();
+      }
       _message = 'ログインしました';
     });
   }
@@ -10835,7 +10856,10 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
         _emailController.text.trim(),
         _passwordController.text,
       );
-      if (mounted) _passwordController.clear();
+      if (mounted) {
+        _passwordController.clear();
+        _passwordConfirmationController.clear();
+      }
       _message = hasSession
           ? 'アカウントを作成しました'
           : '確認メールを送りました。メールを開いて登録を完了してください。';
@@ -10927,6 +10951,7 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
           key: const Key('accountPasswordField'),
           controller: _passwordController,
           enabled: !_busy,
+          textInputAction: _isSignUp ? TextInputAction.next : TextInputAction.done,
           obscureText: true,
           autocorrect: false,
           enableSuggestions: false,
@@ -10937,16 +10962,46 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
           validator: (value) =>
               (value?.length ?? 0) < 6 ? 'パスワードは6文字以上で入力してください' : null,
         ),
+        if (_isSignUp) ...[
+          const SizedBox(height: 12),
+          TextFormField(
+            key: const Key('accountPasswordConfirmationField'),
+            controller: _passwordConfirmationController,
+            enabled: !_busy,
+            obscureText: true,
+            autocorrect: false,
+            enableSuggestions: false,
+            textInputAction: TextInputAction.done,
+            decoration: const InputDecoration(
+              labelText: 'パスワード確認',
+              border: OutlineInputBorder(),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return '確認用のパスワードを入力してください';
+              }
+              if (value != _passwordController.text) {
+                return 'パスワードが一致しません';
+              }
+              return null;
+            },
+          ),
+        ],
         const SizedBox(height: 18),
         FilledButton(
-          key: const Key('accountSignInButton'),
-          onPressed: _busy ? null : _signIn,
-          child: const Text('ログイン'),
+          key: Key(_isSignUp ? 'accountSignUpButton' : 'accountSignInButton'),
+          onPressed: _busy ? null : (_isSignUp ? _signUp : _signIn),
+          child: Text(_isSignUp ? 'アカウントを作成' : 'ログイン'),
         ),
         TextButton(
-          key: const Key('accountSignUpButton'),
-          onPressed: _busy ? null : _signUp,
-          child: const Text('新規アカウント作成'),
+          key: const Key('accountAuthModeButton'),
+          onPressed: _busy ? null : _toggleAuthMode,
+          child: Text(
+            _isSignUp
+                ? 'すでにアカウントをお持ちの方 → ログイン'
+                : 'アカウントをお持ちでない方 → 新規アカウント作成',
+            textAlign: TextAlign.center,
+          ),
         ),
       ],
     ),
@@ -10956,7 +11011,9 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
   Widget build(BuildContext context) {
     final signedIn = _auth?.isSignedIn ?? false;
     return Scaffold(
-      appBar: AppBar(title: const Text('アカウント')),
+      appBar: AppBar(
+        title: Text(!signedIn && _isSignUp ? 'アカウントを作成' : 'アカウント'),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [

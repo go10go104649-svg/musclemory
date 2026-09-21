@@ -194,52 +194,67 @@ void main() {
     expect(auth.events.hasListener, isFalse);
   });
 
-  testWidgets('Google launch waits for auth callback without Premium or sync', (
-    tester,
-  ) async {
-    final auth = _FakeAccountAuth()..googleLaunch = Completer<void>();
-    addTearDown(auth.events.close);
-    var syncs = 0;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: CloudAccountPage(
-          historyCount: 0,
-          auth: auth,
-          onSyncRequested: () async {
-            syncs++;
-            return 0;
-          },
-        ),
-      ),
+  for (final registration in [false, true]) {
+    testWidgets(
+      'Google launch waits for auth callback registration=$registration',
+      (tester) async {
+        final auth = _FakeAccountAuth()..googleLaunch = Completer<void>();
+        addTearDown(auth.events.close);
+        var syncs = 0;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: CloudAccountPage(
+              historyCount: 0,
+              auth: auth,
+              onSyncRequested: () async {
+                syncs++;
+                return 0;
+              },
+            ),
+          ),
+        );
+        if (registration) {
+          await tester.tap(find.byKey(const Key('accountAuthModeButton')));
+          await tester.pumpAndSettle();
+        }
+        final google = find.byKey(const Key('accountGoogleSignInButton'));
+        expect(google, findsOneWidget);
+        await tester.tap(google);
+        await tester.pump();
+        expect(auth.googleSignIns, 1);
+        expect(
+          tester
+              .widget<TextButton>(
+                find.byKey(const Key('accountAuthModeButton')),
+              )
+              .onPressed,
+          isNull,
+        );
+        expect(tester.widget<OutlinedButton>(google).onPressed, isNull);
+        await tester.tap(google);
+        expect(auth.googleSignIns, 1);
+        auth.googleLaunch!.complete();
+        await tester.pumpAndSettle();
+        // Closing/cancelling the browser without a callback leaves login available.
+        expect(find.byKey(const Key('accountEmailField')), findsOneWidget);
+        expect(tester.widget<OutlinedButton>(google).onPressed, isNotNull);
+        expect(find.text('ログインしました'), findsNothing);
+        expect(find.text('通信に失敗しました。接続を確認してください。'), findsNothing);
+        auth.signedIn('google@example.com');
+        await tester.pumpAndSettle();
+        expect(find.text('google@example.com'), findsOneWidget);
+        expect(google, findsNothing);
+        expect(SupabaseSyncService.canUseCloud, isFalse);
+        expect(syncs, 0);
+        expect(
+          tester
+              .widget<FilledButton>(find.byKey(const Key('cloudBackupButton')))
+              .onPressed,
+          isNull,
+        );
+      },
     );
-    final google = find.byKey(const Key('accountGoogleSignInButton'));
-    expect(google, findsOneWidget);
-    await tester.tap(google);
-    await tester.pump();
-    expect(auth.googleSignIns, 1);
-    expect(tester.widget<OutlinedButton>(google).onPressed, isNull);
-    await tester.tap(google);
-    expect(auth.googleSignIns, 1);
-    auth.googleLaunch!.complete();
-    await tester.pumpAndSettle();
-    // Closing/cancelling the browser without a callback leaves login available.
-    expect(find.byKey(const Key('accountEmailField')), findsOneWidget);
-    expect(tester.widget<OutlinedButton>(google).onPressed, isNotNull);
-    expect(find.text('ログインしました'), findsNothing);
-    expect(find.text('通信に失敗しました。接続を確認してください。'), findsNothing);
-    auth.signedIn('google@example.com');
-    await tester.pumpAndSettle();
-    expect(find.text('google@example.com'), findsOneWidget);
-    expect(google, findsNothing);
-    expect(SupabaseSyncService.canUseCloud, isFalse);
-    expect(syncs, 0);
-    expect(
-      tester
-          .widget<FilledButton>(find.byKey(const Key('cloudBackupButton')))
-          .onPressed,
-      isNull,
-    );
-  });
+  }
 
   testWidgets('Google launch errors are shown and can be retried', (
     tester,
@@ -295,6 +310,70 @@ void main() {
     },
   );
 
+  testWidgets(
+    'account modes switch without authentication and validate confirmation',
+    (tester) async {
+      final auth = _FakeAccountAuth();
+      addTearDown(auth.events.close);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CloudAccountPage(
+            historyCount: 0,
+            auth: auth,
+            onSyncRequested: () async => throw StateError('Unexpected sync'),
+          ),
+        ),
+      );
+      final toggle = find.byKey(const Key('accountAuthModeButton'));
+      final confirmation = find.byKey(
+        const Key('accountPasswordConfirmationField'),
+      );
+      final email = find.byKey(const Key('accountEmailField'));
+      final password = find.byKey(const Key('accountPasswordField'));
+      expect(find.text('アカウントをお持ちでない方 → 新規アカウント作成'), findsOneWidget);
+      expect(confirmation, findsNothing);
+      await tester.enterText(email, 'user@example.com');
+      await tester.enterText(password, 'secret123');
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      expect(auth.signIns, 0);
+      expect(auth.signUps, 0);
+      expect(find.text('アカウントを作成'), findsNWidgets(2));
+      expect(find.text('すでにアカウントをお持ちの方 → ログイン'), findsOneWidget);
+      expect(find.byKey(const Key('accountSignInButton')), findsNothing);
+      expect(
+        tester.widget<TextFormField>(email).controller!.text,
+        'user@example.com',
+      );
+      expect(tester.widget<TextFormField>(password).controller!.text, isEmpty);
+      await tester.enterText(password, 'secret123');
+      final submit = find.byKey(const Key('accountSignUpButton'));
+      await tester.tap(submit);
+      await tester.pumpAndSettle();
+      expect(find.text('確認用のパスワードを入力してください'), findsOneWidget);
+      await tester.enterText(confirmation, 'secret123 ');
+      await tester.ensureVisible(submit);
+      await tester.tap(submit);
+      await tester.pumpAndSettle();
+      expect(find.text('パスワードが一致しません'), findsOneWidget);
+      expect(auth.signUps, 0);
+      await tester.ensureVisible(toggle);
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      expect(confirmation, findsNothing);
+      expect(find.text('パスワードが一致しません'), findsNothing);
+      expect(find.byKey(const Key('accountSignInButton')), findsOneWidget);
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<TextFormField>(confirmation).controller!.text,
+        isEmpty,
+      );
+      expect(auth.signUps, 0);
+      expect(auth.signIns, 0);
+    },
+  );
+
   testWidgets('account validates credentials without calling authentication', (
     tester,
   ) async {
@@ -310,6 +389,11 @@ void main() {
       ),
     );
     for (final button in ['accountSignInButton', 'accountSignUpButton']) {
+      if (button == 'accountSignUpButton') {
+        await tester.ensureVisible(find.byKey(const Key('accountAuthModeButton')));
+        await tester.tap(find.byKey(const Key('accountAuthModeButton')));
+        await tester.pumpAndSettle();
+      }
       await tester.enterText(find.byKey(const Key('accountEmailField')), '');
       await tester.enterText(
         find.byKey(const Key('accountPasswordField')),
@@ -424,12 +508,18 @@ void main() {
           ),
         ),
       );
+      await tester.tap(find.byKey(const Key('accountAuthModeButton')));
+      await tester.pumpAndSettle();
       await tester.enterText(
         find.byKey(const Key('accountEmailField')),
         'user@example.com',
       );
       await tester.enterText(
         find.byKey(const Key('accountPasswordField')),
+        'secret123',
+      );
+      await tester.enterText(
+        find.byKey(const Key('accountPasswordConfirmationField')),
         'secret123',
       );
       await tester.tap(find.byKey(const Key('accountSignUpButton')));
