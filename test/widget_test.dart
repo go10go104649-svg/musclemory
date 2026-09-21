@@ -399,19 +399,53 @@ void main() {
 
     expect(find.text('部位・カテゴリを選択'), findsOneWidget);
     expect(find.text('トレッドミル'), findsNothing);
-    for (final category in ['胸', '背中', '肩', '腕', '脚', '腹', '有酸素']) {
+    for (final category in ['胸', '背中', '肩', '腕', '脚', '腹', '有酸素', 'HYROX']) {
       expect(find.byKey(Key('bodyPartIllustration$category')), findsOneWidget);
+    }
+    const assets = {
+      '胸': 'chest', '背中': 'back', '肩': 'shoulders',
+      '腕': 'arms', '脚': 'legs', '腹': 'abs',
+    };
+    for (final entry in assets.entries) {
+      final image = tester.widget<Image>(find.descendant(
+        of: find.byKey(Key('bodyPartIllustration${entry.key}')),
+        matching: find.byType(Image),
+      ));
+      expect((image.image as AssetImage).assetName,
+          'assets/category_muscles/${entry.value}.png');
+    }
+    for (final category in ['有酸素', 'HYROX']) {
+      final mark = find.byKey(Key('bodyPartIllustration$category'));
+      expect(find.descendant(of: mark, matching: find.byIcon(Icons.directions_run_rounded)), findsOneWidget);
+      expect(find.descendant(of: mark, matching: find.byIcon(category == '有酸素'
+          ? Icons.monitor_heart_outlined : Icons.fitness_center_rounded)), findsOneWidget);
+      expect(find.descendant(of: mark, matching: find.byType(Image)), findsNothing);
     }
     await tester.tap(find.byKey(const Key('exerciseCategory有酸素')));
     await tester.pumpAndSettle();
     expect(find.text('有酸素の種目'), findsOneWidget);
+    await tester.enterText(find.byKey(const Key('exerciseSearchField')), 'トレッドミル');
+    await tester.pumpAndSettle();
     expect(find.text('トレッドミル'), findsOneWidget);
     expect(find.byKey(const Key('exerciseSearchField')), findsOneWidget);
 
-    await tester.enterText(find.byKey(const Key('exerciseSearchField')), 'バイク');
-    await tester.pumpAndSettle();
-    expect(find.text('エアロバイク'), findsOneWidget);
-    expect(find.text('トレッドミル'), findsNothing);
+    tester.view.physicalSize = const Size(320, 480);
+    for (final category in ['有酸素', 'HYROX']) {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(const MaterialApp(
+        home: Scaffold(body: ExercisePickerSheet(existingNames: <String>{})),
+      ));
+      await tester.pumpAndSettle();
+      final card = find.byKey(Key('exerciseCategory$category'));
+      await tester.scrollUntilVisible(card, 180, scrollable: find.byType(Scrollable));
+      await tester.pumpAndSettle();
+      expect(find.byKey(Key('bodyPartIllustration$category')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.tap(card);
+      await tester.pumpAndSettle();
+      expect(find.text('$categoryの種目'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
   });
 
   testWidgets('exercise muscle detail explains main and supporting targets', (
