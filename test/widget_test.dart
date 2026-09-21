@@ -1,3 +1,4 @@
+import 'package:muscle_memory/exercise_form_catalog.dart';
 import 'support/bulk_exercise_flow.dart';
 import 'support/legal_consent_fixture.dart';
 import 'dart:convert';
@@ -604,6 +605,7 @@ void main() {
   testWidgets('exercise list opens 3D detail for multiple exercises', (
     tester,
   ) async {
+    _setExistingUserPreferences({});
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -615,20 +617,37 @@ void main() {
         ),
       ),
     );
-    await openExerciseCategory(tester, '胸');
-
-    for (final name in ['ベンチプレス', 'インクラインダンベルプレス']) {
-      await tester.enterText(find.byKey(const Key('exerciseSearchField')), name);
+    await tester.pumpAndSettle();
+    final available = exerciseTemplates.where((e) =>
+      ExerciseFormCatalog.resolve(e.exerciseId, e.name)?.available == true,
+    ).take(2).toList();
+    expect(available, hasLength(2));
+    for (final exercise in available) {
+      await tester.enterText(find.byKey(const Key('exerciseSearchField')), exercise.name);
       await tester.pumpAndSettle();
-      final exercise = exerciseTemplates.firstWhere((item) => item.name == name);
-      await tester.tap(find.byKey(Key('exerciseMuscles${exercise.exerciseId ?? name}')));
+      final badge = find.byKey(Key('exerciseMuscles${exercise.exerciseId ?? exercise.name}'));
+      expect(badge, findsOneWidget);
+      expect(find.descendant(of: badge, matching: find.byType(TextButton)), findsNothing);
+      expect(find.descendant(of: badge, matching: find.text('3D')), findsOneWidget);
+      final favoritesBefore = await ExerciseFavoritePreference.load();
+      await tester.tap(badge);
       await tester.pumpAndSettle();
-      expect(find.text(name), findsWidgets);
+      expect(find.byType(ExerciseMuscleDetailPage), findsOneWidget);
+      expect(find.text(exercise.name), findsWidgets);
+      // Desktop widget tests use the existing non-mobile 3D fallback.
       expect(find.byKey(const Key('exerciseMuscleModel3D')), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('0種目選択中'), findsOneWidget);
+      expect(await ExerciseFavoritePreference.load(), favoritesBefore);
     }
+    final unavailable = exerciseTemplates.firstWhere((e) =>
+      ExerciseFormCatalog.resolve(e.exerciseId, e.name)?.available != true,
+    );
+    await tester.enterText(find.byKey(const Key('exerciseSearchField')), unavailable.name);
+    await tester.pumpAndSettle();
+    expect(find.byKey(Key('selectExercise${unavailable.exerciseId ?? unavailable.name}')), findsOneWidget);
+    expect(find.byKey(Key('exerciseMuscles${unavailable.exerciseId ?? unavailable.name}')), findsNothing);
   });
 
   testWidgets('custom exercise is created from and inherits its category', (

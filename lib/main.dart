@@ -7190,15 +7190,12 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                       subtitle: Text(
                         added ? '追加済み' : '${e.bodyPart} ・ ${e.equipment}',
                       ),
-                      trailing: Tooltip(
-                        message: '使う筋肉を見る',
-                        child: TextButton.icon(
-                          key: Key('exerciseMuscles${e.exerciseId ?? e.name}'),
-                          onPressed: () => _showExerciseMuscles(e),
-                          icon: const Icon(Icons.view_in_ar_rounded, size: 18),
-                          label: const Text('3D'),
-                        ),
-                      ),
+                      trailing: ExerciseFormCatalog.resolve(e.exerciseId, e.name)?.available == true
+                          ? _Exercise3dBadge(
+                              key: Key('exerciseMuscles${e.exerciseId ?? e.name}'),
+                              onPressed: () => _showExerciseMuscles(e),
+                            )
+                          : null,
                       onTap: added ? null : () => _toggle(item),
                     );
                   }),
@@ -7276,6 +7273,69 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
       ),
     );
   }
+}
+
+/// A compact box mark with an independent, accessible touch target.
+class _Exercise3dBadge extends StatelessWidget {
+  const _Exercise3dBadge({super.key, required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+    tooltip: '使う筋肉を見る',
+    onPressed: onPressed,
+    padding: const EdgeInsets.all(6),
+    constraints: const BoxConstraints.tightFor(width: 48, height: 48),
+    icon: ExcludeSemantics(
+      child: SizedBox.square(
+        dimension: 36,
+        child: CustomPaint(
+          painter: const _Exercise3dBadgePainter(),
+          child: Align(
+            alignment: const Alignment(-0.3, 0.3),
+            child: Text(
+              '3D',
+              textScaler: TextScaler.noScaling,
+              style: const TextStyle(
+                color: Color(0xFF303A40),
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+class _Exercise3dBadgePainter extends CustomPainter {
+  const _Exercise3dBadgePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 36, size.height / 36);
+    final top = Path()
+      ..moveTo(3, 11)..lineTo(10, 4)..lineTo(33, 4)
+      ..lineTo(26, 11)..close();
+    canvas.drawPath(top, Paint()..color = const Color(0xFFE9F4D1));
+    final outline = Path()
+      ..moveTo(3, 11)..lineTo(10, 4)..lineTo(33, 4)
+      ..lineTo(33, 26)..lineTo(26, 33)..lineTo(3, 33)..close()
+      ..moveTo(3, 11)..lineTo(26, 11)..lineTo(33, 4)
+      ..moveTo(26, 11)..lineTo(26, 33);
+    canvas.drawPath(outline, Paint()
+      ..color = const Color(0xFF303A40)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4
+      ..strokeJoin = StrokeJoin.round);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _Exercise3dBadgePainter oldDelegate) => false;
 }
 
 class ExerciseMuscleDetailPage extends StatelessWidget {
