@@ -1494,6 +1494,199 @@ void main() {
     },
   );
 
+  testWidgets(
+    'custom rest duration validates persists and marks the selected duration',
+    (tester) async {
+      _setExistingUserPreferences({
+        'completion_check_enabled': true,
+        'rest_timer_enabled': true,
+        'rest_timer_seconds': 90,
+      });
+      await RestTimerPreference.load();
+      await WorkoutUiPreference.load();
+      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.person_outline_rounded));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(const Key('trainingSettingsButton')),
+      );
+      await tester.tap(find.byKey(const Key('trainingSettingsButton')));
+      await tester.pumpAndSettle();
+      Future<void> openDurations() async {
+        await tester.tap(find.byKey(const Key('restTimerDurationButton')));
+        await tester.pumpAndSettle();
+      }
+
+      Future<void> openCustom() async {
+        final custom = find.byKey(const Key('customRestDurationButton'));
+        await tester.scrollUntilVisible(
+          custom,
+          120,
+          scrollable: find.descendant(
+            of: find.byType(BottomSheet),
+            matching: find.byType(Scrollable),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(custom);
+        await tester.pumpAndSettle();
+      }
+
+      Finder field(String unit) => find.byKey(Key('customRest${unit}Field'));
+      Future<void> enter(String minutes, String seconds) async {
+        await tester.enterText(field('Minutes'), minutes);
+        await tester.enterText(field('Seconds'), seconds);
+        await tester.tap(find.byKey(const Key('saveCustomRestDurationButton')));
+        await tester.pumpAndSettle();
+      }
+
+      await openDurations();
+      for (final seconds in [30, 60, 90, 120, 180]) {
+        expect(find.byKey(Key('restDurationPreset$seconds')), findsOneWidget);
+      }
+      expect(find.text('5分'), findsNothing);
+      expect(
+        tester
+            .widget<ListTile>(find.byKey(const Key('restDurationPreset90')))
+            .trailing,
+        isNotNull,
+      );
+      await openCustom();
+      String value(String unit) => tester
+          .widget<EditableText>(
+            find.descendant(
+              of: field(unit),
+              matching: find.byType(EditableText),
+            ),
+          )
+          .controller
+          .text;
+      expect(value('Minutes'), '1');
+      expect(value('Seconds'), '30');
+      for (final invalid in [
+        ('0', '0'),
+        ('0', '60'),
+        ('60', '0'),
+        ('-1', '0'),
+        ('abc', '0'),
+        ('1.5', '0'),
+      ]) {
+        await enter(invalid.$1, invalid.$2);
+        expect(
+          find.byKey(const Key('saveCustomRestDurationButton')),
+          findsOneWidget,
+        );
+        expect(RestTimerPreference.seconds, 90);
+      }
+      await enter('5', '0');
+      expect(RestTimerPreference.seconds, 300);
+      expect(find.text('5分'), findsOneWidget);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getInt('rest_timer_seconds'), 300);
+      await openDurations();
+      await openCustom();
+      expect(value('Minutes'), '5');
+      expect(value('Seconds'), '0');
+      await enter('4', '30');
+      expect(RestTimerPreference.seconds, 270);
+      expect(find.text('4分30秒'), findsOneWidget);
+      RestTimerPreference.seconds = 90;
+      await RestTimerPreference.load();
+      expect(RestTimerPreference.seconds, 270);
+      await openDurations();
+      final custom = find.byKey(const Key('customRestDurationButton'));
+      await tester.scrollUntilVisible(
+        custom,
+        120,
+        scrollable: find.descendant(
+          of: find.byType(BottomSheet),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.widget<ListTile>(custom).trailing, isNotNull);
+      expect(
+        tester
+            .widget<ListTile>(find.byKey(const Key('restDurationPreset90')))
+            .trailing,
+        isNull,
+      );
+      await tester.tap(custom);
+      await tester.pumpAndSettle();
+      expect(value('Minutes'), '4');
+      expect(value('Seconds'), '30');
+      await tester.tap(find.text('キャンセル'));
+      await tester.pumpAndSettle();
+      expect(RestTimerPreference.seconds, 270);
+      await openDurations();
+      await tester.tap(find.byKey(const Key('restDurationPreset90')));
+      await tester.pumpAndSettle();
+      await openDurations();
+      await tester.scrollUntilVisible(
+        custom,
+        120,
+        scrollable: find.descendant(
+          of: find.byType(BottomSheet),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.widget<ListTile>(custom).trailing, isNull);
+      expect(
+        tester
+            .widget<ListTile>(find.byKey(const Key('restDurationPreset90')))
+            .trailing,
+        isNotNull,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  test('custom rest duration survives the existing backup format', () {
+    for (final seconds in [270, 300]) {
+      final json = MuscleMemoryBackup(
+        workouts: const [],
+        restTimerSeconds: seconds,
+      ).toJson();
+      expect(json['version'], 3);
+      expect(MuscleMemoryBackup.fromJson(json).restTimerSeconds, seconds);
+    }
+  });
+
+  testWidgets(
+    'custom rest duration starts and retains pause resume and extra seconds',
+    (tester) async {
+      _setExistingUserPreferences({
+        'completion_check_enabled': true,
+        'rest_timer_enabled': true,
+        'rest_timer_seconds': 300,
+      });
+      await RestTimerPreference.load();
+      await WorkoutUiPreference.load();
+      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('startWorkoutButton')));
+      await tester.pumpAndSettle();
+      expect(find.text('休憩  05:00'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('startRestTimerButton')));
+      await tester.pump();
+      expect(find.text('休憩  05:00'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('stopRestTimerButton')));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      expect(find.text('休憩  05:00'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('startRestTimerButton')));
+      await tester.pump();
+      expect(find.text('休憩  05:00'), findsOneWidget);
+      await tester.tap(find.text('+30秒'));
+      await tester.pump();
+      expect(find.text('休憩  05:30'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpAndSettle();
+    },
+  );
+
   testWidgets('previously selected custom gym is migrated for reuse', (
     tester,
   ) async {

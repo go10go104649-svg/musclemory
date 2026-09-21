@@ -10372,6 +10372,100 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+class _CustomRestDurationDialog extends StatefulWidget {
+  const _CustomRestDurationDialog({required this.seconds});
+  final int seconds;
+
+  @override
+  State<_CustomRestDurationDialog> createState() =>
+      _CustomRestDurationDialogState();
+}
+
+class _CustomRestDurationDialogState extends State<_CustomRestDurationDialog> {
+  final _form = GlobalKey<FormState>();
+  late String _minutes = '${widget.seconds ~/ 60}';
+  late String _seconds = '${widget.seconds % 60}';
+  String? _error;
+
+  String? _validate(String? value, String unit) {
+    if (value == null || !RegExp(r'^\d+$').hasMatch(value)) {
+      return '$unitは0〜59の整数で入力してください';
+    }
+    final number = int.tryParse(value);
+    return number == null || number > 59 ? '$unitは0〜59で入力してください' : null;
+  }
+
+  void _save() {
+    setState(() => _error = null);
+    if (!_form.currentState!.validate()) return;
+    final total = int.parse(_minutes) * 60 + int.parse(_seconds);
+    if (total == 0) {
+      setState(() => _error = '1秒以上の時間を設定してください');
+      return;
+    }
+    Navigator.pop(context, total);
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('休憩時間を設定'),
+    content: SingleChildScrollView(
+      child: Form(
+        key: _form,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              key: const Key('customRestMinutesField'),
+              initialValue: _minutes,
+              decoration: const InputDecoration(
+                labelText: '分',
+                errorMaxLines: 2,
+              ),
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
+              validator: (value) => _validate(value, '分'),
+              onChanged: (value) => _minutes = value,
+            ),
+            TextFormField(
+              key: const Key('customRestSecondsField'),
+              initialValue: _seconds,
+              decoration: const InputDecoration(
+                labelText: '秒',
+                errorMaxLines: 2,
+              ),
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.done,
+              validator: (value) => _validate(value, '秒'),
+              onChanged: (value) => _seconds = value,
+              onFieldSubmitted: (_) => _save(),
+            ),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  _error!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+          ],
+        ),
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('キャンセル'),
+      ),
+      FilledButton(
+        key: const Key('saveCustomRestDurationButton'),
+        onPressed: _save,
+        child: const Text('保存'),
+      ),
+    ],
+  );
+}
+
 class TrainingSettingsPage extends StatefulWidget {
   const TrainingSettingsPage({
     super.key,
@@ -10456,7 +10550,7 @@ class _TrainingSettingsPageState extends State<TrainingSettingsPage> {
 
   Future<void> _selectRestDuration() async {
     const durations = [30, 60, 90, 120, 180];
-    final selected = await showModalBottomSheet<int>(
+    var selected = await showModalBottomSheet<int>(
       context: context,
       showDragHandle: true,
       builder: (context) => SafeArea(
@@ -10473,6 +10567,7 @@ class _TrainingSettingsPageState extends State<TrainingSettingsPage> {
             ),
             ...durations.map(
               (seconds) => ListTile(
+                key: Key('restDurationPreset$seconds'),
                 title: Text(_durationLabel(seconds)),
                 trailing: seconds == _restTimerSeconds
                     ? const Icon(
@@ -10483,13 +10578,29 @@ class _TrainingSettingsPageState extends State<TrainingSettingsPage> {
                 onTap: () => Navigator.pop(context, seconds),
               ),
             ),
+            ListTile(
+              key: const Key('customRestDurationButton'),
+              title: const Text('カスタム'),
+              trailing: !durations.contains(_restTimerSeconds)
+                  ? const Icon(Icons.check_circle_rounded, color: Color(0xFF83AD30))
+                  : null,
+              onTap: () => Navigator.pop(context, -1),
+            ),
           ],
         ),
       ),
     );
-    if (selected == null) return;
-    setState(() => _restTimerSeconds = selected);
-    widget.onRestTimerSecondsChanged(selected);
+    if (!mounted || selected == null) return;
+    if (selected == -1) {
+      selected = await showDialog<int>(
+        context: context,
+        builder: (_) => _CustomRestDurationDialog(seconds: _restTimerSeconds),
+      );
+    }
+    if (!mounted || selected == null) return;
+    final seconds = selected;
+    setState(() => _restTimerSeconds = seconds);
+    widget.onRestTimerSecondsChanged(seconds);
   }
 
   @override
