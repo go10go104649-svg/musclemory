@@ -86,7 +86,9 @@ Future<void> verifyBulkExerciseFlow(
   expect(find.text('3種目選択中'), findsOneWidget);
   expect(find.byKey(const Key('clearSelectedExercises')), findsNothing);
   expect(find.byKey(const Key('selectAllExercises')), findsNothing);
-  // Repeated group selection must not duplicate or reorder saved exercises.
+  // Return to the menu list before selecting the group again.
+  await tester.tap(find.byKey(const Key('backToExerciseCategories')));
+  await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('pickMenuまとめて記録')));
   await tester.pumpAndSettle();
   expect(find.text('3種目選択中'), findsOneWidget);
@@ -117,6 +119,8 @@ Future<void> verifyBulkExerciseFlow(
         .onPressed,
     isNull,
   );
+  await tester.tap(find.byKey(const Key('backToExerciseCategories')));
+  await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('backToExerciseCategories')));
   await tester.pumpAndSettle();
   await tester.ensureVisible(find.byKey(const Key('exerciseCategory胸')));
