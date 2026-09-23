@@ -154,7 +154,6 @@ class _BenchPressFormViewState extends State<ExerciseFormView>
                   ),
                   label: Text(_playing ? '一時停止' : '再生'),
                 ),
-
               ],
             ),
           ),

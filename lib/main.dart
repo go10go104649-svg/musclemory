@@ -413,10 +413,12 @@ class OnboardingPreference {
 class LegalDocuments {
   static const termsVersion = 'provisional-1';
   static const privacyVersion = 'provisional-1';
-  static const terms = '正式版公開前の暫定内容です。\n\n'
+  static const terms =
+      '正式版公開前の暫定内容です。\n\n'
       '現在、正式な利用規約を準備しています。本ページは正式な利用規約ではありません。'
       '\n正式版の公開後に、内容をご確認のうえ改めて同意をお願いします。';
-  static const privacy = '正式版公開前の暫定内容です。\n\n'
+  static const privacy =
+      '正式版公開前の暫定内容です。\n\n'
       '現在、正式なプライバシーポリシーを準備しています。本ページは正式なポリシーではありません。'
       '\n正式版の公開後に、内容をご確認のうえ改めて同意をお願いします。';
 }
@@ -452,13 +454,16 @@ class LegalConsentPreference {
     }
     final preferences = await SharedPreferences.getInstance();
     // One write keeps the acceptance, timestamp and versions together.
-    final saved = await preferences.setString(_key, jsonEncode({
-      'accepted': true,
-      'over16': true,
-      'acceptedAt': DateTime.now().toUtc().toIso8601String(),
-      'termsVersion': LegalDocuments.termsVersion,
-      'privacyVersion': LegalDocuments.privacyVersion,
-    }));
+    final saved = await preferences.setString(
+      _key,
+      jsonEncode({
+        'accepted': true,
+        'over16': true,
+        'acceptedAt': DateTime.now().toUtc().toIso8601String(),
+        'termsVersion': LegalDocuments.termsVersion,
+        'privacyVersion': LegalDocuments.privacyVersion,
+      }),
+    );
     if (!saved) throw StateError('Consent could not be saved');
   }
 }
@@ -481,7 +486,9 @@ class _LegalConsentGateState extends State<_LegalConsentGate> {
       future: _accepted,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
         if (snapshot.data == true) return const HomeShell();
         return _LegalConsentPage(
@@ -507,30 +514,37 @@ class _LegalConsentPageState extends State<_LegalConsentPage> {
   bool _saving = false;
 
   void _openDocument(String title, String content) {
-    Navigator.of(context).push<void>(MaterialPageRoute(
-      builder: (_) => Scaffold(
-        appBar: AppBar(title: Text(title)),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Text(content, style: const TextStyle(fontSize: 16, height: 1.7)),
+    Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(title: Text(title)),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              content,
+              style: const TextStyle(fontSize: 16, height: 1.7),
+            ),
+          ),
         ),
       ),
-    ));
+    );
   }
 
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
       await LegalConsentPreference.accept(
-        over16: _over16, terms: _terms, privacy: _privacy,
+        over16: _over16,
+        terms: _terms,
+        privacy: _privacy,
       );
       if (mounted) widget.onFinished();
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('保存できませんでした。もう一度お試しください。')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('保存できませんでした。もう一度お試しください。')));
     }
   }
 
@@ -542,9 +556,16 @@ class _LegalConsentPageState extends State<_LegalConsentPage> {
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            const Icon(Icons.fact_check_outlined, size: 56, color: Color(0xFF6B8E23)),
+            const Icon(
+              Icons.fact_check_outlined,
+              size: 56,
+              color: Color(0xFF6B8E23),
+            ),
             const SizedBox(height: 20),
-            const Text('ご利用の前に', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900)),
+            const Text(
+              'ご利用の前に',
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 12),
             const Text('内容をご確認のうえ、3項目すべてにチェックしてください。'),
             const SizedBox(height: 12),
@@ -556,7 +577,8 @@ class _LegalConsentPageState extends State<_LegalConsentPage> {
             ),
             TextButton(
               key: const Key('openPrivacy'),
-              onPressed: () => _openDocument('プライバシーポリシー', LegalDocuments.privacy),
+              onPressed: () =>
+                  _openDocument('プライバシーポリシー', LegalDocuments.privacy),
               child: const Text('プライバシーポリシーを読む'),
             ),
             CheckboxListTile(
@@ -564,26 +586,34 @@ class _LegalConsentPageState extends State<_LegalConsentPage> {
               contentPadding: EdgeInsets.zero,
               title: const Text('私は16歳以上です'),
               value: _over16,
-              onChanged: _saving ? null : (value) => setState(() => _over16 = value!),
+              onChanged: _saving
+                  ? null
+                  : (value) => setState(() => _over16 = value!),
             ),
             CheckboxListTile(
               key: const Key('confirmTerms'),
               contentPadding: EdgeInsets.zero,
               title: const Text('利用規約に同意します'),
               value: _terms,
-              onChanged: _saving ? null : (value) => setState(() => _terms = value!),
+              onChanged: _saving
+                  ? null
+                  : (value) => setState(() => _terms = value!),
             ),
             CheckboxListTile(
               key: const Key('confirmPrivacy'),
               contentPadding: EdgeInsets.zero,
               title: const Text('プライバシーポリシーに同意します'),
               value: _privacy,
-              onChanged: _saving ? null : (value) => setState(() => _privacy = value!),
+              onChanged: _saving
+                  ? null
+                  : (value) => setState(() => _privacy = value!),
             ),
             const SizedBox(height: 20),
             FilledButton(
               key: const Key('acceptLegalConsent'),
-              onPressed: _over16 && _terms && _privacy && !_saving ? _save : null,
+              onPressed: _over16 && _terms && _privacy && !_saving
+                  ? _save
+                  : null,
               child: const Text('同意してはじめる'),
             ),
           ],
@@ -638,26 +668,30 @@ class _OnboardingPageState extends State<_OnboardingPage> {
     (
       icon: Icons.fitness_center_rounded,
       title: 'ジムと一緒にトレーニングを記録',
-      body: '種目・重量・回数・セットをかんたんに記録。'
+      body:
+          '種目・重量・回数・セットをかんたんに記録。'
           '\nジムを選んで、その日の場所も記録。未登録の場所も追加できます。'
           '\n今後は店舗のマシン情報と連動し、そのジムで使えるマシンや種目を探しやすくする予定です。',
     ),
     (
       icon: Icons.insights_rounded,
       title: '成長を可視化',
-      body: '履歴と筋肉ヒートマップで、積み重ねを振り返りましょう。'
+      body:
+          '履歴と筋肉ヒートマップで、積み重ねを振り返りましょう。'
           '\n対応種目の3Dフォームガイドで動きも確認できます。',
     ),
     (
       icon: Icons.qr_code_rounded,
       title: 'Trainerと連携',
-      body: 'Trainerが表示する招待QRコードをMUSCLEMORYで読み取れます。'
+      body:
+          'Trainerが表示する招待QRコードをMUSCLEMORYで読み取れます。'
           '\nTrainerとの接続や、メニュー・トレーニング情報の共有は今後対応予定です。',
     ),
     (
       icon: Icons.cloud_outlined,
       title: 'アカウントでデータを引き継ぐ',
-      body: '機種変更や別端末での利用に備えて。'
+      body:
+          '機種変更や別端末での利用に備えて。'
           '\nアカウントを使うクラウドバックアップで、データを引き継げます。'
           '\nクラウド機能はPremium限定です。',
     ),
@@ -688,9 +722,9 @@ class _OnboardingPageState extends State<_OnboardingPage> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('保存できませんでした。もう一度お試しください。')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('保存できませんでした。もう一度お試しください。')));
     }
   }
 
@@ -877,17 +911,18 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _saveWorkout(WorkoutRecord workout) async {
     final updated = sortWorkoutsNewestFirst([workout, ..._history]);
-    setState(() => _history = updated);
     await _persistHistory(updated);
-    await _syncHistory(updated);
+    if (mounted) setState(() => _history = updated);
+    unawaited(_syncHistory(updated));
   }
 
   Future<void> _persistHistory(List<WorkoutRecord> history) async {
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(
+    final saved = await preferences.setString(
       _storageKey,
       jsonEncode(history.map((item) => item.toJson()).toList()),
     );
+    if (!saved) throw StateError('Workout history could not be saved');
   }
 
   Future<void> _saveBodyWeight(BodyWeightEntry entry) async {
@@ -912,9 +947,9 @@ class _HomeShellState extends State<HomeShell> {
     final updated = sortWorkoutsNewestFirst(
       _history.map((item) => item.date == originalDate ? workout : item),
     );
-    setState(() => _history = updated);
     await _persistHistory(updated);
-    await _syncHistory(updated);
+    if (mounted) setState(() => _history = updated);
+    unawaited(_syncHistory(updated));
   }
 
   Future<bool> _deleteWorkout(WorkoutRecord workout) async {
@@ -1249,16 +1284,16 @@ class DashboardPage extends StatelessWidget {
     BuildContext context, {
     WorkoutRecord? initialWorkout,
   }) async {
-    final workout = await Navigator.of(context).push<WorkoutRecord>(
+    await Navigator.of(context).push<WorkoutRecord>(
       MaterialPageRoute(
         builder: (_) => WorkoutPage(
           history: history,
           initialWorkout: initialWorkout,
           gymName: selectedGym,
+          onSave: onWorkoutCompleted,
         ),
       ),
     );
-    if (workout != null) await onWorkoutCompleted(workout);
     await onDraftChanged();
   }
 
@@ -2668,7 +2703,8 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
             ButtonSegment(value: angle, label: Text(angle.label)),
         ],
         selected: {_angle},
-        onSelectionChanged: (selection) => setState(() => _angle = selection.single),
+        onSelectionChanged: (selection) =>
+            setState(() => _angle = selection.single),
       ),
     );
     if (Platform.isIOS || Platform.isAndroid) {
@@ -2730,10 +2766,7 @@ Color _muscleHeatColor(int value, int maximum) =>
     bodyTabHeatColor(maximum <= 0 ? 0 : value / maximum);
 
 class _MuscleBodyPainter extends CustomPainter {
-  const _MuscleBodyPainter({
-    required this.counts,
-    required this.maximum,
-  });
+  const _MuscleBodyPainter({required this.counts, required this.maximum});
 
   final Map<String, int> counts;
   final int maximum;
@@ -3057,8 +3090,7 @@ class _MuscleBodyPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _MuscleBodyPainter old) =>
-      old.counts != counts ||
-      old.maximum != maximum;
+      old.counts != counts || old.maximum != maximum;
 }
 
 class MonthlyHistoryPage extends StatefulWidget {
@@ -3173,7 +3205,10 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('月間カレンダー'),
+        title: const Text(
+          '月間カレンダー',
+          style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
+        ),
         actions: [
           if (widget.history.isNotEmpty)
             IconButton(
@@ -3433,10 +3468,8 @@ class _BodyWeightTrendSectionState extends State<BodyWeightTrendSection> {
   Future<void> _edit([BodyWeightEntry? initial]) async {
     final result = await showDialog<BodyWeightEntry>(
       context: context,
-      builder: (_) => BodyWeightEditorDialog(
-        initial: initial,
-        onDeleted: widget.onDeleted,
-      ),
+      builder: (_) =>
+          BodyWeightEditorDialog(initial: initial, onDeleted: widget.onDeleted),
     );
     if (result == null) return;
     await widget.onSaved(result);
@@ -3710,7 +3743,9 @@ class _BodyWeightEditorDialogState extends State<BodyWeightEditorDialog> {
           ),
           TextButton(
             key: const Key('confirmDeleteBodyWeightButton'),
-            style: TextButton.styleFrom(foregroundColor: const Color(0xFFB3261E)),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFB3261E),
+            ),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('削除'),
           ),
@@ -3791,7 +3826,9 @@ class _BodyWeightEditorDialogState extends State<BodyWeightEditorDialog> {
           TextButton(
             key: const Key('deleteBodyWeightButton'),
             onPressed: _deleting ? null : _delete,
-            style: TextButton.styleFrom(foregroundColor: const Color(0xFFB3261E)),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFB3261E),
+            ),
             child: const Text('削除'),
           ),
         TextButton(
@@ -4617,13 +4654,12 @@ class WorkoutDetailPage extends StatelessWidget {
                       initialWorkout: workout,
                       isEditing: true,
                       gymName: workout.gymName ?? selectedGym,
+                      onSave: (updated) =>
+                          onWorkoutUpdated(workout.date, updated),
                     ),
                   ),
                 );
-                if (updated != null && context.mounted) {
-                  await onWorkoutUpdated(workout.date, updated);
-                  if (context.mounted) Navigator.pop(context);
-                }
+                if (updated != null && context.mounted) Navigator.pop(context);
               }
               if (value == 'delete' && context.mounted) {
                 await _confirmDelete(context);
@@ -4758,17 +4794,16 @@ class WorkoutDetailPage extends StatelessWidget {
               onPressed: () async {
                 final canStart = await discardDraftBeforeNewWorkout(context);
                 if (!canStart || !context.mounted) return;
-                final repeated = await Navigator.of(context)
-                    .push<WorkoutRecord>(
-                      MaterialPageRoute(
-                        builder: (_) => WorkoutPage(
-                          history: [workout],
-                          initialWorkout: workout,
-                          gymName: selectedGym,
-                        ),
-                      ),
-                    );
-                if (repeated != null) await onWorkoutCompleted(repeated);
+                await Navigator.of(context).push<WorkoutRecord>(
+                  MaterialPageRoute(
+                    builder: (_) => WorkoutPage(
+                      history: [workout],
+                      initialWorkout: workout,
+                      gymName: selectedGym,
+                      onSave: onWorkoutCompleted,
+                    ),
+                  ),
+                );
               },
               icon: const Icon(Icons.replay_rounded),
               label: const Text('この内容でもう一度'),
@@ -5057,12 +5092,16 @@ class WorkoutPage extends StatefulWidget {
     this.initialWorkout,
     this.isEditing = false,
     this.gymName,
+    this.onSave,
   });
 
   final List<WorkoutRecord> history;
   final WorkoutRecord? initialWorkout;
   final bool isEditing;
   final String? gymName;
+
+  /// Host persists locally before the completion dialog opens.
+  final Future<void> Function(WorkoutRecord)? onSave;
 
   @override
   State<WorkoutPage> createState() => _WorkoutPageState();
@@ -5119,6 +5158,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   bool _workoutTimerStopped = false;
   bool _restoringDraft = false;
   bool _exiting = false;
+  bool _completing = false;
+  WorkoutRecord? _savedRecord;
   final _draftStore = WorkoutDraftStore(
     write: (value) async {
       final preferences = await SharedPreferences.getInstance();
@@ -5685,7 +5726,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   }
 
   Future<void> _confirmLeave() async {
-    if (_leaveDialogOpen) return;
+    if (_completing || _savedRecord != null || _leaveDialogOpen) return;
     _leaveDialogOpen = true;
     final leave = await showDialog<bool>(
       context: context,
@@ -5792,12 +5833,14 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               IconButton(
                 key: const Key('deleteWorkoutDraftButton'),
                 tooltip: '記録を全削除',
-                onPressed: _deleteWorkoutDraft,
+                onPressed: _completing || _savedRecord != null
+                    ? null
+                    : _deleteWorkoutDraft,
                 icon: const Icon(Icons.delete_outline_rounded),
               ),
             OutlinedButton(
               key: const Key('completeWorkoutButton'),
-              onPressed: _completeWorkout,
+              onPressed: _completing ? null : _completeWorkout,
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: const Color(0xFF426B83),
@@ -5821,355 +5864,363 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         bottomNavigationBar: _WorkoutNumericKeypad(controller: _numericPad),
         body: _NumericPadScope(
           controller: _numericPad,
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              key: const Key('workoutScrollView'),
-              padding: EdgeInsets.fromLTRB(
-                16 + MediaQuery.paddingOf(context).left,
-                8,
-                16 + MediaQuery.paddingOf(context).right,
-                24 + MediaQuery.paddingOf(context).bottom,
-              ),
-              children: [
-                Column(
-                  key: const Key('workoutInfoCard'),
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Semantics(
-                      label: 'トレーニング日 ${workoutDateLabel(_workoutDate)}',
-                      button: true,
-                      child: InkWell(
-                        key: const Key('workoutDateButton'),
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: _selectWorkoutDate,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        '${_workoutDate.month}.${_workoutDate.day}（${const ['月', '火', '水', '木', '金', '土', '日'][_workoutDate.weekday - 1]}）',
-                                        key: const Key('workoutDateValue'),
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          fontSize: 36,
-                                          height: 1.15,
-                                          fontWeight: FontWeight.w900,
-                                          color: colors.onSurface,
+          child: AbsorbPointer(
+            absorbing: _completing || _savedRecord != null,
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                key: const Key('workoutScrollView'),
+                padding: EdgeInsets.fromLTRB(
+                  16 + MediaQuery.paddingOf(context).left,
+                  8,
+                  16 + MediaQuery.paddingOf(context).right,
+                  24 + MediaQuery.paddingOf(context).bottom,
+                ),
+                children: [
+                  Column(
+                    key: const Key('workoutInfoCard'),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Semantics(
+                        label: 'トレーニング日 ${workoutDateLabel(_workoutDate)}',
+                        button: true,
+                        child: InkWell(
+                          key: const Key('workoutDateButton'),
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: _selectWorkoutDate,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          '${_workoutDate.month}.${_workoutDate.day}（${const ['月', '火', '水', '木', '金', '土', '日'][_workoutDate.weekday - 1]}）',
+                                          key: const Key('workoutDateValue'),
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: 36,
+                                            height: 1.15,
+                                            fontWeight: FontWeight.w900,
+                                            color: colors.onSurface,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${_workoutDate.year}年',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: colors.onSurfaceVariant,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${_workoutDate.year}年',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: colors.onSurfaceVariant,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
+                                const SizedBox(width: 12),
+                                Icon(
+                                  Icons.edit_calendar_outlined,
+                                  color: colors.onSurface,
+                                  size: 28,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        key: const Key('workoutGymButton'),
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          Icons.location_on_outlined,
+                          color: colors.onSurfaceVariant,
+                        ),
+                        title: Text(
+                          _gymName ?? '未選択',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: _selectWorkoutGym,
+                      ),
+                      if (WorkoutUiPreference.workoutTimerEnabled ||
+                          (widget.isEditing &&
+                              WorkoutUiPreference.workoutDurationEnabled))
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            children: [
                               Icon(
-                                Icons.edit_calendar_outlined,
-                                color: colors.onSurface,
-                                size: 28,
+                                Icons.schedule_rounded,
+                                size: 14,
+                                color: colors.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                widget.isEditing
+                                    ? widget.initialWorkout!.durationLabel
+                                    : _elapsedLabel,
+                                key: const Key('workoutElapsedLabel'),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colors.onSurfaceVariant,
+                                ),
                               ),
                             ],
                           ),
                         ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  if (!widget.isEditing &&
+                      WorkoutUiPreference.completionCheckEnabled &&
+                      RestTimerPreference.enabled) ...[
+                    Container(
+                      key: const Key('restTimerBanner'),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.fromLTRB(14, 4, 10, 12),
+                      decoration: BoxDecoration(
+                        color:
+                            Theme.of(context).cardTheme.color ??
+                            colors.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                    ),
-                    const Divider(height: 1),
-                    ListTile(
-                      key: const Key('workoutGymButton'),
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        Icons.location_on_outlined,
-                        color: colors.onSurfaceVariant,
-                      ),
-                      title: Text(
-                        _gymName ?? '未選択',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w800),
-                      ),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: _selectWorkoutGym,
-                    ),
-                    if (WorkoutUiPreference.workoutTimerEnabled ||
-                        (widget.isEditing &&
-                            WorkoutUiPreference.workoutDurationEnabled))
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.schedule_rounded,
-                              size: 14,
-                              color: colors.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              widget.isEditing
-                                  ? widget.initialWorkout!.durationLabel
-                                  : _elapsedLabel,
-                              key: const Key('workoutElapsedLabel'),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: colors.onSurfaceVariant,
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '休憩タイマー',
+                                  style: TextStyle(
+                                    color: colors.onSurface,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                              TextButton(
+                                onPressed: () {
+                                  if (_restEndsAt != null) {
+                                    _startRestTimer(_restRemaining + 30);
+                                  } else {
+                                    setState(
+                                      () => _restRemaining =
+                                          (_restRemaining > 0
+                                              ? _restRemaining
+                                              : RestTimerPreference.seconds) +
+                                          30,
+                                    );
+                                  }
+                                },
+                                child: const Text('+30秒'),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.timer_outlined,
+                                color: colors.primary,
+                                size: 28,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  _restRemaining > 0
+                                      ? _restLabel
+                                      : _configuredRestLabel,
+                                  key: const Key('restRemainingLabel'),
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    color: colors.onSurface,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                key: Key(
+                                  _restEndsAt != null
+                                      ? 'stopRestTimerButton'
+                                      : 'startRestTimerButton',
+                                ),
+                                onPressed: _restEndsAt != null
+                                    ? _pauseRest
+                                    : _resumeRest,
+                                style: IconButton.styleFrom(
+                                  backgroundColor: colors.secondaryContainer,
+                                  foregroundColor: colors.onSecondaryContainer,
+                                  minimumSize: const Size(48, 48),
+                                ),
+                                tooltip: _restEndsAt != null ? '一時停止' : '開始・再開',
+                                icon: Icon(
+                                  _restEndsAt != null
+                                      ? Icons.pause_rounded
+                                      : Icons.play_arrow_rounded,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
+                    ),
                   ],
-                ),
-                const SizedBox(height: 12),
-                if (!widget.isEditing &&
-                    WorkoutUiPreference.completionCheckEnabled &&
-                    RestTimerPreference.enabled) ...[
-                  Container(
-                    key: const Key('restTimerBanner'),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.fromLTRB(14, 4, 10, 12),
-                    decoration: BoxDecoration(
-                      color:
-                          Theme.of(context).cardTheme.color ??
-                          colors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Column(
+                  Padding(
+                    key: const Key('workoutExercisesHeading'),
+                    padding: const EdgeInsets.only(top: 4, bottom: 12),
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                '休憩タイマー',
-                                style: TextStyle(
-                                  color: colors.onSurface,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                if (_restEndsAt != null) {
-                                  _startRestTimer(_restRemaining + 30);
-                                } else {
-                                  setState(
-                                    () => _restRemaining =
-                                        (_restRemaining > 0
-                                            ? _restRemaining
-                                            : RestTimerPreference.seconds) +
-                                        30,
-                                  );
-                                }
-                              },
-                              child: const Text('+30秒'),
-                            ),
-                          ],
+                        Container(
+                          width: 4,
+                          height: 22,
+                          color: colors.secondary,
                         ),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.timer_outlined,
-                              color: colors.primary,
-                              size: 28,
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'トレーニング種目',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                _restRemaining > 0
-                                    ? _restLabel
-                                    : _configuredRestLabel,
-                                key: const Key('restRemainingLabel'),
-                                maxLines: 1,
-                                style: TextStyle(
-                                  color: colors.onSurface,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              key: Key(
-                                _restEndsAt != null
-                                    ? 'stopRestTimerButton'
-                                    : 'startRestTimerButton',
-                              ),
-                              onPressed: _restEndsAt != null
-                                  ? _pauseRest
-                                  : _resumeRest,
-                              style: IconButton.styleFrom(
-                                backgroundColor: colors.secondaryContainer,
-                                foregroundColor: colors.onSecondaryContainer,
-                                minimumSize: const Size(48, 48),
-                              ),
-                              tooltip: _restEndsAt != null ? '一時停止' : '開始・再開',
-                              icon: Icon(
-                                _restEndsAt != null
-                                    ? Icons.pause_rounded
-                                    : Icons.play_arrow_rounded,
-                              ),
-                            ),
-                          ],
+                          ),
+                        ),
+                        Text(
+                          '${_exercises.length}種目',
+                          key: const Key('workoutExerciseCount'),
+                          style: TextStyle(
+                            color: colors.onSurfaceVariant,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
-                Padding(
-                  key: const Key('workoutExercisesHeading'),
-                  padding: const EdgeInsets.only(top: 4, bottom: 12),
-                  child: Row(
-                    children: [
-                      Container(width: 4, height: 22, color: colors.secondary),
-                      const SizedBox(width: 8),
-                      const Expanded(
-                        child: Text(
-                          'トレーニング種目',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
+                  if (_exercises.isEmpty) ...[
+                    Container(
+                      key: const Key('emptyWorkoutExercises'),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 28,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: const Color(0xFFE0E4DE)),
+                      ),
+                      child: const Column(
+                        children: [
+                          Icon(
+                            Icons.fitness_center_rounded,
+                            size: 34,
+                            color: Color(0xFF777F78),
                           ),
-                        ),
+                          SizedBox(height: 12),
+                          Text(
+                            '種目はまだありません',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            '下の「種目を追加」から選んでください',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Color(0xFF777F78)),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '${_exercises.length}種目',
-                        key: const Key('workoutExerciseCount'),
-                        style: TextStyle(
-                          color: colors.onSurfaceVariant,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_exercises.isEmpty) ...[
-                  Container(
-                    key: const Key('emptyWorkoutExercises'),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 28,
                     ),
+                  ],
+                  // Keep numeric fields mounted across cards for keyboard traversal.
+                  Column(
+                    children: List.generate(
+                      _exercises.length,
+                      (exerciseIndex) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: ExerciseInputCard(
+                          key: ValueKey((
+                            _exercises[exerciseIndex].sets,
+                            _inputRevision,
+                          )),
+                          numericNodes: _nodesFor,
+                          nextNumeric: _nextNumeric,
+                          exerciseIndex: exerciseIndex,
+                          exercise: _exercises[exerciseIndex],
+                          history: widget.history,
+                          onAddSet: () => _addSet(exerciseIndex),
+                          onRemoveSet: (setIndex) =>
+                              _removeSet(exerciseIndex, setIndex),
+                          onRemove: () => _removeExercise(exerciseIndex),
+                          onToggleSet: (setIndex) =>
+                              _toggleSet(exerciseIndex, setIndex),
+                          onApplyPrevious: (sets) =>
+                              _applyPreviousSets(exerciseIndex, sets),
+                          onSetAllCompleted: (completed) =>
+                              _setAllSetsCompleted(exerciseIndex, completed),
+                          onValuesChanged: _saveDraft,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 54,
+                    child: FilledButton.icon(
+                      key: const Key('addExerciseButton'),
+                      onPressed: _addExercise,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFF101820),
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: const Icon(Icons.add_rounded),
+                      label: const Text(
+                        '種目を追加',
+                        style: TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: const Color(0xFFE0E4DE)),
                     ),
-                    child: const Column(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.fitness_center_rounded,
-                          size: 34,
-                          color: Color(0xFF777F78),
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          '種目はまだありません',
+                        const Text(
+                          'トレーニングメモ',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
-                        SizedBox(height: 6),
-                        Text(
-                          '下の「種目を追加」から選んでください',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Color(0xFF777F78)),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _noteController,
+                          maxLines: 3,
+                          maxLength: 200,
+                          decoration: const InputDecoration(
+                            hintText: 'フォームや体調などをメモ',
+                            border: OutlineInputBorder(),
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ],
-                // Keep numeric fields mounted across cards for keyboard traversal.
-                Column(
-                  children: List.generate(
-                    _exercises.length,
-                    (exerciseIndex) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: ExerciseInputCard(
-                        key: ValueKey((
-                          _exercises[exerciseIndex].sets,
-                          _inputRevision,
-                        )),
-                        numericNodes: _nodesFor,
-                        nextNumeric: _nextNumeric,
-                        exerciseIndex: exerciseIndex,
-                        exercise: _exercises[exerciseIndex],
-                        history: widget.history,
-                        onAddSet: () => _addSet(exerciseIndex),
-                        onRemoveSet: (setIndex) =>
-                            _removeSet(exerciseIndex, setIndex),
-                        onRemove: () => _removeExercise(exerciseIndex),
-                        onToggleSet: (setIndex) =>
-                            _toggleSet(exerciseIndex, setIndex),
-                        onApplyPrevious: (sets) =>
-                            _applyPreviousSets(exerciseIndex, sets),
-                        onSetAllCompleted: (completed) =>
-                            _setAllSetsCompleted(exerciseIndex, completed),
-                        onValuesChanged: _saveDraft,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 54,
-                  child: FilledButton.icon(
-                    key: const Key('addExerciseButton'),
-                    onPressed: _addExercise,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF101820),
-                      foregroundColor: Colors.white,
-                    ),
-                    icon: const Icon(Icons.add_rounded),
-                    label: const Text(
-                      '種目を追加',
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'トレーニングメモ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: _noteController,
-                        maxLines: 3,
-                        maxLength: 200,
-                        decoration: const InputDecoration(
-                          hintText: 'フォームや体調などをメモ',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -6177,7 +6228,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     );
   }
 
-  void _completeWorkout() {
+  Future<void> _completeWorkout() async {
+    if (_completing || _exiting) return;
     _formKey.currentState?.save();
     final completedSets = <RecordedSet>[
       for (final exercise in _exercises)
@@ -6220,7 +6272,6 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     setState(() {
       finalElapsed = _stopWorkoutTimer(keepStopped: true);
     });
-    unawaited(_saveDraft());
     final personalBests = _personalBestExercises(completedSets);
     final completedSetCount = completedSets
         .where((set) => set.recordType.usesSets)
@@ -6230,83 +6281,106 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       if (completedSetCount > 0) '$completedSetCountセット',
       if (activityCount > 0) '有酸素・移動 $activityCount件',
     ].join('・');
-    final record = WorkoutRecord(
-      date: _workoutDate,
-      sets: completedSets,
-      durationSeconds: widget.isEditing
-          ? widget.initialWorkout!.durationSeconds
-          : WorkoutUiPreference.workoutDurationEnabled
-          ? finalElapsed.inSeconds
-          : 0,
-      gymName: _gymName,
-      note: _noteController.text.trim(),
-    );
-    showDialog<void>(
+    final record =
+        _savedRecord ??
+        WorkoutRecord(
+          date: _workoutDate,
+          sets: completedSets,
+          durationSeconds: widget.isEditing
+              ? widget.initialWorkout!.durationSeconds
+              : WorkoutUiPreference.workoutDurationEnabled
+              ? finalElapsed.inSeconds
+              : 0,
+          gymName: _gymName,
+          note: _noteController.text.trim(),
+        );
+    setState(() => _completing = true);
+    try {
+      // Retry draft cleanup without inserting the already persisted record twice.
+      if (_savedRecord == null) {
+        await widget.onSave?.call(record);
+        _savedRecord = record;
+      }
+      if (!widget.isEditing) await _clearDraft();
+    } catch (_) {
+      if (mounted) {
+        setState(() => _completing = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('保存できませんでした。もう一度「完了」を押してください。')),
+        );
+      }
+      return;
+    }
+    if (!mounted) return;
+    await showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(widget.isEditing ? '修正を保存' : 'トレーニング完了'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('$completionCountLabelを${widget.isEditing ? '保存' : '記録'}します。'),
-            if (!widget.isEditing && personalBests.isNotEmpty) ...[
-              const SizedBox(height: 14),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9F4D1),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.emoji_events_rounded),
-                    const SizedBox(width: 9),
-                    Expanded(
-                      child: Text(
-                        '自己ベスト更新\n${personalBests.join('・')}',
-                        style: const TextStyle(fontWeight: FontWeight.w800),
-                      ),
-                    ),
-                  ],
-                ),
+      builder: (dialogContext) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          title: Text(widget.isEditing ? '修正を保存' : 'トレーニング完了'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$completionCountLabelを${widget.isEditing ? '保存' : '記録'}しました。',
               ),
+              if (!widget.isEditing && personalBests.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE9F4D1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.emoji_events_rounded),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: Text(
+                          '自己ベスト更新\n${personalBests.join('・')}',
+                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
-          ],
-        ),
-        actions: [
-          if (!widget.isEditing)
-            TextButton(
-              key: const Key('completeWithoutSharingButton'),
+          ),
+          actions: [
+            if (!widget.isEditing)
+              TextButton(
+                key: const Key('completeWithoutSharingButton'),
+                onPressed: () async {
+                  if (!dialogContext.mounted || !mounted) return;
+                  Navigator.of(dialogContext).pop();
+                  _exitWorkout(record);
+                },
+                child: const Text('ホームへ戻る'),
+              ),
+            FilledButton(
+              key: const Key('completeAndPreviewShareButton'),
               onPressed: () async {
-                await _clearDraft();
                 if (!dialogContext.mounted || !mounted) return;
                 Navigator.of(dialogContext).pop();
-                _exitWorkout(record);
+                if (widget.isEditing) {
+                  _exitWorkout(record);
+                  return;
+                }
+                await Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (_) => WorkoutSharePage(workout: record),
+                  ),
+                );
+                if (mounted) _exitWorkout(record);
               },
-              child: const Text('ホームへ戻る'),
+              child: Text(widget.isEditing ? '閉じる' : '共有画像を確認'),
             ),
-          FilledButton(
-            key: const Key('completeAndPreviewShareButton'),
-            onPressed: () async {
-              if (!widget.isEditing) await _clearDraft();
-              if (!dialogContext.mounted || !mounted) return;
-              Navigator.of(dialogContext).pop();
-              if (widget.isEditing) {
-                _exitWorkout(record);
-                return;
-              }
-              await Navigator.of(context).push<void>(
-                MaterialPageRoute(
-                  builder: (_) => WorkoutSharePage(workout: record),
-                ),
-              );
-              if (mounted) _exitWorkout(record);
-            },
-            child: Text(widget.isEditing ? '保存する' : '共有画像を確認'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -7417,7 +7491,10 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                           key: ValueKey(
                             'selectExercise${e.exerciseId ?? e.name}',
                           ),
-                          contentPadding: const EdgeInsetsDirectional.only(start: 8, end: 4),
+                          contentPadding: const EdgeInsetsDirectional.only(
+                            start: 8,
+                            end: 4,
+                          ),
                           horizontalTitleGap: 8,
                           selected: added || _selected.containsKey(e.identity),
                           selectedTileColor: const Color(0xFFE9F4D1),
@@ -7594,19 +7671,33 @@ class _Exercise3dBadgePainter extends CustomPainter {
     canvas.save();
     canvas.scale(size.width / 36, size.height / 36);
     final top = Path()
-      ..moveTo(3, 11)..lineTo(10, 4)..lineTo(33, 4)
-      ..lineTo(26, 11)..close();
+      ..moveTo(3, 11)
+      ..lineTo(10, 4)
+      ..lineTo(33, 4)
+      ..lineTo(26, 11)
+      ..close();
     canvas.drawPath(top, Paint()..color = const Color(0xFFE9F4D1));
     final outline = Path()
-      ..moveTo(3, 11)..lineTo(10, 4)..lineTo(33, 4)
-      ..lineTo(33, 26)..lineTo(26, 33)..lineTo(3, 33)..close()
-      ..moveTo(3, 11)..lineTo(26, 11)..lineTo(33, 4)
-      ..moveTo(26, 11)..lineTo(26, 33);
-    canvas.drawPath(outline, Paint()
-      ..color = const Color(0xFF303A40)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4
-      ..strokeJoin = StrokeJoin.round);
+      ..moveTo(3, 11)
+      ..lineTo(10, 4)
+      ..lineTo(33, 4)
+      ..lineTo(33, 26)
+      ..lineTo(26, 33)
+      ..lineTo(3, 33)
+      ..close()
+      ..moveTo(3, 11)
+      ..lineTo(26, 11)
+      ..lineTo(33, 4)
+      ..moveTo(26, 11)
+      ..lineTo(26, 33);
+    canvas.drawPath(
+      outline,
+      Paint()
+        ..color = const Color(0xFF303A40)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.4
+        ..strokeJoin = StrokeJoin.round,
+    );
     canvas.restore();
   }
 
@@ -7626,7 +7717,10 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
       exercise.bodyPart,
       exerciseId: exercise.exerciseId,
     );
-    final form = ExerciseFormCatalog.resolve(exercise.exerciseId, exercise.name);
+    final form = ExerciseFormCatalog.resolve(
+      exercise.exerciseId,
+      exercise.name,
+    );
     final primaryLabels = form != null
         ? form.primaryMuscleLabels
         : profile.primary.map((muscle) => muscle.label).toList();
@@ -7888,7 +7982,6 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
 
   static const _bodyParts = ['胸', '背中', '脚', '肩', '腕', '腹', '有酸素', 'HYROX'];
 
-
   List<ExerciseRecordType> get _editableRecordTypes {
     const visible = [
       ExerciseRecordType.weightReps,
@@ -8107,15 +8200,15 @@ class _ExerciseEditorDialogState extends State<_ExerciseEditorDialog> {
 }
 
 const exerciseEquipmentOptions = [
-    'フリーウェイト',
-    'ダンベル',
-    'マシン',
-    'プレートロード',
-    'ケーブル',
-    '自重',
-    'カスタム',
-    'その他',
-  ];
+  'フリーウェイト',
+  'ダンベル',
+  'マシン',
+  'プレートロード',
+  'ケーブル',
+  '自重',
+  'カスタム',
+  'その他',
+];
 
 class WorkoutExercise {
   WorkoutExercise({
@@ -8136,8 +8229,6 @@ class WorkoutExercise {
   final String equipment;
   final ExerciseRecordType recordType;
   final List<WorkoutSet> sets;
-
-
 }
 
 class ExerciseInputCard extends StatelessWidget {
@@ -10246,7 +10337,9 @@ class _ProfileNameCardState extends State<_ProfileNameCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _name.isEmpty ? ProfilePreference.defaultDisplayName : _name,
+                    _name.isEmpty
+                        ? ProfilePreference.defaultDisplayName
+                        : _name,
                     key: const Key('profileDisplayName'),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -10793,7 +10886,10 @@ class _TrainingSettingsPageState extends State<TrainingSettingsPage> {
               key: const Key('customRestDurationButton'),
               title: const Text('カスタム'),
               trailing: !durations.contains(_restTimerSeconds)
-                  ? const Icon(Icons.check_circle_rounded, color: Color(0xFF83AD30))
+                  ? const Icon(
+                      Icons.check_circle_rounded,
+                      color: Color(0xFF83AD30),
+                    )
                   : null,
               onTap: () => Navigator.pop(context, -1),
             ),
@@ -10949,8 +11045,7 @@ class CloudAccountPage extends StatefulWidget {
 }
 
 class _CloudAccountPageState extends State<CloudAccountPage> {
-  static const _authStateErrorMessage =
-      'ログイン状態を確認できませんでした。もう一度お試しください。';
+  static const _authStateErrorMessage = 'ログイン状態を確認できませんでした。もう一度お試しください。';
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -11144,7 +11239,9 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
           key: const Key('accountPasswordField'),
           controller: _passwordController,
           enabled: !_busy,
-          textInputAction: _isSignUp ? TextInputAction.next : TextInputAction.done,
+          textInputAction: _isSignUp
+              ? TextInputAction.next
+              : TextInputAction.done,
           obscureText: true,
           autocorrect: false,
           enableSuggestions: false,
@@ -11190,9 +11287,7 @@ class _CloudAccountPageState extends State<CloudAccountPage> {
           key: const Key('accountAuthModeButton'),
           onPressed: _busy ? null : _toggleAuthMode,
           child: Text(
-            _isSignUp
-                ? 'すでにアカウントをお持ちの方 → ログイン'
-                : 'アカウントをお持ちでない方 → 新規アカウント作成',
+            _isSignUp ? 'すでにアカウントをお持ちの方 → ログイン' : 'アカウントをお持ちでない方 → 新規アカウント作成',
             textAlign: TextAlign.center,
           ),
         ),

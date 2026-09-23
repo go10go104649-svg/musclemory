@@ -11,36 +11,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "legacy_press",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.58,
-      0.13
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.58, 0.13],
     "cameraScale": 1.225,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "press",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {
-      "benchAngle": 0
-    },
+    "parameters": {"benchAngle": 0},
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 0,
@@ -51,7 +32,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Bench Press",
     "distanceUnit": "km",
     "startWeight": 40.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "incline_dumbbell_press",
@@ -64,36 +45,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "legacy_press",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.58,
-      0.13
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.58, 0.13],
     "cameraScale": 1.225,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "press",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {
-      "benchAngle": 45
-    },
+    "parameters": {"benchAngle": 45},
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 0,
@@ -104,7 +66,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Incline Dumbbell Press",
     "distanceUnit": "km",
     "startWeight": 20.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "incline_barbell_press",
@@ -117,30 +79,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "legacy_press",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.918583869934082,
-      2.770430564880371,
-      3.672604560852051
-    ],
+    "cameraAngle": [2.918583869934082, 2.770430564880371, 3.672604560852051],
     "cameraTarget": [
       -0.08709995448589325,
       0.7093896865844727,
-      0.16239485144615173
+      0.16239485144615173,
     ],
     "cameraScale": 1.2322142630815507,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "incline_barbell_press",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -154,7 +103,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "inclineBackSupport": true,
       "rebuildAdjustableBench": true,
       "barbellPressReach": true,
-      "matchedForearmRoll": true
+      "matchedForearmRoll": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -171,13 +120,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "previewEnabled": false,
     "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish.",
     "references": [
-      "https://shop.lifefitness.com/products/hammer-strength-home-multi-adjustable-bench"
-    ]
+      "https://shop.lifefitness.com/products/hammer-strength-home-multi-adjustable-bench",
+    ],
   },
   {
     "exerciseId": "flat_dumbbell_press",
@@ -190,30 +139,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "legacy_press",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.984753370285034,
-      2.633376359939575,
-      3.6643805503845215
-    ],
+    "cameraAngle": [2.984753370285034, 2.633376359939575, 3.6643805503845215],
     "cameraTarget": [
       -0.020930632948875427,
       0.5723354816436768,
-      0.15417081117630005
+      0.15417081117630005,
     ],
     "cameraScale": 1.0088205951359124,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "flat_dumbbell_press",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -227,7 +163,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "rebuildAdjustableBench": true,
       "matchedForearmRoll": true,
       "bottomGripWidth": 0.86,
-      "fullPressReach": true
+      "fullPressReach": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -244,13 +180,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "previewEnabled": false,
     "references": [
       "https://www.acefitness.org/resources/everyone/exercise-library/19/chest-press/",
-      "https://shop.lifefitness.com/products/hammer-strength-home-multi-adjustable-bench"
-    ]
+      "https://shop.lifefitness.com/products/hammer-strength-home-multi-adjustable-bench",
+    ],
   },
   {
     "exerciseId": "chest_press",
@@ -263,30 +199,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "chest_press",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -297,7 +216,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 75,
       "additionalWeight": 0,
-      "pressLeverForward": 0.3
+      "pressLeverForward": 0.3,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -314,8 +233,8 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
-    }
+      "productionRoute": false,
+    },
   },
   {
     "exerciseId": "pec_fly",
@@ -328,30 +247,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "pec_fly",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -362,7 +264,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 80,
       "additionalWeight": 0,
-      "flyLeverRadius": 0.49
+      "flyLeverRadius": 0.49,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -379,8 +281,8 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
-    }
+      "productionRoute": false,
+    },
   },
   {
     "exerciseId": "cable_fly",
@@ -393,30 +295,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "cable_fly",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -426,7 +311,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -436,7 +321,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "tags": [],
     "englishName": "Cable Fly",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "dips",
@@ -449,30 +334,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "dips",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -482,7 +350,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
@@ -494,45 +362,26 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Dips",
     "distanceUnit": "km",
     "startWeight": 0.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "push_up",
     "exerciseName": "プッシュアップ",
     "category": "胸",
-    "aliases": [
-      "腕立て伏せ"
-    ],
+    "aliases": ["腕立て伏せ"],
     "modelId": "mpfb-athlete-v1",
     "animationId": "push_up",
     "equipmentId": "floor",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "push_up",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -542,7 +391,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
@@ -554,7 +403,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Push Up",
     "distanceUnit": "km",
     "startWeight": 0.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "incline_press_machine",
@@ -567,30 +416,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.9686241149902344,
-      2.5147953033447266,
-      3.4947571754455566
-    ],
+    "cameraAngle": [2.9686241149902344, 2.5147953033447266, 3.4947571754455566],
     "cameraTarget": [
       -0.03228975087404251,
       0.6928120851516724,
-      -0.1492089331150055
+      -0.1492089331150055,
     ],
     "cameraScale": 1.1647780577838422,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "incline_press_machine",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -601,19 +437,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 35,
       "additionalWeight": 0,
-      "leverPivot": [
-        0.55,
-        0.25,
-        1.55
-      ],
-      "handleBottom": [
-        0.33,
-        -0.36,
-        1.0
-      ],
+      "leverPivot": [0.55, 0.25, 1.55],
+      "handleBottom": [0.33, -0.36, 1.0],
       "leverTravelDegrees": -28,
       "convergenceAxis": 0.22,
-      "inclineBackSupport": true
+      "inclineBackSupport": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -622,7 +450,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "assetPath": "assets/models/forms/incline_press_machine.form.json",
     "references": [
       "https://shop.lifefitness.com/products/hammer-strength-plate-loaded-iso-lateral-incline-press",
-      "https://www.youtube.com/watch?v=UKPBc1BWRzw"
+      "https://www.youtube.com/watch?v=UKPBc1BWRzw",
     ],
     "review": {
       "equipmentReference": false,
@@ -630,13 +458,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Incline Press Machine",
     "distanceUnit": "km",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "decline_fly_machine",
@@ -649,28 +477,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.9145970344543457,
-      2.2830214500427246,
-      3.602597713470459
-    ],
+    "cameraAngle": [2.9145970344543457, 2.2830214500427246, 3.602597713470459],
     "cameraTarget": [
       -0.08631694316864014,
       0.4610383212566376,
-      -0.04136870056390762
+      -0.04136870056390762,
     ],
     "cameraScale": 1.1670683002471924,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid"],
     "movementVariant": "decline_fly_machine",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -681,7 +498,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 50,
       "additionalWeight": 0,
-      "arcDeclination": 20
+      "arcDeclination": 20,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -690,7 +507,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "assetPath": "assets/models/forms/decline_fly_machine.form.json",
     "references": [
       "https://www.panattasport.com/en/free-weight-special/super-lower-chest-flight-machine/",
-      "https://www.youtube.com/watch?v=0UDQ8CzNxbQ"
+      "https://www.youtube.com/watch?v=0UDQ8CzNxbQ",
     ],
     "review": {
       "equipmentReference": false,
@@ -698,13 +515,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Decline Fly Machine",
     "distanceUnit": "km",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "decline_press_machine",
@@ -717,30 +534,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      0.6769609451293945,
-      1.9096853733062744,
-      5.11701774597168
-    ],
+    "cameraAngle": [0.6769609451293945, 1.9096853733062744, 5.11701774597168],
     "cameraTarget": [
       -0.03013208508491516,
       0.6470193862915039,
-      0.26837992668151855
+      0.26837992668151855,
     ],
     "cameraScale": 1.0103797298669817,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid", "triceps"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
     "movementVariant": "decline_press_machine",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -751,19 +555,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 75,
       "additionalWeight": 0,
-      "leverPivot": [
-        0.55,
-        -0.95,
-        1.65
-      ],
-      "handleBottom": [
-        0.33,
-        -0.38,
-        1.04
-      ],
+      "leverPivot": [0.55, -0.95, 1.65],
+      "handleBottom": [0.33, -0.38, 1.04],
       "leverTravelDegrees": -22.5,
       "convergenceAxis": 0.22,
-      "inclineBackSupport": true
+      "inclineBackSupport": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -772,7 +568,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "assetPath": "assets/models/forms/decline_press_machine.form.json",
     "references": [
       "https://shop.lifefitness.com/products/hammer-strength-plate-loaded-iso-lateral-decline-chest-press",
-      "https://player.vimeo.com/video/1038957272"
+      "https://player.vimeo.com/video/1038957272",
     ],
     "review": {
       "equipmentReference": false,
@@ -780,13 +576,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Decline Press Machine",
     "distanceUnit": "km",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "lat_pulldown",
@@ -802,27 +598,18 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraAngle": [
       2.8017756938934326,
       2.5239157676696777,
-      -2.8519039154052734
+      -2.8519039154052734,
     ],
     "cameraTarget": [
       -0.014974027872085571,
       1.0149425268173218,
-      1.071426272392273
+      1.071426272392273,
     ],
     "cameraScale": 1.4531660366058352,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "lat_pulldown",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -834,7 +621,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoAngle": 0,
       "additionalWeight": 0,
       "bottomHandHeight": 0.07,
-      "bottomHandForward": 0.12
+      "bottomHandForward": 0.12,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -843,7 +630,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "assetPath": "assets/models/forms/lat_pulldown.form.json",
     "references": [
       "https://www.youtube.com/watch?v=nZip-pdLlQM",
-      "https://www.lifefitness.com.au/wp-content/uploads/2015/02/Cable_Motion_Manual_11_08a_1_56.pdf"
+      "https://www.lifefitness.com.au/wp-content/uploads/2015/02/Cable_Motion_Manual_11_08a_1_56.pdf",
     ],
     "review": {
       "equipmentReference": false,
@@ -851,13 +638,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Lat Pulldown",
     "distanceUnit": "km",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "mag_narrow",
@@ -870,30 +657,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "neutral",
     "cameraPreset": "seated_pull_back_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.813331365585327,
-      2.5239250659942627,
-      -2.817140579223633
-    ],
+    "cameraAngle": [2.813331365585327, 2.5239250659942627, -2.817140579223633],
     "cameraTarget": [
       -0.0034181177616119385,
       1.0149520635604858,
-      1.1061897277832031
+      1.1061897277832031,
     ],
     "cameraScale": 1.4459749341011048,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "mag_narrow",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -906,7 +680,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "additionalWeight": 0,
       "sourceModel": "CN001",
       "bottomHandHeight": 0.07,
-      "bottomHandForward": 0.12
+      "bottomHandForward": 0.12,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -916,7 +690,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "references": [
       "https://www.maxagrip.com/close-grip-neutral-cn001/",
       "https://www.lifefitness.com.au/wp-content/uploads/2015/02/Optima_user_manual_for_all_strength_2_585_1371787541.pdf",
-      "https://www.youtube.com/watch?v=nZip-pdLlQM"
+      "https://www.youtube.com/watch?v=nZip-pdLlQM",
     ],
     "review": {
       "equipmentReference": false,
@@ -924,13 +698,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Mag Narrow",
     "distanceUnit": "km",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "mag_medium",
@@ -946,27 +720,18 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraAngle": [
       2.8144800662994385,
       2.5239882469177246,
-      -2.8187403678894043
+      -2.8187403678894043,
     ],
     "cameraTarget": [
       -0.0022695064544677734,
       1.0150151252746582,
-      1.104589819908142
+      1.104589819908142,
     ],
     "cameraScale": 1.446565380692482,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "mag_medium",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -979,7 +744,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "additionalWeight": 0,
       "sourceModel": "MN004",
       "bottomHandHeight": 0.07,
-      "bottomHandForward": 0.12
+      "bottomHandForward": 0.12,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -989,7 +754,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "references": [
       "https://www.maxagrip.com/medium-grip-neutral-mn004/",
       "https://www.lifefitness.com.au/wp-content/uploads/2015/02/Optima_user_manual_for_all_strength_2_585_1371787541.pdf",
-      "https://www.youtube.com/watch?v=nZip-pdLlQM"
+      "https://www.youtube.com/watch?v=nZip-pdLlQM",
     ],
     "review": {
       "equipmentReference": false,
@@ -997,13 +762,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Mag Medium",
     "distanceUnit": "km",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "mag_wide",
@@ -1016,30 +781,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "neutral",
     "cameraPreset": "seated_pull_back_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.776167154312134,
-      2.5190982818603516,
-      -2.8915693759918213
-    ],
+    "cameraAngle": [2.776167154312134, 2.5190982818603516, -2.8915693759918213],
     "cameraTarget": [
       -0.040582507848739624,
       1.0101253986358643,
-      1.0317609310150146
+      1.0317609310150146,
     ],
     "cameraScale": 1.4640893006324769,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "mag_wide",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1052,7 +804,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "additionalWeight": 0,
       "sourceModel": "WG007",
       "bottomHandHeight": 0.07,
-      "bottomHandForward": 0.12
+      "bottomHandForward": 0.12,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1062,7 +814,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "references": [
       "https://www.maxagrip.com/wide-grip-wg007/",
       "https://www.lifefitness.com.au/wp-content/uploads/2015/02/Optima_user_manual_for_all_strength_2_585_1371787541.pdf",
-      "https://www.youtube.com/watch?v=nZip-pdLlQM"
+      "https://www.youtube.com/watch?v=nZip-pdLlQM",
     ],
     "review": {
       "equipmentReference": false,
@@ -1070,21 +822,19 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Mag Wide",
     "distanceUnit": "km",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "chin_up",
     "exerciseName": "チンニング",
     "category": "背中",
-    "aliases": [
-      "懸垂"
-    ],
+    "aliases": ["懸垂"],
     "modelId": "mpfb-athlete-v1",
     "animationId": "chin_up",
     "equipmentId": "pullup_bar",
@@ -1094,27 +844,18 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraAngle": [
       -2.9685254096984863,
       2.640474796295166,
-      -3.3546383380889893
+      -3.3546383380889893,
     ],
     "cameraTarget": [
       0.07642041891813278,
       1.009253740310669,
-      0.3427963852882385
+      0.3427963852882385,
     ],
     "cameraScale": 1.4863229912519456,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "chin_up",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1124,7 +865,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
@@ -1132,7 +873,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "status": "authored",
     "assetPath": "assets/models/forms/chin_up.form.json",
     "references": [
-      "https://www.acefitness.org/resources/everyone/exercise-library/191/pull-ups/"
+      "https://www.acefitness.org/resources/everyone/exercise-library/191/pull-ups/",
     ],
     "review": {
       "equipmentReference": false,
@@ -1140,7 +881,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "自重",
     "tags": [],
@@ -1148,7 +889,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "distanceUnit": "km",
     "startWeight": 0.0,
     "startReps": 10,
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "assisted_chin_up",
@@ -1161,30 +902,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      -2.877469301223755,
-      2.565751552581787,
-      -3.259071111679077
-    ],
+    "cameraAngle": [-2.877469301223755, 2.565751552581787, -3.259071111679077],
     "cameraTarget": [
       0.16747607290744781,
       0.9345303773880005,
-      0.43836405873298645
+      0.43836405873298645,
     ],
     "cameraScale": 1.4189777123928071,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "assisted_chin_up",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1197,7 +925,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "additionalWeight": 0,
       "rebuildAssistedChin": true,
       "matchedForearmRoll": true,
-      "assistedPullTravel": 0.44
+      "assistedPullTravel": 0.44,
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
@@ -1206,7 +934,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "assetPath": "assets/models/forms/assisted_chin_up.form.json",
     "references": [
       "https://www.youtube.com/watch?v=acMgjzqo5AI",
-      "https://www.lifefitness.com/en-gb/catalog/strength-training/selectorized/insignia-series-assist-dip-chin"
+      "https://www.lifefitness.com/en-gb/catalog/strength-training/selectorized/insignia-series-assist-dip-chin",
     ],
     "review": {
       "equipmentReference": true,
@@ -1214,52 +942,33 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Assisted Chin Up",
     "distanceUnit": "km",
     "authoringNotes": "2026-09-22 user-reported machine/pose defects: revision in progress, hold publication pending visual and native QA.",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "seated_row",
     "exerciseName": "シーテッドロー",
     "category": "背中",
-    "aliases": [
-      "シーテッドロウ"
-    ],
+    "aliases": ["シーテッドロウ"],
     "modelId": "mpfb-athlete-v1",
     "animationId": "row",
     "equipmentId": "row_machine",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "seated_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1269,7 +978,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.4,
       "pullHeight": 1.05,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1281,45 +990,26 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Seated Row",
     "distanceUnit": "km",
     "startWeight": 30.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "bent_over_row",
     "exerciseName": "ベントオーバーロー",
     "category": "背中",
-    "aliases": [
-      "バーベルロウ"
-    ],
+    "aliases": ["バーベルロウ"],
     "modelId": "mpfb-athlete-v1",
     "animationId": "row",
     "equipmentId": "barbell",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "bent_over_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1329,7 +1019,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.4,
       "pullHeight": 1.05,
       "torsoAngle": 35,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1341,7 +1031,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Bent Over Row",
     "distanceUnit": "km",
     "startWeight": 30.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "one_arm_dumbbell_row",
@@ -1354,30 +1044,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "one_arm_dumbbell_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1387,7 +1060,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.4,
       "pullHeight": 1.05,
       "torsoAngle": 15,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1397,7 +1070,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "tags": [],
     "englishName": "One Arm Dumbbell Row",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "deadlift",
@@ -1410,32 +1083,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.9656999111175537,
-      2.520989418029785,
-      3.841207504272461
-    ],
+    "cameraAngle": [2.9656999111175537, 2.520989418029785, 3.841207504272461],
     "cameraTarget": [
       -0.06857798993587494,
       0.8412996530532837,
-      0.15672671794891357
+      0.15672671794891357,
     ],
     "cameraScale": 1.0623417758196594,
-    "targetMuscles": [
-      "gluteus",
-      "hamstrings",
-      "quadriceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["gluteus", "hamstrings", "quadriceps", "trapezius"],
     "primaryMuscle": "gluteus",
-    "primaryMuscles": [
-      "gluteus",
-      "hamstrings"
-    ],
-    "secondaryMuscles": [
-      "quadriceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["gluteus", "hamstrings"],
+    "secondaryMuscles": ["quadriceps", "trapezius"],
     "movementVariant": "deadlift",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1449,7 +1107,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoLean": 50,
       "toeOut": 15,
       "hangingWristReach": true,
-      "barY": -0.24
+      "barY": -0.24,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1468,9 +1126,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "t_bar_row",
@@ -1483,30 +1141,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "t_bar_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1516,7 +1157,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.4,
       "pullHeight": 1.05,
       "torsoAngle": 35,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1526,7 +1167,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "T Bar Row",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "straight_arm_pulldown",
@@ -1539,30 +1180,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "straight_arm_pulldown",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1572,7 +1196,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 75,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1582,7 +1206,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "tags": [],
     "englishName": "Straight Arm Pulldown",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "dy_row",
@@ -1595,30 +1219,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "supinated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      -1.480484127998352,
-      2.52852201461792,
-      -3.9169974327087402
-    ],
+    "cameraAngle": [-1.480484127998352, 2.52852201461792, -3.9169974327087402],
     "cameraTarget": [
       0.029743820428848267,
       0.8564838767051697,
-      0.6136865615844727
+      0.6136865615844727,
     ],
     "cameraScale": 1.3261718457937242,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "dy_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1629,40 +1240,16 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.27,
       "torsoAngle": 85,
       "additionalWeight": 0,
-      "leverPivot": [
-        0.66,
-        -0.65,
-        1.91
-      ],
-      "handleStart": [
-        0.27,
-        -0.93,
-        0.8
-      ],
+      "leverPivot": [0.66, -0.65, 1.91],
+      "handleStart": [0.27, -0.93, 0.8],
       "leverTravelDegrees": 10,
       "convergenceAxis": 0,
-      "leverElbow": [
-        0,
-        -0.16,
-        -0.28
-      ],
-      "loadingOffset": [
-        0,
-        -0.16,
-        -0.28
-      ],
-      "handForward": [
-        0,
-        -1,
-        0
-      ],
-      "elbowPole": [
-        0.05,
-        1,
-        -1
-      ],
+      "leverElbow": [0, -0.16, -0.28],
+      "loadingOffset": [0, -0.16, -0.28],
+      "handForward": [0, -1, 0],
+      "elbowPole": [0.05, 1, -1],
       "rebuildDyMachine": true,
-      "matchedForearmRoll": true
+      "matchedForearmRoll": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1671,7 +1258,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "assetPath": "assets/models/forms/dy_row.form.json",
     "references": [
       "https://www.lifefitness.com/ja-jp/catalog/strength-training/plate-loaded/plate-loaded-iso-lateral-d-y-row",
-      "https://player.vimeo.com/video/1050766924"
+      "https://player.vimeo.com/video/1050766924",
     ],
     "review": {
       "equipmentReference": true,
@@ -1679,14 +1266,14 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Dy Row",
     "distanceUnit": "km",
     "previewEnabled": false,
-    "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish."
+    "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish.",
   },
   {
     "exerciseId": "low_row",
@@ -1699,30 +1286,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      -2.951796293258667,
-      2.625889778137207,
-      -3.1719820499420166
-    ],
+    "cameraAngle": [-2.951796293258667, 2.625889778137207, -3.1719820499420166],
     "cameraTarget": [
       0.060456547886133194,
       0.8508121967315674,
-      0.4857533574104309
+      0.4857533574104309,
     ],
     "cameraScale": 1.3336279577016832,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "low_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1733,35 +1307,15 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 0.84,
       "torsoAngle": 90,
       "additionalWeight": 0,
-      "leverPivot": [
-        0.58,
-        -0.65,
-        1.58
-      ],
-      "handleStart": [
-        0.28,
-        -0.88,
-        0.7
-      ],
+      "leverPivot": [0.58, -0.65, 1.58],
+      "handleStart": [0.28, -0.88, 0.7],
       "leverTravelDegrees": 18,
       "convergenceAxis": 0,
       "rebuildLowRowMachine": true,
       "matchedForearmRoll": true,
-      "elbowPole": [
-        0.2,
-        1,
-        -0.25
-      ],
-      "handForward": [
-        0,
-        -0.8,
-        -0.6
-      ],
-      "handForwardEnd": [
-        0,
-        -0.95,
-        0.312
-      ]
+      "elbowPole": [0.2, 1, -0.25],
+      "handForward": [0, -0.8, -0.6],
+      "handForwardEnd": [0, -0.95, 0.312],
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1770,7 +1324,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "assetPath": "assets/models/forms/low_row.form.json",
     "references": [
       "https://www.lifefitness.com/en-us/catalog/strength-training/plate-loaded/plate-loaded-iso-lateral-low-row",
-      "https://player.vimeo.com/video/1089148269"
+      "https://player.vimeo.com/video/1089148269",
     ],
     "review": {
       "equipmentReference": true,
@@ -1778,13 +1332,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Low Row",
     "distanceUnit": "km",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "linear_row",
@@ -1797,30 +1351,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "seated_pull_back_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8738913536071777,
-      2.444476366043091,
-      4.076758861541748
-    ],
+    "cameraAngle": [2.8738913536071777, 2.444476366043091, 4.076758861541748],
     "cameraTarget": [
       -0.10587504506111145,
       0.7559420466423035,
-      0.3520512580871582
+      0.3520512580871582,
     ],
     "cameraScale": 1.39189692735672,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "linear_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1832,27 +1373,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoAngle": 75,
       "additionalWeight": 0,
       "torsoLean": 22,
-      "gripStart": [
-        0,
-        -0.49,
-        0.91
-      ],
-      "gripEnd": [
-        0,
-        -0.29,
-        1.12
-      ],
+      "gripStart": [0, -0.49, 0.91],
+      "gripEnd": [0, -0.29, 1.12],
       "matchedForearmRoll": true,
-      "elbowPole": [
-        0.65,
-        0.6,
-        0
-      ],
-      "handForward": [
-        0,
-        -0.9701425,
-        -0.2425356
-      ]
+      "elbowPole": [0.65, 0.6, 0],
+      "handForward": [0, -0.9701425, -0.2425356],
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1861,7 +1386,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "assetPath": "assets/models/forms/linear_row.form.json",
     "references": [
       "https://www.deltafitness.shop/product/907",
-      "https://act-energy.co.jp/20260406-2/"
+      "https://act-energy.co.jp/20260406-2/",
     ],
     "review": {
       "equipmentReference": true,
@@ -1869,14 +1394,14 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Linear Row",
     "distanceUnit": "km",
     "authoringNotes": "2026-09-22 user-reported machine/pose defects: revision in progress, hold publication pending visual and native QA.",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "high_row",
@@ -1889,30 +1414,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      3.0129010677337646,
-      2.5716559886932373,
-      3.7456471920013428
-    ],
+    "cameraAngle": [3.0129010677337646, 2.5716559886932373, 3.7456471920013428],
     "cameraTarget": [
       -0.021376892924308777,
       0.8919662833213806,
-      0.06116655468940735
+      0.06116655468940735,
     ],
     "cameraScale": 1.4214579844474793,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "high_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -1923,41 +1435,17 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.6,
       "torsoAngle": 85,
       "additionalWeight": 0,
-      "leverPivot": [
-        0.64,
-        0.2,
-        1.5
-      ],
-      "handleStart": [
-        0.32,
-        -0.7,
-        1.4
-      ],
+      "leverPivot": [0.64, 0.2, 1.5],
+      "handleStart": [0.32, -0.7, 1.4],
       "leverTravelDegrees": 35,
       "convergenceAxis": 0,
-      "leverElbow": [
-        0,
-        -0.55,
-        0.22
-      ],
-      "loadingOffset": [
-        0,
-        0.28,
-        0.12
-      ],
-      "handForward": [
-        0,
-        -0.3420201433,
-        0.9396926208
-      ],
-      "elbowPole": [
-        0.1,
-        1,
-        -1
-      ],
+      "leverElbow": [0, -0.55, 0.22],
+      "loadingOffset": [0, 0.28, 0.12],
+      "handForward": [0, -0.3420201433, 0.9396926208],
+      "elbowPole": [0.1, 1, -1],
       "thighRestraint": true,
       "rebuildHighRowMachine": true,
-      "matchedForearmRoll": true
+      "matchedForearmRoll": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1966,7 +1454,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "assetPath": "assets/models/forms/high_row.form.json",
     "references": [
       "https://www.lifefitness.com/ja-jp/catalog/strength-training/plate-loaded/plate-loaded-iso-lateral-high-row",
-      "https://player.vimeo.com/video/1064752886"
+      "https://player.vimeo.com/video/1064752886",
     ],
     "review": {
       "equipmentReference": true,
@@ -1974,14 +1462,14 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "High Row",
     "distanceUnit": "km",
     "previewEnabled": false,
-    "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish."
+    "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish.",
   },
   {
     "exerciseId": "cable_row",
@@ -1994,30 +1482,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      -2.6913976669311523,
-      2.590212345123291,
-      4.0315093994140625
-    ],
+    "cameraAngle": [-2.6913976669311523, 2.590212345123291, 4.0315093994140625],
     "cameraTarget": [
       0.27158892154693604,
       0.888764500617981,
-      0.2993006706237793
+      0.2993006706237793,
     ],
     "cameraScale": 1.1983523130044342,
-    "targetMuscles": [
-      "latissimusDorsi",
-      "biceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["latissimusDorsi", "biceps", "trapezius"],
     "primaryMuscle": "latissimusDorsi",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
     "movementVariant": "cable_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2028,22 +1503,14 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 0.9,
       "torsoAngle": 90,
       "additionalWeight": 0,
-      "gripStart": [
-        0,
-        -0.64,
-        1.0
-      ],
-      "gripEnd": [
-        0,
-        -0.18,
-        0.86
-      ],
+      "gripStart": [0, -0.64, 1.0],
+      "gripEnd": [0, -0.18, 0.86],
       "pulleyHeight": 0.7,
       "seatHipHeight": 0.6,
       "ankleY": -0.68,
       "ankleZ": 0.32,
       "footplateAngle": -50,
-      "matchedForearmRoll": true
+      "matchedForearmRoll": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2056,7 +1523,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "distanceUnit": "km",
     "authoringNotes": "2026-09-22 user-reported machine/pose defects: revision in progress, hold publication pending visual and native QA.",
     "references": [
-      "https://www.bodykore.com/product/isolation-series-selectorized-low-pull-gr616"
+      "https://www.bodykore.com/product/isolation-series-selectorized-low-pull-gr616",
     ],
     "review": {
       "equipmentReference": true,
@@ -2064,9 +1531,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "back_extension",
@@ -2079,30 +1546,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      -3.779470682144165,
-      2.424133777618408,
-      -2.8702824115753174
-    ],
+    "cameraAngle": [-3.779470682144165, 2.424133777618408, -2.8702824115753174],
     "cameraTarget": [
       0.002216517925262451,
       0.7959073781967163,
-      0.07103000581264496
+      0.07103000581264496,
     ],
     "cameraScale": 1.110830151438713,
-    "targetMuscles": [
-      "erectorSpinae",
-      "gluteus",
-      "hamstrings"
-    ],
+    "targetMuscles": ["erectorSpinae", "gluteus", "hamstrings"],
     "primaryMuscle": "erectorSpinae",
-    "primaryMuscles": [
-      "erectorSpinae"
-    ],
-    "secondaryMuscles": [
-      "gluteus",
-      "hamstrings"
-    ],
+    "primaryMuscles": ["erectorSpinae"],
+    "secondaryMuscles": ["gluteus", "hamstrings"],
     "movementVariant": "back_extension",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2113,7 +1567,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 45,
       "additionalWeight": 0,
-      "hipFlexionDegrees": 60
+      "hipFlexionDegrees": 60,
     },
     "recordType": "weightReps",
     "loadMode": "additional",
@@ -2123,7 +1577,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "references": [
       "https://shop.lifefitness.com/products/hammer-strength-back-extension",
       "https://player.vimeo.com/video/1161896691",
-      "https://www.jssm.org/volume20/iss2/cap/jssm-20-181.pdf"
+      "https://www.jssm.org/volume20/iss2/cap/jssm-20-181.pdf",
     ],
     "review": {
       "equipmentReference": false,
@@ -2131,13 +1585,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "ローマンチェア",
     "tags": [],
     "englishName": "Back Extension",
     "distanceUnit": "km",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "weighted_back_extension",
@@ -2153,27 +1607,18 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraAngle": [
       -3.775362014770508,
       2.4391064643859863,
-      -2.8668527603149414
+      -2.8668527603149414,
     ],
     "cameraTarget": [
       0.006325036287307739,
       0.810880184173584,
-      0.07445946335792542
+      0.07445946335792542,
     ],
     "cameraScale": 1.1286352777481081,
-    "targetMuscles": [
-      "erectorSpinae",
-      "gluteus",
-      "hamstrings"
-    ],
+    "targetMuscles": ["erectorSpinae", "gluteus", "hamstrings"],
     "primaryMuscle": "erectorSpinae",
-    "primaryMuscles": [
-      "erectorSpinae"
-    ],
-    "secondaryMuscles": [
-      "gluteus",
-      "hamstrings"
-    ],
+    "primaryMuscles": ["erectorSpinae"],
+    "secondaryMuscles": ["gluteus", "hamstrings"],
     "movementVariant": "weighted_back_extension",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2184,7 +1629,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 45,
       "additionalWeight": 10,
-      "hipFlexionDegrees": 60
+      "hipFlexionDegrees": 60,
     },
     "recordType": "weightReps",
     "loadMode": "additional",
@@ -2194,7 +1639,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "references": [
       "https://shop.lifefitness.com/products/hammer-strength-back-extension",
       "https://player.vimeo.com/video/1161896691",
-      "https://www.jssm.org/volume20/iss2/cap/jssm-20-181.pdf"
+      "https://www.jssm.org/volume20/iss2/cap/jssm-20-181.pdf",
     ],
     "review": {
       "equipmentReference": false,
@@ -2202,14 +1647,14 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "equipmentLabel": "ローマンチェア",
     "tags": [],
     "englishName": "Weighted Back Extension",
     "distanceUnit": "km",
     "authoringNotes": "Blender 4.5.3 export and start/mid/end preview reviewed. Original procedural equipment with author-selected dimensions; native-platform and production-route review pending.",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "shoulder_press",
@@ -2222,28 +1667,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["anteriorDeltoid", "triceps"],
     "primaryMuscle": "anteriorDeltoid",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
     "movementVariant": "shoulder_press",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2253,7 +1683,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 85,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2263,7 +1693,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Shoulder Press",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "dumbbell_shoulder_press",
@@ -2276,28 +1706,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.9885802268981934,
-      2.364790678024292,
-      3.8404455184936523
-    ],
+    "cameraAngle": [2.9885802268981934, 2.364790678024292, 3.8404455184936523],
     "cameraTarget": [
       -0.04569758474826813,
       0.6851010918617249,
-      0.15596485137939453
+      0.15596485137939453,
     ],
     "cameraScale": 1.0718453303352,
-    "targetMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["anteriorDeltoid", "triceps"],
     "primaryMuscle": "anteriorDeltoid",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
     "movementVariant": "dumbbell_shoulder_press",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2317,7 +1736,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "bottomGripWidth": 0.86,
       "rebuildAdjustableBench": true,
       "matchedForearmRoll": true,
-      "verticalForearmPress": true
+      "verticalForearmPress": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2329,7 +1748,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Dumbbell Shoulder Press",
     "distanceUnit": "km",
     "references": [
-      "https://www.acefitness.org/resources/everyone/exercise-library/45/seated-overhead-press/"
+      "https://www.acefitness.org/resources/everyone/exercise-library/45/seated-overhead-press/",
     ],
     "review": {
       "equipmentReference": true,
@@ -2337,9 +1756,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "military_press",
@@ -2352,28 +1771,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      3.0737624168395996,
-      2.8396406173706055,
-      3.920286178588867
-    ],
+    "cameraAngle": [3.0737624168395996, 2.8396406173706055, 3.920286178588867],
     "cameraTarget": [
       0.039484381675720215,
       1.159950852394104,
-      0.23580557107925415
+      0.23580557107925415,
     ],
     "cameraScale": 1.3305652815056965,
-    "targetMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["anteriorDeltoid", "triceps"],
     "primaryMuscle": "anteriorDeltoid",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
     "movementVariant": "military_press",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2387,7 +1795,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "barForward": 0.28,
       "topForward": 0.06,
       "bottomAboveShoulder": 0.04,
-      "reachRatio": 0.985
+      "reachRatio": 0.985,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2406,9 +1814,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "lateral_raise",
@@ -2421,28 +1829,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      3.001854658126831,
-      2.544029712677002,
-      3.7730298042297363
-    ],
+    "cameraAngle": [3.001854658126831, 2.544029712677002, 3.7730298042297363],
     "cameraTarget": [
       -0.032423362135887146,
       0.8643399477005005,
-      0.08854915201663971
+      0.08854915201663971,
     ],
     "cameraScale": 1.1477969847572969,
-    "targetMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["anteriorDeltoid", "triceps"],
     "primaryMuscle": "anteriorDeltoid",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
     "movementVariant": "lateral_raise",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2450,7 +1847,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "raisePlane": 15,
       "startAngle": 8,
       "endAngle": 80,
-      "elbowBend": 10
+      "elbowBend": 10,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2464,7 +1861,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "startWeight": 5.0,
     "startReps": 10,
     "references": [
-      "https://www.catalystathletics.com/exercise/825/Dumbbell-Lateral-Raise/"
+      "https://www.catalystathletics.com/exercise/825/Dumbbell-Lateral-Raise/",
     ],
     "review": {
       "equipmentReference": false,
@@ -2472,9 +1869,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "front_raise",
@@ -2487,28 +1884,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.9969232082366943,
-      2.544029712677002,
-      3.9948177337646484
-    ],
+    "cameraAngle": [2.9969232082366943, 2.544029712677002, 3.9948177337646484],
     "cameraTarget": [
       -0.03735464811325073,
       0.8643399477005005,
-      0.31033700704574585
+      0.31033700704574585,
     ],
     "cameraScale": 1.101152033652179,
-    "targetMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["anteriorDeltoid", "triceps"],
     "primaryMuscle": "anteriorDeltoid",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
     "movementVariant": "front_raise",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2516,7 +1902,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "raisePlane": 80,
       "startAngle": 8,
       "endAngle": 80,
-      "elbowBend": 10
+      "elbowBend": 10,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2528,7 +1914,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Front Raise",
     "distanceUnit": "km",
     "references": [
-      "https://contentcdn.eacefitness.com/certifiednews/images/article/pdfs/ShoulderExercises.pdf"
+      "https://contentcdn.eacefitness.com/certifiednews/images/article/pdfs/ShoulderExercises.pdf",
     ],
     "review": {
       "equipmentReference": false,
@@ -2536,9 +1922,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "rear_raise",
@@ -2551,28 +1937,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "posteriorDeltoid",
-      "trapezius"
-    ],
+    "targetMuscles": ["posteriorDeltoid", "trapezius"],
     "primaryMuscle": "posteriorDeltoid",
-    "primaryMuscles": [
-      "posteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "trapezius"
-    ],
+    "primaryMuscles": ["posteriorDeltoid"],
+    "secondaryMuscles": ["trapezius"],
     "movementVariant": "rear_raise",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2582,7 +1953,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 15,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2594,7 +1965,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Rear Raise",
     "distanceUnit": "km",
     "startWeight": 5.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "rear_delt",
@@ -2607,28 +1978,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.7669403553009033,
-      2.0275094509124756,
-      -3.368009090423584
-    ],
+    "cameraAngle": [2.7669403553009033, 2.0275094509124756, -3.368009090423584],
     "cameraTarget": [
       -0.053423717617988586,
       0.775731086730957,
-      0.6422523260116577
+      0.6422523260116577,
     ],
     "cameraScale": 1.078737227646634,
-    "targetMuscles": [
-      "posteriorDeltoid",
-      "trapezius"
-    ],
+    "targetMuscles": ["posteriorDeltoid", "trapezius"],
     "primaryMuscle": "posteriorDeltoid",
-    "primaryMuscles": [
-      "posteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "trapezius"
-    ],
+    "primaryMuscles": ["posteriorDeltoid"],
+    "secondaryMuscles": ["trapezius"],
     "movementVariant": "rear_delt",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2645,7 +2005,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "startAngle": -12,
       "sweepDegrees": 85,
       "rebuildRearDeltMachine": true,
-      "matchedForearmRoll": true
+      "matchedForearmRoll": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2659,7 +2019,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish.",
     "references": [
       "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/insignia-series-pectoral-fly-rear-deltoid",
-      "https://kb.cybexintl.com/Owners_Manuals/Strength/Life_Fitness_Insignia_Series_Owners_Manual_9481201_Rev_BE.pdf"
+      "https://kb.cybexintl.com/Owners_Manuals/Strength/Life_Fitness_Insignia_Series_Owners_Manual_9481201_Rev_BE.pdf",
     ],
     "review": {
       "equipmentReference": false,
@@ -2667,9 +2027,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "face_pull",
@@ -2682,28 +2042,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "posteriorDeltoid",
-      "trapezius"
-    ],
+    "targetMuscles": ["posteriorDeltoid", "trapezius"],
     "primaryMuscle": "posteriorDeltoid",
-    "primaryMuscles": [
-      "posteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "trapezius"
-    ],
+    "primaryMuscles": ["posteriorDeltoid"],
+    "secondaryMuscles": ["trapezius"],
     "movementVariant": "face_pull",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2713,7 +2058,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2723,7 +2068,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "tags": [],
     "englishName": "Face Pull",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "upright_row",
@@ -2736,28 +2081,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
+    "targetMuscles": ["anteriorDeltoid", "triceps"],
     "primaryMuscle": "anteriorDeltoid",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
     "movementVariant": "upright_row",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2767,7 +2097,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2777,7 +2107,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Upright Row",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "barbell_curl",
@@ -2790,28 +2120,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "supinated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      3.0612564086914062,
-      2.58400821685791,
-      3.9561684131622314
-    ],
+    "cameraAngle": [3.0612564086914062, 2.58400821685791, 3.9561684131622314],
     "cameraTarget": [
       0.026978522539138794,
       0.9043186902999878,
-      0.271687775850296
+      0.271687775850296,
     ],
     "cameraScale": 1.0478632733179258,
-    "targetMuscles": [
-      "biceps",
-      "forearms"
-    ],
+    "targetMuscles": ["biceps", "forearms"],
     "primaryMuscle": "biceps",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
     "movementVariant": "barbell_curl",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2822,7 +2141,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 90,
       "additionalWeight": 0,
-      "matchedForearmRoll": true
+      "matchedForearmRoll": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2839,48 +2158,35 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "references": [
-      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/barbell-biceps-curl/"
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/barbell-biceps-curl/",
     ],
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "dumbbell_curl",
     "exerciseName": "ダンベルカール",
     "category": "腕",
-    "aliases": [
-      "アームカール"
-    ],
+    "aliases": ["アームカール"],
     "modelId": "mpfb-athlete-v1",
     "animationId": "curl",
     "equipmentId": "dumbbell",
     "gripType": "supinated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.9902946949005127,
-      2.544029712677002,
-      3.8674373626708984
-    ],
+    "cameraAngle": [2.9902946949005127, 2.544029712677002, 3.8674373626708984],
     "cameraTarget": [
       -0.043983131647109985,
       0.8643400073051453,
-      0.18295657634735107
+      0.18295657634735107,
     ],
     "cameraScale": 1.0478632733179258,
-    "targetMuscles": [
-      "biceps",
-      "forearms"
-    ],
+    "targetMuscles": ["biceps", "forearms"],
     "primaryMuscle": "biceps",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
     "movementVariant": "dumbbell_curl",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2891,7 +2197,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 90,
       "additionalWeight": 0,
-      "matchedForearmRoll": true
+      "matchedForearmRoll": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2910,12 +2216,12 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "references": [
-      "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/biceps-curl/vid-20084675"
+      "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/biceps-curl/vid-20084675",
     ],
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "hammer_curl",
@@ -2928,28 +2234,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      3.017672300338745,
-      2.544029712677002,
-      3.8598177433013916
-    ],
+    "cameraAngle": [3.017672300338745, 2.544029712677002, 3.8598177433013916],
     "cameraTarget": [
       -0.016605645418167114,
       0.8643399477005005,
-      0.17533713579177856
+      0.17533713579177856,
     ],
     "cameraScale": 1.0475324913812802,
-    "targetMuscles": [
-      "biceps",
-      "forearms"
-    ],
+    "targetMuscles": ["biceps", "forearms"],
     "primaryMuscle": "biceps",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
     "movementVariant": "hammer_curl",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -2960,7 +2255,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 90,
       "additionalWeight": 0,
-      "matchedForearmRoll": true
+      "matchedForearmRoll": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -2979,12 +2274,12 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": true
+      "productionRoute": true,
     },
     "references": [
-      "https://www.catalystathletics.com/exercise/841/Hammer-Curl/"
+      "https://www.catalystathletics.com/exercise/841/Hammer-Curl/",
     ],
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "preacher_curl",
@@ -2997,28 +2292,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "supinated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "biceps",
-      "forearms"
-    ],
+    "targetMuscles": ["biceps", "forearms"],
     "primaryMuscle": "biceps",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
     "movementVariant": "preacher_curl",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3028,7 +2308,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 60,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3038,7 +2318,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Preacher Curl",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "cable_curl",
@@ -3051,28 +2331,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "supinated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "biceps",
-      "forearms"
-    ],
+    "targetMuscles": ["biceps", "forearms"],
     "primaryMuscle": "biceps",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
     "movementVariant": "cable_curl",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3082,7 +2347,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3092,7 +2357,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "tags": [],
     "englishName": "Cable Curl",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "triceps_pushdown",
@@ -3105,32 +2370,21 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.9469916820526123,
-      2.6429035663604736,
-      4.585789203643799
-    ],
+    "cameraAngle": [2.9469916820526123, 2.6429035663604736, 4.585789203643799],
     "cameraTarget": [
       -0.08728641271591187,
       0.9632137417793274,
-      0.9013082981109619
+      0.9013082981109619,
     ],
     "cameraScale": 1.4080203784629703,
-    "targetMuscles": [
-      "triceps"
-    ],
+    "targetMuscles": ["triceps"],
     "primaryMuscle": "triceps",
-    "primaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["triceps"],
     "secondaryMuscles": [],
     "movementVariant": "triceps_pushdown",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {
-      "attachment": "rope",
-      "singleArm": false
-    },
+    "parameters": {"attachment": "rope", "singleArm": false},
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
@@ -3144,7 +2398,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "startReps": 10,
     "references": [
       "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
-      "https://shop.lifefitness.com/products/cable-attachments"
+      "https://shop.lifefitness.com/products/cable-attachments",
     ],
     "review": {
       "equipmentReference": false,
@@ -3152,9 +2406,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "french_press",
@@ -3167,24 +2421,12 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "triceps"
-    ],
+    "targetMuscles": ["triceps"],
     "primaryMuscle": "triceps",
-    "primaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["triceps"],
     "secondaryMuscles": [],
     "movementVariant": "french_press",
     "animationSpeed": 1.0,
@@ -3195,7 +2437,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3205,7 +2447,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "tags": [],
     "englishName": "French Press",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "skull_crusher",
@@ -3218,24 +2460,12 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "triceps"
-    ],
+    "targetMuscles": ["triceps"],
     "primaryMuscle": "triceps",
-    "primaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["triceps"],
     "secondaryMuscles": [],
     "movementVariant": "skull_crusher",
     "animationSpeed": 1.0,
@@ -3246,7 +2476,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3256,7 +2486,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Skull Crusher",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "overhead_triceps_extension",
@@ -3269,24 +2499,12 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "triceps"
-    ],
+    "targetMuscles": ["triceps"],
     "primaryMuscle": "triceps",
-    "primaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["triceps"],
     "secondaryMuscles": [],
     "movementVariant": "overhead_triceps_extension",
     "animationSpeed": 1.0,
@@ -3297,7 +2515,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3307,45 +2525,30 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "tags": [],
     "englishName": "Overhead Triceps Extension",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "barbell_squat",
     "exerciseName": "バーベルスクワット",
     "category": "脚",
-    "aliases": [
-      "スクワット"
-    ],
+    "aliases": ["スクワット"],
     "modelId": "mpfb-athlete-v1",
     "animationId": "squat",
     "equipmentId": "barbell",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      3.0448267459869385,
-      2.4998130798339844,
-      3.6910500526428223
-    ],
+    "cameraAngle": [3.0448267459869385, 2.4998130798339844, 3.6910500526428223],
     "cameraTarget": [
       0.010548919439315796,
       0.820123553276062,
-      0.006569460034370422
+      0.006569460034370422,
     ],
     "cameraScale": 1.1075860705971718,
-    "targetMuscles": [
-      "quadriceps",
-      "gluteus",
-      "hamstrings"
-    ],
+    "targetMuscles": ["quadriceps", "gluteus", "hamstrings"],
     "primaryMuscle": "quadriceps",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
     "movementVariant": "barbell_squat",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3357,7 +2560,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "shinDegrees": 22,
       "thighDegrees": 80,
       "torsoLean": 30,
-      "toeOut": 15
+      "toeOut": 15,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3371,7 +2574,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "startWeight": 40.0,
     "startReps": 10,
     "references": [
-      "https://www.acefitness.org/resources/everyone/exercise-library/11/back-squat/"
+      "https://www.acefitness.org/resources/everyone/exercise-library/11/back-squat/",
     ],
     "review": {
       "equipmentReference": false,
@@ -3379,9 +2582,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "hack_squat",
@@ -3394,30 +2597,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "quadriceps",
-      "gluteus",
-      "hamstrings"
-    ],
+    "targetMuscles": ["quadriceps", "gluteus", "hamstrings"],
     "primaryMuscle": "quadriceps",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
     "movementVariant": "hack_squat",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3427,7 +2613,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 55,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3437,7 +2623,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Hack Squat",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "leg_press",
@@ -3450,30 +2636,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "quadriceps",
-      "gluteus",
-      "hamstrings"
-    ],
+    "targetMuscles": ["quadriceps", "gluteus", "hamstrings"],
     "primaryMuscle": "quadriceps",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
     "movementVariant": "leg_press",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3483,7 +2652,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 45,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3495,7 +2664,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Leg Press",
     "distanceUnit": "km",
     "startWeight": 60.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "bulgarian_split_squat",
@@ -3508,30 +2677,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "quadriceps",
-      "gluteus",
-      "hamstrings"
-    ],
+    "targetMuscles": ["quadriceps", "gluteus", "hamstrings"],
     "primaryMuscle": "quadriceps",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
     "movementVariant": "bulgarian_split_squat",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3541,7 +2693,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3553,7 +2705,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Bulgarian Split Squat",
     "distanceUnit": "km",
     "startWeight": 10.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "lunge",
@@ -3566,30 +2718,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "quadriceps",
-      "gluteus",
-      "hamstrings"
-    ],
+    "targetMuscles": ["quadriceps", "gluteus", "hamstrings"],
     "primaryMuscle": "quadriceps",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
     "movementVariant": "lunge",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3599,7 +2734,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3609,7 +2744,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "tags": [],
     "englishName": "Lunge",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "leg_extension",
@@ -3622,30 +2757,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.9333276748657227,
-      2.2332961559295654,
-      4.146904945373535
-    ],
+    "cameraAngle": [2.9333276748657227, 2.2332961559295654, 4.146904945373535],
     "cameraTarget": [
       -0.04371511936187744,
       0.6455398797988892,
-      0.3759840726852417
+      0.3759840726852417,
     ],
     "cameraScale": 0.9991469920414793,
-    "targetMuscles": [
-      "quadriceps",
-      "gluteus",
-      "hamstrings"
-    ],
+    "targetMuscles": ["quadriceps", "gluteus", "hamstrings"],
     "primaryMuscle": "quadriceps",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
     "movementVariant": "leg_extension",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3654,7 +2776,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "inclineBackSupport": true,
       "kneeAction": "extension",
       "kneeStart": 0,
-      "kneeEnd": 75
+      "kneeEnd": 75,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3668,7 +2790,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "startWeight": 25.0,
     "startReps": 10,
     "references": [
-      "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/axiom-series-seated-leg-curl-extension"
+      "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/axiom-series-seated-leg-curl-extension",
     ],
     "review": {
       "equipmentReference": false,
@@ -3676,9 +2798,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "leg_curl",
@@ -3691,24 +2813,12 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "hamstrings"
-    ],
+    "targetMuscles": ["hamstrings"],
     "primaryMuscle": "hamstrings",
-    "primaryMuscles": [
-      "hamstrings"
-    ],
+    "primaryMuscles": ["hamstrings"],
     "secondaryMuscles": [],
     "movementVariant": "leg_curl",
     "animationSpeed": 1.0,
@@ -3719,7 +2829,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3731,7 +2841,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Leg Curl",
     "distanceUnit": "km",
     "startWeight": 20.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "romanian_deadlift",
@@ -3744,32 +2854,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      3.022958755493164,
-      2.5327541828155518,
-      3.850736141204834
-    ],
+    "cameraAngle": [3.022958755493164, 2.5327541828155518, 3.850736141204834],
     "cameraTarget": [
       -0.011319071054458618,
       0.8530645370483398,
-      0.1662554293870926
+      0.1662554293870926,
     ],
     "cameraScale": 1.0661250144243242,
-    "targetMuscles": [
-      "gluteus",
-      "hamstrings",
-      "quadriceps",
-      "trapezius"
-    ],
+    "targetMuscles": ["gluteus", "hamstrings", "quadriceps", "trapezius"],
     "primaryMuscle": "gluteus",
-    "primaryMuscles": [
-      "gluteus",
-      "hamstrings"
-    ],
-    "secondaryMuscles": [
-      "quadriceps",
-      "trapezius"
-    ],
+    "primaryMuscles": ["gluteus", "hamstrings"],
+    "secondaryMuscles": ["quadriceps", "trapezius"],
     "movementVariant": "romanian_deadlift",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3782,7 +2877,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "thighDegrees": 25,
       "torsoLean": 65,
       "toeOut": 15,
-      "hangingWristReach": true
+      "hangingWristReach": true,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3794,7 +2889,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Romanian Deadlift",
     "distanceUnit": "km",
     "references": [
-      "https://www.acefitness.org/continuing-education/certified/may-2025/8865/the-ace-do-it-better-series-the-romanian-deadlift/"
+      "https://www.acefitness.org/continuing-education/certified/may-2025/8865/the-ace-do-it-better-series-the-romanian-deadlift/",
     ],
     "review": {
       "equipmentReference": false,
@@ -3802,9 +2897,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "hip_thrust",
@@ -3817,28 +2912,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "gluteus",
-      "hamstrings"
-    ],
+    "targetMuscles": ["gluteus", "hamstrings"],
     "primaryMuscle": "gluteus",
-    "primaryMuscles": [
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
+    "primaryMuscles": ["gluteus"],
+    "secondaryMuscles": ["hamstrings"],
     "movementVariant": "hip_thrust",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -3848,7 +2928,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3858,7 +2938,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Hip Thrust",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "hip_abduction",
@@ -3871,24 +2951,12 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "gluteus"
-    ],
+    "targetMuscles": ["gluteus"],
     "primaryMuscle": "gluteus",
-    "primaryMuscles": [
-      "gluteus"
-    ],
+    "primaryMuscles": ["gluteus"],
     "secondaryMuscles": [],
     "movementVariant": "hip_abduction",
     "animationSpeed": 1.0,
@@ -3899,7 +2967,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3909,7 +2977,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Hip Abduction",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "hip_adduction",
@@ -3922,24 +2990,12 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "adductors"
-    ],
+    "targetMuscles": ["adductors"],
     "primaryMuscle": "adductors",
-    "primaryMuscles": [
-      "adductors"
-    ],
+    "primaryMuscles": ["adductors"],
     "secondaryMuscles": [],
     "movementVariant": "hip_adduction",
     "animationSpeed": 1.0,
@@ -3950,7 +3006,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -3960,7 +3016,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Hip Adduction",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "calf_raise",
@@ -3973,24 +3029,12 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "calves"
-    ],
+    "targetMuscles": ["calves"],
     "primaryMuscle": "calves",
-    "primaryMuscles": [
-      "calves"
-    ],
+    "primaryMuscles": ["calves"],
     "secondaryMuscles": [],
     "movementVariant": "calf_raise",
     "animationSpeed": 1.0,
@@ -4001,7 +3045,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -4011,7 +3055,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Calf Raise",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "crunch",
@@ -4024,28 +3068,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "rectusAbdominis",
-      "obliques"
-    ],
+    "targetMuscles": ["rectusAbdominis", "obliques"],
     "primaryMuscle": "rectusAbdominis",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
     "movementVariant": "crunch",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -4055,7 +3084,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
@@ -4067,7 +3096,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Crunch",
     "distanceUnit": "km",
     "startWeight": 0.0,
-    "startReps": 15
+    "startReps": 15,
   },
   {
     "exerciseId": "abdominal_crunch",
@@ -4080,28 +3109,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "rectusAbdominis",
-      "obliques"
-    ],
+    "targetMuscles": ["rectusAbdominis", "obliques"],
     "primaryMuscle": "rectusAbdominis",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
     "movementVariant": "abdominal_crunch",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -4111,7 +3125,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -4121,7 +3135,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Abdominal Crunch",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "leg_raise",
@@ -4134,28 +3148,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "rectusAbdominis",
-      "obliques"
-    ],
+    "targetMuscles": ["rectusAbdominis", "obliques"],
     "primaryMuscle": "rectusAbdominis",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
     "movementVariant": "leg_raise",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -4165,7 +3164,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
@@ -4175,7 +3174,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "tags": [],
     "englishName": "Leg Raise",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "hanging_leg_raise",
@@ -4188,28 +3187,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "rectusAbdominis",
-      "obliques"
-    ],
+    "targetMuscles": ["rectusAbdominis", "obliques"],
     "primaryMuscle": "rectusAbdominis",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
     "movementVariant": "hanging_leg_raise",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -4219,7 +3203,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
@@ -4229,7 +3213,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "tags": [],
     "englishName": "Hanging Leg Raise",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "cable_crunch",
@@ -4242,28 +3226,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "rectusAbdominis",
-      "obliques"
-    ],
+    "targetMuscles": ["rectusAbdominis", "obliques"],
     "primaryMuscle": "rectusAbdominis",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
     "movementVariant": "cable_crunch",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -4273,7 +3242,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 60,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -4283,7 +3252,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "tags": [],
     "englishName": "Cable Crunch",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
   },
   {
     "exerciseId": "plank",
@@ -4296,28 +3265,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
-    "targetMuscles": [
-      "rectusAbdominis",
-      "obliques"
-    ],
+    "targetMuscles": ["rectusAbdominis", "obliques"],
     "primaryMuscle": "rectusAbdominis",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
     "movementVariant": "plank",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -4327,7 +3281,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "recordType": "timed",
     "loadMode": "external",
@@ -4339,7 +3293,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Plank",
     "distanceUnit": "km",
     "startWeight": 0.0,
-    "startReps": 60
+    "startReps": 60,
   },
   {
     "exerciseId": "ab_wheel",
@@ -4352,28 +3306,17 @@ const List<Map<String, Object?>> exerciseFormData = [
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      3.028836727142334,
-      1.8550690412521362,
-      3.9970271587371826
-    ],
+    "cameraAngle": [3.028836727142334, 1.8550690412521362, 3.9970271587371826],
     "cameraTarget": [
       -0.0054412782192230225,
       0.17537936568260193,
-      0.3125465214252472
+      0.3125465214252472,
     ],
     "cameraScale": 0.9430412846616589,
-    "targetMuscles": [
-      "rectusAbdominis",
-      "obliques"
-    ],
+    "targetMuscles": ["rectusAbdominis", "obliques"],
     "primaryMuscle": "rectusAbdominis",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
     "movementVariant": "ab_wheel",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -4391,7 +3334,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoStart": 78,
       "torsoTravel": 2,
       "reachRatio": 0.96,
-      "footPitch": 150
+      "footPitch": 150,
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
@@ -4410,45 +3353,32 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "incline_fly_machine",
     "exerciseName": "インクラインフライマシン",
     "category": "胸",
-    "aliases": [
-      "Incline Fly Machine"
-    ],
+    "aliases": ["Incline Fly Machine"],
     "modelId": "mpfb-athlete-v1",
     "animationId": "fly",
     "equipmentId": "incline_fly_machine",
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
-    "cameraAngle": [
-      2.9154469966888428,
-      2.2865705490112305,
-      3.6036295890808105
-    ],
+    "cameraAngle": [2.9154469966888428, 2.2865705490112305, 3.6036295890808105],
     "cameraTarget": [
       -0.0854671448469162,
       0.4645875096321106,
-      -0.04033666104078293
+      -0.04033666104078293,
     ],
     "cameraScale": 1.1670683841094958,
-    "targetMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid"
-    ],
+    "targetMuscles": ["pectoralisMajor", "anteriorDeltoid"],
     "primaryMuscle": "pectoralisMajor",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid"],
     "movementVariant": "incline_fly_machine",
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
@@ -4459,7 +3389,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 50,
       "additionalWeight": 0,
-      "arcDeclination": -15
+      "arcDeclination": -15,
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -4473,14 +3403,14 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "englishName": "Incline Fly Machine",
     "equipmentLabel": "マシン",
     "tags": [],
     "distanceUnit": "km",
     "authoringNotes": "Blender 4.5.3 export and start/mid/end preview reviewed. Original procedural equipment with author-selected dimensions; native-platform and production-route review pending. Manufacturer/reference review remains unverified; offline draft only.",
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "dumbbell_fly",
@@ -4492,16 +3422,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "胸",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid"],
+    "tags": ["胸", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "dumbbell_fly",
     "status": "authored",
@@ -4510,15 +3433,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "fly",
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.9807159900665283,
-      2.216235876083374,
-      3.8250842094421387
-    ],
+    "cameraAngle": [2.9807159900665283, 2.216235876083374, 3.8250842094421387],
     "cameraTarget": [
       -0.053561970591545105,
       0.5365461707115173,
-      0.1406034529209137
+      0.1406034529209137,
     ],
     "cameraScale": 1.1719111674260874,
     "cameraDistance": 5.06,
@@ -4531,7 +3450,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 0,
       "additionalWeight": 0,
-      "constantElbowFly": true
+      "constantElbowFly": true,
     },
     "startWeight": 10.0,
     "startReps": 10,
@@ -4541,9 +3460,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "sit_up",
@@ -4555,16 +3474,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
-    "tags": [
-      "腹筋",
-      "自重"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
+    "tags": ["腹筋", "自重"],
     "distanceUnit": "km",
     "movementVariant": "sit_up",
     "status": "planned",
@@ -4573,23 +3485,15 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "sit_up",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
     "startWeight": 0.0,
-    "startReps": 15
+    "startReps": 15,
   },
   {
     "exerciseId": "side_plank",
@@ -4601,16 +3505,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "timed",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "obliques"
-    ],
-    "secondaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "tags": [
-      "腹筋",
-      "自重"
-    ],
+    "primaryMuscles": ["obliques"],
+    "secondaryMuscles": ["rectusAbdominis"],
+    "tags": ["腹筋", "自重"],
     "distanceUnit": "km",
     "movementVariant": "side_plank",
     "status": "planned",
@@ -4619,23 +3516,15 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "side_plank",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
     "startWeight": 0.0,
-    "startReps": 45
+    "startReps": 45,
   },
   {
     "exerciseId": "wall_sit",
@@ -4647,16 +3536,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "timed",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "quadriceps"
-    ],
-    "secondaryMuscles": [
-      "gluteus"
-    ],
-    "tags": [
-      "脚",
-      "自重"
-    ],
+    "primaryMuscles": ["quadriceps"],
+    "secondaryMuscles": ["gluteus"],
+    "tags": ["脚", "自重"],
     "distanceUnit": "km",
     "movementVariant": "wall_sit",
     "status": "planned",
@@ -4665,23 +3547,15 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "wall_sit",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
     "startWeight": 0.0,
-    "startReps": 60
+    "startReps": 60,
   },
   {
     "exerciseId": "treadmill",
@@ -4693,17 +3567,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "calves"
-    ],
-    "secondaryMuscles": [
-      "gluteus"
-    ],
-    "tags": [
-      "有酸素",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "calves"],
+    "secondaryMuscles": ["gluteus"],
+    "tags": ["有酸素", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "treadmill",
     "status": "planned",
@@ -4712,29 +3578,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "treadmill",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "speed",
-      "incline"
-    ],
+    "recordFields": ["duration", "distance", "speed", "incline"],
     "startWeight": 1.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "exercise_bike",
@@ -4746,18 +3599,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings",
-      "calves"
-    ],
-    "tags": [
-      "有酸素",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings", "calves"],
+    "tags": ["有酸素", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "exercise_bike",
     "status": "planned",
@@ -4766,29 +3610,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "exercise_bike",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "speed",
-      "resistance"
-    ],
+    "recordFields": ["duration", "distance", "speed", "resistance"],
     "startWeight": 1.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "cross_trainer",
@@ -4800,18 +3631,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings",
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "有酸素",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings", "anteriorDeltoid"],
+    "tags": ["有酸素", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "cross_trainer",
     "status": "planned",
@@ -4820,28 +3642,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cross_trainer",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "resistance"
-    ],
+    "recordFields": ["duration", "distance", "resistance"],
     "startWeight": 1.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "stair_climber",
@@ -4853,17 +3663,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "calves"
-    ],
-    "tags": [
-      "有酸素",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["calves"],
+    "tags": ["有酸素", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "stair_climber",
     "status": "planned",
@@ -4872,28 +3674,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "stair_climber",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "resistance",
-      "speed"
-    ],
+    "recordFields": ["duration", "resistance", "speed"],
     "startWeight": 1.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "rowing_machine",
@@ -4905,18 +3695,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "gluteus"
-    ],
-    "tags": [
-      "有酸素",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "gluteus"],
+    "tags": ["有酸素", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "rowing_machine",
     "status": "planned",
@@ -4925,28 +3706,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "rowing_machine",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "pace"
-    ],
+    "recordFields": ["duration", "distance", "pace"],
     "startWeight": 1.0,
-    "startReps": 10
+    "startReps": 10,
   },
   {
     "exerciseId": "running",
@@ -4958,17 +3727,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "distance",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "calves"
-    ],
-    "secondaryMuscles": [
-      "gluteus"
-    ],
-    "tags": [
-      "有酸素",
-      "自重"
-    ],
+    "primaryMuscles": ["quadriceps", "calves"],
+    "secondaryMuscles": ["gluteus"],
+    "tags": ["有酸素", "自重"],
     "distanceUnit": "km",
     "movementVariant": "running",
     "status": "planned",
@@ -4977,29 +3738,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "running",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "speed",
-      "pace"
-    ],
+    "recordFields": ["duration", "distance", "speed", "pace"],
     "startWeight": 0.0,
-    "startReps": 30
+    "startReps": 30,
   },
   {
     "exerciseId": "walking",
@@ -5011,17 +3759,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "distance",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "calves"
-    ],
-    "secondaryMuscles": [
-      "gluteus"
-    ],
-    "tags": [
-      "有酸素",
-      "自重"
-    ],
+    "primaryMuscles": ["quadriceps", "calves"],
+    "secondaryMuscles": ["gluteus"],
+    "tags": ["有酸素", "自重"],
     "distanceUnit": "km",
     "movementVariant": "walking",
     "status": "planned",
@@ -5030,29 +3770,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "walking",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "speed",
-      "pace"
-    ],
+    "recordFields": ["duration", "distance", "speed", "pace"],
     "startWeight": 0.0,
-    "startReps": 30
+    "startReps": 30,
   },
   {
     "exerciseId": "cycling",
@@ -5064,18 +3791,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "distance",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings",
-      "calves"
-    ],
-    "tags": [
-      "有酸素",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings", "calves"],
+    "tags": ["有酸素", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "cycling",
     "status": "planned",
@@ -5084,29 +3802,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cycling",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "speed",
-      "pace"
-    ],
+    "recordFields": ["duration", "distance", "speed", "pace"],
     "startWeight": 0.0,
-    "startReps": 30
+    "startReps": 30,
   },
   {
     "exerciseId": "decline_barbell_press",
@@ -5118,17 +3823,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
-    "tags": [
-      "胸",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
+    "tags": ["胸", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "decline_barbell_press",
     "status": "authored",
@@ -5137,15 +3834,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      3.067674398422241,
-      2.3528358936309814,
-      3.748364210128784
-    ],
+    "cameraAngle": [3.067674398422241, 2.3528358936309814, 3.748364210128784],
     "cameraTarget": [
       0.033396556973457336,
       0.6731462478637695,
-      0.06388357281684875
+      0.06388357281684875,
     ],
     "cameraScale": 1.096644193631444,
     "cameraDistance": 5.06,
@@ -5158,7 +3851,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": -15,
       "additionalWeight": 0,
-      "declineLegSupport": true
+      "declineLegSupport": true,
     },
     "review": {
       "equipmentReference": false,
@@ -5166,12 +3859,12 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "references": [
-      "https://www.lifefitness.com/en-gb/catalog/strength-training/benches/life-fitness-adjustable-decline-bench"
+      "https://www.lifefitness.com/en-gb/catalog/strength-training/benches/life-fitness-adjustable-decline-bench",
     ],
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "smith_bench_press",
@@ -5183,17 +3876,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "スミスマシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
-    "tags": [
-      "胸",
-      "スミスマシン"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
+    "tags": ["胸", "スミスマシン"],
     "distanceUnit": "km",
     "movementVariant": "smith_bench_press",
     "status": "planned",
@@ -5202,21 +3887,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "smith_bench_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "smith_incline_press",
@@ -5228,17 +3905,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "スミスマシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
-    "tags": [
-      "胸",
-      "スミスマシン"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
+    "tags": ["胸", "スミスマシン"],
     "distanceUnit": "km",
     "movementVariant": "smith_incline_press",
     "status": "planned",
@@ -5247,21 +3916,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "smith_incline_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "smith_decline_press",
@@ -5273,17 +3934,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "スミスマシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
-    "tags": [
-      "胸",
-      "スミスマシン"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
+    "tags": ["胸", "スミスマシン"],
     "distanceUnit": "km",
     "movementVariant": "smith_decline_press",
     "status": "planned",
@@ -5292,21 +3945,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "smith_decline_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "decline_dumbbell_press",
@@ -5318,17 +3963,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
-    "tags": [
-      "胸",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
+    "tags": ["胸", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "decline_dumbbell_press",
     "status": "authored",
@@ -5337,15 +3974,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      3.0125389099121094,
-      2.261887550354004,
-      3.8316214084625244
-    ],
+    "cameraAngle": [3.0125389099121094, 2.261887550354004, 3.8316214084625244],
     "cameraTarget": [
       -0.021738991141319275,
       0.582197904586792,
-      0.1471407562494278
+      0.1471407562494278,
     ],
     "cameraScale": 0.9821314340367955,
     "cameraDistance": 5.06,
@@ -5358,7 +3991,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": -15,
       "additionalWeight": 0,
-      "declineLegSupport": true
+      "declineLegSupport": true,
     },
     "review": {
       "equipmentReference": false,
@@ -5366,12 +3999,12 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "references": [
-      "https://www.lifefitness.com/en-gb/catalog/strength-training/benches/life-fitness-adjustable-decline-bench"
+      "https://www.lifefitness.com/en-gb/catalog/strength-training/benches/life-fitness-adjustable-decline-bench",
     ],
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "incline_dumbbell_fly",
@@ -5383,16 +4016,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "胸",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid"],
+    "tags": ["胸", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "incline_dumbbell_fly",
     "status": "authored",
@@ -5401,15 +4027,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "fly",
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      3.0090043544769287,
-      2.311736583709717,
-      3.9549994468688965
-    ],
+    "cameraAngle": [3.0090043544769287, 2.311736583709717, 3.9549994468688965],
     "cameraTarget": [
       -0.025273635983467102,
       0.6320469379425049,
-      0.27051886916160583
+      0.27051886916160583,
     ],
     "cameraScale": 1.2290076706351534,
     "cameraDistance": 5.06,
@@ -5423,7 +4045,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoAngle": 30,
       "additionalWeight": 0,
       "constantElbowFly": true,
-      "inclineBackSupport": true
+      "inclineBackSupport": true,
     },
     "review": {
       "equipmentReference": false,
@@ -5431,9 +4053,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "decline_dumbbell_fly",
@@ -5445,16 +4067,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "胸",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid"],
+    "tags": ["胸", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "decline_dumbbell_fly",
     "status": "planned",
@@ -5463,21 +4078,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "decline_dumbbell_fly",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "low_cable_fly",
@@ -5489,16 +4096,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "胸",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid"],
+    "tags": ["胸", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "low_cable_fly",
     "status": "planned",
@@ -5507,21 +4107,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "low_cable_fly",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "high_cable_fly",
@@ -5533,16 +4125,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "胸",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid"],
+    "tags": ["胸", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "high_cable_fly",
     "status": "planned",
@@ -5551,21 +4136,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "high_cable_fly",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "single_arm_cable_fly",
@@ -5577,17 +4154,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "obliques"
-    ],
-    "tags": [
-      "胸",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "obliques"],
+    "tags": ["胸", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "single_arm_cable_fly",
     "status": "planned",
@@ -5596,21 +4165,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "single_arm_cable_fly",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "plate_loaded_chest_press",
@@ -5622,17 +4183,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "プレートロード",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
-    "tags": [
-      "胸",
-      "プレートロード"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
+    "tags": ["胸", "プレートロード"],
     "distanceUnit": "km",
     "movementVariant": "plate_loaded_chest_press",
     "status": "planned",
@@ -5641,21 +4194,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "plate_loaded_chest_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "selectorized_incline_chest_press",
@@ -5667,17 +4212,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
-    "tags": [
-      "胸",
-      "マシン"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
+    "tags": ["胸", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "selectorized_incline_chest_press",
     "status": "planned",
@@ -5686,21 +4223,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "selectorized_incline_chest_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "plate_loaded_incline_chest_press",
@@ -5712,17 +4241,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "プレートロード",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid",
-      "triceps"
-    ],
-    "tags": [
-      "胸",
-      "プレートロード"
-    ],
+    "primaryMuscles": ["pectoralisMajor"],
+    "secondaryMuscles": ["anteriorDeltoid", "triceps"],
+    "tags": ["胸", "プレートロード"],
     "distanceUnit": "km",
     "movementVariant": "plate_loaded_incline_chest_press",
     "status": "planned",
@@ -5731,21 +4252,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "plate_loaded_incline_chest_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "weighted_dip",
@@ -5757,17 +4270,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "weightReps",
     "loadMode": "additional",
-    "primaryMuscles": [
-      "pectoralisMajor",
-      "triceps"
-    ],
-    "secondaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "胸",
-      "自重"
-    ],
+    "primaryMuscles": ["pectoralisMajor", "triceps"],
+    "secondaryMuscles": ["anteriorDeltoid"],
+    "tags": ["胸", "自重"],
     "distanceUnit": "km",
     "movementVariant": "weighted_dip",
     "status": "planned",
@@ -5776,21 +4281,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "weighted_dip",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "rack_pull",
@@ -5802,19 +4299,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "erectorSpinae",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings",
-      "trapezius",
-      "forearms"
-    ],
-    "tags": [
-      "背中",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["erectorSpinae", "gluteus"],
+    "secondaryMuscles": ["hamstrings", "trapezius", "forearms"],
+    "tags": ["背中", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "rack_pull",
     "status": "planned",
@@ -5823,21 +4310,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "rack_pull",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "snatch_grip_deadlift",
@@ -5849,20 +4328,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "gluteus",
-      "hamstrings",
-      "erectorSpinae"
-    ],
-    "secondaryMuscles": [
-      "quadriceps",
-      "trapezius",
-      "forearms"
-    ],
-    "tags": [
-      "背中",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["gluteus", "hamstrings", "erectorSpinae"],
+    "secondaryMuscles": ["quadriceps", "trapezius", "forearms"],
+    "tags": ["背中", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "snatch_grip_deadlift",
     "status": "planned",
@@ -5871,21 +4339,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "snatch_grip_deadlift",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "pendlay_row",
@@ -5897,19 +4357,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "posteriorDeltoid",
-      "erectorSpinae"
-    ],
-    "tags": [
-      "背中",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "trapezius"],
+    "secondaryMuscles": ["biceps", "posteriorDeltoid", "erectorSpinae"],
+    "tags": ["背中", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "pendlay_row",
     "status": "planned",
@@ -5918,21 +4368,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "pendlay_row",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "chest_supported_dumbbell_row",
@@ -5944,18 +4386,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "posteriorDeltoid"
-    ],
-    "tags": [
-      "背中",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "trapezius"],
+    "secondaryMuscles": ["biceps", "posteriorDeltoid"],
+    "tags": ["背中", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "chest_supported_dumbbell_row",
     "status": "planned",
@@ -5964,21 +4397,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "chest_supported_dumbbell_row",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "chest_supported_tbar_row",
@@ -5990,18 +4415,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "posteriorDeltoid"
-    ],
-    "tags": [
-      "背中",
-      "マシン"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "trapezius"],
+    "secondaryMuscles": ["biceps", "posteriorDeltoid"],
+    "tags": ["背中", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "chest_supported_tbar_row",
     "status": "planned",
@@ -6010,21 +4426,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "chest_supported_tbar_row",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "seal_row",
@@ -6036,18 +4444,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "posteriorDeltoid"
-    ],
-    "tags": [
-      "背中",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "trapezius"],
+    "secondaryMuscles": ["biceps", "posteriorDeltoid"],
+    "tags": ["背中", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "seal_row",
     "status": "planned",
@@ -6056,21 +4455,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "seal_row",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "inverted_row",
@@ -6082,18 +4473,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "posteriorDeltoid"
-    ],
-    "tags": [
-      "背中",
-      "自重"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "trapezius"],
+    "secondaryMuscles": ["biceps", "posteriorDeltoid"],
+    "tags": ["背中", "自重"],
     "distanceUnit": "km",
     "movementVariant": "inverted_row",
     "status": "planned",
@@ -6102,21 +4484,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "inverted_row",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "neutral_grip_lat_pulldown",
@@ -6128,17 +4502,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
-    "tags": [
-      "背中",
-      "マシン"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
+    "tags": ["背中", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "neutral_grip_lat_pulldown",
     "status": "planned",
@@ -6147,21 +4513,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "neutral_grip_lat_pulldown",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "reverse_grip_lat_pulldown",
@@ -6173,17 +4531,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
-    "tags": [
-      "背中",
-      "マシン"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
+    "tags": ["背中", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "reverse_grip_lat_pulldown",
     "status": "planned",
@@ -6192,21 +4542,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "reverse_grip_lat_pulldown",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "single_arm_lat_pulldown",
@@ -6218,17 +4560,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
-    "tags": [
-      "背中",
-      "マシン"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
+    "tags": ["背中", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "single_arm_lat_pulldown",
     "status": "planned",
@@ -6237,21 +4571,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "single_arm_lat_pulldown",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "plate_loaded_lat_pulldown",
@@ -6263,17 +4589,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "プレートロード",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "trapezius"
-    ],
-    "tags": [
-      "背中",
-      "プレートロード"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "trapezius"],
+    "tags": ["背中", "プレートロード"],
     "distanceUnit": "km",
     "movementVariant": "plate_loaded_lat_pulldown",
     "status": "planned",
@@ -6282,21 +4600,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "plate_loaded_lat_pulldown",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "plate_loaded_seated_row",
@@ -6308,18 +4618,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "プレートロード",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "posteriorDeltoid"
-    ],
-    "tags": [
-      "背中",
-      "プレートロード"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "trapezius"],
+    "secondaryMuscles": ["biceps", "posteriorDeltoid"],
+    "tags": ["背中", "プレートロード"],
     "distanceUnit": "km",
     "movementVariant": "plate_loaded_seated_row",
     "status": "planned",
@@ -6328,21 +4629,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "plate_loaded_seated_row",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "iso_lateral_row",
@@ -6354,18 +4647,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "プレートロード",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "posteriorDeltoid"
-    ],
-    "tags": [
-      "背中",
-      "プレートロード"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "trapezius"],
+    "secondaryMuscles": ["biceps", "posteriorDeltoid"],
+    "tags": ["背中", "プレートロード"],
     "distanceUnit": "km",
     "movementVariant": "iso_lateral_row",
     "status": "planned",
@@ -6374,21 +4658,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "iso_lateral_row",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "kneeling_lat_pulldown",
@@ -6400,17 +4676,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "rectusAbdominis"
-    ],
-    "tags": [
-      "背中",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "rectusAbdominis"],
+    "tags": ["背中", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "kneeling_lat_pulldown",
     "status": "planned",
@@ -6419,21 +4687,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "kneeling_lat_pulldown",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "dumbbell_pullover",
@@ -6445,17 +4705,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
-    "tags": [
-      "背中",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "pectoralisMajor"],
+    "secondaryMuscles": ["triceps"],
+    "tags": ["背中", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "dumbbell_pullover",
     "status": "planned",
@@ -6464,21 +4716,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "dumbbell_pullover",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "cable_pullover",
@@ -6490,17 +4734,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "triceps",
-      "pectoralisMajor"
-    ],
-    "tags": [
-      "背中",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["triceps", "pectoralisMajor"],
+    "tags": ["背中", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "cable_pullover",
     "status": "planned",
@@ -6509,21 +4745,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cable_pullover",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "machine_pullover",
@@ -6535,17 +4763,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "pectoralisMajor",
-      "triceps"
-    ],
-    "tags": [
-      "背中",
-      "マシン"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["pectoralisMajor", "triceps"],
+    "tags": ["背中", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "machine_pullover",
     "status": "planned",
@@ -6554,21 +4774,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "machine_pullover",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "weighted_chin_up",
@@ -6580,17 +4792,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "weightReps",
     "loadMode": "additional",
-    "primaryMuscles": [
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "forearms"
-    ],
-    "tags": [
-      "背中",
-      "自重"
-    ],
+    "primaryMuscles": ["latissimusDorsi"],
+    "secondaryMuscles": ["biceps", "forearms"],
+    "tags": ["背中", "自重"],
     "distanceUnit": "km",
     "movementVariant": "weighted_chin_up",
     "status": "planned",
@@ -6599,21 +4803,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "weighted_chin_up",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "plate_loaded_shoulder_press",
@@ -6625,16 +4821,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "プレートロード",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
-    "tags": [
-      "肩",
-      "プレートロード"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
+    "tags": ["肩", "プレートロード"],
     "distanceUnit": "km",
     "movementVariant": "plate_loaded_shoulder_press",
     "status": "planned",
@@ -6643,21 +4832,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "plate_loaded_shoulder_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "smith_shoulder_press",
@@ -6669,16 +4850,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "スミスマシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
-    "tags": [
-      "肩",
-      "スミスマシン"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
+    "tags": ["肩", "スミスマシン"],
     "distanceUnit": "km",
     "movementVariant": "smith_shoulder_press",
     "status": "planned",
@@ -6687,21 +4861,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "smith_shoulder_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "arnold_press",
@@ -6713,16 +4879,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
-    "tags": [
-      "肩",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
+    "tags": ["肩", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "arnold_press",
     "status": "planned",
@@ -6731,21 +4890,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "arnold_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "landmine_press",
@@ -6757,17 +4908,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ランドマイン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "anteriorDeltoid",
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
-    "tags": [
-      "肩",
-      "ランドマイン"
-    ],
+    "primaryMuscles": ["anteriorDeltoid", "pectoralisMajor"],
+    "secondaryMuscles": ["triceps"],
+    "tags": ["肩", "ランドマイン"],
     "distanceUnit": "km",
     "movementVariant": "landmine_press",
     "status": "planned",
@@ -6776,21 +4919,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "landmine_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "single_arm_landmine_press",
@@ -6802,18 +4937,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ランドマイン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "anteriorDeltoid",
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "triceps",
-      "obliques"
-    ],
-    "tags": [
-      "肩",
-      "ランドマイン"
-    ],
+    "primaryMuscles": ["anteriorDeltoid", "pectoralisMajor"],
+    "secondaryMuscles": ["triceps", "obliques"],
+    "tags": ["肩", "ランドマイン"],
     "distanceUnit": "km",
     "movementVariant": "single_arm_landmine_press",
     "status": "planned",
@@ -6822,21 +4948,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "single_arm_landmine_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "cable_shoulder_press",
@@ -6848,16 +4966,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps"
-    ],
-    "tags": [
-      "肩",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["triceps"],
+    "tags": ["肩", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "cable_shoulder_press",
     "status": "planned",
@@ -6866,21 +4977,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cable_shoulder_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "machine_lateral_raise",
@@ -6892,16 +4995,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "lateralDeltoid"
-    ],
-    "secondaryMuscles": [
-      "trapezius"
-    ],
-    "tags": [
-      "肩",
-      "マシン"
-    ],
+    "primaryMuscles": ["lateralDeltoid"],
+    "secondaryMuscles": ["trapezius"],
+    "tags": ["肩", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "machine_lateral_raise",
     "status": "planned",
@@ -6910,21 +5006,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "machine_lateral_raise",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "cable_lateral_raise",
@@ -6936,16 +5024,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "lateralDeltoid"
-    ],
-    "secondaryMuscles": [
-      "trapezius"
-    ],
-    "tags": [
-      "肩",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["lateralDeltoid"],
+    "secondaryMuscles": ["trapezius"],
+    "tags": ["肩", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "cable_lateral_raise",
     "status": "planned",
@@ -6954,21 +5035,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cable_lateral_raise",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "single_arm_cable_lateral_raise",
@@ -6980,16 +5053,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "lateralDeltoid"
-    ],
-    "secondaryMuscles": [
-      "trapezius"
-    ],
-    "tags": [
-      "肩",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["lateralDeltoid"],
+    "secondaryMuscles": ["trapezius"],
+    "tags": ["肩", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "single_arm_cable_lateral_raise",
     "status": "planned",
@@ -6998,21 +5064,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "single_arm_cable_lateral_raise",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "cable_front_raise",
@@ -7024,16 +5082,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "pectoralisMajor"
-    ],
-    "tags": [
-      "肩",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["pectoralisMajor"],
+    "tags": ["肩", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "cable_front_raise",
     "status": "planned",
@@ -7042,21 +5093,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cable_front_raise",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "cable_rear_delt_fly",
@@ -7068,16 +5111,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "posteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "trapezius"
-    ],
-    "tags": [
-      "肩",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["posteriorDeltoid"],
+    "secondaryMuscles": ["trapezius"],
+    "tags": ["肩", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "cable_rear_delt_fly",
     "status": "planned",
@@ -7086,21 +5122,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cable_rear_delt_fly",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "dumbbell_shrug",
@@ -7112,16 +5140,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
-    "tags": [
-      "肩",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["trapezius"],
+    "secondaryMuscles": ["forearms"],
+    "tags": ["肩", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "dumbbell_shrug",
     "status": "planned",
@@ -7130,21 +5151,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "dumbbell_shrug",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "barbell_shrug",
@@ -7156,16 +5169,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
-    "tags": [
-      "肩",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["trapezius"],
+    "secondaryMuscles": ["forearms"],
+    "tags": ["肩", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "barbell_shrug",
     "status": "planned",
@@ -7174,21 +5180,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "barbell_shrug",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "ez_bar_curl",
@@ -7200,16 +5198,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "EZバー",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
-    "tags": [
-      "腕",
-      "EZバー"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
+    "tags": ["腕", "EZバー"],
     "distanceUnit": "km",
     "movementVariant": "ez_bar_curl",
     "status": "planned",
@@ -7218,21 +5209,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "ez_bar_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "incline_dumbbell_curl",
@@ -7244,16 +5227,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
-    "tags": [
-      "腕",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
+    "tags": ["腕", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "incline_dumbbell_curl",
     "status": "authored",
@@ -7262,15 +5238,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "curl",
     "gripType": "supinated",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.927830934524536,
-      2.165215253829956,
-      3.7603604793548584
-    ],
+    "cameraAngle": [2.927830934524536, 2.165215253829956, 3.7603604793548584],
     "cameraTarget": [
       -0.10644705593585968,
       0.48552554845809937,
-      0.0758797749876976
+      0.0758797749876976,
     ],
     "cameraScale": 1.0143682286143303,
     "cameraDistance": 5.06,
@@ -7282,7 +5254,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "upperArmOutward": 0.35,
       "supinating": true,
       "seatedFootHalfWidth": 0.15,
-      "inclineBackSupport": true
+      "inclineBackSupport": true,
     },
     "review": {
       "equipmentReference": false,
@@ -7290,13 +5262,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "references": [
       "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/incline-dumbbell-biceps-curl/",
-      "https://www.youtube.com/watch?v=0U7xqYDSfxQ"
+      "https://www.youtube.com/watch?v=0U7xqYDSfxQ",
     ],
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "concentration_curl",
@@ -7308,16 +5280,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
-    "tags": [
-      "腕",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
+    "tags": ["腕", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "concentration_curl",
     "status": "planned",
@@ -7326,21 +5291,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "concentration_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "spider_curl",
@@ -7352,16 +5309,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
-    "tags": [
-      "腕",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
+    "tags": ["腕", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "spider_curl",
     "status": "planned",
@@ -7370,21 +5320,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "spider_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "reverse_curl",
@@ -7396,16 +5338,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "forearms"
-    ],
-    "secondaryMuscles": [
-      "biceps"
-    ],
-    "tags": [
-      "腕",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["forearms"],
+    "secondaryMuscles": ["biceps"],
+    "tags": ["腕", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "reverse_curl",
     "status": "authored",
@@ -7414,15 +5349,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "curl",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      3.0650813579559326,
-      2.5812606811523438,
-      3.9437978267669678
-    ],
+    "cameraAngle": [3.0650813579559326, 2.5812606811523438, 3.9437978267669678],
     "cameraTarget": [
       0.030803382396697998,
       0.9015709161758423,
-      0.25931715965270996
+      0.25931715965270996,
     ],
     "cameraScale": 1.0465675306273625,
     "cameraDistance": 5.06,
@@ -7434,7 +5365,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
     },
     "review": {
       "equipmentReference": false,
@@ -7442,12 +5373,12 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
     "references": [
-      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/reverse-grip-barbell-biceps-curl/"
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/reverse-grip-barbell-biceps-curl/",
     ],
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "cable_hammer_curl",
@@ -7459,15 +5390,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "biceps",
-      "forearms"
-    ],
+    "primaryMuscles": ["biceps", "forearms"],
     "secondaryMuscles": [],
-    "tags": [
-      "腕",
-      "ケーブル"
-    ],
+    "tags": ["腕", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "cable_hammer_curl",
     "status": "planned",
@@ -7476,21 +5401,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cable_hammer_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "machine_arm_curl",
@@ -7502,16 +5419,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
-    "tags": [
-      "腕",
-      "マシン"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
+    "tags": ["腕", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "machine_arm_curl",
     "status": "planned",
@@ -7520,21 +5430,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "machine_arm_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "machine_preacher_curl",
@@ -7546,16 +5448,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
-    "tags": [
-      "腕",
-      "マシン"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
+    "tags": ["腕", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "machine_preacher_curl",
     "status": "planned",
@@ -7564,21 +5459,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "machine_preacher_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "bayesian_curl",
@@ -7590,16 +5477,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "biceps"
-    ],
-    "secondaryMuscles": [
-      "forearms"
-    ],
-    "tags": [
-      "腕",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["biceps"],
+    "secondaryMuscles": ["forearms"],
+    "tags": ["腕", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "bayesian_curl",
     "status": "planned",
@@ -7608,21 +5488,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "bayesian_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "zottman_curl",
@@ -7634,15 +5506,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "biceps",
-      "forearms"
-    ],
+    "primaryMuscles": ["biceps", "forearms"],
     "secondaryMuscles": [],
-    "tags": [
-      "腕",
-      "ダンベル"
-    ],
+    "tags": ["腕", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "zottman_curl",
     "status": "planned",
@@ -7651,21 +5517,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "zottman_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "close_grip_bench_press",
@@ -7677,17 +5535,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "triceps"
-    ],
-    "secondaryMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "腕",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["triceps"],
+    "secondaryMuscles": ["pectoralisMajor", "anteriorDeltoid"],
+    "tags": ["腕", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "close_grip_bench_press",
     "status": "planned",
@@ -7696,21 +5546,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "close_grip_bench_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "jm_press",
@@ -7722,17 +5564,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "triceps"
-    ],
-    "secondaryMuscles": [
-      "pectoralisMajor",
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "腕",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["triceps"],
+    "secondaryMuscles": ["pectoralisMajor", "anteriorDeltoid"],
+    "tags": ["腕", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "jm_press",
     "status": "planned",
@@ -7741,21 +5575,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "jm_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "single_arm_pushdown",
@@ -7767,14 +5593,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["triceps"],
     "secondaryMuscles": [],
-    "tags": [
-      "腕",
-      "ケーブル"
-    ],
+    "tags": ["腕", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "single_arm_pushdown",
     "status": "authored",
@@ -7783,27 +5604,20 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "pressdown",
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.9469916820526123,
-      2.6429035663604736,
-      4.585789203643799
-    ],
+    "cameraAngle": [2.9469916820526123, 2.6429035663604736, 4.585789203643799],
     "cameraTarget": [
       -0.08728641271591187,
       0.9632137417793274,
-      0.9013082981109619
+      0.9013082981109619,
     ],
     "cameraScale": 1.4080203784629703,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {
-      "attachment": "rope",
-      "singleArm": true
-    },
+    "parameters": {"attachment": "rope", "singleArm": true},
     "references": [
       "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
-      "https://shop.lifefitness.com/products/cable-attachments"
+      "https://shop.lifefitness.com/products/cable-attachments",
     ],
     "review": {
       "equipmentReference": false,
@@ -7811,9 +5625,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "reverse_grip_pushdown",
@@ -7825,14 +5639,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["triceps"],
     "secondaryMuscles": [],
-    "tags": [
-      "腕",
-      "ケーブル"
-    ],
+    "tags": ["腕", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "reverse_grip_pushdown",
     "status": "authored",
@@ -7841,27 +5650,20 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "pressdown",
     "gripType": "supinated",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.9431848526000977,
-      2.6418654918670654,
-      4.585103511810303
-    ],
+    "cameraAngle": [2.9431848526000977, 2.6418654918670654, 4.585103511810303],
     "cameraTarget": [
       -0.09109312295913696,
       0.9621758460998535,
-      0.9006227254867554
+      0.9006227254867554,
     ],
     "cameraScale": 1.4080204379186037,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {
-      "attachment": "bar",
-      "singleArm": false
-    },
+    "parameters": {"attachment": "bar", "singleArm": false},
     "references": [
       "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
-      "https://shop.lifefitness.com/products/cable-attachments"
+      "https://shop.lifefitness.com/products/cable-attachments",
     ],
     "review": {
       "equipmentReference": false,
@@ -7869,9 +5671,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "straight_bar_pushdown",
@@ -7883,14 +5685,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["triceps"],
     "secondaryMuscles": [],
-    "tags": [
-      "腕",
-      "ケーブル"
-    ],
+    "tags": ["腕", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "straight_bar_pushdown",
     "status": "authored",
@@ -7899,27 +5696,20 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "pressdown",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.9423959255218506,
-      2.6425747871398926,
-      4.5883636474609375
-    ],
+    "cameraAngle": [2.9423959255218506, 2.6425747871398926, 4.5883636474609375],
     "cameraTarget": [
       -0.09188193082809448,
       0.9628850221633911,
-      0.9038832187652588
+      0.9038832187652588,
     ],
     "cameraScale": 1.4080204379186037,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {
-      "attachment": "bar",
-      "singleArm": false
-    },
+    "parameters": {"attachment": "bar", "singleArm": false},
     "references": [
       "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
-      "https://shop.lifefitness.com/products/cable-attachments"
+      "https://shop.lifefitness.com/products/cable-attachments",
     ],
     "review": {
       "equipmentReference": false,
@@ -7927,9 +5717,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "rope_pushdown",
@@ -7941,14 +5731,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["triceps"],
     "secondaryMuscles": [],
-    "tags": [
-      "腕",
-      "ケーブル"
-    ],
+    "tags": ["腕", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "rope_pushdown",
     "status": "authored",
@@ -7957,27 +5742,20 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "pressdown",
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.9469916820526123,
-      2.6429035663604736,
-      4.585789203643799
-    ],
+    "cameraAngle": [2.9469916820526123, 2.6429035663604736, 4.585789203643799],
     "cameraTarget": [
       -0.08728641271591187,
       0.9632137417793274,
-      0.9013082981109619
+      0.9013082981109619,
     ],
     "cameraScale": 1.4080203784629703,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {
-      "attachment": "rope",
-      "singleArm": false
-    },
+    "parameters": {"attachment": "rope", "singleArm": false},
     "references": [
       "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
-      "https://shop.lifefitness.com/products/cable-attachments"
+      "https://shop.lifefitness.com/products/cable-attachments",
     ],
     "review": {
       "equipmentReference": false,
@@ -7985,9 +5763,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "machine_triceps_extension",
@@ -7999,14 +5777,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "triceps"
-    ],
+    "primaryMuscles": ["triceps"],
     "secondaryMuscles": [],
-    "tags": [
-      "腕",
-      "マシン"
-    ],
+    "tags": ["腕", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "machine_triceps_extension",
     "status": "planned",
@@ -8015,21 +5788,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "machine_triceps_extension",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "triceps_kickback",
@@ -8041,16 +5806,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "triceps"
-    ],
-    "secondaryMuscles": [
-      "posteriorDeltoid"
-    ],
-    "tags": [
-      "腕",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["triceps"],
+    "secondaryMuscles": ["posteriorDeltoid"],
+    "tags": ["腕", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "triceps_kickback",
     "status": "planned",
@@ -8059,21 +5817,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "triceps_kickback",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "wrist_curl",
@@ -8085,14 +5835,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "forearms"
-    ],
+    "primaryMuscles": ["forearms"],
     "secondaryMuscles": [],
-    "tags": [
-      "腕",
-      "フリーウェイト"
-    ],
+    "tags": ["腕", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "wrist_curl",
     "status": "planned",
@@ -8101,21 +5846,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "wrist_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "reverse_wrist_curl",
@@ -8127,14 +5864,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "forearms"
-    ],
+    "primaryMuscles": ["forearms"],
     "secondaryMuscles": [],
-    "tags": [
-      "腕",
-      "フリーウェイト"
-    ],
+    "tags": ["腕", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "reverse_wrist_curl",
     "status": "planned",
@@ -8143,21 +5875,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "reverse_wrist_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "front_squat",
@@ -8169,18 +5893,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "rectusAbdominis",
-      "erectorSpinae"
-    ],
-    "tags": [
-      "脚",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["rectusAbdominis", "erectorSpinae"],
+    "tags": ["脚", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "front_squat",
     "status": "planned",
@@ -8189,16 +5904,8 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "squat",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
@@ -8211,10 +5918,10 @@ const List<Map<String, Object?>> exerciseFormData = [
       "shinDegrees": 25,
       "thighDegrees": 80,
       "torsoLean": 18,
-      "toeOut": 15
+      "toeOut": 15,
     },
     "references": [
-      "https://www.catalystathletics.com/exercise/78/Front-Squat/"
+      "https://www.catalystathletics.com/exercise/78/Front-Squat/",
     ],
     "review": {
       "equipmentReference": false,
@@ -8222,8 +5929,8 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
-    }
+      "productionRoute": false,
+    },
   },
   {
     "exerciseId": "goblet_squat",
@@ -8235,17 +5942,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "tags": [
-      "脚",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["rectusAbdominis"],
+    "tags": ["脚", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "goblet_squat",
     "status": "planned",
@@ -8254,16 +5953,8 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "squat",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
@@ -8276,10 +5967,10 @@ const List<Map<String, Object?>> exerciseFormData = [
       "shinDegrees": 25,
       "thighDegrees": 80,
       "torsoLean": 18,
-      "toeOut": 15
+      "toeOut": 15,
     },
     "references": [
-      "https://www.nasm.org/resource-center/exercise-library/goblet-squat"
+      "https://www.nasm.org/resource-center/exercise-library/goblet-squat",
     ],
     "review": {
       "equipmentReference": false,
@@ -8287,8 +5978,8 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
-    }
+      "productionRoute": false,
+    },
   },
   {
     "exerciseId": "smith_squat",
@@ -8300,17 +5991,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "スミスマシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "スミスマシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "スミスマシン"],
     "distanceUnit": "km",
     "movementVariant": "smith_squat",
     "status": "planned",
@@ -8319,21 +6002,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "smith_squat",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "pendulum_squat",
@@ -8345,17 +6020,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "pendulum_squat",
     "status": "planned",
@@ -8364,21 +6031,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "pendulum_squat",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "belt_squat",
@@ -8390,17 +6049,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "プレートロード",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "プレートロード"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "プレートロード"],
     "distanceUnit": "km",
     "movementVariant": "belt_squat",
     "status": "planned",
@@ -8409,21 +6060,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "belt_squat",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "sumo_deadlift",
@@ -8435,20 +6078,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "gluteus",
-      "quadriceps",
-      "adductors"
-    ],
-    "secondaryMuscles": [
-      "hamstrings",
-      "erectorSpinae",
-      "forearms"
-    ],
-    "tags": [
-      "脚",
-      "フリーウェイト"
-    ],
+    "primaryMuscles": ["gluteus", "quadriceps", "adductors"],
+    "secondaryMuscles": ["hamstrings", "erectorSpinae", "forearms"],
+    "tags": ["脚", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "sumo_deadlift",
     "status": "authored",
@@ -8457,15 +6089,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hinge",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.9732556343078613,
-      2.4942374229431152,
-      3.831613540649414
-    ],
+    "cameraAngle": [2.9732556343078613, 2.4942374229431152, 3.831613540649414],
     "cameraTarget": [
       -0.06102237105369568,
       0.8145478963851929,
-      0.1471327543258667
+      0.1471327543258667,
     ],
     "cameraScale": 1.0668419221043588,
     "cameraDistance": 5.06,
@@ -8481,7 +6109,7 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoLean": 40,
       "toeOut": 15,
       "hangingWristReach": true,
-      "barY": -0.24
+      "barY": -0.24,
     },
     "review": {
       "equipmentReference": false,
@@ -8489,9 +6117,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "trap_bar_deadlift",
@@ -8503,19 +6131,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "トラップバー",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings",
-      "erectorSpinae",
-      "forearms"
-    ],
-    "tags": [
-      "脚",
-      "トラップバー"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings", "erectorSpinae", "forearms"],
+    "tags": ["脚", "トラップバー"],
     "distanceUnit": "km",
     "movementVariant": "trap_bar_deadlift",
     "status": "planned",
@@ -8524,21 +6142,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "trap_bar_deadlift",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "split_squat",
@@ -8550,17 +6160,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "split_squat",
     "status": "planned",
@@ -8569,21 +6171,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "split_squat",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "smith_bulgarian_split_squat",
@@ -8595,17 +6189,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "スミスマシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "スミスマシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "スミスマシン"],
     "distanceUnit": "km",
     "movementVariant": "smith_bulgarian_split_squat",
     "status": "planned",
@@ -8614,21 +6200,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "smith_bulgarian_split_squat",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "reverse_lunge",
@@ -8640,17 +6218,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "reverse_lunge",
     "status": "planned",
@@ -8659,21 +6229,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "reverse_lunge",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "walking_lunge",
@@ -8685,17 +6247,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "walking_lunge",
     "status": "planned",
@@ -8704,21 +6258,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "walking_lunge",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "step_up",
@@ -8730,17 +6276,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "step_up",
     "status": "planned",
@@ -8749,21 +6287,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "step_up",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "horizontal_leg_press",
@@ -8775,17 +6305,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "horizontal_leg_press",
     "status": "planned",
@@ -8794,21 +6316,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "horizontal_leg_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "single_leg_press",
@@ -8820,17 +6334,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "single_leg_press",
     "status": "planned",
@@ -8839,21 +6345,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "single_leg_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "lying_leg_curl",
@@ -8865,16 +6363,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "hamstrings"
-    ],
-    "secondaryMuscles": [
-      "calves"
-    ],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "primaryMuscles": ["hamstrings"],
+    "secondaryMuscles": ["calves"],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "lying_leg_curl",
     "status": "planned",
@@ -8883,21 +6374,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "lying_leg_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "seated_leg_curl",
@@ -8909,16 +6392,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "hamstrings"
-    ],
-    "secondaryMuscles": [
-      "calves"
-    ],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "primaryMuscles": ["hamstrings"],
+    "secondaryMuscles": ["calves"],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "seated_leg_curl",
     "status": "authored",
@@ -8927,15 +6403,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "knee_machine",
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.969118595123291,
-      2.2342171669006348,
-      4.118261337280273
-    ],
+    "cameraAngle": [2.969118595123291, 2.2342171669006348, 4.118261337280273],
     "cameraTarget": [
       -0.007924258708953857,
       0.646460771560669,
-      0.3473407030105591
+      0.3473407030105591,
     ],
     "cameraScale": 0.9829583777487279,
     "cameraDistance": 5.06,
@@ -8946,10 +6418,10 @@ const List<Map<String, Object?>> exerciseFormData = [
       "inclineBackSupport": true,
       "kneeAction": "flexion",
       "kneeStart": 75,
-      "kneeEnd": 0
+      "kneeEnd": 0,
     },
     "references": [
-      "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/axiom-series-seated-leg-curl-extension"
+      "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/axiom-series-seated-leg-curl-extension",
     ],
     "review": {
       "equipmentReference": false,
@@ -8957,9 +6429,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "standing_leg_curl",
@@ -8971,16 +6443,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "hamstrings"
-    ],
-    "secondaryMuscles": [
-      "calves"
-    ],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "primaryMuscles": ["hamstrings"],
+    "secondaryMuscles": ["calves"],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "standing_leg_curl",
     "status": "planned",
@@ -8989,21 +6454,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "standing_leg_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "nordic_hamstring_curl",
@@ -9015,16 +6472,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "hamstrings"
-    ],
-    "secondaryMuscles": [
-      "calves"
-    ],
-    "tags": [
-      "脚",
-      "自重"
-    ],
+    "primaryMuscles": ["hamstrings"],
+    "secondaryMuscles": ["calves"],
+    "tags": ["脚", "自重"],
     "distanceUnit": "km",
     "movementVariant": "nordic_hamstring_curl",
     "status": "planned",
@@ -9033,21 +6483,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "nordic_hamstring_curl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "good_morning",
@@ -9059,16 +6501,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "フリーウェイト",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "hamstrings",
-      "gluteus",
-      "erectorSpinae"
-    ],
+    "primaryMuscles": ["hamstrings", "gluteus", "erectorSpinae"],
     "secondaryMuscles": [],
-    "tags": [
-      "脚",
-      "フリーウェイト"
-    ],
+    "tags": ["脚", "フリーウェイト"],
     "distanceUnit": "km",
     "movementVariant": "good_morning",
     "status": "authored",
@@ -9077,15 +6512,11 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hinge",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      3.019268035888672,
-      2.535329818725586,
-      3.825551748275757
-    ],
+    "cameraAngle": [3.019268035888672, 2.535329818725586, 3.825551748275757],
     "cameraTarget": [
       -0.015009805560112,
       0.8556402921676636,
-      0.14107118546962738
+      0.14107118546962738,
     ],
     "cameraScale": 1.109509293437004,
     "cameraDistance": 5.06,
@@ -9099,10 +6530,10 @@ const List<Map<String, Object?>> exerciseFormData = [
       "shinDegrees": 3,
       "thighDegrees": 25,
       "torsoLean": 60,
-      "toeOut": 15
+      "toeOut": 15,
     },
     "references": [
-      "https://www.nasm.org/resource-center/exercise-library/good-mornings"
+      "https://www.nasm.org/resource-center/exercise-library/good-mornings",
     ],
     "review": {
       "equipmentReference": false,
@@ -9110,9 +6541,9 @@ const List<Map<String, Object?>> exerciseFormData = [
       "motion": false,
       "android": false,
       "ios": false,
-      "productionRoute": false
+      "productionRoute": false,
     },
-    "previewEnabled": false
+    "previewEnabled": false,
   },
   {
     "exerciseId": "single_leg_rdl",
@@ -9124,17 +6555,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "hamstrings",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "erectorSpinae"
-    ],
-    "tags": [
-      "脚",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["hamstrings", "gluteus"],
+    "secondaryMuscles": ["erectorSpinae"],
+    "tags": ["脚", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "single_leg_rdl",
     "status": "planned",
@@ -9143,21 +6566,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "single_leg_rdl",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "glute_bridge",
@@ -9169,16 +6584,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "自重"
-    ],
+    "primaryMuscles": ["gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "自重"],
     "distanceUnit": "km",
     "movementVariant": "glute_bridge",
     "status": "planned",
@@ -9187,21 +6595,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "glute_bridge",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "machine_hip_thrust",
@@ -9213,16 +6613,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "primaryMuscles": ["gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "machine_hip_thrust",
     "status": "planned",
@@ -9231,21 +6624,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "machine_hip_thrust",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "cable_pull_through",
@@ -9257,17 +6642,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "gluteus",
-      "hamstrings"
-    ],
-    "secondaryMuscles": [
-      "erectorSpinae"
-    ],
-    "tags": [
-      "脚",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["gluteus", "hamstrings"],
+    "secondaryMuscles": ["erectorSpinae"],
+    "tags": ["脚", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "cable_pull_through",
     "status": "planned",
@@ -9276,21 +6653,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cable_pull_through",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "glute_kickback_machine",
@@ -9302,16 +6671,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "primaryMuscles": ["gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "glute_kickback_machine",
     "status": "planned",
@@ -9320,21 +6682,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "glute_kickback_machine",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "cable_glute_kickback",
@@ -9346,16 +6700,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings"
-    ],
-    "tags": [
-      "脚",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["gluteus"],
+    "secondaryMuscles": ["hamstrings"],
+    "tags": ["脚", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "cable_glute_kickback",
     "status": "planned",
@@ -9364,21 +6711,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cable_glute_kickback",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "standing_calf_raise",
@@ -9390,14 +6729,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "calves"
-    ],
+    "primaryMuscles": ["calves"],
     "secondaryMuscles": [],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "standing_calf_raise",
     "status": "planned",
@@ -9406,21 +6740,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "standing_calf_raise",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "seated_calf_raise",
@@ -9432,14 +6758,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "calves"
-    ],
+    "primaryMuscles": ["calves"],
     "secondaryMuscles": [],
-    "tags": [
-      "脚",
-      "マシン"
-    ],
+    "tags": ["脚", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "seated_calf_raise",
     "status": "planned",
@@ -9448,21 +6769,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "seated_calf_raise",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "decline_sit_up",
@@ -9474,16 +6787,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
-    "tags": [
-      "腹筋",
-      "自重"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
+    "tags": ["腹筋", "自重"],
     "distanceUnit": "km",
     "movementVariant": "decline_sit_up",
     "status": "planned",
@@ -9492,21 +6798,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "decline_sit_up",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "weighted_crunch",
@@ -9518,16 +6816,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "additional",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
-    "tags": [
-      "腹筋",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
+    "tags": ["腹筋", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "weighted_crunch",
     "status": "planned",
@@ -9536,21 +6827,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "weighted_crunch",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "reverse_crunch",
@@ -9562,16 +6845,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
-    "tags": [
-      "腹筋",
-      "自重"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
+    "tags": ["腹筋", "自重"],
     "distanceUnit": "km",
     "movementVariant": "reverse_crunch",
     "status": "planned",
@@ -9580,21 +6856,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "reverse_crunch",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "bicycle_crunch",
@@ -9606,15 +6874,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "rectusAbdominis",
-      "obliques"
-    ],
+    "primaryMuscles": ["rectusAbdominis", "obliques"],
     "secondaryMuscles": [],
-    "tags": [
-      "腹筋",
-      "自重"
-    ],
+    "tags": ["腹筋", "自重"],
     "distanceUnit": "km",
     "movementVariant": "bicycle_crunch",
     "status": "planned",
@@ -9623,21 +6885,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "bicycle_crunch",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "russian_twist",
@@ -9649,16 +6903,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ダンベル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "obliques"
-    ],
-    "secondaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "tags": [
-      "腹筋",
-      "ダンベル"
-    ],
+    "primaryMuscles": ["obliques"],
+    "secondaryMuscles": ["rectusAbdominis"],
+    "tags": ["腹筋", "ダンベル"],
     "distanceUnit": "km",
     "movementVariant": "russian_twist",
     "status": "planned",
@@ -9667,21 +6914,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "russian_twist",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "cable_woodchop",
@@ -9693,16 +6932,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "obliques"
-    ],
-    "secondaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "tags": [
-      "腹筋",
-      "ケーブル"
-    ],
+    "primaryMuscles": ["obliques"],
+    "secondaryMuscles": ["rectusAbdominis"],
+    "tags": ["腹筋", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "cable_woodchop",
     "status": "planned",
@@ -9711,21 +6943,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "cable_woodchop",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "pallof_press",
@@ -9737,15 +6961,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケーブル",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "obliques",
-      "rectusAbdominis"
-    ],
+    "primaryMuscles": ["obliques", "rectusAbdominis"],
     "secondaryMuscles": [],
-    "tags": [
-      "腹筋",
-      "ケーブル"
-    ],
+    "tags": ["腹筋", "ケーブル"],
     "distanceUnit": "km",
     "movementVariant": "pallof_press",
     "status": "planned",
@@ -9754,21 +6972,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "pallof_press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "hanging_knee_raise",
@@ -9780,17 +6990,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques",
-      "forearms"
-    ],
-    "tags": [
-      "腹筋",
-      "自重"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques", "forearms"],
+    "tags": ["腹筋", "自重"],
     "distanceUnit": "km",
     "movementVariant": "hanging_knee_raise",
     "status": "planned",
@@ -9799,21 +7001,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hanging_knee_raise",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "captain_chair_leg_raise",
@@ -9825,16 +7019,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
-    "tags": [
-      "腹筋",
-      "自重"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
+    "tags": ["腹筋", "自重"],
     "distanceUnit": "km",
     "movementVariant": "captain_chair_leg_raise",
     "status": "planned",
@@ -9843,21 +7030,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "captain_chair_leg_raise",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "dead_bug",
@@ -9869,16 +7048,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
-    "primaryMuscles": [
-      "rectusAbdominis"
-    ],
-    "secondaryMuscles": [
-      "obliques"
-    ],
-    "tags": [
-      "腹筋",
-      "自重"
-    ],
+    "primaryMuscles": ["rectusAbdominis"],
+    "secondaryMuscles": ["obliques"],
+    "tags": ["腹筋", "自重"],
     "distanceUnit": "km",
     "movementVariant": "dead_bug",
     "status": "planned",
@@ -9887,21 +7059,13 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "dead_bug",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {},
   },
   {
     "exerciseId": "assault_bike",
@@ -9913,18 +7077,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings",
-      "anteriorDeltoid"
-    ],
-    "tags": [
-      "有酸素",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings", "anteriorDeltoid"],
+    "tags": ["有酸素", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "assault_bike",
     "status": "planned",
@@ -9933,27 +7088,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "assault_bike",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "speed",
-      "resistance"
-    ]
+    "recordFields": ["duration", "distance", "speed", "resistance"],
   },
   {
     "exerciseId": "spin_bike",
@@ -9965,18 +7107,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings",
-      "calves"
-    ],
-    "tags": [
-      "有酸素",
-      "マシン"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings", "calves"],
+    "tags": ["有酸素", "マシン"],
     "distanceUnit": "km",
     "movementVariant": "spin_bike",
     "status": "planned",
@@ -9985,27 +7118,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "spin_bike",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "speed",
-      "resistance"
-    ]
+    "recordFields": ["duration", "distance", "speed", "resistance"],
   },
   {
     "exerciseId": "jump_rope",
@@ -10017,17 +7137,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ロープ",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "calves"
-    ],
-    "secondaryMuscles": [
-      "quadriceps",
-      "forearms"
-    ],
-    "tags": [
-      "有酸素",
-      "ロープ"
-    ],
+    "primaryMuscles": ["calves"],
+    "secondaryMuscles": ["quadriceps", "forearms"],
+    "tags": ["有酸素", "ロープ"],
     "distanceUnit": "km",
     "movementVariant": "jump_rope",
     "status": "planned",
@@ -10036,24 +7148,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "jump_rope",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration"
-    ]
+    "recordFields": ["duration"],
   },
   {
     "exerciseId": "battle_rope",
@@ -10065,17 +7167,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ロープ",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "rectusAbdominis",
-      "forearms"
-    ],
-    "tags": [
-      "有酸素",
-      "ロープ"
-    ],
+    "primaryMuscles": ["anteriorDeltoid"],
+    "secondaryMuscles": ["rectusAbdominis", "forearms"],
+    "tags": ["有酸素", "ロープ"],
     "distanceUnit": "km",
     "movementVariant": "battle_rope",
     "status": "planned",
@@ -10084,24 +7178,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "battle_rope",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration"
-    ]
+    "recordFields": ["duration"],
   },
   {
     "exerciseId": "hyrox_ski_erg",
@@ -10113,21 +7197,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "triceps"
-    ],
-    "secondaryMuscles": [
-      "rectusAbdominis",
-      "gluteus"
-    ],
-    "tags": [
-      "HYROX",
-      "マシン",
-      "全身",
-      "背中",
-      "体幹"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "triceps"],
+    "secondaryMuscles": ["rectusAbdominis", "gluteus"],
+    "tags": ["HYROX", "マシン", "全身", "背中", "体幹"],
     "distanceUnit": "m",
     "movementVariant": "hyrox_ski_erg",
     "status": "planned",
@@ -10136,26 +7208,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hyrox_ski_erg",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "pace"
-    ]
+    "recordFields": ["duration", "distance", "pace"],
   },
   {
     "exerciseId": "hyrox_sled_push",
@@ -10167,21 +7227,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "スレッド",
     "recordType": "loadedDistance",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "calves",
-      "triceps"
-    ],
-    "tags": [
-      "HYROX",
-      "スレッド",
-      "全身",
-      "脚",
-      "臀部"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["calves", "triceps"],
+    "tags": ["HYROX", "スレッド", "全身", "脚", "臀部"],
     "distanceUnit": "m",
     "movementVariant": "hyrox_sled_push",
     "status": "planned",
@@ -10190,26 +7238,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hyrox_sled_push",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "weight",
-      "distance",
-      "duration"
-    ]
+    "recordFields": ["weight", "distance", "duration"],
   },
   {
     "exerciseId": "hyrox_sled_pull",
@@ -10221,23 +7257,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "スレッド",
     "recordType": "loadedDistance",
     "loadMode": "external",
-    "primaryMuscles": [
-      "latissimusDorsi",
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "biceps",
-      "forearms"
-    ],
-    "tags": [
-      "HYROX",
-      "スレッド",
-      "全身",
-      "背中",
-      "脚",
-      "臀部"
-    ],
+    "primaryMuscles": ["latissimusDorsi", "quadriceps", "gluteus"],
+    "secondaryMuscles": ["biceps", "forearms"],
+    "tags": ["HYROX", "スレッド", "全身", "背中", "脚", "臀部"],
     "distanceUnit": "m",
     "movementVariant": "hyrox_sled_pull",
     "status": "planned",
@@ -10246,26 +7268,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hyrox_sled_pull",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "weight",
-      "distance",
-      "duration"
-    ]
+    "recordFields": ["weight", "distance", "duration"],
   },
   {
     "exerciseId": "hyrox_burpee_broad_jump",
@@ -10277,23 +7287,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "自重",
     "recordType": "distance",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus",
-      "pectoralisMajor"
-    ],
-    "secondaryMuscles": [
-      "triceps",
-      "rectusAbdominis"
-    ],
-    "tags": [
-      "HYROX",
-      "自重",
-      "全身",
-      "脚",
-      "臀部",
-      "胸"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus", "pectoralisMajor"],
+    "secondaryMuscles": ["triceps", "rectusAbdominis"],
+    "tags": ["HYROX", "自重", "全身", "脚", "臀部", "胸"],
     "distanceUnit": "m",
     "movementVariant": "hyrox_burpee_broad_jump",
     "status": "planned",
@@ -10302,25 +7298,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hyrox_burpee_broad_jump",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance"
-    ]
+    "recordFields": ["duration", "distance"],
   },
   {
     "exerciseId": "hyrox_rowing",
@@ -10332,21 +7317,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "recordType": "cardio",
     "loadMode": "none",
-    "primaryMuscles": [
-      "quadriceps",
-      "latissimusDorsi"
-    ],
-    "secondaryMuscles": [
-      "gluteus",
-      "biceps"
-    ],
-    "tags": [
-      "HYROX",
-      "マシン",
-      "全身",
-      "脚",
-      "背中"
-    ],
+    "primaryMuscles": ["quadriceps", "latissimusDorsi"],
+    "secondaryMuscles": ["gluteus", "biceps"],
+    "tags": ["HYROX", "マシン", "全身", "脚", "背中"],
     "distanceUnit": "m",
     "movementVariant": "hyrox_rowing",
     "status": "planned",
@@ -10355,26 +7328,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hyrox_rowing",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "duration",
-      "distance",
-      "pace"
-    ]
+    "recordFields": ["duration", "distance", "pace"],
   },
   {
     "exerciseId": "hyrox_farmers_carry",
@@ -10386,21 +7347,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ケトルベル",
     "recordType": "loadedDistance",
     "loadMode": "external",
-    "primaryMuscles": [
-      "forearms",
-      "trapezius"
-    ],
-    "secondaryMuscles": [
-      "rectusAbdominis",
-      "gluteus"
-    ],
-    "tags": [
-      "HYROX",
-      "ケトルベル",
-      "全身",
-      "腕",
-      "体幹"
-    ],
+    "primaryMuscles": ["forearms", "trapezius"],
+    "secondaryMuscles": ["rectusAbdominis", "gluteus"],
+    "tags": ["HYROX", "ケトルベル", "全身", "腕", "体幹"],
     "distanceUnit": "m",
     "movementVariant": "hyrox_farmers_carry",
     "status": "planned",
@@ -10409,26 +7358,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hyrox_farmers_carry",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "weight",
-      "distance",
-      "duration"
-    ]
+    "recordFields": ["weight", "distance", "duration"],
   },
   {
     "exerciseId": "hyrox_sandbag_lunge",
@@ -10440,21 +7377,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "サンドバッグ",
     "recordType": "loadedDistance",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus"
-    ],
-    "secondaryMuscles": [
-      "hamstrings",
-      "rectusAbdominis"
-    ],
-    "tags": [
-      "HYROX",
-      "サンドバッグ",
-      "全身",
-      "脚",
-      "臀部"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus"],
+    "secondaryMuscles": ["hamstrings", "rectusAbdominis"],
+    "tags": ["HYROX", "サンドバッグ", "全身", "脚", "臀部"],
     "distanceUnit": "m",
     "movementVariant": "hyrox_sandbag_lunge",
     "status": "planned",
@@ -10463,26 +7388,14 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hyrox_sandbag_lunge",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {},
-    "recordFields": [
-      "weight",
-      "distance",
-      "duration"
-    ]
+    "recordFields": ["weight", "distance", "duration"],
   },
   {
     "exerciseId": "hyrox_wall_ball",
@@ -10494,23 +7407,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "ボール",
     "recordType": "weightReps",
     "loadMode": "external",
-    "primaryMuscles": [
-      "quadriceps",
-      "gluteus",
-      "anteriorDeltoid"
-    ],
-    "secondaryMuscles": [
-      "triceps",
-      "rectusAbdominis"
-    ],
-    "tags": [
-      "HYROX",
-      "ボール",
-      "全身",
-      "脚",
-      "臀部",
-      "体幹"
-    ],
+    "primaryMuscles": ["quadriceps", "gluteus", "anteriorDeltoid"],
+    "secondaryMuscles": ["triceps", "rectusAbdominis"],
+    "tags": ["HYROX", "ボール", "全身", "脚", "臀部", "体幹"],
     "distanceUnit": "m",
     "movementVariant": "hyrox_wall_ball",
     "status": "planned",
@@ -10519,20 +7418,12 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationId": "hyrox_wall_ball",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
-    "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
-    ],
-    "cameraTarget": [
-      0,
-      0.95,
-      0
-    ],
+    "cameraAngle": [2.8, 2.5, 3.4],
+    "cameraTarget": [0, 0.95, 0],
     "cameraScale": 1.35,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
-  }
+    "parameters": {},
+  },
 ];

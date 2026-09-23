@@ -2223,7 +2223,7 @@ void main() {
     await tester.tap(find.byKey(const Key('completeWorkoutButton')));
     await tester.pumpAndSettle();
     expect(find.text('修正を保存'), findsOneWidget);
-    await tester.tap(find.text('保存する'));
+    await tester.tap(find.byKey(const Key('completeAndPreviewShareButton')));
     await tester.pumpAndSettle();
 
     final preferences = await SharedPreferences.getInstance();
@@ -2606,7 +2606,7 @@ void main() {
     expect(find.byKey(const Key('toggleAllSets0')), findsNothing);
     await tester.tap(find.byKey(const Key('completeWorkoutButton')));
     await tester.pumpAndSettle();
-    expect(find.text('1セットを記録します。'), findsOneWidget);
+    expect(find.text('1セットを記録しました。'), findsOneWidget);
   });
 
   testWidgets('active workout can be deleted without leaving a draft', (
