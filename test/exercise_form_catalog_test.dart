@@ -115,7 +115,8 @@ void main() {
       };
       final restored = RecordedSet.fromJson(source);
       expect(restored.toJson()['exerciseName'], '懸垂');
-      expect(exerciseDisplayName(restored.exerciseName), 'チンニング');
+      expect(exerciseDisplayName(restored.exerciseName), '懸垂');
+      expect(exerciseDisplayName(restored.exerciseName, exerciseId: 'chin_up'), 'チンニング');
       expect(restored.reps, 8);
       expect(restored.hasRequiredValues, isTrue);
     },

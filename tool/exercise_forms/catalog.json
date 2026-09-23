@@ -255,9 +255,12 @@
     },
     {
       "exerciseId": "chest_press",
-      "exerciseName": "チェストプレス",
+      "exerciseName": "チェストプレスマシン",
       "category": "胸",
-      "aliases": [],
+      "aliases": [
+        "チェストプレス",
+        "Chest Press"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "press",
       "equipmentId": "press_machine",
@@ -307,7 +310,7 @@
       "assetPath": null,
       "equipmentLabel": "マシン",
       "tags": [],
-      "englishName": "Chest Press",
+      "englishName": "Chest Press Machine",
       "distanceUnit": "km",
       "review": {
         "equipmentReference": false,
@@ -320,9 +323,12 @@
     },
     {
       "exerciseId": "pec_fly",
-      "exerciseName": "ペックフライ",
+      "exerciseName": "ペックフライマシン",
       "category": "胸",
-      "aliases": [],
+      "aliases": [
+        "ペックフライ",
+        "Pec Fly"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "fly",
       "equipmentId": "fly_machine",
@@ -372,7 +378,7 @@
       "assetPath": null,
       "equipmentLabel": "マシン",
       "tags": [],
-      "englishName": "Pec Fly",
+      "englishName": "Pec Fly Machine",
       "distanceUnit": "km",
       "review": {
         "equipmentReference": false,
@@ -633,7 +639,7 @@
         "ios": false,
         "productionRoute": false
       },
-      "equipmentLabel": "マシン",
+      "equipmentLabel": "プレートロード",
       "tags": [],
       "englishName": "Incline Press Machine",
       "distanceUnit": "km",
@@ -701,7 +707,7 @@
         "ios": false,
         "productionRoute": false
       },
-      "equipmentLabel": "マシン",
+      "equipmentLabel": "プレートロード",
       "tags": [],
       "englishName": "Decline Fly Machine",
       "distanceUnit": "km",
@@ -783,7 +789,7 @@
         "ios": false,
         "productionRoute": false
       },
-      "equipmentLabel": "マシン",
+      "equipmentLabel": "プレートロード",
       "tags": [],
       "englishName": "Decline Press Machine",
       "distanceUnit": "km",
@@ -791,9 +797,12 @@
     },
     {
       "exerciseId": "lat_pulldown",
-      "exerciseName": "ラットプルダウン",
+      "exerciseName": "ケーブルラットプルダウン",
       "category": "背中",
-      "aliases": [],
+      "aliases": [
+        "ラットプルダウン",
+        "Lat Pulldown"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "pulldown",
       "equipmentId": "pulldown_machine",
@@ -854,9 +863,9 @@
         "ios": false,
         "productionRoute": false
       },
-      "equipmentLabel": "マシン",
+      "equipmentLabel": "ケーブル",
       "tags": [],
-      "englishName": "Lat Pulldown",
+      "englishName": "Cable Lat Pulldown",
       "distanceUnit": "km",
       "previewEnabled": false
     },
@@ -1226,10 +1235,12 @@
     },
     {
       "exerciseId": "seated_row",
-      "exerciseName": "シーテッドロー",
+      "exerciseName": "シーテッドローマシン",
       "category": "背中",
       "aliases": [
-        "シーテッドロウ"
+        "シーテッドロウ",
+        "シーテッドロー",
+        "Seated Row"
       ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "row",
@@ -1279,7 +1290,7 @@
       "assetPath": null,
       "equipmentLabel": "マシン",
       "tags": [],
-      "englishName": "Seated Row",
+      "englishName": "Seated Row Machine",
       "distanceUnit": "km",
       "startWeight": 30.0,
       "startReps": 10
@@ -1533,7 +1544,10 @@
       "exerciseId": "straight_arm_pulldown",
       "exerciseName": "ストレートアームプルダウン",
       "category": "背中",
-      "aliases": [],
+      "aliases": [
+        "ケーブルプルオーバー",
+        "Cable Pullover"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "straight_arm_pull",
       "equipmentId": "cable",
@@ -1682,7 +1696,7 @@
         "ios": true,
         "productionRoute": true
       },
-      "equipmentLabel": "マシン",
+      "equipmentLabel": "プレートロード",
       "tags": [],
       "englishName": "Dy Row",
       "distanceUnit": "km",
@@ -1781,7 +1795,7 @@
         "ios": true,
         "productionRoute": true
       },
-      "equipmentLabel": "マシン",
+      "equipmentLabel": "プレートロード",
       "tags": [],
       "englishName": "Low Row",
       "distanceUnit": "km",
@@ -1872,7 +1886,7 @@
         "ios": true,
         "productionRoute": true
       },
-      "equipmentLabel": "マシン",
+      "equipmentLabel": "プレートロード",
       "tags": [],
       "englishName": "Linear Row",
       "distanceUnit": "km",
@@ -1977,7 +1991,7 @@
         "ios": true,
         "productionRoute": true
       },
-      "equipmentLabel": "マシン",
+      "equipmentLabel": "プレートロード",
       "tags": [],
       "englishName": "High Row",
       "distanceUnit": "km",
@@ -1986,9 +2000,16 @@
     },
     {
       "exerciseId": "cable_row",
-      "exerciseName": "ケーブルロー",
+      "exerciseName": "シーテッドケーブルロー",
       "category": "背中",
-      "aliases": [],
+      "aliases": [
+        "ケーブルロー",
+        "Cable Row",
+        "シーテッドロー",
+        "シーテッドロウ",
+        "シーテッドケーブルロウ",
+        "ケーブルロウ"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "row",
       "equipmentId": "cable_row",
@@ -2053,7 +2074,7 @@
       "assetPath": "assets/models/forms/cable_row.form.json",
       "equipmentLabel": "ケーブル",
       "tags": [],
-      "englishName": "Cable Row",
+      "englishName": "Seated Cable Row",
       "distanceUnit": "km",
       "authoringNotes": "2026-09-22 user-reported machine/pose defects: revision in progress, hold publication pending visual and native QA.",
       "references": [
@@ -2214,9 +2235,12 @@
     },
     {
       "exerciseId": "shoulder_press",
-      "exerciseName": "ショルダープレス",
+      "exerciseName": "ショルダープレスマシン",
       "category": "肩",
-      "aliases": [],
+      "aliases": [
+        "ショルダープレス",
+        "Shoulder Press"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "press",
       "equipmentId": "shoulder_machine",
@@ -2263,7 +2287,7 @@
       "assetPath": null,
       "equipmentLabel": "マシン",
       "tags": [],
-      "englishName": "Shoulder Press",
+      "englishName": "Shoulder Press Machine",
       "distanceUnit": "km"
     },
     {
@@ -2413,9 +2437,12 @@
     },
     {
       "exerciseId": "lateral_raise",
-      "exerciseName": "サイドレイズ",
+      "exerciseName": "ダンベルサイドレイズ",
       "category": "肩",
-      "aliases": [],
+      "aliases": [
+        "サイドレイズ",
+        "Lateral Raise"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "raise",
       "equipmentId": "dumbbell",
@@ -2460,7 +2487,7 @@
       "assetPath": "assets/models/forms/lateral_raise.form.json",
       "equipmentLabel": "ダンベル",
       "tags": [],
-      "englishName": "Lateral Raise",
+      "englishName": "Dumbbell Lateral Raise",
       "distanceUnit": "km",
       "startWeight": 5.0,
       "startReps": 10,
@@ -2479,9 +2506,12 @@
     },
     {
       "exerciseId": "front_raise",
-      "exerciseName": "フロントレイズ",
+      "exerciseName": "ダンベルフロントレイズ",
       "category": "肩",
-      "aliases": [],
+      "aliases": [
+        "フロントレイズ",
+        "Front Raise"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "raise",
       "equipmentId": "dumbbell",
@@ -2526,7 +2556,7 @@
       "assetPath": "assets/models/forms/front_raise.form.json",
       "equipmentLabel": "ダンベル",
       "tags": [],
-      "englishName": "Front Raise",
+      "englishName": "Dumbbell Front Raise",
       "distanceUnit": "km",
       "references": [
         "https://contentcdn.eacefitness.com/certifiednews/images/article/pdfs/ShoulderExercises.pdf"
@@ -2543,9 +2573,12 @@
     },
     {
       "exerciseId": "rear_raise",
-      "exerciseName": "リアレイズ",
+      "exerciseName": "ダンベルリアレイズ",
       "category": "肩",
-      "aliases": [],
+      "aliases": [
+        "リアレイズ",
+        "Rear Raise"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "raise",
       "equipmentId": "dumbbell",
@@ -2592,16 +2625,19 @@
       "assetPath": null,
       "equipmentLabel": "ダンベル",
       "tags": [],
-      "englishName": "Rear Raise",
+      "englishName": "Dumbbell Rear Raise",
       "distanceUnit": "km",
       "startWeight": 5.0,
       "startReps": 10
     },
     {
       "exerciseId": "rear_delt",
-      "exerciseName": "リアデルト",
+      "exerciseName": "リアデルトマシン",
       "category": "肩",
-      "aliases": [],
+      "aliases": [
+        "リアデルト",
+        "Rear Delt"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "reverse_fly",
       "equipmentId": "fly_machine",
@@ -2655,7 +2691,7 @@
       "assetPath": "assets/models/forms/rear_delt.form.json",
       "equipmentLabel": "マシン",
       "tags": [],
-      "englishName": "Rear Delt",
+      "englishName": "Rear Delt Machine",
       "distanceUnit": "km",
       "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish.",
       "references": [
@@ -2920,9 +2956,12 @@
     },
     {
       "exerciseId": "hammer_curl",
-      "exerciseName": "ハンマーカール",
+      "exerciseName": "ダンベルハンマーカール",
       "category": "腕",
-      "aliases": [],
+      "aliases": [
+        "ハンマーカール",
+        "Hammer Curl"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "curl",
       "equipmentId": "dumbbell",
@@ -2970,7 +3009,7 @@
       "assetPath": "assets/models/forms/hammer_curl.form.json",
       "equipmentLabel": "ダンベル",
       "tags": [],
-      "englishName": "Hammer Curl",
+      "englishName": "Dumbbell Hammer Curl",
       "distanceUnit": "km",
       "startWeight": 8.0,
       "startReps": 10,
@@ -2989,9 +3028,12 @@
     },
     {
       "exerciseId": "preacher_curl",
-      "exerciseName": "プリーチャーカール",
+      "exerciseName": "プリーチャーカール（フリーウェイト）",
       "category": "腕",
-      "aliases": [],
+      "aliases": [
+        "プリーチャーカール",
+        "Preacher Curl"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "curl",
       "equipmentId": "preacher_bench",
@@ -3038,7 +3080,7 @@
       "assetPath": null,
       "equipmentLabel": "フリーウェイト",
       "tags": [],
-      "englishName": "Preacher Curl",
+      "englishName": "Free Weight Preacher Curl",
       "distanceUnit": "km"
     },
     {
@@ -3155,13 +3197,18 @@
         "ios": false,
         "productionRoute": false
       },
-      "previewEnabled": false
+      "previewEnabled": false,
+      "canonicalExerciseId": "rope_pushdown",
+      "selectable": false
     },
     {
       "exerciseId": "french_press",
-      "exerciseName": "フレンチプレス",
+      "exerciseName": "ダンベルフレンチプレス",
       "category": "腕",
-      "aliases": [],
+      "aliases": [
+        "フレンチプレス",
+        "French Press"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "elbow_extension",
       "equipmentId": "single_dumbbell",
@@ -3205,7 +3252,7 @@
       "assetPath": null,
       "equipmentLabel": "ダンベル",
       "tags": [],
-      "englishName": "French Press",
+      "englishName": "Dumbbell French Press",
       "distanceUnit": "km"
     },
     {
@@ -3261,9 +3308,12 @@
     },
     {
       "exerciseId": "overhead_triceps_extension",
-      "exerciseName": "オーバーヘッドトライセプスエクステンション",
+      "exerciseName": "ケーブルオーバーヘッドトライセプスエクステンション",
       "category": "腕",
-      "aliases": [],
+      "aliases": [
+        "オーバーヘッドトライセプスエクステンション",
+        "Overhead Triceps Extension"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "elbow_extension",
       "equipmentId": "rope_cable",
@@ -3307,7 +3357,7 @@
       "assetPath": null,
       "equipmentLabel": "ケーブル",
       "tags": [],
-      "englishName": "Overhead Triceps Extension",
+      "englishName": "Cable Overhead Triceps Extension",
       "distanceUnit": "km"
     },
     {
@@ -3732,7 +3782,8 @@
       "englishName": "Leg Curl",
       "distanceUnit": "km",
       "startWeight": 20.0,
-      "startReps": 10
+      "startReps": 10,
+      "selectable": false
     },
     {
       "exerciseId": "romanian_deadlift",
@@ -3809,9 +3860,12 @@
     },
     {
       "exerciseId": "hip_thrust",
-      "exerciseName": "ヒップスラスト",
+      "exerciseName": "バーベルヒップスラスト",
       "category": "脚",
-      "aliases": [],
+      "aliases": [
+        "ヒップスラスト",
+        "Hip Thrust"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "hip_thrust",
       "equipmentId": "barbell_bench",
@@ -3858,7 +3912,7 @@
       "assetPath": null,
       "equipmentLabel": "フリーウェイト",
       "tags": [],
-      "englishName": "Hip Thrust",
+      "englishName": "Barbell Hip Thrust",
       "distanceUnit": "km"
     },
     {
@@ -4012,7 +4066,8 @@
       "equipmentLabel": "マシン",
       "tags": [],
       "englishName": "Calf Raise",
-      "distanceUnit": "km"
+      "distanceUnit": "km",
+      "selectable": false
     },
     {
       "exerciseId": "crunch",
@@ -4072,9 +4127,12 @@
     },
     {
       "exerciseId": "abdominal_crunch",
-      "exerciseName": "アブドミナルクランチ",
+      "exerciseName": "アブドミナルクランチマシン",
       "category": "腹筋",
-      "aliases": [],
+      "aliases": [
+        "アブドミナルクランチ",
+        "Abdominal Crunch"
+      ],
       "modelId": "mpfb-athlete-v1",
       "animationId": "crunch",
       "equipmentId": "ab_machine",
@@ -4121,7 +4179,7 @@
       "assetPath": null,
       "equipmentLabel": "マシン",
       "tags": [],
-      "englishName": "Abdominal Crunch",
+      "englishName": "Abdominal Crunch Machine",
       "distanceUnit": "km"
     },
     {
@@ -5615,10 +5673,13 @@
     },
     {
       "exerciseId": "plate_loaded_chest_press",
-      "exerciseName": "チェストプレス",
-      "englishName": "Chest Press",
+      "exerciseName": "プレートロードチェストプレス",
+      "englishName": "Plate Loaded Chest Press",
       "category": "胸",
-      "aliases": [],
+      "aliases": [
+        "チェストプレス",
+        "Chest Press"
+      ],
       "equipmentId": "plate_loaded_chest_press",
       "equipmentLabel": "プレートロード",
       "recordType": "weightReps",
@@ -5660,10 +5721,13 @@
     },
     {
       "exerciseId": "selectorized_incline_chest_press",
-      "exerciseName": "インクラインチェストプレス",
-      "englishName": "Incline Chest Press",
+      "exerciseName": "インクラインチェストプレスマシン",
+      "englishName": "Selectorized Incline Chest Press",
       "category": "胸",
-      "aliases": [],
+      "aliases": [
+        "インクラインチェストプレス",
+        "Incline Chest Press"
+      ],
       "equipmentId": "selectorized_incline_chest_press",
       "equipmentLabel": "マシン",
       "recordType": "weightReps",
@@ -5705,10 +5769,13 @@
     },
     {
       "exerciseId": "plate_loaded_incline_chest_press",
-      "exerciseName": "インクラインチェストプレス",
-      "englishName": "Incline Chest Press",
+      "exerciseName": "プレートロードインクラインチェストプレス",
+      "englishName": "Plate Loaded Incline Chest Press",
       "category": "胸",
-      "aliases": [],
+      "aliases": [
+        "インクラインチェストプレス",
+        "Incline Chest Press"
+      ],
       "equipmentId": "plate_loaded_incline_chest_press",
       "equipmentLabel": "プレートロード",
       "recordType": "weightReps",
@@ -6256,10 +6323,13 @@
     },
     {
       "exerciseId": "plate_loaded_lat_pulldown",
-      "exerciseName": "ラットプルダウン",
-      "englishName": "Lat Pulldown",
+      "exerciseName": "プレートロードラットプルダウン",
+      "englishName": "Plate Loaded Lat Pulldown",
       "category": "背中",
-      "aliases": [],
+      "aliases": [
+        "ラットプルダウン",
+        "Lat Pulldown"
+      ],
       "equipmentId": "plate_loaded_lat_pulldown",
       "equipmentLabel": "プレートロード",
       "recordType": "weightReps",
@@ -6301,10 +6371,14 @@
     },
     {
       "exerciseId": "plate_loaded_seated_row",
-      "exerciseName": "シーテッドロー",
-      "englishName": "Seated Row",
+      "exerciseName": "プレートロードシーテッドロー",
+      "englishName": "Plate Loaded Seated Row",
       "category": "背中",
-      "aliases": [],
+      "aliases": [
+        "シーテッドロー",
+        "Seated Row",
+        "シーテッドロウ"
+      ],
       "equipmentId": "plate_loaded_seated_row",
       "equipmentLabel": "プレートロード",
       "recordType": "weightReps",
@@ -6524,7 +6598,9 @@
       "cameraDistance": 5.06,
       "animationSpeed": 1.0,
       "rangeOfMotion": 1.0,
-      "parameters": {}
+      "parameters": {},
+      "canonicalExerciseId": "straight_arm_pulldown",
+      "selectable": false
     },
     {
       "exerciseId": "machine_pullover",
@@ -6618,10 +6694,13 @@
     },
     {
       "exerciseId": "plate_loaded_shoulder_press",
-      "exerciseName": "ショルダープレス",
-      "englishName": "Shoulder Press",
+      "exerciseName": "プレートロードショルダープレス",
+      "englishName": "Plate Loaded Shoulder Press",
       "category": "肩",
-      "aliases": [],
+      "aliases": [
+        "ショルダープレス",
+        "Shoulder Press"
+      ],
       "equipmentId": "plate_loaded_shoulder_press",
       "equipmentLabel": "プレートロード",
       "recordType": "weightReps",
@@ -7539,10 +7618,13 @@
     },
     {
       "exerciseId": "machine_preacher_curl",
-      "exerciseName": "プリーチャーカール",
-      "englishName": "Preacher Curl",
+      "exerciseName": "プリーチャーカールマシン",
+      "englishName": "Preacher Curl Machine",
       "category": "腕",
-      "aliases": [],
+      "aliases": [
+        "プリーチャーカール",
+        "Preacher Curl"
+      ],
       "equipmentId": "machine_preacher_curl",
       "equipmentLabel": "マシン",
       "recordType": "weightReps",
@@ -7937,7 +8019,10 @@
       "exerciseName": "ローププッシュダウン",
       "englishName": "Rope Pushdown",
       "category": "腕",
-      "aliases": [],
+      "aliases": [
+        "トライセプスプッシュダウン",
+        "Triceps Pushdown"
+      ],
       "equipmentId": "cable",
       "equipmentLabel": "ケーブル",
       "recordType": "weightReps",
@@ -9206,10 +9291,13 @@
     },
     {
       "exerciseId": "machine_hip_thrust",
-      "exerciseName": "ヒップスラスト",
-      "englishName": "Hip Thrust",
+      "exerciseName": "ヒップスラストマシン",
+      "englishName": "Hip Thrust Machine",
       "category": "脚",
-      "aliases": [],
+      "aliases": [
+        "ヒップスラスト",
+        "Hip Thrust"
+      ],
       "equipmentId": "machine_hip_thrust",
       "equipmentLabel": "マシン",
       "recordType": "weightReps",
@@ -9295,10 +9383,13 @@
     },
     {
       "exerciseId": "glute_kickback_machine",
-      "exerciseName": "グルートキックバック",
+      "exerciseName": "グルートキックバックマシン",
       "englishName": "Glute Kickback Machine",
       "category": "脚",
-      "aliases": [],
+      "aliases": [
+        "グルートキックバック",
+        "Glute Kickback Machine"
+      ],
       "equipmentId": "glute_kickback_machine",
       "equipmentLabel": "マシン",
       "recordType": "weightReps",

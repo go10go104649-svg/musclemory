@@ -58,10 +58,12 @@ void main() {
       ) as Map;
       expect(exerciseFormData, source['exercises']);
       final catalogCount = (source['exercises'] as List).length;
-      expect(exerciseTemplates, hasLength(catalogCount));
+      expect(ExerciseFormCatalog.entries, hasLength(catalogCount));
+      final selectableCount = ExerciseFormCatalog.entries.where((e) => e.selectable).length;
+      expect(exerciseTemplates, hasLength(selectableCount));
       expect(
         exerciseTemplates.map((e) => e.identity).toSet(),
-        hasLength(catalogCount),
+        hasLength(selectableCount),
       );
       for (final e in ExerciseFormCatalog.entries) {
         expect(e.equipmentLabel, isNotEmpty);
@@ -88,7 +90,7 @@ void main() {
           exerciseId: 'plate_loaded_shoulder_press',
           languageCode: 'en',
         ),
-        'Shoulder Press',
+        'Plate Loaded Shoulder Press',
       );
       expect(ExerciseFormCatalog.byId['bench_press']!.available, true);
       expect(
@@ -363,7 +365,8 @@ void main() {
         'shoulder press',
       );
       await t.pumpAndSettle();
-      expect(find.text('Shoulder Press'), findsNWidgets(2));
+      expect(find.text('Shoulder Press Machine'), findsOneWidget);
+      expect(find.text('Plate Loaded Shoulder Press'), findsOneWidget);
       final machine = find.byKey(const Key('selectExerciseshoulder_press'));
       final plate = find.byKey(const Key('selectExerciseplate_loaded_shoulder_press'));
       expect(t.widget<ListTile>(machine).onTap, isNull);

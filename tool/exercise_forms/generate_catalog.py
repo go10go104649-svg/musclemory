@@ -34,6 +34,17 @@ for item in source['exercises']:
             for check in ('equipmentReference', 'staticPose', 'motion', 'android', 'ios', 'productionRoute'):
                 assert item.get('review', {}).get(check) is True, f'Unreviewed {check}: {item["exerciseId"]}'
 assert candidates <= ids, f'Unknown QA candidates: {candidates - ids}'
+by_id = {item['exerciseId']: item for item in source['exercises']}
+for item in source['exercises']:
+    assert isinstance(item.get('selectable', True), bool)
+    canonical = item.get('canonicalExerciseId')
+    if canonical is not None:
+        assert canonical in ids and canonical != item['exerciseId']
+        target = by_id[canonical]
+        assert 'canonicalExerciseId' not in target, 'Compatibility must resolve in one step'
+        assert item.get('selectable') is False and target.get('selectable', True)
+        for field in ('recordType', 'loadMode', 'distanceUnit'):
+            assert item.get(field) == target.get(field), f'Incompatible {field}: {item["exerciseId"]}'
 output = copy.deepcopy(source['exercises'])
 for item in output:
     if item['exerciseId'] in candidates:

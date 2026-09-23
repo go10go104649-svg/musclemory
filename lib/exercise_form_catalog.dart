@@ -7,6 +7,8 @@ class ExerciseFormDefinition {
     : _value = Map.unmodifiable(value);
   final Map<String, Object?> _value;
   String get exerciseId => _value['exerciseId']! as String;
+  String? get canonicalExerciseId => _value['canonicalExerciseId'] as String?;
+  bool get selectable => _value['selectable'] as bool? ?? true;
   String? get englishName => _value['englishName'] as String?;
   String get exerciseName => _value['exerciseName']! as String;
   String get category => _value['category']! as String;
@@ -69,6 +71,12 @@ class ExerciseFormCatalog {
     for (final item in entries) item.exerciseId: item,
   };
 
+  // Identity/display compatibility is separate from the exact 3D asset lookup.
+  // Unknown and custom IDs remain untouched; names never assign an identity.
+  static String canonicalId(String id) => byId[id]?.canonicalExerciseId ?? id;
+  static ExerciseFormDefinition? canonicalDefinition(String? id) =>
+      id == null ? null : byId[canonicalId(id)];
+
   /// Names and aliases may be ambiguous. Only an explicit ID selects a variant.
   static final Map<String, List<ExerciseFormDefinition>> byName = _indexNames();
   static Map<String, List<ExerciseFormDefinition>> _indexNames() {
@@ -95,18 +103,24 @@ class ExerciseFormCatalog {
 }
 
 String exerciseIdentity(String? id, String legacyName) =>
-    id != null && id.isNotEmpty ? 'id:$id' : 'legacy:$legacyName';
+    id != null && id.isNotEmpty
+    ? 'id:${ExerciseFormCatalog.canonicalId(id)}'
+    : 'legacy:$legacyName';
+
+String canonicalExerciseIdentity(String identity) => identity.startsWith('id:')
+    ? exerciseIdentity(identity.substring(3), '')
+    : identity;
 
 String exerciseDisplayName(
   String storedName, {
   String? exerciseId,
   String languageCode = 'ja',
 }) {
-  final form = ExerciseFormCatalog.resolve(exerciseId, storedName);
+  final form = ExerciseFormCatalog.canonicalDefinition(exerciseId);
   if (languageCode == 'en' && form?.englishName != null) {
     return form!.englishName!;
   }
-  return storedName == '懸垂' ? 'チンニング' : storedName;
+  return form?.exerciseName ?? storedName;
 }
 
 bool usesAdditionalWeight(String storedName, {String? exerciseId}) =>

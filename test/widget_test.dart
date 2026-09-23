@@ -642,7 +642,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     final exercise = exerciseTemplates.firstWhere(
-      (item) => item.name == 'チェストプレス',
+      (item) => item.exerciseId == 'chest_press',
     );
     await tester.pumpWidget(
       MaterialApp(home: ExerciseMuscleDetailPage(exercise: exercise)),

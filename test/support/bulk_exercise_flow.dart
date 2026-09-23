@@ -135,7 +135,7 @@ Future<void> verifyBulkExerciseFlow(
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('addSelectedExercises')));
   await tester.pumpAndSettle();
-  expect(exercises().map((e) => e['name']).toList(), [...names, 'チェストプレス']);
+  expect(exercises().map((e) => e['name']).toList(), [...names, 'チェストプレスマシン']);
   expect(exercises().first['sets'][0]['weight'], 22.5);
   expect(tester.takeException(), isNull);
   await tester.pumpWidget(const SizedBox());
