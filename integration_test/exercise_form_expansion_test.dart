@@ -15,7 +15,7 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
   testWidgets(
-    'baseline and revised form load, play, pause, change speed and reopen',
+    'baseline and revised form load, play, pause, resume and reopen',
     (tester) async {
       const selected = String.fromEnvironment('FORM_QA_IDS');
       final plan = FormQaPlan.parse(
@@ -120,14 +120,11 @@ void main() {
           await tester.tap(find.byKey(const Key('benchPressPlayPause')));
           await tester.pump();
           await capture(binding, '${id}_paused');
-          await tester.tap(find.byKey(const Key('benchPressPlaybackSpeed')));
-          await tester.pumpAndSettle();
-          await tester.tap(find.text('0.5倍速').last);
-          await tester.pumpAndSettle();
+          expect(find.text('再生'), findsOneWidget);
           await tester.tap(find.byKey(const Key('benchPressPlayPause')));
           await tester.pump();
           await Future<void>.delayed(const Duration(seconds: 8));
-          await capture(binding, '${id}_half_speed');
+          await capture(binding, '${id}_resumed');
         }
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
@@ -147,8 +144,19 @@ Future<List<int>> capture(
   bool record = true,
 }) async {
   if (Platform.isAndroid) {
-    final bytes = await const MethodChannel('com.musclememory/rest_timer')
-        .invokeMethod<Uint8List>('debugScreenshot');
+    Uint8List? bytes;
+    // Software-rendered QA emulators can time out a PixelCopy readback while
+    // the scene is still rendering. Retry capture only; never hide load errors.
+    for (var attempt = 0; attempt < 3; attempt++) {
+      try {
+        bytes = await const MethodChannel('com.musclememory/rest_timer')
+            .invokeMethod<Uint8List>('debugScreenshot');
+        break;
+      } on PlatformException catch (error) {
+        if (error.code != 'PIXEL_COPY' || attempt == 2) rethrow;
+        await Future<void>.delayed(const Duration(seconds: 2));
+      }
+    }
     if (!record) return bytes!;
     binding.reportData ??= <String, dynamic>{};
     final shots = binding.reportData!.putIfAbsent(

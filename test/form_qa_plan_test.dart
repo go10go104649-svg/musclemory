@@ -73,7 +73,7 @@ void main() {
     final report = value.report();
     expect(report['reviewApproved'], isFalse);
     expect(report['declaredBaselineEvidence'], 'qa/full-ios');
-    expect(report['notChecked'], contains('half-speed playback'));
+    expect(report['notChecked'], contains('pause/resume'));
     expect(report['notChecked'], contains('production route (separate test)'));
     expect(report.containsKey('verified'), isFalse);
     expect(known, contains('planned'));

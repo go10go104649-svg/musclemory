@@ -21,7 +21,7 @@ class FileFormBundle extends CachingAssetBundle {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('production catalog exposes only fully reviewed new scenes', () {
+  test('catalog distinguishes reviewed scenes from explicit previews', () {
     final generated = File('lib/exercise_form_catalog.g.dart')
         .readAsStringSync();
     expect(generated, isNot(contains('TEMPORARY QA CANDIDATES')));
@@ -31,8 +31,16 @@ void main() {
     for (final raw in source['exercises'] as List) {
       final entry = raw as Map<String, dynamic>;
       final form = ExerciseFormCatalog.byId[entry['exerciseId']]!;
-      expect(form.available, entry['status'] == 'verified');
-      if (!form.available ||
+      expect(
+        form.available,
+        entry['status'] == 'verified' || entry['previewEnabled'] == true,
+      );
+      if (form.isPreview) {
+        expect(form.status, 'authored');
+        expect((entry['review'] as Map)['staticPose'], isTrue);
+        expect(File(form.assetPath!).existsSync(), isTrue);
+      }
+      if (form.status != 'verified' ||
           {'bench_press', 'incline_dumbbell_press'}.contains(form.exerciseId)) {
         continue;
       }
@@ -54,6 +62,28 @@ void main() {
         );
       }
     }
+  });
+
+  test('trial availability requires explicit opt-in, pose QA and an asset', () {
+    final source = <String, Object?>{
+      'status': 'authored',
+      'assetPath': 'assets/models/forms/example.form.json',
+      'previewEnabled': true,
+      'review': {'staticPose': true},
+    };
+    expect(ExerciseFormDefinition(source).isPreview, isTrue);
+    expect(ExerciseFormDefinition(source).available, isTrue);
+    for (final override in <Map<String, Object?>>[
+      {'previewEnabled': false},
+      {'status': 'planned'},
+      {'assetPath': null},
+      {'review': {'staticPose': false}},
+    ]) {
+      expect(ExerciseFormDefinition({...source, ...override}).available, isFalse);
+    }
+    expect(ExerciseFormCatalog.byId['chin_up']!.available, isFalse);
+    expect(ExerciseFormCatalog.byId['lat_pulldown']!.available, isFalse);
+    expect(ExerciseFormCatalog.entries.where((form) => form.isPreview), isEmpty);
   });
 
   test(
@@ -212,5 +242,7 @@ void main() {
         );
       }
     },
+    // Validate every packed scene; the growing catalog exceeds 30s on QA hosts.
+    timeout: const Timeout(Duration(minutes: 2)),
   );
 }

@@ -68,7 +68,7 @@ class FormQaPlan {
     'declaredBaselineEvidence': baselineEvidence,
     'reviewApproved': false,
     'notChecked': [
-      if (isLight) ...['four motion frames', 'pause/resume', 'half-speed playback'],
+      if (isLight) ...['four motion frames', 'pause/resume'],
       'anatomical correctness',
       'complete motion loop appearance',
       'production route (separate test)',

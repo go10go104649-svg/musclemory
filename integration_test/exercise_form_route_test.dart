@@ -39,14 +39,17 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        await tester.tap(find.byKey(Key('exerciseCategory${form.category}')));
+        final category = find.byKey(Key('exerciseCategory${form.category}'));
+        await tester.ensureVisible(category);
         await tester.pumpAndSettle();
-        final button = find.byKey(Key('exerciseMuscles${form.exerciseName}'));
+        await tester.tap(category);
+        await tester.pumpAndSettle();
+        final button = find.byKey(Key('exerciseMuscles${form.exerciseId}'));
         await tester.scrollUntilVisible(
           button,
           300,
           scrollable: find.descendant(
-            of: find.byKey(ValueKey('exercisePickerList${form.category}')),
+            of: find.byKey(ValueKey('exercisePickerList${form.category}false')),
             matching: find.byType(Scrollable),
           ),
         );

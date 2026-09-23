@@ -80,9 +80,13 @@ class _BenchPressFormViewState extends State<ExerciseFormView>
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 18, 18, 4),
-            child: const Text(
-              '3Dフォーム',
-              style: TextStyle(
+            child: Text(
+              form!.isPreview
+                  ? (Localizations.localeOf(context).languageCode == 'en'
+                        ? '3D Form · Preview'
+                        : '3Dフォーム · 試用')
+                  : '3Dフォーム',
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
@@ -96,7 +100,7 @@ class _BenchPressFormViewState extends State<ExerciseFormView>
               children: [
                 if (!_failed)
                   IgnorePointer(
-                    key: ValueKey(form!.assetPath),
+                    key: ValueKey(form.assetPath),
                     child: Interactive3d(
                       key: const Key('benchPressNativeScene'),
                       modelPath: form.assetPath,

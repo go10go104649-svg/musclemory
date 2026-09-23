@@ -22,6 +22,11 @@ for item in source['exercises']:
     assert 0 < item['animationSpeed'] <= 2
     assert 0 < item['rangeOfMotion'] <= 1
     assert item['status'] in ['planned', 'authored', 'verified']
+    assert isinstance(item.get('previewEnabled', False), bool)
+    if item.get('previewEnabled', False):
+        assert item['status'] == 'authored', f'Preview must remain authored: {item["exerciseId"]}'
+        assert item['assetPath'] and (ROOT / item['assetPath']).is_file()
+        assert item.get('review', {}).get('staticPose') is True, f'Preview pose unchecked: {item["exerciseId"]}'
     if item['status'] == 'verified':
         assert item['assetPath'] and (ROOT / item['assetPath']).is_file()
         if item['exerciseId'] not in {'bench_press', 'incline_dumbbell_press'}:

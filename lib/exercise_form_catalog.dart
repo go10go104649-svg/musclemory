@@ -26,7 +26,13 @@ class ExerciseFormDefinition {
   String get loadMode => _value['loadMode']! as String;
   String get status => _value['status']! as String;
   String? get assetPath => _value['assetPath'] as String?;
-  bool get available => status == 'verified' && assetPath != null;
+  bool get isPreview =>
+      status == 'authored' &&
+      _value['previewEnabled'] == true &&
+      (_value['review'] as Map?)?['staticPose'] == true &&
+      assetPath != null;
+  bool get available =>
+      assetPath != null && (status == 'verified' || isPreview);
   double get animationSpeed => (_value['animationSpeed']! as num).toDouble();
   double get rangeOfMotion => (_value['rangeOfMotion']! as num).toDouble();
   List<String> get aliases => (_value['aliases']! as List).cast<String>();

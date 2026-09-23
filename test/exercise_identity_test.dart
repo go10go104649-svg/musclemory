@@ -51,14 +51,18 @@ void main() {
   tearDown(() => CustomExercisePreference.exercises = []);
 
   test(
-    'identity catalog source equals generated data and all 194 IDs are unique',
+    'identity catalog source equals generated data and all catalog IDs are unique',
     () {
       final source = jsonDecode(
         File('tool/exercise_forms/catalog.json').readAsStringSync(),
       ) as Map;
       expect(exerciseFormData, source['exercises']);
-      expect(exerciseTemplates, hasLength(194));
-      expect(exerciseTemplates.map((e) => e.identity).toSet(), hasLength(194));
+      final catalogCount = (source['exercises'] as List).length;
+      expect(exerciseTemplates, hasLength(catalogCount));
+      expect(
+        exerciseTemplates.map((e) => e.identity).toSet(),
+        hasLength(catalogCount),
+      );
       for (final e in ExerciseFormCatalog.entries) {
         expect(e.equipmentLabel, isNotEmpty);
         expect(e.englishName, isNotEmpty);

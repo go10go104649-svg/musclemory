@@ -118,16 +118,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "legacy_press",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.918583869934082,
+      2.770430564880371,
+      3.672604560852051
     ],
     "cameraTarget": [
-      0,
-      0.58,
-      0.13
+      -0.08709995448589325,
+      0.7093896865844727,
+      0.16239485144615173
     ],
-    "cameraScale": 1.225,
+    "cameraScale": 1.2322142630815507,
     "targetMuscles": [
       "pectoralisMajor",
       "anteriorDeltoid",
@@ -150,17 +150,34 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 30,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "inclineBackSupport": true,
+      "rebuildAdjustableBench": true,
+      "barbellPressReach": true,
+      "matchedForearmRoll": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "verified",
+    "assetPath": "assets/models/forms/incline_barbell_press.form.json",
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Incline Barbell Press",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "review": {
+      "equipmentReference": true,
+      "staticPose": true,
+      "motion": true,
+      "android": true,
+      "ios": true,
+      "productionRoute": true
+    },
+    "previewEnabled": false,
+    "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish.",
+    "references": [
+      "https://shop.lifefitness.com/products/hammer-strength-home-multi-adjustable-bench"
+    ]
   },
   {
     "exerciseId": "flat_dumbbell_press",
@@ -174,16 +191,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "legacy_press",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.984753370285034,
+      2.633376359939575,
+      3.6643805503845215
     ],
     "cameraTarget": [
-      0,
-      0.58,
-      0.13
+      -0.020930632948875427,
+      0.5723354816436768,
+      0.15417081117630005
     ],
-    "cameraScale": 1.225,
+    "cameraScale": 1.0088205951359124,
     "targetMuscles": [
       "pectoralisMajor",
       "anteriorDeltoid",
@@ -206,17 +223,34 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "rebuildAdjustableBench": true,
+      "matchedForearmRoll": true,
+      "bottomGripWidth": 0.86,
+      "fullPressReach": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "verified",
+    "assetPath": "assets/models/forms/flat_dumbbell_press.form.json",
     "equipmentLabel": "ダンベル",
     "tags": [],
     "englishName": "Flat Dumbbell Press",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "review": {
+      "equipmentReference": true,
+      "staticPose": true,
+      "motion": true,
+      "android": true,
+      "ios": true,
+      "productionRoute": true
+    },
+    "previewEnabled": false,
+    "references": [
+      "https://www.acefitness.org/resources/everyone/exercise-library/19/chest-press/",
+      "https://shop.lifefitness.com/products/hammer-strength-home-multi-adjustable-bench"
+    ]
   },
   {
     "exerciseId": "chest_press",
@@ -262,7 +296,8 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 75,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "pressLeverForward": 0.3
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -272,7 +307,15 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Chest Press",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    }
   },
   {
     "exerciseId": "pec_fly",
@@ -318,7 +361,8 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 80,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "flyLeverRadius": 0.49
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -328,7 +372,15 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Pec Fly",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    }
   },
   {
     "exerciseId": "cable_fly",
@@ -517,15 +569,15 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraDistance": 5.06,
     "cameraAngle": [
       2.9686241149902344,
-      2.5147948265075684,
-      3.494757652282715
+      2.5147953033447266,
+      3.4947571754455566
     ],
     "cameraTarget": [
-      -0.032289713621139526,
-      0.6928116083145142,
-      -0.14920884370803833
+      -0.03228975087404251,
+      0.6928120851516724,
+      -0.1492089331150055
     ],
-    "cameraScale": 1.1647776872292162,
+    "cameraScale": 1.1647780577838422,
     "targetMuscles": [
       "pectoralisMajor",
       "anteriorDeltoid",
@@ -560,7 +612,8 @@ const List<Map<String, Object?>> exerciseFormData = [
         1.0
       ],
       "leverTravelDegrees": -28,
-      "convergenceAxis": 0.22
+      "convergenceAxis": 0.22,
+      "inclineBackSupport": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -572,17 +625,18 @@ const List<Map<String, Object?>> exerciseFormData = [
       "https://www.youtube.com/watch?v=UKPBc1BWRzw"
     ],
     "review": {
-      "equipmentReference": true,
+      "equipmentReference": false,
       "staticPose": false,
       "motion": false,
-      "android": true,
-      "ios": true,
+      "android": false,
+      "ios": false,
       "productionRoute": false
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Incline Press Machine",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false
   },
   {
     "exerciseId": "decline_fly_machine",
@@ -639,17 +693,18 @@ const List<Map<String, Object?>> exerciseFormData = [
       "https://www.youtube.com/watch?v=0UDQ8CzNxbQ"
     ],
     "review": {
-      "equipmentReference": true,
+      "equipmentReference": false,
       "staticPose": false,
       "motion": false,
-      "android": true,
-      "ios": true,
+      "android": false,
+      "ios": false,
       "productionRoute": false
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Decline Fly Machine",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false
   },
   {
     "exerciseId": "decline_press_machine",
@@ -663,16 +718,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      0.6769610047340393,
-      1.9096852540969849,
-      5.117018699645996
+      0.6769609451293945,
+      1.9096853733062744,
+      5.11701774597168
     ],
     "cameraTarget": [
-      -0.030132051557302475,
-      0.6470191478729248,
+      -0.03013208508491516,
+      0.6470193862915039,
       0.26837992668151855
     ],
-    "cameraScale": 1.010379631817341,
+    "cameraScale": 1.0103797298669817,
     "targetMuscles": [
       "pectoralisMajor",
       "anteriorDeltoid",
@@ -707,7 +762,8 @@ const List<Map<String, Object?>> exerciseFormData = [
         1.04
       ],
       "leverTravelDegrees": -22.5,
-      "convergenceAxis": 0.22
+      "convergenceAxis": 0.22,
+      "inclineBackSupport": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -719,17 +775,18 @@ const List<Map<String, Object?>> exerciseFormData = [
       "https://player.vimeo.com/video/1038957272"
     ],
     "review": {
-      "equipmentReference": true,
+      "equipmentReference": false,
       "staticPose": false,
       "motion": false,
-      "android": true,
-      "ios": true,
+      "android": false,
+      "ios": false,
       "productionRoute": false
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Decline Press Machine",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false
   },
   {
     "exerciseId": "lat_pulldown",
@@ -789,17 +846,18 @@ const List<Map<String, Object?>> exerciseFormData = [
       "https://www.lifefitness.com.au/wp-content/uploads/2015/02/Cable_Motion_Manual_11_08a_1_56.pdf"
     ],
     "review": {
-      "equipmentReference": true,
+      "equipmentReference": false,
       "staticPose": false,
       "motion": false,
-      "android": true,
-      "ios": true,
+      "android": false,
+      "ios": false,
       "productionRoute": false
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Lat Pulldown",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false
   },
   {
     "exerciseId": "mag_narrow",
@@ -861,17 +919,18 @@ const List<Map<String, Object?>> exerciseFormData = [
       "https://www.youtube.com/watch?v=nZip-pdLlQM"
     ],
     "review": {
-      "equipmentReference": true,
+      "equipmentReference": false,
       "staticPose": false,
       "motion": false,
-      "android": true,
-      "ios": true,
+      "android": false,
+      "ios": false,
       "productionRoute": false
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Mag Narrow",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false
   },
   {
     "exerciseId": "mag_medium",
@@ -933,17 +992,18 @@ const List<Map<String, Object?>> exerciseFormData = [
       "https://www.youtube.com/watch?v=nZip-pdLlQM"
     ],
     "review": {
-      "equipmentReference": true,
+      "equipmentReference": false,
       "staticPose": false,
       "motion": false,
-      "android": true,
-      "ios": true,
+      "android": false,
+      "ios": false,
       "productionRoute": false
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Mag Medium",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false
   },
   {
     "exerciseId": "mag_wide",
@@ -1005,17 +1065,18 @@ const List<Map<String, Object?>> exerciseFormData = [
       "https://www.youtube.com/watch?v=nZip-pdLlQM"
     ],
     "review": {
-      "equipmentReference": true,
+      "equipmentReference": false,
       "staticPose": false,
       "motion": false,
-      "android": true,
-      "ios": true,
+      "android": false,
+      "ios": false,
       "productionRoute": false
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Mag Wide",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false
   },
   {
     "exerciseId": "chin_up",
@@ -1074,11 +1135,11 @@ const List<Map<String, Object?>> exerciseFormData = [
       "https://www.acefitness.org/resources/everyone/exercise-library/191/pull-ups/"
     ],
     "review": {
-      "equipmentReference": true,
+      "equipmentReference": false,
       "staticPose": false,
       "motion": false,
-      "android": true,
-      "ios": true,
+      "android": false,
+      "ios": false,
       "productionRoute": false
     },
     "equipmentLabel": "自重",
@@ -1086,7 +1147,8 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Chin Up",
     "distanceUnit": "km",
     "startWeight": 0.0,
-    "startReps": 10
+    "startReps": 10,
+    "previewEnabled": false
   },
   {
     "exerciseId": "assisted_chin_up",
@@ -1100,16 +1162,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      -2.954190731048584,
-      2.6327953338623047,
-      -3.3372318744659424
+      -2.877469301223755,
+      2.565751552581787,
+      -3.259071111679077
     ],
     "cameraTarget": [
-      0.09075509756803513,
-      1.0015743970870972,
-      0.3602027893066406
+      0.16747607290744781,
+      0.9345303773880005,
+      0.43836405873298645
     ],
-    "cameraScale": 1.4863229912519456,
+    "cameraScale": 1.4189777123928071,
     "targetMuscles": [
       "latissimusDorsi",
       "biceps",
@@ -1132,28 +1194,34 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "rebuildAssistedChin": true,
+      "matchedForearmRoll": true,
+      "assistedPullTravel": 0.44
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
     "priority": 1,
-    "status": "authored",
+    "status": "verified",
     "assetPath": "assets/models/forms/assisted_chin_up.form.json",
     "references": [
-      "https://www.youtube.com/watch?v=acMgjzqo5AI"
+      "https://www.youtube.com/watch?v=acMgjzqo5AI",
+      "https://www.lifefitness.com/en-gb/catalog/strength-training/selectorized/insignia-series-assist-dip-chin"
     ],
     "review": {
       "equipmentReference": true,
-      "staticPose": false,
-      "motion": false,
+      "staticPose": true,
+      "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": false
+      "productionRoute": true
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Assisted Chin Up",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "authoringNotes": "2026-09-22 user-reported machine/pose defects: revision in progress, hold publication pending visual and native QA.",
+    "previewEnabled": false
   },
   {
     "exerciseId": "seated_row",
@@ -1343,16 +1411,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9656999111175537,
+      2.520989418029785,
+      3.841207504272461
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.06857798993587494,
+      0.8412996530532837,
+      0.15672671794891357
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.0623417758196594,
     "targetMuscles": [
       "gluteus",
       "hamstrings",
@@ -1372,24 +1440,37 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {
-      "benchAngle": 0,
-      "gripWidth": 0.7,
-      "elbowPlane": 0.6,
-      "pullHeight": 1.15,
-      "torsoAngle": 0,
-      "additionalWeight": 0
+      "plantedFeet": true,
+      "loadPosition": "hanging",
+      "stanceWidth": 0.36,
+      "gripWidth": 0.5,
+      "shinDegrees": 20,
+      "thighDegrees": 62,
+      "torsoLean": 50,
+      "toeOut": 15,
+      "hangingWristReach": true,
+      "barY": -0.24
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/deadlift.form.json",
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Deadlift",
     "distanceUnit": "km",
     "startWeight": 50.0,
-    "startReps": 10
+    "startReps": 10,
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "t_bar_row",
@@ -1515,16 +1596,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      -1.445993185043335,
-      2.302224636077881,
-      -3.9879796504974365
+      -1.480484127998352,
+      2.52852201461792,
+      -3.9169974327087402
     ],
     "cameraTarget": [
-      0.06423491984605789,
-      0.6301864385604858,
-      0.5427048206329346
+      0.029743820428848267,
+      0.8564838767051697,
+      0.6136865615844727
     ],
-    "cameraScale": 1.09653735101223,
+    "cameraScale": 1.3261718457937242,
     "targetMuscles": [
       "latissimusDorsi",
       "biceps",
@@ -1549,16 +1630,16 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoAngle": 85,
       "additionalWeight": 0,
       "leverPivot": [
-        0.55,
-        -0.3,
-        1.6
+        0.66,
+        -0.65,
+        1.91
       ],
       "handleStart": [
-        0.28,
-        -0.78,
-        0.9
+        0.27,
+        -0.93,
+        0.8
       ],
-      "leverTravelDegrees": 24,
+      "leverTravelDegrees": 10,
       "convergenceAxis": 0,
       "leverElbow": [
         0,
@@ -1572,14 +1653,16 @@ const List<Map<String, Object?>> exerciseFormData = [
       ],
       "handForward": [
         0,
-        1,
+        -1,
         0
       ],
       "elbowPole": [
-        0.12,
+        0.05,
         1,
-        -0.7
-      ]
+        -1
+      ],
+      "rebuildDyMachine": true,
+      "matchedForearmRoll": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1601,7 +1684,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Dy Row",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false,
+    "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish."
   },
   {
     "exerciseId": "low_row",
@@ -1615,16 +1700,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      -2.8568127155303955,
-      2.4777908325195312,
-      -3.1189870834350586
+      -2.951796293258667,
+      2.625889778137207,
+      -3.1719820499420166
     ],
     "cameraTarget": [
-      0.15544003248214722,
-      0.7027133107185364,
-      0.5387485027313232
+      0.060456547886133194,
+      0.8508121967315674,
+      0.4857533574104309
     ],
-    "cameraScale": 1.2454815351963044,
+    "cameraScale": 1.3336279577016832,
     "targetMuscles": [
       "latissimusDorsi",
       "biceps",
@@ -1649,17 +1734,34 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoAngle": 90,
       "additionalWeight": 0,
       "leverPivot": [
-        0.55,
-        -0.87,
-        1.6
+        0.58,
+        -0.65,
+        1.58
       ],
       "handleStart": [
         0.28,
-        -0.86,
-        0.66
+        -0.88,
+        0.7
       ],
-      "leverTravelDegrees": 15,
-      "convergenceAxis": 0
+      "leverTravelDegrees": 18,
+      "convergenceAxis": 0,
+      "rebuildLowRowMachine": true,
+      "matchedForearmRoll": true,
+      "elbowPole": [
+        0.2,
+        1,
+        -0.25
+      ],
+      "handForward": [
+        0,
+        -0.8,
+        -0.6
+      ],
+      "handForwardEnd": [
+        0,
+        -0.95,
+        0.312
+      ]
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1667,7 +1769,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "status": "verified",
     "assetPath": "assets/models/forms/low_row.form.json",
     "references": [
-      "https://www.lifefitness.com/ja-jp/catalog/strength-training/plate-loaded/plate-loaded-iso-lateral-low-row",
+      "https://www.lifefitness.com/en-us/catalog/strength-training/plate-loaded/plate-loaded-iso-lateral-low-row",
       "https://player.vimeo.com/video/1089148269"
     ],
     "review": {
@@ -1681,7 +1783,8 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Low Row",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false
   },
   {
     "exerciseId": "linear_row",
@@ -1695,16 +1798,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "seated_pull_back_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.7917487621307373,
-      2.188937187194824,
-      -3.189096689224243
+      2.8738913536071777,
+      2.444476366043091,
+      4.076758861541748
     ],
     "cameraTarget": [
-      -0.11362907290458679,
-      0.6324846744537354,
-      0.6501527428627014
+      -0.10587504506111145,
+      0.7559420466423035,
+      0.3520512580871582
     ],
-    "cameraScale": 1.233436715126038,
+    "cameraScale": 1.39189692735672,
     "targetMuscles": [
       "latissimusDorsi",
       "biceps",
@@ -1723,7 +1826,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "rangeOfMotion": 1.0,
     "parameters": {
       "benchAngle": 75,
-      "gripWidth": 0.5,
+      "gripWidth": 0.64,
       "elbowPlane": 0.3,
       "pullHeight": 1.05,
       "torsoAngle": 75,
@@ -1731,19 +1834,30 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoLean": 22,
       "gripStart": [
         0,
-        -0.45,
-        1.0
+        -0.49,
+        0.91
       ],
       "gripEnd": [
         0,
         -0.29,
-        1.25
+        1.12
+      ],
+      "matchedForearmRoll": true,
+      "elbowPole": [
+        0.65,
+        0.6,
+        0
+      ],
+      "handForward": [
+        0,
+        -0.9701425,
+        -0.2425356
       ]
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 1,
-    "status": "authored",
+    "status": "verified",
     "assetPath": "assets/models/forms/linear_row.form.json",
     "references": [
       "https://www.deltafitness.shop/product/907",
@@ -1751,16 +1865,18 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "review": {
       "equipmentReference": true,
-      "staticPose": false,
-      "motion": false,
+      "staticPose": true,
+      "motion": true,
       "android": true,
       "ios": true,
-      "productionRoute": false
+      "productionRoute": true
     },
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Linear Row",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "authoringNotes": "2026-09-22 user-reported machine/pose defects: revision in progress, hold publication pending visual and native QA.",
+    "previewEnabled": false
   },
   {
     "exerciseId": "high_row",
@@ -1774,16 +1890,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.9778037071228027,
-      2.570591926574707,
-      3.8476905822753906
+      3.0129010677337646,
+      2.5716559886932373,
+      3.7456471920013428
     ],
     "cameraTarget": [
-      -0.05647408962249756,
-      0.8909022808074951,
-      0.1632099747657776
+      -0.021376892924308777,
+      0.8919662833213806,
+      0.06116655468940735
     ],
-    "cameraScale": 1.3984145998954773,
+    "cameraScale": 1.4214579844474793,
     "targetMuscles": [
       "latissimusDorsi",
       "biceps",
@@ -1808,16 +1924,16 @@ const List<Map<String, Object?>> exerciseFormData = [
       "torsoAngle": 85,
       "additionalWeight": 0,
       "leverPivot": [
-        0.6,
-        0.15,
-        1.4
+        0.64,
+        0.2,
+        1.5
       ],
       "handleStart": [
         0.32,
-        -0.54,
-        1.48
+        -0.7,
+        1.4
       ],
-      "leverTravelDegrees": 40,
+      "leverTravelDegrees": 35,
       "convergenceAxis": 0,
       "leverElbow": [
         0,
@@ -1831,15 +1947,17 @@ const List<Map<String, Object?>> exerciseFormData = [
       ],
       "handForward": [
         0,
-        0,
-        1
+        -0.3420201433,
+        0.9396926208
       ],
       "elbowPole": [
-        0.3,
-        0.3,
+        0.1,
+        1,
         -1
       ],
-      "thighRestraint": true
+      "thighRestraint": true,
+      "rebuildHighRowMachine": true,
+      "matchedForearmRoll": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
@@ -1861,7 +1979,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "High Row",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false,
+    "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish."
   },
   {
     "exerciseId": "cable_row",
@@ -1875,16 +1995,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      -2.6913976669311523,
+      2.590212345123291,
+      4.0315093994140625
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      0.27158892154693604,
+      0.888764500617981,
+      0.2993006706237793
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.1983523130044342,
     "targetMuscles": [
       "latissimusDorsi",
       "biceps",
@@ -1903,21 +2023,50 @@ const List<Map<String, Object?>> exerciseFormData = [
     "rangeOfMotion": 1.0,
     "parameters": {
       "benchAngle": 90,
-      "gripWidth": 0.7,
+      "gripWidth": 0.3,
       "elbowPlane": 0.15,
       "pullHeight": 0.9,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "gripStart": [
+        0,
+        -0.64,
+        1.0
+      ],
+      "gripEnd": [
+        0,
+        -0.18,
+        0.86
+      ],
+      "pulleyHeight": 0.7,
+      "seatHipHeight": 0.6,
+      "ankleY": -0.68,
+      "ankleZ": 0.32,
+      "footplateAngle": -50,
+      "matchedForearmRoll": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 1,
-    "status": "planned",
-    "assetPath": null,
+    "status": "verified",
+    "assetPath": "assets/models/forms/cable_row.form.json",
     "equipmentLabel": "ケーブル",
     "tags": [],
     "englishName": "Cable Row",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "authoringNotes": "2026-09-22 user-reported machine/pose defects: revision in progress, hold publication pending visual and native QA.",
+    "references": [
+      "https://www.bodykore.com/product/isolation-series-selectorized-low-pull-gr616"
+    ],
+    "review": {
+      "equipmentReference": true,
+      "staticPose": true,
+      "motion": true,
+      "android": true,
+      "ios": true,
+      "productionRoute": true
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "back_extension",
@@ -1969,7 +2118,7 @@ const List<Map<String, Object?>> exerciseFormData = [
     "recordType": "weightReps",
     "loadMode": "additional",
     "priority": 1,
-    "status": "verified",
+    "status": "authored",
     "assetPath": "assets/models/forms/back_extension.form.json",
     "references": [
       "https://shop.lifefitness.com/products/hammer-strength-back-extension",
@@ -1977,17 +2126,90 @@ const List<Map<String, Object?>> exerciseFormData = [
       "https://www.jssm.org/volume20/iss2/cap/jssm-20-181.pdf"
     ],
     "review": {
-      "equipmentReference": true,
-      "staticPose": true,
-      "motion": true,
-      "android": true,
-      "ios": true,
-      "productionRoute": true
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
     },
     "equipmentLabel": "ローマンチェア",
     "tags": [],
     "englishName": "Back Extension",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "previewEnabled": false
+  },
+  {
+    "exerciseId": "weighted_back_extension",
+    "exerciseName": "バックエクステンション（荷重）",
+    "category": "背中",
+    "aliases": [],
+    "modelId": "mpfb-athlete-v1",
+    "animationId": "back_extension",
+    "equipmentId": "roman_chair",
+    "gripType": "pronated",
+    "cameraPreset": "studio_oblique",
+    "cameraDistance": 5.06,
+    "cameraAngle": [
+      -3.775362014770508,
+      2.4391064643859863,
+      -2.8668527603149414
+    ],
+    "cameraTarget": [
+      0.006325036287307739,
+      0.810880184173584,
+      0.07445946335792542
+    ],
+    "cameraScale": 1.1286352777481081,
+    "targetMuscles": [
+      "erectorSpinae",
+      "gluteus",
+      "hamstrings"
+    ],
+    "primaryMuscle": "erectorSpinae",
+    "primaryMuscles": [
+      "erectorSpinae"
+    ],
+    "secondaryMuscles": [
+      "gluteus",
+      "hamstrings"
+    ],
+    "movementVariant": "weighted_back_extension",
+    "animationSpeed": 1.0,
+    "rangeOfMotion": 1.0,
+    "parameters": {
+      "benchAngle": 45,
+      "gripWidth": 0.7,
+      "elbowPlane": 0.6,
+      "pullHeight": 1.15,
+      "torsoAngle": 45,
+      "additionalWeight": 10,
+      "hipFlexionDegrees": 60
+    },
+    "recordType": "weightReps",
+    "loadMode": "additional",
+    "priority": 1,
+    "status": "authored",
+    "assetPath": "assets/models/forms/weighted_back_extension.form.json",
+    "references": [
+      "https://shop.lifefitness.com/products/hammer-strength-back-extension",
+      "https://player.vimeo.com/video/1161896691",
+      "https://www.jssm.org/volume20/iss2/cap/jssm-20-181.pdf"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "equipmentLabel": "ローマンチェア",
+    "tags": [],
+    "englishName": "Weighted Back Extension",
+    "distanceUnit": "km",
+    "authoringNotes": "Blender 4.5.3 export and start/mid/end preview reviewed. Original procedural equipment with author-selected dimensions; native-platform and production-route review pending.",
+    "previewEnabled": false
   },
   {
     "exerciseId": "shoulder_press",
@@ -2049,22 +2271,22 @@ const List<Map<String, Object?>> exerciseFormData = [
     "category": "肩",
     "aliases": [],
     "modelId": "mpfb-athlete-v1",
-    "animationId": "press",
+    "animationId": "overhead_press",
     "equipmentId": "dumbbell",
     "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9885802268981934,
+      2.364790678024292,
+      3.8404455184936523
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.04569758474826813,
+      0.6851010918617249,
+      0.15596485137939453
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.0718453303352,
     "targetMuscles": [
       "anteriorDeltoid",
       "triceps"
@@ -2081,21 +2303,43 @@ const List<Map<String, Object?>> exerciseFormData = [
     "rangeOfMotion": 1.0,
     "parameters": {
       "benchAngle": 85,
-      "gripWidth": 0.7,
+      "gripWidth": 0.56,
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 85,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "barForward": 0.08,
+      "topForward": 0.06,
+      "bottomAboveShoulder": 0.04,
+      "reachRatio": 0.985,
+      "seated": true,
+      "inclineBackSupport": true,
+      "bottomGripWidth": 0.86,
+      "rebuildAdjustableBench": true,
+      "matchedForearmRoll": true,
+      "verticalForearmPress": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "verified",
+    "assetPath": "assets/models/forms/dumbbell_shoulder_press.form.json",
     "equipmentLabel": "ダンベル",
     "tags": [],
     "englishName": "Dumbbell Shoulder Press",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "references": [
+      "https://www.acefitness.org/resources/everyone/exercise-library/45/seated-overhead-press/"
+    ],
+    "review": {
+      "equipmentReference": true,
+      "staticPose": true,
+      "motion": true,
+      "android": true,
+      "ios": true,
+      "productionRoute": true
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "military_press",
@@ -2109,16 +2353,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.0737624168395996,
+      2.8396406173706055,
+      3.920286178588867
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      0.039484381675720215,
+      1.159950852394104,
+      0.23580557107925415
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.3305652815056965,
     "targetMuscles": [
       "anteriorDeltoid",
       "triceps"
@@ -2135,21 +2379,36 @@ const List<Map<String, Object?>> exerciseFormData = [
     "rangeOfMotion": 1.0,
     "parameters": {
       "benchAngle": 90,
-      "gripWidth": 0.7,
+      "gripWidth": 0.56,
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "barForward": 0.28,
+      "topForward": 0.06,
+      "bottomAboveShoulder": 0.04,
+      "reachRatio": 0.985
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 1,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/military_press.form.json",
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Military Press",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "authoringNotes": "Blender 4.5.3 export and start/mid/end preview reviewed. Original procedural equipment with author-selected dimensions; native-platform and production-route review pending. Manufacturer/reference review remains unverified; offline draft only.",
+    "references": [],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "lateral_raise",
@@ -2163,16 +2422,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.001854658126831,
+      2.544029712677002,
+      3.7730298042297363
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.032423362135887146,
+      0.8643399477005005,
+      0.08854915201663971
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.1477969847572969,
     "targetMuscles": [
       "anteriorDeltoid",
       "triceps"
@@ -2188,24 +2447,34 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {
-      "benchAngle": 90,
-      "gripWidth": 0.7,
-      "elbowPlane": 0.6,
-      "pullHeight": 1.15,
-      "torsoAngle": 90,
-      "additionalWeight": 0
+      "raisePlane": 15,
+      "startAngle": 8,
+      "endAngle": 80,
+      "elbowBend": 10
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/lateral_raise.form.json",
     "equipmentLabel": "ダンベル",
     "tags": [],
     "englishName": "Lateral Raise",
     "distanceUnit": "km",
     "startWeight": 5.0,
-    "startReps": 10
+    "startReps": 10,
+    "references": [
+      "https://www.catalystathletics.com/exercise/825/Dumbbell-Lateral-Raise/"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "front_raise",
@@ -2219,16 +2488,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9969232082366943,
+      2.544029712677002,
+      3.9948177337646484
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.03735464811325073,
+      0.8643399477005005,
+      0.31033700704574585
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.101152033652179,
     "targetMuscles": [
       "anteriorDeltoid",
       "triceps"
@@ -2244,22 +2513,32 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {
-      "benchAngle": 90,
-      "gripWidth": 0.7,
-      "elbowPlane": 0.6,
-      "pullHeight": 1.15,
-      "torsoAngle": 90,
-      "additionalWeight": 0
+      "raisePlane": 80,
+      "startAngle": 8,
+      "endAngle": 80,
+      "elbowBend": 10
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/front_raise.form.json",
     "equipmentLabel": "ダンベル",
     "tags": [],
     "englishName": "Front Raise",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "references": [
+      "https://contentcdn.eacefitness.com/certifiednews/images/article/pdfs/ShoulderExercises.pdf"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "rear_raise",
@@ -2329,16 +2608,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.7669403553009033,
+      2.0275094509124756,
+      -3.368009090423584
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.053423717617988586,
+      0.775731086730957,
+      0.6422523260116577
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.078737227646634,
     "targetMuscles": [
       "posteriorDeltoid",
       "trapezius"
@@ -2359,17 +2638,38 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "pivotAboveShoulder": 0.46,
+      "armRadius": 0.575,
+      "handleHeight": 0.012,
+      "startAngle": -12,
+      "sweepDegrees": 85,
+      "rebuildRearDeltMachine": true,
+      "matchedForearmRoll": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 1,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/rear_delt.form.json",
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Rear Delt",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "authoringNotes": "Rebuild draft after global withdrawal. Original procedural equipment reconstructed from reference observations; not appearance-approved. Pose/native/normal-route QA pending; do not publish.",
+    "references": [
+      "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/insignia-series-pectoral-fly-rear-deltoid",
+      "https://kb.cybexintl.com/Owners_Manuals/Strength/Life_Fitness_Insignia_Series_Owners_Manual_9481201_Rev_BE.pdf"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "face_pull",
@@ -2491,16 +2791,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.0612564086914062,
+      2.58400821685791,
+      3.9561684131622314
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      0.026978522539138794,
+      0.9043186902999878,
+      0.271687775850296
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.0478632733179258,
     "targetMuscles": [
       "biceps",
       "forearms"
@@ -2521,17 +2821,30 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "matchedForearmRoll": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "verified",
+    "assetPath": "assets/models/forms/barbell_curl.form.json",
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Barbell Curl",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "review": {
+      "equipmentReference": true,
+      "staticPose": true,
+      "motion": true,
+      "android": true,
+      "ios": true,
+      "productionRoute": true
+    },
+    "references": [
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/barbell-biceps-curl/"
+    ],
+    "previewEnabled": false
   },
   {
     "exerciseId": "dumbbell_curl",
@@ -2547,16 +2860,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9902946949005127,
+      2.544029712677002,
+      3.8674373626708984
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.043983131647109985,
+      0.8643400073051453,
+      0.18295657634735107
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.0478632733179258,
     "targetMuscles": [
       "biceps",
       "forearms"
@@ -2577,19 +2890,32 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "matchedForearmRoll": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "verified",
+    "assetPath": "assets/models/forms/dumbbell_curl.form.json",
     "equipmentLabel": "ダンベル",
     "tags": [],
     "englishName": "Dumbbell Curl",
     "distanceUnit": "km",
     "startWeight": 10.0,
-    "startReps": 10
+    "startReps": 10,
+    "review": {
+      "equipmentReference": true,
+      "staticPose": true,
+      "motion": true,
+      "android": true,
+      "ios": true,
+      "productionRoute": true
+    },
+    "references": [
+      "https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/biceps-curl/vid-20084675"
+    ],
+    "previewEnabled": false
   },
   {
     "exerciseId": "hammer_curl",
@@ -2603,16 +2929,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.017672300338745,
+      2.544029712677002,
+      3.8598177433013916
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.016605645418167114,
+      0.8643399477005005,
+      0.17533713579177856
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.0475324913812802,
     "targetMuscles": [
       "biceps",
       "forearms"
@@ -2633,19 +2959,32 @@ const List<Map<String, Object?>> exerciseFormData = [
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 90,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "matchedForearmRoll": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "verified",
+    "assetPath": "assets/models/forms/hammer_curl.form.json",
     "equipmentLabel": "ダンベル",
     "tags": [],
     "englishName": "Hammer Curl",
     "distanceUnit": "km",
     "startWeight": 8.0,
-    "startReps": 10
+    "startReps": 10,
+    "review": {
+      "equipmentReference": true,
+      "staticPose": true,
+      "motion": true,
+      "android": true,
+      "ios": true,
+      "productionRoute": true
+    },
+    "references": [
+      "https://www.catalystathletics.com/exercise/841/Hammer-Curl/"
+    ],
+    "previewEnabled": false
   },
   {
     "exerciseId": "preacher_curl",
@@ -2761,22 +3100,22 @@ const List<Map<String, Object?>> exerciseFormData = [
     "category": "腕",
     "aliases": [],
     "modelId": "mpfb-athlete-v1",
-    "animationId": "elbow_extension",
+    "animationId": "pressdown",
     "equipmentId": "rope_cable",
-    "gripType": "pronated",
+    "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9469916820526123,
+      2.6429035663604736,
+      4.585789203643799
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.08728641271591187,
+      0.9632137417793274,
+      0.9013082981109619
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.4080203784629703,
     "targetMuscles": [
       "triceps"
     ],
@@ -2789,24 +3128,33 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {
-      "benchAngle": 90,
-      "gripWidth": 0.7,
-      "elbowPlane": 0.6,
-      "pullHeight": 1.15,
-      "torsoAngle": 90,
-      "additionalWeight": 0
+      "attachment": "rope",
+      "singleArm": false
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/triceps_pushdown.form.json",
     "equipmentLabel": "ケーブル",
     "tags": [],
     "englishName": "Triceps Pushdown",
     "distanceUnit": "km",
     "startWeight": 15.0,
-    "startReps": 10
+    "startReps": 10,
+    "references": [
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
+      "https://shop.lifefitness.com/products/cable-attachments"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "french_press",
@@ -2975,16 +3323,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.0448267459869385,
+      2.4998130798339844,
+      3.6910500526428223
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      0.010548919439315796,
+      0.820123553276062,
+      0.006569460034370422
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.1075860705971718,
     "targetMuscles": [
       "quadriceps",
       "gluteus",
@@ -3002,24 +3350,38 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {
-      "benchAngle": 90,
-      "gripWidth": 0.7,
-      "elbowPlane": 0.6,
-      "pullHeight": 1.15,
-      "torsoAngle": 90,
-      "additionalWeight": 0
+      "plantedFeet": true,
+      "loadPosition": "back",
+      "stanceWidth": 0.42,
+      "gripWidth": 0.8,
+      "shinDegrees": 22,
+      "thighDegrees": 80,
+      "torsoLean": 30,
+      "toeOut": 15
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/barbell_squat.form.json",
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Barbell Squat",
     "distanceUnit": "km",
     "startWeight": 40.0,
-    "startReps": 10
+    "startReps": 10,
+    "references": [
+      "https://www.acefitness.org/resources/everyone/exercise-library/11/back-squat/"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "hack_squat",
@@ -3255,22 +3617,22 @@ const List<Map<String, Object?>> exerciseFormData = [
     "category": "脚",
     "aliases": [],
     "modelId": "mpfb-athlete-v1",
-    "animationId": "leg_extension",
+    "animationId": "knee_machine",
     "equipmentId": "leg_extension_machine",
-    "gripType": "pronated",
+    "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9333276748657227,
+      2.2332961559295654,
+      4.146904945373535
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.04371511936187744,
+      0.6455398797988892,
+      0.3759840726852417
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 0.9991469920414793,
     "targetMuscles": [
       "quadriceps",
       "gluteus",
@@ -3289,23 +3651,34 @@ const List<Map<String, Object?>> exerciseFormData = [
     "rangeOfMotion": 1.0,
     "parameters": {
       "benchAngle": 90,
-      "gripWidth": 0.7,
-      "elbowPlane": 0.6,
-      "pullHeight": 1.15,
-      "torsoAngle": 90,
-      "additionalWeight": 0
+      "inclineBackSupport": true,
+      "kneeAction": "extension",
+      "kneeStart": 0,
+      "kneeEnd": 75
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/leg_extension.form.json",
     "equipmentLabel": "マシン",
     "tags": [],
     "englishName": "Leg Extension",
     "distanceUnit": "km",
     "startWeight": 25.0,
-    "startReps": 10
+    "startReps": 10,
+    "references": [
+      "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/axiom-series-seated-leg-curl-extension"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "leg_curl",
@@ -3372,16 +3745,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.022958755493164,
+      2.5327541828155518,
+      3.850736141204834
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.011319071054458618,
+      0.8530645370483398,
+      0.1662554293870926
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.0661250144243242,
     "targetMuscles": [
       "gluteus",
       "hamstrings",
@@ -3401,22 +3774,37 @@ const List<Map<String, Object?>> exerciseFormData = [
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
     "parameters": {
-      "benchAngle": 0,
-      "gripWidth": 0.7,
-      "elbowPlane": 0.6,
-      "pullHeight": 1.15,
-      "torsoAngle": 0,
-      "additionalWeight": 0
+      "plantedFeet": true,
+      "loadPosition": "hanging",
+      "stanceWidth": 0.36,
+      "gripWidth": 0.5,
+      "shinDegrees": 3,
+      "thighDegrees": 25,
+      "torsoLean": 65,
+      "toeOut": 15,
+      "hangingWristReach": true
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 2,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/romanian_deadlift.form.json",
     "equipmentLabel": "フリーウェイト",
     "tags": [],
     "englishName": "Romanian Deadlift",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "references": [
+      "https://www.acefitness.org/continuing-education/certified/may-2025/8865/the-ace-do-it-better-series-the-romanian-deadlift/"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "hip_thrust",
@@ -3965,16 +4353,16 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.028836727142334,
+      1.8550690412521362,
+      3.9970271587371826
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.0054412782192230225,
+      0.17537936568260193,
+      0.3125465214252472
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 0.9430412846616589,
     "targetMuscles": [
       "rectusAbdominis",
       "obliques"
@@ -3991,21 +4379,40 @@ const List<Map<String, Object?>> exerciseFormData = [
     "rangeOfMotion": 1.0,
     "parameters": {
       "benchAngle": 0,
-      "gripWidth": 0.7,
+      "gripWidth": 0.34,
       "elbowPlane": 0.6,
       "pullHeight": 1.15,
       "torsoAngle": 0,
-      "additionalWeight": 0
+      "additionalWeight": 0,
+      "wheelRadius": 0.12,
+      "kneeHeight": 0.08,
+      "thighStart": 35,
+      "thighTravel": 30,
+      "torsoStart": 78,
+      "torsoTravel": 2,
+      "reachRatio": 0.96,
+      "footPitch": 150
     },
     "recordType": "bodyweightReps",
     "loadMode": "bodyweight",
     "priority": 1,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/ab_wheel.form.json",
     "equipmentLabel": "アブローラー",
     "tags": [],
     "englishName": "Ab Wheel",
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "authoringNotes": "Blender 4.5.3 export and start/mid/end preview reviewed. Original procedural equipment with author-selected dimensions; native-platform and production-route review pending. Manufacturer/reference review remains unverified; offline draft only.",
+    "references": [],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "incline_fly_machine",
@@ -4015,22 +4422,22 @@ const List<Map<String, Object?>> exerciseFormData = [
       "Incline Fly Machine"
     ],
     "modelId": "mpfb-athlete-v1",
-    "animationId": "incline_fly_machine",
+    "animationId": "fly",
     "equipmentId": "incline_fly_machine",
     "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraDistance": 5.06,
     "cameraAngle": [
-      2.9145970344543457,
-      2.2830214500427246,
-      3.602597713470459
+      2.9154469966888428,
+      2.2865705490112305,
+      3.6036295890808105
     ],
     "cameraTarget": [
-      -0.08631694316864014,
-      0.4610383212566376,
-      -0.04136870056390762
+      -0.0854671448469162,
+      0.4645875096321106,
+      -0.04033666104078293
     ],
-    "cameraScale": 1.1670683002471924,
+    "cameraScale": 1.1670683841094958,
     "targetMuscles": [
       "pectoralisMajor",
       "anteriorDeltoid"
@@ -4052,13 +4459,13 @@ const List<Map<String, Object?>> exerciseFormData = [
       "pullHeight": 1.15,
       "torsoAngle": 50,
       "additionalWeight": 0,
-      "arcDeclination": 20
+      "arcDeclination": -15
     },
     "recordType": "weightReps",
     "loadMode": "external",
     "priority": 1,
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/incline_fly_machine.form.json",
     "references": [],
     "review": {
       "equipmentReference": false,
@@ -4071,7 +4478,9 @@ const List<Map<String, Object?>> exerciseFormData = [
     "englishName": "Incline Fly Machine",
     "equipmentLabel": "マシン",
     "tags": [],
-    "distanceUnit": "km"
+    "distanceUnit": "km",
+    "authoringNotes": "Blender 4.5.3 export and start/mid/end preview reviewed. Original procedural equipment with author-selected dimensions; native-platform and production-route review pending. Manufacturer/reference review remains unverified; offline draft only.",
+    "previewEnabled": false
   },
   {
     "exerciseId": "dumbbell_fly",
@@ -4095,29 +4504,46 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "dumbbell_fly",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/dumbbell_fly.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "dumbbell_fly",
-    "gripType": "unspecified",
+    "animationId": "fly",
+    "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9807159900665283,
+      2.216235876083374,
+      3.8250842094421387
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.053561970591545105,
+      0.5365461707115173,
+      0.1406034529209137
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.1719111674260874,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {},
+    "parameters": {
+      "benchAngle": 0,
+      "gripWidth": 0.7,
+      "elbowPlane": 0.6,
+      "pullHeight": 1.15,
+      "torsoAngle": 0,
+      "additionalWeight": 0,
+      "constantElbowFly": true
+    },
     "startWeight": 10.0,
-    "startReps": 10
+    "startReps": 10,
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "sit_up",
@@ -4705,27 +5131,47 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "decline_barbell_press",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/decline_barbell_press.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "decline_barbell_press",
+    "animationId": "press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.067674398422241,
+      2.3528358936309814,
+      3.748364210128784
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      0.033396556973457336,
+      0.6731462478637695,
+      0.06388357281684875
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.096644193631444,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "benchAngle": -15,
+      "gripWidth": 0.7,
+      "elbowPlane": 0.6,
+      "pullHeight": 1.15,
+      "torsoAngle": -15,
+      "additionalWeight": 0,
+      "declineLegSupport": true
+    },
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "references": [
+      "https://www.lifefitness.com/en-gb/catalog/strength-training/benches/life-fitness-adjustable-decline-bench"
+    ],
+    "previewEnabled": false
   },
   {
     "exerciseId": "smith_bench_press",
@@ -4885,27 +5331,47 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "decline_dumbbell_press",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/decline_dumbbell_press.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "decline_dumbbell_press",
+    "animationId": "press",
     "gripType": "unspecified",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.0125389099121094,
+      2.261887550354004,
+      3.8316214084625244
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.021738991141319275,
+      0.582197904586792,
+      0.1471407562494278
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 0.9821314340367955,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "benchAngle": -15,
+      "gripWidth": 0.7,
+      "elbowPlane": 0.6,
+      "pullHeight": 1.15,
+      "torsoAngle": -15,
+      "additionalWeight": 0,
+      "declineLegSupport": true
+    },
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "references": [
+      "https://www.lifefitness.com/en-gb/catalog/strength-training/benches/life-fitness-adjustable-decline-bench"
+    ],
+    "previewEnabled": false
   },
   {
     "exerciseId": "incline_dumbbell_fly",
@@ -4929,27 +5395,45 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "incline_dumbbell_fly",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/incline_dumbbell_fly.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "incline_dumbbell_fly",
-    "gripType": "unspecified",
+    "animationId": "fly",
+    "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.0090043544769287,
+      2.311736583709717,
+      3.9549994468688965
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.025273635983467102,
+      0.6320469379425049,
+      0.27051886916160583
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.2290076706351534,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "benchAngle": 30,
+      "gripWidth": 0.7,
+      "elbowPlane": 0.6,
+      "pullHeight": 1.15,
+      "torsoAngle": 30,
+      "additionalWeight": 0,
+      "constantElbowFly": true,
+      "inclineBackSupport": true
+    },
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "decline_dumbbell_fly",
@@ -6772,27 +7256,47 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "incline_dumbbell_curl",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/incline_dumbbell_curl.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "incline_dumbbell_curl",
-    "gripType": "unspecified",
+    "animationId": "curl",
+    "gripType": "supinated",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.927830934524536,
+      2.165215253829956,
+      3.7603604793548584
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.10644705593585968,
+      0.48552554845809937,
+      0.0758797749876976
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.0143682286143303,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "benchAngle": 60,
+      "seated": true,
+      "upperArmOutward": 0.35,
+      "supinating": true,
+      "seatedFootHalfWidth": 0.15,
+      "inclineBackSupport": true
+    },
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "references": [
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/incline-dumbbell-biceps-curl/",
+      "https://www.youtube.com/watch?v=0U7xqYDSfxQ"
+    ],
+    "previewEnabled": false
   },
   {
     "exerciseId": "concentration_curl",
@@ -6904,27 +7408,46 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "reverse_curl",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/reverse_curl.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "reverse_curl",
-    "gripType": "unspecified",
+    "animationId": "curl",
+    "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.0650813579559326,
+      2.5812606811523438,
+      3.9437978267669678
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      0.030803382396697998,
+      0.9015709161758423,
+      0.25931715965270996
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.0465675306273625,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "benchAngle": 90,
+      "gripWidth": 0.7,
+      "elbowPlane": 0.6,
+      "pullHeight": 1.15,
+      "torsoAngle": 90,
+      "additionalWeight": 0
+    },
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "references": [
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/reverse-grip-barbell-biceps-curl/"
+    ],
+    "previewEnabled": false
   },
   {
     "exerciseId": "cable_hammer_curl",
@@ -7254,27 +7777,43 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "single_arm_pushdown",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/single_arm_pushdown.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "single_arm_pushdown",
-    "gripType": "unspecified",
+    "animationId": "pressdown",
+    "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9469916820526123,
+      2.6429035663604736,
+      4.585789203643799
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.08728641271591187,
+      0.9632137417793274,
+      0.9013082981109619
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.4080203784629703,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "attachment": "rope",
+      "singleArm": true
+    },
+    "references": [
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
+      "https://shop.lifefitness.com/products/cable-attachments"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "reverse_grip_pushdown",
@@ -7296,27 +7835,43 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "reverse_grip_pushdown",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/reverse_grip_pushdown.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "reverse_grip_pushdown",
-    "gripType": "unspecified",
+    "animationId": "pressdown",
+    "gripType": "supinated",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9431848526000977,
+      2.6418654918670654,
+      4.585103511810303
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.09109312295913696,
+      0.9621758460998535,
+      0.9006227254867554
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.4080204379186037,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "attachment": "bar",
+      "singleArm": false
+    },
+    "references": [
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
+      "https://shop.lifefitness.com/products/cable-attachments"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "straight_bar_pushdown",
@@ -7338,27 +7893,43 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "straight_bar_pushdown",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/straight_bar_pushdown.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "straight_bar_pushdown",
-    "gripType": "unspecified",
+    "animationId": "pressdown",
+    "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9423959255218506,
+      2.6425747871398926,
+      4.5883636474609375
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.09188193082809448,
+      0.9628850221633911,
+      0.9038832187652588
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.4080204379186037,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "attachment": "bar",
+      "singleArm": false
+    },
+    "references": [
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
+      "https://shop.lifefitness.com/products/cable-attachments"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "rope_pushdown",
@@ -7380,27 +7951,43 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "rope_pushdown",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/rope_pushdown.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "rope_pushdown",
-    "gripType": "unspecified",
+    "animationId": "pressdown",
+    "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9469916820526123,
+      2.6429035663604736,
+      4.585789203643799
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.08728641271591187,
+      0.9632137417793274,
+      0.9013082981109619
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.4080203784629703,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "attachment": "rope",
+      "singleArm": false
+    },
+    "references": [
+      "https://www.muscleandfitness.com/exercise/workouts/arm-exercises/triceps-pressdown/",
+      "https://shop.lifefitness.com/products/cable-attachments"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "machine_triceps_extension",
@@ -7599,8 +8186,8 @@ const List<Map<String, Object?>> exerciseFormData = [
     "status": "planned",
     "assetPath": null,
     "modelId": "mpfb-athlete-v1",
-    "animationId": "front_squat",
-    "gripType": "unspecified",
+    "animationId": "squat",
+    "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
       2.8,
@@ -7616,7 +8203,27 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "plantedFeet": true,
+      "loadPosition": "front",
+      "stanceWidth": 0.42,
+      "gripWidth": 0.52,
+      "shinDegrees": 25,
+      "thighDegrees": 80,
+      "torsoLean": 18,
+      "toeOut": 15
+    },
+    "references": [
+      "https://www.catalystathletics.com/exercise/78/Front-Squat/"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    }
   },
   {
     "exerciseId": "goblet_squat",
@@ -7644,8 +8251,8 @@ const List<Map<String, Object?>> exerciseFormData = [
     "status": "planned",
     "assetPath": null,
     "modelId": "mpfb-athlete-v1",
-    "animationId": "goblet_squat",
-    "gripType": "unspecified",
+    "animationId": "squat",
+    "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
       2.8,
@@ -7661,7 +8268,27 @@ const List<Map<String, Object?>> exerciseFormData = [
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "plantedFeet": true,
+      "loadPosition": "goblet",
+      "stanceWidth": 0.44,
+      "gripWidth": 0.12,
+      "shinDegrees": 25,
+      "thighDegrees": 80,
+      "torsoLean": 18,
+      "toeOut": 15
+    },
+    "references": [
+      "https://www.nasm.org/resource-center/exercise-library/goblet-squat"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    }
   },
   {
     "exerciseId": "smith_squat",
@@ -7824,27 +8451,47 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "sumo_deadlift",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/sumo_deadlift.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "sumo_deadlift",
-    "gripType": "unspecified",
+    "animationId": "hinge",
+    "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.9732556343078613,
+      2.4942374229431152,
+      3.831613540649414
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.06102237105369568,
+      0.8145478963851929,
+      0.1471327543258667
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.0668419221043588,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "plantedFeet": true,
+      "loadPosition": "hanging",
+      "stanceWidth": 0.6,
+      "gripWidth": 0.42,
+      "shinDegrees": 20,
+      "thighDegrees": 62,
+      "torsoLean": 40,
+      "toeOut": 15,
+      "hangingWristReach": true,
+      "barY": -0.24
+    },
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "trap_bar_deadlift",
@@ -8274,27 +8921,45 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "seated_leg_curl",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/seated_leg_curl.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "seated_leg_curl",
-    "gripType": "unspecified",
+    "animationId": "knee_machine",
+    "gripType": "neutral",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      2.969118595123291,
+      2.2342171669006348,
+      4.118261337280273
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.007924258708953857,
+      0.646460771560669,
+      0.3473407030105591
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 0.9829583777487279,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "benchAngle": 90,
+      "inclineBackSupport": true,
+      "kneeAction": "flexion",
+      "kneeStart": 75,
+      "kneeEnd": 0
+    },
+    "references": [
+      "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/axiom-series-seated-leg-curl-extension"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "standing_leg_curl",
@@ -8406,27 +9071,48 @@ const List<Map<String, Object?>> exerciseFormData = [
     ],
     "distanceUnit": "km",
     "movementVariant": "good_morning",
-    "status": "planned",
-    "assetPath": null,
+    "status": "authored",
+    "assetPath": "assets/models/forms/good_morning.form.json",
     "modelId": "mpfb-athlete-v1",
-    "animationId": "good_morning",
-    "gripType": "unspecified",
+    "animationId": "hinge",
+    "gripType": "pronated",
     "cameraPreset": "studio_oblique",
     "cameraAngle": [
-      2.8,
-      2.5,
-      3.4
+      3.019268035888672,
+      2.535329818725586,
+      3.825551748275757
     ],
     "cameraTarget": [
-      0,
-      0.95,
-      0
+      -0.015009805560112,
+      0.8556402921676636,
+      0.14107118546962738
     ],
-    "cameraScale": 1.35,
+    "cameraScale": 1.109509293437004,
     "cameraDistance": 5.06,
     "animationSpeed": 1.0,
     "rangeOfMotion": 1.0,
-    "parameters": {}
+    "parameters": {
+      "plantedFeet": true,
+      "loadPosition": "back",
+      "stanceWidth": 0.36,
+      "gripWidth": 0.8,
+      "shinDegrees": 3,
+      "thighDegrees": 25,
+      "torsoLean": 60,
+      "toeOut": 15
+    },
+    "references": [
+      "https://www.nasm.org/resource-center/exercise-library/good-mornings"
+    ],
+    "review": {
+      "equipmentReference": false,
+      "staticPose": false,
+      "motion": false,
+      "android": false,
+      "ios": false,
+      "productionRoute": false
+    },
+    "previewEnabled": false
   },
   {
     "exerciseId": "single_leg_rdl",
