@@ -80,7 +80,7 @@ object RestTimerState {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle("MUSCLEMORY · 休憩タイマー")
             .setContentText(p.getString("exerciseName", "")).setContentIntent(open)
-            .setCategory(Notification.CATEGORY_STOPWATCH).setVisibility(Notification.VISIBILITY_PUBLIC)
+            .setCategory(Notification.CATEGORY_STATUS).setVisibility(Notification.VISIBILITY_PUBLIC)
             .setOngoing(true).setOnlyAlertOnce(true).setWhen(deadline).setShowWhen(true).setUsesChronometer(true)
             .addAction(Notification.Action.Builder(null, "停止", actionIntent(STOP, 7343)).build())
             .addAction(Notification.Action.Builder(null, "+30秒", actionIntent(EXTEND, 7344)).build())

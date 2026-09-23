@@ -60,6 +60,7 @@ import UserNotifications
               DispatchQueue.main.async {
                 result([
                   "playing": feedback.isPlaying,
+                  "liveActivities": RestTimerDisplay.shared.activityCount(),
                   "authorization": settings.authorizationStatus.rawValue,
                   "applicationState": UIApplication.shared.applicationState.rawValue,
                   "pending": pending.filter { $0.identifier.hasPrefix("musclemory_rest_timer") }.map {
@@ -74,6 +75,17 @@ import UserNotifications
         return
       }
       #endif
+      if call.method == "state" { result(RestTimerDisplay.shared.snapshot()); return }
+      if call.method == "cancel" {
+        let args = call.arguments as? [String: Any]
+        RestTimerDisplay.shared.cancel(remaining: (args?["remainingSeconds"] as? Int) ?? 0)
+      }
+      if call.method == "schedule", let args = call.arguments as? [String: Any] {
+        let deadline = (args["endsAtMilliseconds"] as? NSNumber).map {
+          Date(timeIntervalSince1970: $0.doubleValue / 1000)
+        } ?? Date().addingTimeInterval(TimeInterval(args["seconds"] as? Int ?? 1))
+        RestTimerDisplay.shared.schedule(deadline: deadline, name: args["exerciseName"] as? String ?? "")
+      }
       if call.method == "playCompletionFeedback" {
         notifications.presentCompletion(result: result)
         return

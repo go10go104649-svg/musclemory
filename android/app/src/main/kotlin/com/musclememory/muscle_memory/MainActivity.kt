@@ -52,6 +52,17 @@ class MainActivity : FlutterActivity() {
                             }
                         }
                     }
+                    "debugRestAction" -> {
+                        if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE == 0) result.notImplemented()
+                        else {
+                            val action = call.argument<String>("action")
+                            val p = getSharedPreferences("rest_timer", MODE_PRIVATE)
+                            RestTimerState.action(this, Intent(this, RestTimerReceiver::class.java)
+                                .setAction(if (action == "extend") RestTimerState.EXTEND else RestTimerState.STOP)
+                                .putExtra("timerId", p.getString("timerId", "")))
+                            result.success(null)
+                        }
+                    }
                     "debugStatus" -> {
                         if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE == 0) {
                             result.notImplemented()
@@ -104,6 +115,11 @@ class MainActivity : FlutterActivity() {
                     result.error("image_save_failed", error.localizedMessage, null)
                 }
             }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 7342) RestTimerState.show(this)
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {

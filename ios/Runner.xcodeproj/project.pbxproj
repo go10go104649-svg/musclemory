@@ -16,6 +16,11 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+AB0923000000000000000006 = {isa = PBXBuildFile; fileRef = AB0923000000000000000001; };
+AB0923000000000000000007 = {isa = PBXBuildFile; fileRef = AB0923000000000000000002; };
+AB0923000000000000000008 = {isa = PBXBuildFile; fileRef = AB0923000000000000000001; };
+AB0923000000000000000009 = {isa = PBXBuildFile; fileRef = AB0923000000000000000003; };
+AB092300000000000000000A = {isa = PBXBuildFile; fileRef = AB0923000000000000000005; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,6 +31,7 @@
 			remoteGlobalIDString = 97C146ED1CF9000F007C117D;
 			remoteInfo = Runner;
 		};
+AB0923000000000000000015 = {isa = PBXContainerItemProxy; containerPortal = 97C146E61CF9000F007C117D; proxyType = 1; remoteGlobalIDString = AB092300000000000000000B; remoteInfo = RestTimerWidget; };
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,6 +45,7 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+AB0923000000000000000014 = {isa = PBXCopyFilesBuildPhase; buildActionMask = 2147483647; dstPath = ""; dstSubfolderSpec = 13; files = (AB092300000000000000000A, ); name = "Embed App Extensions"; runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +66,12 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+AB0923000000000000000001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Runner/RestTimerAttributes.swift; sourceTree = SOURCE_ROOT; };
+AB0923000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Runner/RestTimerDisplay.swift; sourceTree = SOURCE_ROOT; };
+AB0923000000000000000003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerWidget.swift; sourceTree = "<group>"; };
+AB0923000000000000000004 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+AB0923000000000000000005 = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; path = RestTimerWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+AB0923000000000000000017 = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +83,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+AB092300000000000000000E = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -96,6 +110,7 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
+AB092300000000000000000C,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
@@ -107,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
+AB0923000000000000000005,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
 			);
 			name = Products;
@@ -128,6 +144,7 @@
 			path = Runner;
 			sourceTree = "<group>";
 		};
+AB092300000000000000000C = {isa = PBXGroup; children = (AB0923000000000000000001, AB0923000000000000000002, AB0923000000000000000003, AB0923000000000000000004, ); path = RestTimerWidget; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -152,6 +169,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
 			buildPhases = (
+AB0923000000000000000014,
 				9740EEB61CF901F6004384FC /* Run Script */,
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
@@ -162,6 +180,7 @@
 			buildRules = (
 			);
 			dependencies = (
+AB0923000000000000000016,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -171,6 +190,7 @@
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
 		};
+AB092300000000000000000B = {isa = PBXNativeTarget; buildConfigurationList = AB0923000000000000000010; buildPhases = (AB092300000000000000000D, AB092300000000000000000E, AB092300000000000000000F, ); buildRules = (); dependencies = (); name = RestTimerWidget; productName = RestTimerWidget; productReference = AB0923000000000000000005; productType = "com.apple.product-type.app-extension"; };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -207,6 +227,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+AB092300000000000000000B,
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
 			);
@@ -232,6 +253,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+AB092300000000000000000F = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -282,11 +304,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+AB0923000000000000000006,
+AB0923000000000000000007,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+AB092300000000000000000D = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (AB0923000000000000000008, AB0923000000000000000009, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -295,6 +320,7 @@
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
 		};
+AB0923000000000000000016 = {isa = PBXTargetDependency; target = AB092300000000000000000B; targetProxy = AB0923000000000000000015; };
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -597,6 +623,36 @@
 			};
 			name = Release;
 		};
+AB0923000000000000000011 = {isa = XCBuildConfiguration; baseConfigurationReference = AB0923000000000000000017; buildSettings = {
+ APPLICATION_EXTENSION_API_ONLY = YES; CLANG_ENABLE_MODULES = YES; CODE_SIGN_STYLE = Automatic;
+ DEVELOPMENT_TEAM = 87WS98J5L6; GENERATE_INFOPLIST_FILE = NO;
+ INFOPLIST_FILE = RestTimerWidget/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+ LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
+ CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)"; MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+ PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory.RestTimerWidget;
+ PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0;
+ TARGETED_DEVICE_FAMILY = "1,2";
+ }; name = Debug; };
+AB0923000000000000000012 = {isa = XCBuildConfiguration; baseConfigurationReference = AB0923000000000000000017; buildSettings = {
+ APPLICATION_EXTENSION_API_ONLY = YES; CLANG_ENABLE_MODULES = YES; CODE_SIGN_STYLE = Automatic;
+ DEVELOPMENT_TEAM = 87WS98J5L6; GENERATE_INFOPLIST_FILE = NO;
+ INFOPLIST_FILE = RestTimerWidget/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+ LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
+ CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)"; MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+ PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory.RestTimerWidget;
+ PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0;
+ TARGETED_DEVICE_FAMILY = "1,2";
+ }; name = Release; };
+AB0923000000000000000013 = {isa = XCBuildConfiguration; baseConfigurationReference = AB0923000000000000000017; buildSettings = {
+ APPLICATION_EXTENSION_API_ONLY = YES; CLANG_ENABLE_MODULES = YES; CODE_SIGN_STYLE = Automatic;
+ DEVELOPMENT_TEAM = 87WS98J5L6; GENERATE_INFOPLIST_FILE = NO;
+ INFOPLIST_FILE = RestTimerWidget/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+ LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
+ CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)"; MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+ PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory.RestTimerWidget;
+ PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0;
+ TARGETED_DEVICE_FAMILY = "1,2";
+ }; name = Profile; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -630,6 +686,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+AB0923000000000000000010 = {isa = XCConfigurationList; buildConfigurations = (AB0923000000000000000011, AB0923000000000000000012, AB0923000000000000000013, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */

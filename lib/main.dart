@@ -147,11 +147,16 @@ class RestNotificationService {
 
   static const _channel = MethodChannel('com.musclememory/rest_timer');
 
-  static Future<void> schedule(int seconds, {DateTime? endsAt}) async {
+  static Future<void> schedule(
+    int seconds, {
+    DateTime? endsAt,
+    String exerciseName = '',
+  }) async {
     if (!(Platform.isIOS || Platform.isAndroid)) return;
     try {
       await _channel.invokeMethod<void>('schedule', {
         'seconds': seconds,
+        'exerciseName': exerciseName,
         'endsAtMilliseconds':
             (endsAt ?? DateTime.now().add(Duration(seconds: seconds)))
                 .millisecondsSinceEpoch,
@@ -161,12 +166,37 @@ class RestNotificationService {
     }
   }
 
-  static Future<void> cancel() async {
+  static Future<void> cancel({int remainingSeconds = 0}) async {
     if (!(Platform.isIOS || Platform.isAndroid)) return;
     try {
-      await _channel.invokeMethod<void>('cancel');
+      await _channel.invokeMethod<void>('cancel', {
+        'remainingSeconds': remainingSeconds,
+      });
     } on PlatformException catch (error) {
       debugPrint('Rest notification cancellation failed: $error');
+    }
+  }
+
+  static void listen(VoidCallback? listener) {
+    if (!(Platform.isIOS || Platform.isAndroid)) return;
+    _channel.setMethodCallHandler(
+      listener == null
+          ? null
+          : (call) async {
+              if (call.method == 'stateChanged') listener();
+            },
+    );
+  }
+
+  static Future<Map<String, dynamic>?> state() async {
+    if (!(Platform.isIOS || Platform.isAndroid)) return null;
+    try {
+      return await _channel.invokeMapMethod<String, dynamic>('state');
+    } on PlatformException catch (error) {
+      debugPrint('Rest timer state unavailable: $error');
+      return null;
+    } on MissingPluginException {
+      return null;
     }
   }
 
@@ -5049,6 +5079,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   int _restRemaining = 0;
   int _restRevision = 0;
   DateTime? _restEndsAt;
+  String _restExerciseName = '';
   int _inputRevision = 0;
   final _numericFocus = <WorkoutSet, List<FocusNode>>{};
   late final _numericPad = _NumericPadController(() => _numericOrder);
@@ -5109,6 +5140,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    RestNotificationService.listen(() => unawaited(_syncRestState()));
     _gymName = widget.isEditing
         ? widget.initialWorkout?.gymName
         : widget.gymName;
@@ -5141,6 +5173,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    RestNotificationService.listen(null);
     _timer?.cancel();
     _restTimer?.cancel();
     unawaited(RestNotificationService.cancel());
@@ -5156,13 +5189,42 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed || _restEndsAt == null) return;
-    final remaining = remainingRestSeconds(_restEndsAt!, DateTime.now());
-    if (remaining > 0) {
-      setState(() => _restRemaining = remaining);
+    if (state == AppLifecycleState.resumed) unawaited(_syncRestState());
+  }
+
+  Future<void> _syncRestState() async {
+    if (widget.isEditing || _exiting) return;
+    final requested = _restRevision;
+    final native = await RestNotificationService.state();
+    if (!mounted || _exiting || requested != _restRevision) return;
+    if (!RestTimerPreference.enabled ||
+        !WorkoutUiPreference.completionCheckEnabled) {
+      _skipRest();
       return;
     }
-    _finishRestTimer(notify: false);
+    if (native != null) {
+      _restRevision++;
+      _restTimer?.cancel();
+      final deadline = (native['endsAtMilliseconds'] as num?)?.toInt() ?? 0;
+      _restEndsAt = deadline > 0
+          ? DateTime.fromMillisecondsSinceEpoch(deadline)
+          : null;
+      _restExerciseName = native['exerciseName'] as String? ?? '';
+      setState(
+        () => _restRemaining = _restEndsAt == null
+            ? (native['remainingSeconds'] as num?)?.toInt() ?? 0
+            : remainingRestSeconds(_restEndsAt!, DateTime.now()),
+      );
+      if (_restEndsAt != null && _restRemaining > 0) _watchRestDeadline();
+    }
+    if (_restEndsAt != null) {
+      final remaining = remainingRestSeconds(_restEndsAt!, DateTime.now());
+      if (remaining <= 0) {
+        _finishRestTimer(notify: false);
+      } else {
+        setState(() => _restRemaining = remaining);
+      }
+    }
   }
 
   String get _elapsedLabel {
@@ -5282,6 +5344,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       if (setIndex == _exercises[exerciseIndex].sets.length - 1) {
         _skipRest();
       } else {
+        _restExerciseName = exerciseDisplayName(_exercises[exerciseIndex].name);
         _startRestTimer();
       }
     }
@@ -5337,9 +5400,20 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     final duration = seconds ?? RestTimerPreference.seconds;
     _restEndsAt = DateTime.now().add(Duration(seconds: duration));
     setState(() => _restRemaining = duration);
-    unawaited(RestNotificationService.schedule(duration, endsAt: _restEndsAt));
+    unawaited(
+      RestNotificationService.schedule(
+        duration,
+        endsAt: _restEndsAt,
+        exerciseName: _restExerciseName,
+      ),
+    );
+    _watchRestDeadline();
+  }
+
+  void _watchRestDeadline() {
+    _restTimer?.cancel();
     _restTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) return;
+      if (!mounted || _restEndsAt == null) return;
       final remaining = remainingRestSeconds(_restEndsAt!, DateTime.now());
       if (remaining <= 0) return _finishRestTimer();
       setState(() => _restRemaining = remaining);
@@ -5383,7 +5457,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     _restTimer?.cancel();
     _restTimer = null;
     _restEndsAt = null;
-    unawaited(RestNotificationService.cancel());
+    unawaited(RestNotificationService.cancel(remainingSeconds: remaining));
     setState(() => _restRemaining = remaining);
   }
 
@@ -5499,6 +5573,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       if (timerStopped) {
         _stopWorkoutTimer(keepStopped: true);
       }
+      await _syncRestState();
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('入力途中のトレーニングを再開しました')));
