@@ -34,6 +34,7 @@ const appVersion = '1.0.0';
 
 enum ExerciseRecordType {
   weightReps,
+  assistedReps,
   bodyweightReps,
   timed,
   cardio,
@@ -47,6 +48,7 @@ enum ExerciseRecordType {
 
   String get label => switch (this) {
     ExerciseRecordType.weightReps => '重量・回数',
+    ExerciseRecordType.assistedReps => '補助重量・回数',
     ExerciseRecordType.bodyweightReps => '自重・回数',
     ExerciseRecordType.timed => '時間',
     ExerciseRecordType.cardio => '有酸素',
@@ -56,6 +58,9 @@ enum ExerciseRecordType {
 }
 
 extension ExerciseRecordTypeUi on ExerciseRecordType {
+  bool get hasWeightInput =>
+      this == ExerciseRecordType.weightReps ||
+      this == ExerciseRecordType.assistedReps;
   bool get usesSets =>
       this != ExerciseRecordType.cardio &&
       this != ExerciseRecordType.distance &&
@@ -1742,11 +1747,9 @@ RecordedSet _initialRecordedSet(ExerciseTemplate template) => RecordedSet(
   distanceUnit: template.distanceUnit,
   bodyPart: template.bodyPart,
   recordType: template.recordType,
-  weight: template.recordType == ExerciseRecordType.weightReps
-      ? template.startWeight
-      : 0,
+  weight: template.recordType.hasWeightInput ? template.startWeight : 0,
   reps:
-      template.recordType == ExerciseRecordType.weightReps ||
+      template.recordType.hasWeightInput ||
           template.recordType == ExerciseRecordType.bodyweightReps
       ? template.startReps
       : 0,
@@ -2460,6 +2463,7 @@ int countPersonalBests(List<WorkoutRecord> history, DateTime since) {
   for (final workout in chronological) {
     final workoutBest = <String, double>{};
     for (final set in workout.sets) {
+      if (set.recordType == ExerciseRecordType.assistedReps) continue;
       workoutBest.update(
         set.identity,
         (value) => set.weight > value ? set.weight : value,
@@ -3213,9 +3217,12 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '月間カレンダー',
-          style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
+        title: const Padding(
+          padding: EdgeInsets.only(top: 6),
+          child: Text(
+            '月間カレンダー',
+            style: TextStyle(fontSize: 27, fontWeight: FontWeight.w900),
+          ),
         ),
         actions: [
           if (widget.history.isNotEmpty)
@@ -4160,6 +4167,50 @@ class _ExerciseProgressPageState extends State<ExerciseProgressPage> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedSets = widget.history
+        .expand((w) => w.sets)
+        .where((s) => s.identity == _selectedExercise);
+    if (selectedSets.any(
+          (s) => s.recordType == ExerciseRecordType.assistedReps,
+        ) ||
+        selectedSets.any(
+          (s) => usesAssistanceWeight(s.exerciseName, exerciseId: s.exerciseId),
+        )) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('種目ごとの成長')),
+        body: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: _selectedExercise,
+              items: _exerciseNames
+                  .map(
+                    (id) => DropdownMenuItem(
+                      value: id,
+                      child: Text(_labelForIdentity(id)),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (id) {
+                if (id != null) setState(() => _selectedExercise = id);
+              },
+            ),
+            const SizedBox(height: 16),
+            const Text('補助重量は軽いほど負荷が高くなります。総ボリューム・最高重量・推定1RMには含めません。'),
+            for (final workout in widget.history)
+              for (final set in workout.sets.where(
+                (s) => s.identity == _selectedExercise,
+              ))
+                ListTile(
+                  title: Text(set.displaySummary),
+                  subtitle: Text(
+                    '${workout.date.year}/${workout.date.month}/${workout.date.day}${set.recordType == ExerciseRecordType.bodyweightReps ? ' ・ 補助重量未記録' : ''}',
+                  ),
+                ),
+          ],
+        ),
+      );
+    }
     final points = _points;
     final bestWeight = points.fold<double>(
       0.0,
@@ -5060,7 +5111,9 @@ List<Widget> _exerciseShareRows(WorkoutRecord workout) {
         ? sets.reduce((a, b) => b.weight > a.weight ? b : a)
         : sets.first;
     final summary = switch (type) {
-      ExerciseRecordType.weightReps || ExerciseRecordType.bodyweightReps =>
+      ExerciseRecordType.weightReps ||
+      ExerciseRecordType.assistedReps ||
+      ExerciseRecordType.bodyweightReps =>
         '${best.displaySummary}  /  ${sets.length} セット',
       ExerciseRecordType.timed =>
         '${best.displaySummary}  /  ${sets.length} セット',
@@ -5149,9 +5202,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   List<FocusNode> get _numericOrder => [
     for (final exercise in _exercises)
       for (final set in exercise.sets) ...[
-        if (exercise.recordType == ExerciseRecordType.weightReps)
-          _nodesFor(set)[0],
-        if (exercise.recordType == ExerciseRecordType.weightReps ||
+        if (exercise.recordType.hasWeightInput) _nodesFor(set)[0],
+        if (exercise.recordType.hasWeightInput ||
             exercise.recordType == ExerciseRecordType.bodyweightReps)
           _nodesFor(set)[1],
       ],
@@ -6192,6 +6244,10 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                           onSetAllCompleted: (completed) =>
                               _setAllSetsCompleted(exerciseIndex, completed),
                           onValuesChanged: _saveDraft,
+                          onRecordTypeChanged: () {
+                            setState(() {});
+                            unawaited(_saveDraft());
+                          },
                         ),
                       ),
                     ),
@@ -6467,9 +6523,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       sets: List.generate(
         1,
         (_) => WorkoutSet(
-          weight: template.recordType == ExerciseRecordType.weightReps
-              ? template.startWeight
-              : 0,
+          weight: template.recordType.hasWeightInput ? template.startWeight : 0,
           reps: template.recordType == ExerciseRecordType.timed
               ? 0
               : template.startReps,
@@ -7976,7 +8030,7 @@ class _CustomExerciseManagementPageState
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
                     subtitle: Text(
-                      exercise.recordType == ExerciseRecordType.weightReps
+                      exercise.recordType.hasWeightInput
                           ? '${exercise.bodyPart} ・ ${exercise.equipment} ・ ${formatWeight(exercise.startWeight)}kg × ${exercise.startReps}回'
                           : '${exercise.bodyPart} ・ ${exercise.equipment} ・ ${exercise.recordType.label}',
                     ),
@@ -8271,7 +8325,7 @@ class WorkoutExercise {
   String get identity => exerciseIdentity(exerciseId, name);
   final String bodyPart;
   final String equipment;
-  final ExerciseRecordType recordType;
+  ExerciseRecordType recordType;
   final List<WorkoutSet> sets;
 }
 
@@ -8288,6 +8342,7 @@ class ExerciseInputCard extends StatelessWidget {
     required this.onApplyPrevious,
     required this.onSetAllCompleted,
     required this.onValuesChanged,
+    this.onRecordTypeChanged,
     this.numericNodes,
     this.nextNumeric,
   });
@@ -8304,6 +8359,7 @@ class ExerciseInputCard extends StatelessWidget {
   final ValueChanged<List<RecordedSet>> onApplyPrevious;
   final ValueChanged<bool> onSetAllCompleted;
   final VoidCallback onValuesChanged;
+  final VoidCallback? onRecordTypeChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -8465,6 +8521,19 @@ class ExerciseInputCard extends StatelessWidget {
                   ),
               ],
             ),
+          if (exercise.recordType == ExerciseRecordType.bodyweightReps &&
+              usesAssistanceWeight(
+                exercise.name,
+                exerciseId: exercise.exerciseId,
+              ))
+            TextButton(
+              key: Key('addAssistanceWeight$exerciseIndex'),
+              onPressed: () {
+                exercise.recordType = ExerciseRecordType.assistedReps;
+                (onRecordTypeChanged ?? onValuesChanged)();
+              },
+              child: const Text('補助重量を追加'),
+            ),
           if (usesAdditionalWeight(
             exercise.name,
             exerciseId: exercise.exerciseId,
@@ -8472,6 +8541,14 @@ class ExerciseInputCard extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(bottom: 8),
               child: Text('追加重量（kg）・自重のみは0', style: TextStyle(fontSize: 12)),
+            ),
+          if (exercise.recordType == ExerciseRecordType.assistedReps)
+            const Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: Text(
+                '補助重量（kg）・補助なしは0。軽いほど負荷が高くなります。',
+                style: TextStyle(fontSize: 12),
+              ),
             ),
           SetHeader(
             recordType: exercise.recordType,
@@ -8687,6 +8764,8 @@ class RecordedSet {
   final bool completed;
 
   bool get hasRequiredValues => switch (recordType) {
+    ExerciseRecordType.assistedReps =>
+      weight.isFinite && weight >= 0 && reps > 0,
     ExerciseRecordType.weightReps =>
       (weight > 0 ||
               (weight == 0 &&
@@ -8717,6 +8796,8 @@ class RecordedSet {
   }
 
   String get displaySummary => switch (recordType) {
+    ExerciseRecordType.assistedReps =>
+      '補助 ${formatWeight(weight)} kg × $reps 回',
     ExerciseRecordType.weightReps =>
       usesAdditionalWeight(exerciseName, exerciseId: exerciseId)
           ? '${weight == 0 ? '自重' : '+${formatWeight(weight)} kg'} × $reps 回'
@@ -8757,10 +8838,15 @@ class RecordedSet {
     equipment: json['equipment'] as String? ?? '',
     bodyPart: json['bodyPart'] as String? ?? '胸',
     recordType: json['recordType'] == null
-        ? recordTypeForExerciseName(
-            json['exerciseName'] as String? ?? 'ベンチプレス',
-            bodyPart: json['bodyPart'] as String? ?? '胸',
-          )
+        ? (usesAssistanceWeight(
+                json['exerciseName'] as String? ?? '',
+                exerciseId: json['exerciseId'] as String?,
+              )
+              ? ExerciseRecordType.bodyweightReps
+              : recordTypeForExerciseName(
+                  json['exerciseName'] as String? ?? 'ベンチプレス',
+                  bodyPart: json['bodyPart'] as String? ?? '胸',
+                ))
         : ExerciseRecordType.fromName(json['recordType'] as String?),
     weight: (json['weight'] as num?)?.toDouble() ?? 0,
     reps: (json['reps'] as num?)?.toInt() ?? 0,
@@ -8986,6 +9072,7 @@ class SetHeader extends StatelessWidget {
     if (!recordType.usesSets) return const SizedBox.shrink();
     final labels = switch (recordType) {
       ExerciseRecordType.weightReps => const ['KG', 'REPS'],
+      ExerciseRecordType.assistedReps => const ['補助 KG', 'REPS'],
       ExerciseRecordType.bodyweightReps => const ['REPS'],
       ExerciseRecordType.timed => const ['TIME'],
       _ => const <String>[],
@@ -9083,13 +9170,15 @@ class SetRow extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),
-          if (recordType == ExerciseRecordType.weightReps) ...[
+          if (recordType.hasWeightInput) ...[
             Expanded(
               child: ValueBox(
                 largeTouchTarget: true,
                 key: Key('weightField$fieldPrefix$number'),
                 value: set.weight,
-                stepLabel: 'KG',
+                stepLabel: recordType == ExerciseRecordType.assistedReps
+                    ? '補助 KG'
+                    : 'KG',
                 focusNode: weightFocus,
                 onNext: nextWeight,
                 normalizeZeros: true,
@@ -9099,7 +9188,7 @@ class SetRow extends StatelessWidget {
             ),
             const SizedBox(width: 8),
           ],
-          if (recordType == ExerciseRecordType.weightReps ||
+          if (recordType.hasWeightInput ||
               recordType == ExerciseRecordType.bodyweightReps)
             Expanded(
               child: ValueBox(

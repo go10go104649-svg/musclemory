@@ -14,7 +14,7 @@ for item in source['exercises']:
     ids.add(item['exerciseId'])
     assert item['exerciseId'] and isinstance(item['exerciseName'], str)
     assert len(item['aliases']) == len(set(item['aliases']))
-    assert item['recordType'] in ['weightReps', 'bodyweightReps', 'timed', 'cardio', 'distance', 'loadedDistance']
+    assert item['recordType'] in ['weightReps', 'assistedReps', 'bodyweightReps', 'timed', 'cardio', 'distance', 'loadedDistance']
     assert item['equipmentLabel'] and isinstance(item['tags'], list)
     assert item.get('distanceUnit', 'km') in ['m', 'km']
     if item['status'] == 'planned':

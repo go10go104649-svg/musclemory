@@ -126,3 +126,7 @@ String exerciseDisplayName(
 bool usesAdditionalWeight(String storedName, {String? exerciseId}) =>
     ExerciseFormCatalog.resolve(exerciseId, storedName)?.loadMode ==
     'additional';
+
+bool usesAssistanceWeight(String storedName, {String? exerciseId}) =>
+    ExerciseFormCatalog.resolve(exerciseId, storedName)?.loadMode ==
+    'assistance';

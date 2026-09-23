@@ -334,7 +334,13 @@ void main() {
         true,
       );
       expect(find.text('2種目選択中'), findsOneWidget);
-      expect(find.text('肩 ・ プレートロード'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: check('plate_loaded_shoulder_press'),
+          matching: find.text('肩 ・ プレートロード'),
+        ),
+        findsOneWidget,
+      );
       await tapVisible(t, const Key('selectExerciseshoulder_press'));
       expect(find.text('1種目選択中'), findsOneWidget);
       expect(
