@@ -1,3 +1,5 @@
+import 'gym/gym_repository.dart';
+import 'gym/gym_pages.dart';
 import 'trainer_qr_page.dart';
 import 'exercise_form_catalog.dart';
 import 'body_tab_colors.dart';
@@ -5185,6 +5187,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   late DateTime _startedAt;
   late DateTime _workoutDate;
   String? _gymName;
+  GymStore? _gymStore;
   Timer? _timer;
   Timer? _restTimer;
   Duration _elapsed = Duration.zero;
@@ -5257,6 +5260,10 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     _gymName = widget.isEditing
         ? widget.initialWorkout?.gymName
         : widget.gymName;
+    final storeId = widget.isEditing ? widget.initialWorkout?.gymStoreId : null;
+    if (storeId != null) {
+      _gymStore = GymStore(id: storeId, chainName: '', name: _gymName ?? '店舗');
+    }
     _startedAt = DateTime.now();
     _workoutDate = widget.isEditing
         ? widget.initialWorkout!.date
@@ -5615,12 +5622,17 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
           heightFactor: 0.82,
           child: ExercisePickerSheet(
             existingIdentities: existingIdentities,
+            gymStoreId: _gymStore?.id,
             menus: menus,
           ),
         ),
       ),
     );
     if (selected == null || selected.isEmpty || !mounted) return;
+    _applyExerciseSelection(selected);
+  }
+
+  void _applyExerciseSelection(List<ExerciseSelection> selected) {
     setState(() {
       final names = _exercises.map((item) => item.identity).toSet();
       for (final item in selected) {
@@ -5682,6 +5694,10 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
           final gym = draft['gymName'];
           if (gym == null || gym is String) _gymName = gym as String?;
         }
+        final storeId = draft['gymStoreId'] as String?;
+        _gymStore = storeId == null
+            ? null
+            : GymStore(id: storeId, chainName: '', name: _gymName ?? '店舗');
         _noteController.text = draft['note'] as String? ?? '';
         final savedDate = draft['date'] as String?;
         if (savedDate != null) _workoutDate = DateTime.parse(savedDate);
@@ -5702,10 +5718,47 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   }
 
   Future<void> _selectWorkoutGym() async {
-    final selected = await showGymPicker(context, _gymName);
-    if (!mounted || selected == null || selected == _gymName) return;
-    setState(() => _gymName = selected);
+    GymStore? store;
+    final selected = await showGymPicker(
+      context,
+      _gymName,
+      onStoreSelected: (value) => store = value,
+    );
+    if (!mounted || selected == null) return;
+    if (store == null && selected == _gymName) return;
+    setState(() {
+      _gymName = selected;
+      _gymStore = store;
+    });
     await _saveDraft();
+  }
+
+  Future<void> _openGymEquipment() async {
+    final store = _gymStore;
+    if (store == null) return;
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => GymStoreEquipmentPage(
+          store: store,
+          existingIds: _exercises
+              .map((e) => e.exerciseId)
+              .whereType<String>()
+              .map(ExerciseFormCatalog.canonicalId)
+              .toSet(),
+          onAdd: (ids) async {
+            if (!mounted) return;
+            _applyExerciseSelection(
+              exerciseTemplates
+                  .where((e) => ids.contains(e.exerciseId))
+                  .map((e) => ExerciseSelection(e))
+                  .toList(),
+            );
+            await _saveDraft();
+          },
+        ),
+      ),
+    );
   }
 
   Future<void> _saveDraft() async {
@@ -5717,6 +5770,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       'date': _workoutDate.toIso8601String(),
       'note': _noteController.text,
       'gymName': _gymName,
+      'gymStoreId': _gymStore?.id,
       'exercises': _exercises
           .map(
             (exercise) => {
@@ -6026,6 +6080,13 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                         trailing: const Icon(Icons.chevron_right_rounded),
                         onTap: _selectWorkoutGym,
                       ),
+                      if (_gymStore != null)
+                        OutlinedButton.icon(
+                          key: const Key('workoutGymEquipmentButton'),
+                          onPressed: _openGymEquipment,
+                          icon: const Icon(Icons.fitness_center),
+                          label: const Text('この店舗の設備から種目を追加'),
+                        ),
                       if (WorkoutUiPreference.workoutTimerEnabled ||
                           (widget.isEditing &&
                               WorkoutUiPreference.workoutDurationEnabled))
@@ -6371,6 +6432,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               ? finalElapsed.inSeconds
               : 0,
           gymName: _gymName,
+          gymStoreId: _gymStore?.id,
           note: _noteController.text.trim(),
         );
     setState(() => _completing = true);
@@ -7263,7 +7325,9 @@ class ExercisePickerSheet extends StatefulWidget {
     this.existingIdentities = const {},
     this.existingNames = const {},
     this.menus = const [],
+    this.gymStoreId,
   });
+  final String? gymStoreId;
   final Set<String> existingIdentities;
   // Compatibility for old name-only callers; never use names for ID variants.
   final Set<String> existingNames;
@@ -7273,6 +7337,45 @@ class ExercisePickerSheet extends StatefulWidget {
 }
 
 class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
+  bool _storeOnly = false, _storeLoading = false, _storeFailed = false;
+  Set<String>? _storeIds;
+  int _storeRequest = 0;
+  Future<void> _filterStore(bool enabled) async {
+    final request = ++_storeRequest;
+    if (!enabled) {
+      setState(() {
+        _storeOnly = false;
+        _storeLoading = false;
+      });
+      return;
+    }
+    if (_storeIds != null) {
+      setState(() => _storeOnly = true);
+      return;
+    }
+    setState(() {
+      _storeLoading = true;
+      _storeFailed = false;
+    });
+    try {
+      final ids = await GymServices.repository.exerciseIds(widget.gymStoreId!);
+      if (mounted && request == _storeRequest) {
+        setState(() {
+          _storeIds = ids;
+          _storeOnly = true;
+        });
+      }
+    } catch (_) {
+      if (mounted && request == _storeRequest) {
+        setState(() => _storeFailed = true);
+      }
+    } finally {
+      if (mounted && request == _storeRequest) {
+        setState(() => _storeLoading = false);
+      }
+    }
+  }
+
   static const _categories = ['胸', '背中', '肩', '腕', '脚', '腹', '有酸素', 'HYROX'];
   String _query = '';
   String? _selectedCategory;
@@ -7402,6 +7505,10 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
       _query = '';
       _searchController.clear();
       for (final item in _menuItems(menu)) {
+        if (_storeOnly &&
+            !(_storeIds?.contains(item.template.exerciseId) ?? false)) {
+          continue;
+        }
         final identity = item.template.identity;
         if (_alreadyAdded(item.template) || _selected.containsKey(identity)) {
           continue;
@@ -7427,6 +7534,9 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
         _selectedCategory != null || _showMenus || _query.isNotEmpty;
     final filtered = _source.where((item) {
       final e = item.template;
+      if (_storeOnly && !(_storeIds?.contains(e.exerciseId) ?? false)) {
+        return false;
+      }
       final query = _query.toLowerCase();
       return e.matchesQuery(query) ||
           exerciseDisplayName(
@@ -7495,6 +7605,39 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
               ),
             ),
           ),
+          if (widget.gymStoreId != null && !menuList)
+            fixedArea(
+              'exercisePickerStoreFilter',
+              Column(
+                children: [
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      ChoiceChip(
+                        label: const Text('全種目'),
+                        selected: !_storeOnly,
+                        onSelected: (_) => _filterStore(false),
+                      ),
+                      ChoiceChip(
+                        key: const Key('storeExerciseFilter'),
+                        label: const Text('この店舗でできる'),
+                        selected: _storeOnly,
+                        onSelected: _storeLoading
+                            ? null
+                            : (_) => _filterStore(true),
+                      ),
+                    ],
+                  ),
+                  if (_storeLoading) const LinearProgressIndicator(),
+                  if (_storeFailed) const Text('設備情報を取得できませんでした。全種目から追加できます。'),
+                  if (_storeOnly)
+                    const Text(
+                      '登録済み設備の対応種目のみ。未掲載の種目は「全種目」から追加できます。',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                ],
+              ),
+            ),
           if (!menuList)
             fixedArea(
               'exercisePickerSearchArea',
@@ -8919,6 +9062,7 @@ class WorkoutRecord {
     required this.sets,
     this.durationSeconds = 0,
     this.gymName,
+    this.gymStoreId,
     this.note = '',
   });
 
@@ -8926,6 +9070,7 @@ class WorkoutRecord {
   final List<RecordedSet> sets;
   final int durationSeconds;
   final String? gymName;
+  final String? gymStoreId;
   final String note;
 
   Map<String, List<RecordedSet>> get exerciseGroups => groupRecordedSets(sets);
@@ -8988,6 +9133,7 @@ class WorkoutRecord {
     date: DateTime.parse(json['date'] as String),
     durationSeconds: (json['durationSeconds'] as num?)?.toInt() ?? 0,
     gymName: json['gymName'] as String?,
+    gymStoreId: json['gymStoreId'] as String?,
     note: json['note'] as String? ?? '',
     sets: (json['sets'] as List<dynamic>)
         .map((item) => RecordedSet.fromJson(item as Map<String, dynamic>))
@@ -9008,6 +9154,7 @@ class WorkoutRecord {
     'date': date.toIso8601String(),
     'durationSeconds': durationSeconds,
     'gymName': gymName,
+    if (gymStoreId != null) 'gymStoreId': gymStoreId,
     'note': note,
     'sets': sets.map((set) => set.toJson()).toList(),
   };
@@ -9958,7 +10105,11 @@ Future<String?> _addCustomGym(BuildContext context) async {
   return await CustomGymPreference.add(name) ? name : null;
 }
 
-Future<String?> showGymPicker(BuildContext context, String? currentGym) {
+Future<String?> showGymPicker(
+  BuildContext context,
+  String? currentGym, {
+  ValueChanged<GymStore>? onStoreSelected,
+}) {
   final gyms = [
     ...standardGyms,
     ...CustomGymPreference.gyms,
@@ -9981,6 +10132,22 @@ Future<String?> showGymPicker(BuildContext context, String? currentGym) {
               'トレーニング場所',
               style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
             ),
+          ),
+          ListTile(
+            key: const Key('searchRegisteredGymStores'),
+            leading: const Icon(Icons.search),
+            title: const Text('登録店舗から探す'),
+            subtitle: const Text('店名・市区町村・駅名で検索'),
+            onTap: () async {
+              final store = await Navigator.push<GymStore>(
+                context,
+                MaterialPageRoute(builder: (_) => const GymStoreSearchPage()),
+              );
+              if (store != null && context.mounted) {
+                onStoreSelected?.call(store);
+                Navigator.pop(context, store.displayName);
+              }
+            },
           ),
           ListTile(
             key: const Key('addWorkoutGymButton'),
@@ -10596,6 +10763,19 @@ class ProfilePage extends StatelessWidget {
                     onSyncRequested: onSyncRequested,
                   ),
                 ),
+              ),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              key: const Key('registeredGymsButton'),
+              leading: const Icon(Icons.location_on_outlined),
+              title: const Text('利用ジム'),
+              subtitle: const Text('店舗を登録・設備を見る（自分だけに表示）'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push<void>(
+                context,
+                MaterialPageRoute(builder: (_) => const RegisteredGymsPage()),
               ),
             ),
           ),

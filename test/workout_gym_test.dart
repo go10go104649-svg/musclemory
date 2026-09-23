@@ -16,6 +16,9 @@ void main() {
   Future<void> chooseGym(WidgetTester tester) async {
     await tester.tap(find.byKey(const Key('workoutGymButton')));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('ゴールドジム'), 150,
+      scrollable: find.descendant(of: find.byType(BottomSheet), matching: find.byType(Scrollable)));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('ゴールドジム'));
     await tester.pumpAndSettle();
   }

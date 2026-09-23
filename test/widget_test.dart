@@ -269,6 +269,7 @@ void main() {
       'スピンバイク',
       '縄跳び',
       'バトルロープ',
+      'リカンベントバイク',
     });
     final workout = WorkoutRecord(
       date: DateTime(2026, 9, 13),
@@ -423,16 +424,21 @@ void main() {
     final row = find.byKey(const Key('selectExerciseplate_loaded_shoulder_press'));
     final star = find.byKey(Key('favoriteExercise${plate.identity}'));
     await tester.ensureVisible(star);
+    await tester.pumpAndSettle();
     await tester.tap(star);
     await tester.pumpAndSettle();
     expect(find.text('0種目選択中'), findsOneWidget);
     expect(await ExerciseFavoritePreference.load(), {plate.identity});
     expect(tester.widget<ListTile>(row).selected, false);
     expect(find.byType(Checkbox), findsNothing);
+    await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
     await tester.tap(row);
     await tester.pumpAndSettle();
     expect(tester.widget<ListTile>(row).selected, true);
     expect(find.text('1種目選択中'), findsOneWidget);
+    await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
     await tester.tap(row);
     await tester.pumpAndSettle();
     expect(find.text('0種目選択中'), findsOneWidget);

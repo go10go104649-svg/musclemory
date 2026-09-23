@@ -1,0 +1,588 @@
+[
+  {
+    "equipment_id": "fp_eq_8bef7d495e23",
+    "expected_name": "Vスクワット（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "v_squat"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_7cf9cfdcb6fa",
+    "expected_name": "アイソラテラルローロー（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "low_row"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_e39013a1ac13",
+    "expected_name": "インクラインチェストプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_incline_chest_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_28e2a518cda8",
+    "expected_name": "ショルダープレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_shoulder_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_51b78f0fad66",
+    "expected_name": "シーテッドチェストプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_chest_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_7da0bcec718d",
+    "expected_name": "シーテッドロー（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_seated_row"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_74ae16617af0",
+    "expected_name": "スミスマシン",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "smith_bench_press",
+      "smith_incline_press",
+      "smith_decline_press",
+      "smith_shoulder_press",
+      "smith_squat",
+      "smith_bulgarian_split_squat"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_cfbe87c2130c",
+    "expected_name": "スミスマシン（垂直）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "smith_bench_press",
+      "smith_incline_press",
+      "smith_shoulder_press",
+      "smith_squat"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_693fa2dd0404",
+    "expected_name": "ダンベル（1〜50kg）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "dumbbell_curl",
+      "hammer_curl",
+      "lateral_raise",
+      "front_raise",
+      "one_arm_dumbbell_row",
+      "goblet_squat"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_86a486d021ac",
+    "expected_name": "チェストプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_chest_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_bf477b40108b",
+    "expected_name": "チン/ディップ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chin_up",
+      "dips"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_062a12acce4a",
+    "expected_name": "チン/ディップ/レッグレイズ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chin_up",
+      "dips",
+      "hanging_leg_raise"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_7c004e084299",
+    "expected_name": "デュアルパワースミスショルダー（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "dual_power_smith_shoulder_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_fb1735fee77f",
+    "expected_name": "ハックスクワット（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "hack_squat"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_0aa64dd696f1",
+    "expected_name": "バイキングプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "viking_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_8a001b1995c8",
+    "expected_name": "ピュアプレート ショルダープレス",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_shoulder_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_f3af8bd694cf",
+    "expected_name": "ピュアプレート チェストプレス",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_chest_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_f619fef1237b",
+    "expected_name": "アップライトバイク",
+    "expected_load_type": "cardio",
+    "exercise_ids": [
+      "exercise_bike"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_4f3c1d4553d6",
+    "expected_name": "クロストレーナー",
+    "expected_load_type": "cardio",
+    "exercise_ids": [
+      "cross_trainer"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_545431d61b99",
+    "expected_name": "ステアクライマー",
+    "expected_load_type": "cardio",
+    "exercise_ids": [
+      "stair_climber"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_42c27564b5e2",
+    "expected_name": "トレッドミル",
+    "expected_load_type": "cardio",
+    "exercise_ids": [
+      "treadmill"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_b6d80023b98e",
+    "expected_name": "リカンベントバイク",
+    "expected_load_type": "cardio",
+    "exercise_ids": [
+      "recumbent_bike"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_6526839222e6",
+    "expected_name": "DUAL アダクター/アブダクター",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hip_adduction",
+      "hip_abduction"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_6e1280aa7ce9",
+    "expected_name": "アウターサイ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hip_abduction"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_3178ca72e8b9",
+    "expected_name": "アシストチン/ディップ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "assisted_chin_up",
+      "assisted_dips"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_e8c7fd4da985",
+    "expected_name": "アジャスタブルデュアルプーリー",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "cable_fly",
+      "cable_curl",
+      "rope_pushdown",
+      "straight_bar_pushdown",
+      "face_pull"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_aacdbc212a99",
+    "expected_name": "アブダクター/アダクター",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hip_adduction",
+      "hip_abduction"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_73709b637965",
+    "expected_name": "アブドミナルクランチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "abdominal_crunch"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_4c7a411ae0db",
+    "expected_name": "インクラインチェストプレス（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "selectorized_incline_chest_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_83deacc91b88",
+    "expected_name": "インナー/アウターサイ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hip_adduction",
+      "hip_abduction"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_397c463724d0",
+    "expected_name": "インナーサイ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hip_adduction"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_fc4c75bfea3e",
+    "expected_name": "インナーサイ/アウターサイ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hip_adduction",
+      "hip_abduction"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_4740a3f1901c",
+    "expected_name": "ケーブルクロスオーバー",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "cable_fly",
+      "low_cable_fly",
+      "high_cable_fly",
+      "single_arm_cable_fly"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_14e5a2bfd025",
+    "expected_name": "コンパクトケーブルクロスオーバー",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "cable_fly",
+      "single_arm_cable_fly"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_ea03283315d0",
+    "expected_name": "ショルダープレス（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "shoulder_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_2b7d06db3537",
+    "expected_name": "シーテッドレッグカール",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "seated_leg_curl"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_504166305869",
+    "expected_name": "シーテッドレッグカール ROM",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "seated_leg_curl"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_c3db2542e1b9",
+    "expected_name": "シーテッドロー（ケーブル）",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "cable_row"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_10ab0b55de72",
+    "expected_name": "チン/ディップ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chin_up",
+      "dips"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_4eb3f9de4efb",
+    "expected_name": "チン/ディップ/レッグレイズ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chin_up",
+      "dips",
+      "hanging_leg_raise"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_9bd01a2a0d06",
+    "expected_name": "デクラインチェストプレス（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "selectorized_decline_chest_press"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_b333827ebb7e",
+    "expected_name": "デュアルアジャスタブルプーリー",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "cable_fly",
+      "cable_curl",
+      "rope_pushdown",
+      "straight_bar_pushdown",
+      "face_pull",
+      "cable_lateral_raise"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_511ff92026d3",
+    "expected_name": "トータルヒップ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "multi_hip_abduction",
+      "multi_hip_adduction",
+      "multi_hip_extension"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_ccf5c869fc06",
+    "expected_name": "ニーリングイージーチンディップ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "assisted_chin_up",
+      "assisted_dips"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_a08395377fb3",
+    "expected_name": "ニーリングレッグカール（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "kneeling_leg_curl"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_3c489c1c47a4",
+    "expected_name": "ハイロー（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "selectorized_high_row"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_9d67a700c436",
+    "expected_name": "ヒップアダクター&ヒップアブダクター",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hip_adduction",
+      "hip_abduction"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_70aafcbfb322",
+    "expected_name": "ヒップアダクター/アブダクター デュアル",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hip_adduction",
+      "hip_abduction"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_ca218039d433",
+    "expected_name": "プローンレッグカール",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "lying_leg_curl"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_43beffc3d542",
+    "expected_name": "マルチヒップ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "multi_hip_abduction",
+      "multi_hip_adduction",
+      "multi_hip_extension"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_389ce19d52fa",
+    "expected_name": "ライイングレッグカール",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "lying_leg_curl"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_7083f3a79b3f",
+    "expected_name": "ラットプルダウン/シーテッドロー（ケーブル）",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "lat_pulldown",
+      "cable_row"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_0b24ae99ff9a",
+    "expected_name": "ラットプルダウン/ロングプル デュアル（ケーブル）",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "lat_pulldown",
+      "cable_row"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_9c94e4e7e8ab",
+    "expected_name": "ラットプルダウン（ケーブル）",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "lat_pulldown"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_4f1c12690a70",
+    "expected_name": "ラットマシン（ケーブル）",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "lat_pulldown"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_2ca7b231d84c",
+    "expected_name": "レッグエクステンション",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_extension"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_8c7eb420416c",
+    "expected_name": "レッグエクステンション ROM",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_extension"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_c21d68793fb5",
+    "expected_name": "レッグエクステンション（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_extension"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_df7883c6be09",
+    "expected_name": "ロングプル（ケーブル）",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "cable_row"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_f9136af0c9c1",
+    "expected_name": "ロータリートルソー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "rotary_torso"
+    ],
+    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  }
+]
