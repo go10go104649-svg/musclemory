@@ -10,11 +10,12 @@ import android.os.Build
 
 class RestTimerReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        if (RestTimerState.action(context, intent)) return
         val preferences = context.getSharedPreferences("rest_timer", Context.MODE_PRIVATE)
         val deadline = preferences.getLong("deadline", 0)
         // A queued broadcast after stop, or after extending/restarting, is obsolete.
         if (deadline == 0L || System.currentTimeMillis() < deadline) return
-        preferences.edit().remove("deadline").apply()
+        RestTimerState.finished(context)
         if (RestTimerFeedback.foreground) return // Dart shows the in-app message and plays once.
         RestTimerFeedback.ensureChannel(context)
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

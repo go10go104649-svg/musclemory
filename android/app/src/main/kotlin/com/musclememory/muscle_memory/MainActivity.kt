@@ -2,8 +2,6 @@ package com.musclememory.muscle_memory
 
 import android.Manifest
 import android.app.NotificationManager
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -22,8 +20,9 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName)
-            .setMethodCallHandler { call, result ->
+        val restChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName)
+        RestTimerState.onChanged = { restChannel.invokeMethod("stateChanged", null) }
+        restChannel.setMethodCallHandler { call, result ->
                 when (call.method) {
                     "debugScreenshot" -> {
                         if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE == 0 ||
@@ -67,24 +66,14 @@ class MainActivity : FlutterActivity() {
                         RestTimerFeedback.stop(this)
                         val deadline = call.argument<Number>("endsAtMilliseconds")?.toLong()
                             ?: (System.currentTimeMillis() + seconds.coerceAtLeast(1) * 1000L)
-                        getSharedPreferences("rest_timer", MODE_PRIVATE).edit()
-                            .putLong("deadline", deadline).apply()
-                        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                        alarmManager.setAndAllowWhileIdle(
-                            AlarmManager.RTC_WAKEUP,
-                            deadline,
-                            restTimerIntent()
-                        )
+                        RestTimerState.schedule(this, deadline, call.argument<String>("exerciseName") ?: "")
                         result.success(null)
                     }
                     "cancel" -> {
-                        getSharedPreferences("rest_timer", MODE_PRIVATE).edit().remove("deadline").apply()
-                        RestTimerFeedback.stop(this)
-                        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                        alarmManager.cancel(restTimerIntent())
-                        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(7341)
+                        RestTimerState.cancel(this, call.argument<Int>("remainingSeconds") ?: 0)
                         result.success(null)
                     }
+                    "state" -> result.success(RestTimerState.snapshot(this))
                     "playCompletionFeedback" -> {
                         RestTimerFeedback.play(this)
                         result.success(null)
@@ -117,9 +106,15 @@ class MainActivity : FlutterActivity() {
             }
     }
 
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        RestTimerState.onChanged = null
+        super.cleanUpFlutterEngine(flutterEngine)
+    }
+
     override fun onResume() {
         super.onResume()
         RestTimerFeedback.foreground = true
+        RestTimerState.show(this)
     }
 
     override fun onPause() {
@@ -160,16 +155,6 @@ class MainActivity : FlutterActivity() {
             arrayOf(file.absolutePath),
             arrayOf("image/png"),
             null
-        )
-    }
-
-    private fun restTimerIntent(): PendingIntent {
-        val intent = Intent(this, RestTimerReceiver::class.java)
-        return PendingIntent.getBroadcast(
-            this,
-            7341,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 

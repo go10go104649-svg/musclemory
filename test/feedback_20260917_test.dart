@@ -127,13 +127,13 @@ void main() {
     await tester.tap(find.byKey(const Key('stopRestTimerButton')));
     await tester.pump();
     expect(tester.getCenter(first), original);
-    expect(find.text('休憩  00:34'), findsOneWidget);
+    expect(find.text('00:34'), findsOneWidget);
     await tester.pump(const Duration(seconds: 40));
-    expect(find.text('休憩  00:34'), findsOneWidget);
+    expect(find.text('00:34'), findsOneWidget);
     expect(find.byKey(const Key('restTimerFinishedMessage')), findsNothing);
     await tester.tap(find.byKey(const Key('startRestTimerButton')));
     await tester.pump();
-    expect(find.text('休憩  00:34'), findsOneWidget);
+    expect(find.text('00:34'), findsOneWidget);
     await tester.tap(find.byKey(const Key('toggleSet0_3')));
     await tester.pump();
     expect(find.byKey(const Key('stopRestTimerButton')), findsNothing);

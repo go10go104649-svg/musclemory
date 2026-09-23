@@ -148,13 +148,13 @@ void main() {
     await tester.tap(find.byKey(const Key('stopRestTimerButton')));
     await tester.pump();
     await tester.pump(const Duration(seconds: 10));
-    expect(find.text('休憩  01:00'), findsOneWidget);
+    expect(find.text('01:00'), findsOneWidget);
     await tester.tap(find.text('+30秒'));
     await tester.pump();
-    expect(find.text('休憩  01:30'), findsOneWidget);
+    expect(find.text('01:30'), findsOneWidget);
     await tester.tap(find.byKey(const Key('startRestTimerButton')));
     await tester.pump();
-    expect(find.text('休憩  01:30'), findsOneWidget);
+    expect(find.text('01:30'), findsOneWidget);
     await tester.pumpWidget(const MaterialApp(home: Scaffold(
       body: StartWorkoutCard(onPressed: _noop),
     )));

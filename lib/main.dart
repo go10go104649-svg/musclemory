@@ -5691,6 +5691,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return PopScope<WorkoutRecord>(
       canPop: _allowPop,
       onPopInvokedWithResult: (didPop, _) {
@@ -5704,7 +5705,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF4F5F0),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          centerTitle: true,
           leading: BackButton(onPressed: _confirmLeave),
           title: Text(
             widget.isEditing ? '記録を修正' : 'トレーニング',
@@ -5747,133 +5749,236 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
           child: Form(
             key: _formKey,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+              key: const Key('workoutScrollView'),
+              padding: EdgeInsets.fromLTRB(
+                16 + MediaQuery.paddingOf(context).left,
+                8,
+                16 + MediaQuery.paddingOf(context).right,
+                24 + MediaQuery.paddingOf(context).bottom,
+              ),
               children: [
-                Card(
+                Column(
                   key: const Key('workoutInfoCard'),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                  child: Column(
-                    children: [
-                  ListTile(
-                    key: const Key('workoutDateButton'),
-                    leading: const CircleAvatar(
-                      backgroundColor: Color(0xFFE9F4D1),
-                      child: Icon(Icons.calendar_today_rounded),
-                    ),
-                    title: const Text(
-                      'トレーニング日',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF6C746D)),
-                    ),
-                    subtitle: Text(
-                      workoutDateLabel(_workoutDate),
-                      style: const TextStyle(
-                        color: Color(0xFF101820),
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    trailing: const Icon(Icons.edit_calendar_outlined),
-                    onTap: _selectWorkoutDate,
-                  ),
-                      const Divider(height: 1, indent: 16, endIndent: 16),
-                  ListTile(
-                    key: const Key('workoutGymButton'),
-                    leading: const CircleAvatar(
-                      backgroundColor: Color(0xFFE9F4D1),
-                      child: Icon(Icons.location_on_outlined),
-                    ),
-                    title: const Text(
-                      'トレーニング場所',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF6C746D)),
-                    ),
-                    subtitle: Text(
-                      _gymName ?? '未選択',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF101820),
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    trailing: const Icon(Icons.edit_location_alt_outlined),
-                    onTap: _selectWorkoutGym,
-                  ),
-                      if (WorkoutUiPreference.workoutTimerEnabled ||
-                          (widget.isEditing && WorkoutUiPreference.workoutDurationEnabled))
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                          child: Text(
-                            widget.isEditing
-                                ? widget.initialWorkout!.durationLabel
-                                : _elapsedLabel,
-                            key: const Key('workoutElapsedLabel'),
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF777F78)),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Semantics(
+                      label: 'トレーニング日 ${workoutDateLabel(_workoutDate)}',
+                      button: true,
+                      child: InkWell(
+                        key: const Key('workoutDateButton'),
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: _selectWorkoutDate,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        '${_workoutDate.month}.${_workoutDate.day}（${const ['月', '火', '水', '木', '金', '土', '日'][_workoutDate.weekday - 1]}）',
+                                        key: const Key('workoutDateValue'),
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 36,
+                                          height: 1.15,
+                                          fontWeight: FontWeight.w900,
+                                          color: colors.onSurface,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${_workoutDate.year}年',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: colors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Icon(
+                                Icons.edit_calendar_outlined,
+                                color: colors.onSurface,
+                                size: 28,
+                              ),
+                            ],
                           ),
                         ),
-                    ],
-                  ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      key: const Key('workoutGymButton'),
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        Icons.location_on_outlined,
+                        color: colors.onSurfaceVariant,
+                      ),
+                      title: Text(
+                        _gymName ?? '未選択',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: _selectWorkoutGym,
+                    ),
+                    if (WorkoutUiPreference.workoutTimerEnabled ||
+                        (widget.isEditing &&
+                            WorkoutUiPreference.workoutDurationEnabled))
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.schedule_rounded,
+                              size: 14,
+                              color: colors.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              widget.isEditing
+                                  ? widget.initialWorkout!.durationLabel
+                                  : _elapsedLabel,
+                              key: const Key('workoutElapsedLabel'),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 if (!widget.isEditing &&
                     WorkoutUiPreference.completionCheckEnabled &&
                     RestTimerPreference.enabled) ...[
                   Container(
                     key: const Key('restTimerBanner'),
                     margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.fromLTRB(12, 4, 6, 4),
+                    padding: const EdgeInsets.fromLTRB(14, 4, 10, 12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFF2EA),
+                      color:
+                          Theme.of(context).cardTheme.color ??
+                          colors.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(18),
                     ),
-                    child: Row(
+                    child: Column(
                       children: [
-                        const Icon(
-                          Icons.timer_outlined,
-                          color: Color(0xFF83AD30),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            '休憩  ${_restRemaining > 0 ? _restLabel : _configuredRestLabel}',
-                            style: const TextStyle(
-                              color: Color(0xFF101820),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '休憩タイマー',
+                                style: TextStyle(
+                                  color: colors.onSurface,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
                             ),
-                          ),
+                            TextButton(
+                              onPressed: () {
+                                if (_restEndsAt != null) {
+                                  _startRestTimer(_restRemaining + 30);
+                                } else {
+                                  setState(
+                                    () => _restRemaining =
+                                        (_restRemaining > 0
+                                            ? _restRemaining
+                                            : RestTimerPreference.seconds) +
+                                        30,
+                                  );
+                                }
+                              },
+                              child: const Text('+30秒'),
+                            ),
+                          ],
                         ),
-                        TextButton(
-                          onPressed: () {
-                            if (_restEndsAt != null) {
-                              _startRestTimer(_restRemaining + 30);
-                            } else {
-                              setState(
-                                () => _restRemaining =
-                                    (_restRemaining > 0
-                                        ? _restRemaining
-                                        : RestTimerPreference.seconds) +
-                                    30,
-                              );
-                            }
-                          },
-                          child: const Text('+30秒'),
-                        ),
-                        IconButton(
-                          key: Key(
-                            _restEndsAt != null
-                                ? 'stopRestTimerButton'
-                                : 'startRestTimerButton',
-                          ),
-                          onPressed: _restEndsAt != null
-                              ? _pauseRest
-                              : _resumeRest,
-                          tooltip: _restEndsAt != null ? '一時停止' : '開始・再開',
-                          icon: Icon(_restEndsAt != null
-                              ? Icons.pause_rounded : Icons.play_arrow_rounded),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              color: colors.primary,
+                              size: 28,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _restRemaining > 0
+                                    ? _restLabel
+                                    : _configuredRestLabel,
+                                key: const Key('restRemainingLabel'),
+                                maxLines: 1,
+                                style: TextStyle(
+                                  color: colors.onSurface,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              key: Key(
+                                _restEndsAt != null
+                                    ? 'stopRestTimerButton'
+                                    : 'startRestTimerButton',
+                              ),
+                              onPressed: _restEndsAt != null
+                                  ? _pauseRest
+                                  : _resumeRest,
+                              style: IconButton.styleFrom(
+                                backgroundColor: colors.secondaryContainer,
+                                foregroundColor: colors.onSecondaryContainer,
+                                minimumSize: const Size(48, 48),
+                              ),
+                              tooltip: _restEndsAt != null ? '一時停止' : '開始・再開',
+                              icon: Icon(
+                                _restEndsAt != null
+                                    ? Icons.pause_rounded
+                                    : Icons.play_arrow_rounded,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ],
+                Padding(
+                  key: const Key('workoutExercisesHeading'),
+                  padding: const EdgeInsets.only(top: 4, bottom: 12),
+                  child: Row(
+                    children: [
+                      Container(width: 4, height: 22, color: colors.secondary),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text(
+                          'トレーニング種目',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${_exercises.length}種目',
+                        key: const Key('workoutExerciseCount'),
+                        style: TextStyle(
+                          color: colors.onSurfaceVariant,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 if (_exercises.isEmpty) ...[
                   Container(
                     key: const Key('emptyWorkoutExercises'),
@@ -8003,9 +8108,11 @@ class ExerciseInputCard extends StatelessWidget {
         ? '前回の記録はありません'
         : '前回  ${previousSets.map((set) => set.displaySummary).join(' ・ ')}';
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:
+            Theme.of(context).cardTheme.color ??
+            Theme.of(context).colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(22),
       ),
       child: Column(
@@ -8036,9 +8143,8 @@ class ExerciseInputCard extends StatelessWidget {
                             final painter = TextPainter(
                               text: TextSpan(
                                 text: name,
-                                style: DefaultTextStyle.of(context).style.merge(
-                                  baseStyle.copyWith(fontSize: size),
-                                ),
+                                style: DefaultTextStyle.of(context).style
+                                    .merge(baseStyle.copyWith(fontSize: size)),
                               ),
                               textDirection: Directionality.of(context),
                               textScaler: MediaQuery.textScalerOf(context),
@@ -8086,7 +8192,7 @@ class ExerciseInputCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -8117,7 +8223,7 @@ class ExerciseInputCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 10),
           if (WorkoutUiPreference.completionCheckEnabled &&
               exercise.recordType.usesSets)
             Row(
@@ -8655,12 +8761,14 @@ class SetHeader extends StatelessWidget {
     };
     return Row(
       children: [
-        const SizedBox(width: 42, child: Text('SET', style: setLabelStyle)),
-        for (final label in labels)
+        const SizedBox(width: 28, child: Text('SET', style: setLabelStyle)),
+        for (final (index, label) in labels.indexed) ...[
+          if (index > 0) const SizedBox(width: 8),
           Expanded(
             child: Center(child: Text(label, style: setLabelStyle)),
           ),
-        SizedBox(width: showCompletionCheck ? 76 : 38),
+        ],
+        SizedBox(width: showCompletionCheck ? 96 : 52),
       ],
     );
   }
@@ -8738,7 +8846,7 @@ class SetRow extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 42,
+            width: 28,
             child: Text(
               '$number',
               style: const TextStyle(fontWeight: FontWeight.w800),
@@ -8747,6 +8855,7 @@ class SetRow extends StatelessWidget {
           if (recordType == ExerciseRecordType.weightReps) ...[
             Expanded(
               child: ValueBox(
+                largeTouchTarget: true,
                 key: Key('weightField$fieldPrefix$number'),
                 value: set.weight,
                 stepLabel: 'KG',
@@ -8763,6 +8872,7 @@ class SetRow extends StatelessWidget {
               recordType == ExerciseRecordType.bodyweightReps)
             Expanded(
               child: ValueBox(
+                largeTouchTarget: true,
                 key: Key('repsField$fieldPrefix$number'),
                 value: set.reps,
                 stepLabel: 'REPS',
@@ -8775,6 +8885,7 @@ class SetRow extends StatelessWidget {
           if (recordType == ExerciseRecordType.timed)
             Expanded(
               child: ValueBox(
+                largeTouchTarget: true,
                 key: Key('durationField$fieldPrefix$number'),
                 value: set.durationSeconds,
                 onChanged: (value) => onDurationChanged(value.toInt()),
@@ -8783,8 +8894,8 @@ class SetRow extends StatelessWidget {
           const SizedBox(width: 8),
           if (showCompletionCheck) ...[
             SizedBox(
-              width: 34,
-              height: 34,
+              width: 44,
+              height: 44,
               child: IconButton.filled(
                 key: Key('toggleSet$fieldPrefix$number'),
                 padding: EdgeInsets.zero,
@@ -8801,11 +8912,10 @@ class SetRow extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 4),
           ],
           SizedBox(
-            width: 34,
-            height: 34,
+            width: 44,
+            height: 44,
             child: IconButton(
               key: Key('deleteSet$fieldPrefix$number'),
               tooltip: 'セットを削除',
@@ -9239,6 +9349,7 @@ class ValueBox extends StatefulWidget {
     required this.value,
     required this.onChanged,
     this.allowDecimal = false,
+    this.largeTouchTarget = false,
     this.normalizeZeros = false,
     this.stepLabel,
     this.focusNode,
@@ -9246,6 +9357,7 @@ class ValueBox extends StatefulWidget {
   });
 
   final num value;
+  final bool largeTouchTarget;
   final ValueChanged<num> onChanged;
   final bool allowDecimal;
   final bool normalizeZeros;
@@ -9413,8 +9525,14 @@ class _ValueBoxState extends State<ValueBox> {
       onSaved: (text) => widget.onChanged(
         widget.allowDecimal ? parseWeight(text) : int.tryParse(text ?? '') ?? 0,
       ),
-      style: const TextStyle(fontWeight: FontWeight.w800),
+      style: TextStyle(
+        fontWeight: FontWeight.w800,
+        fontSize: widget.largeTouchTarget ? 18 : null,
+      ),
       decoration: InputDecoration(
+        constraints: widget.largeTouchTarget
+            ? const BoxConstraints(minHeight: 48)
+            : null,
         isDense: true,
         filled: true,
         fillColor: _usesPad && _focus.hasFocus

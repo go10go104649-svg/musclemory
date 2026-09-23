@@ -104,8 +104,8 @@ void main() {
       await tester.pump();
       await tester.tap(find.byKey(const Key('stopRestTimerButton')));
       await tester.pump();
-      final paused = tester.widget<Text>(find.textContaining('休憩  ')).data!;
-      expect(paused, anyOf('休憩  00:34', '休憩  00:33'));
+      final paused = tester.widget<Text>(find.byKey(const Key('restRemainingLabel'))).data!;
+      expect(paused, anyOf('00:34', '00:33'));
       final channel = const MethodChannel('com.musclememory/rest_timer');
       final stopped = await channel.invokeMapMethod<String, dynamic>(
         'debugStatus',

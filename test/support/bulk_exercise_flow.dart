@@ -74,6 +74,9 @@ Future<void> verifyBulkExerciseFlow(
           )
           .first,
     );
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('addExerciseButton')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('addExerciseButton')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('exercisePickerMyMenuEntry')));

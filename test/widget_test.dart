@@ -1668,20 +1668,20 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('startWorkoutButton')));
       await tester.pumpAndSettle();
-      expect(find.text('休憩  05:00'), findsOneWidget);
+      expect(find.text('05:00'), findsOneWidget);
       await tester.tap(find.byKey(const Key('startRestTimerButton')));
       await tester.pump();
-      expect(find.text('休憩  05:00'), findsOneWidget);
+      expect(find.text('05:00'), findsOneWidget);
       await tester.tap(find.byKey(const Key('stopRestTimerButton')));
       await tester.pump();
       await tester.pump(const Duration(seconds: 2));
-      expect(find.text('休憩  05:00'), findsOneWidget);
+      expect(find.text('05:00'), findsOneWidget);
       await tester.tap(find.byKey(const Key('startRestTimerButton')));
       await tester.pump();
-      expect(find.text('休憩  05:00'), findsOneWidget);
+      expect(find.text('05:00'), findsOneWidget);
       await tester.tap(find.text('+30秒'));
       await tester.pump();
-      expect(find.text('休憩  05:30'), findsOneWidget);
+      expect(find.text('05:30'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();
     },
@@ -2155,7 +2155,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('2025年3月15日'), findsOneWidget);
+    expect(find.text('3.15（土）'), findsOneWidget);
+    expect(find.text('2025年'), findsOneWidget);
     expect(find.text('2分'), findsOneWidget);
     final recordedTimer = tester
         .widget<Text>(find.byKey(const Key('workoutElapsedLabel')))
@@ -2178,7 +2179,7 @@ void main() {
     await tester.tap(find.text('決定'));
     await tester.pumpAndSettle();
 
-    expect(find.text('2025年3月14日'), findsOneWidget);
+    expect(find.text('3.14（金）'), findsOneWidget);
   });
 
   testWidgets('editing history does not remove an active workout draft', (
@@ -2907,6 +2908,7 @@ void main() {
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.byKey(const Key('addExerciseButton')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('addExerciseButton')));
     await tester.pumpAndSettle();
     await openExerciseCategory(tester, '胸');
@@ -2929,6 +2931,7 @@ void main() {
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.byKey(const Key('addExerciseButton')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('addExerciseButton')));
     await tester.pumpAndSettle();
     await openExerciseCategory(tester, '胸');
@@ -2940,9 +2943,11 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const Key('restTimerBanner')), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const Key('startRestTimerButton')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('startRestTimerButton')));
     await tester.pump();
-    expect(find.text('休憩  00:01'), findsOneWidget);
+    expect(find.text('00:01'), findsOneWidget);
     await tester.pump(const Duration(seconds: 2));
     expect(
       platformCalls.any((call) => call.method == 'SystemSound.play'),
@@ -3104,7 +3109,8 @@ void main() {
     preferences = await SharedPreferences.getInstance();
     expect(preferences.getString(activeWorkoutDraftStorageKey), isNull);
     expect(find.text('ラットプルダウン'), findsOneWidget);
-    expect(find.text(workoutDateLabel(DateTime.now())), findsOneWidget);
+    expect(tester.widget<Text>(find.byKey(const Key('workoutDateValue'))).data,
+      startsWith('${DateTime.now().month}.${DateTime.now().day}（'));
     expect(find.text('2024年1月2日'), findsNothing);
 
     await tester.pumpWidget(const SizedBox());
@@ -3172,7 +3178,8 @@ void main() {
     preferences = await SharedPreferences.getInstance();
     expect(preferences.getString(activeWorkoutDraftStorageKey), isNull);
     expect(find.text('スクワット'), findsOneWidget);
-    expect(find.text(workoutDateLabel(DateTime.now())), findsOneWidget);
+    expect(tester.widget<Text>(find.byKey(const Key('workoutDateValue'))).data,
+      startsWith('${DateTime.now().month}.${DateTime.now().day}（'));
 
     await tester.pumpWidget(const SizedBox());
   });
