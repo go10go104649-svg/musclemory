@@ -28,6 +28,10 @@ class MainActivity : FlutterActivity() {
                         RestTimerState.cancel(this)
                         result.success(WorkoutNotificationState.read(this))
                     }
+                    "nextWorkoutTarget" -> result.success(WorkoutNotificationState.nextTarget(this,
+                        call.argument<String>("sessionId") ?: "", call.argument<String>("exerciseInstanceId") ?: "")?.let { json ->
+                            json.keys().asSequence().associateWith { json.getString(it) }
+                        })
                     "readWorkoutDraft" -> result.success(WorkoutNotificationState.read(this))
                     "writeWorkoutDraft" -> {
                         try { result.success(WorkoutNotificationState.write(this, call.argument<String>("draft")!!)) }

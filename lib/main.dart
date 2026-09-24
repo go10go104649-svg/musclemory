@@ -5574,7 +5574,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         !widget.isEditing &&
         WorkoutUiPreference.completionCheckEnabled &&
         RestTimerPreference.enabled) {
-      if (setIndex == exercise.sets.length - 1) {
+      if (Platform.isAndroid) {
+        await _advanceAndroidRest(exercise);
+      } else if (setIndex == exercise.sets.length - 1) {
         _skipRest();
       } else {
         _restExerciseName = exerciseDisplayName(
@@ -5589,6 +5591,23 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         };
         _startRestTimer();
       }
+    }
+  }
+
+  Future<void> _advanceAndroidRest(WorkoutExercise exercise) async {
+    final revision = _restRevision;
+    final target = await AndroidWorkoutDraft.nextTarget(
+      _sessionId,
+      exercise.instanceId,
+    );
+    if (!mounted || _exiting || revision != _restRevision) return;
+    if (target == null) {
+      _restTarget = null;
+      _skipRest();
+    } else {
+      _restTarget = target;
+      _restExerciseName = target['exerciseName'] ?? exercise.name;
+      _startRestTimer();
     }
   }
 
@@ -5620,24 +5639,57 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     );
   }
 
-  void _setAllSetsCompleted(int exerciseIndex, bool completed) {
+  Future<void> _setAllSetsCompleted(int exerciseIndex, bool completed) async {
+    final exercise = _exercises[exerciseIndex];
     setState(() {
       for (final set in _exercises[exerciseIndex].sets) {
         set.completed = completed;
       }
     });
     if (completed) HapticFeedback.mediumImpact();
-    unawaited(_saveDraft());
+    if (Platform.isAndroid) {
+      await _saveDraft();
+    } else {
+      unawaited(_saveDraft());
+    }
+    if (!mounted || _exiting) return;
     if (completed &&
         !widget.isEditing &&
         WorkoutUiPreference.completionCheckEnabled &&
         RestTimerPreference.enabled) {
-      _skipRest();
+      if (Platform.isAndroid) {
+        await _advanceAndroidRest(exercise);
+      } else {
+        _skipRest();
+      }
     }
   }
 
-  void _startRestTimer([int? seconds]) {
-    _restRevision++;
+  Future<void> _startRestTimer([int? seconds]) async {
+    final revision = ++_restRevision;
+    if (Platform.isAndroid && !widget.isEditing && _exercises.isNotEmpty) {
+      await _saveDraft();
+      if (!mounted ||
+          _exiting ||
+          _exercises.isEmpty ||
+          revision != _restRevision) {
+        return;
+      }
+      final current = _restTarget?['exerciseInstanceId'];
+      final exercise = _exercises.firstWhere(
+        (e) => e.instanceId == current,
+        orElse: () => _exercises.first,
+      );
+      final target = await AndroidWorkoutDraft.nextTarget(
+        _sessionId,
+        exercise.instanceId,
+      );
+      if (!mounted || _exiting || revision != _restRevision) return;
+      _restTarget = target;
+      if (target != null) {
+        _restExerciseName = target['exerciseName'] ?? exercise.name;
+      }
+    }
     _restTimer?.cancel();
     final duration = seconds ?? RestTimerPreference.seconds;
     _restEndsAt = DateTime.now().add(Duration(seconds: duration));

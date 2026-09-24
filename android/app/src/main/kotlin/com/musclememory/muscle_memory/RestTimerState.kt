@@ -6,6 +6,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
+import android.widget.RemoteViews
+import android.view.View
 import java.util.UUID
 import org.json.JSONObject
 
@@ -114,7 +117,7 @@ object RestTimerState {
         val p = prefs(c)
         val deadline = p.getLong("deadline", 0)
         val pending = WorkoutNotificationState.pending(c)
-        val target = listOf("sessionId", "exerciseInstanceId", "previousSetId", "targetSetId")
+        val target = listOf("sessionId", "exerciseInstanceId", "previousSetId", "targetSetId", "exerciseName", "setNumber")
             .associateWith { pending?.optString(it) ?: "" }
         return mapOf("target" to target, "timerId" to (p.getString("timerId", "") ?: ""),
             "lastCompletionTimerId" to (p.getString("lastCompletionTimerId", "") ?: ""),
@@ -138,6 +141,41 @@ object RestTimerState {
         return true
     }
 
+    private fun completeIntent(c: Context, id: String, target: JSONObject) = PendingIntent.getBroadcast(c, 7345,
+        Intent(c, RestTimerReceiver::class.java).setAction(WorkoutNotificationState.COMPLETE)
+            .setData(android.net.Uri.parse("musclemory://rest-action/$id"))
+            .putExtra("timerId", id).putExtra("targetSetId", target.getString("targetSetId")),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+    /** System Chronometer ticks in SystemUI; Flutter never posts once per second.
+     * Custom layout intentionally prioritizes legibility over promoted-chip eligibility. */
+    private fun timerLayout(c: Context, builder: Notification.Builder, deadline: Long,
+                            target: JSONObject?, complete: PendingIntent?, name: String) {
+        if (Build.VERSION.SDK_INT < 24) return
+        fun view(expanded: Boolean): RemoteViews {
+            val layout = RemoteViews(c.packageName, if (expanded) R.layout.rest_notification_expanded else R.layout.rest_notification_compact)
+            val running = deadline > System.currentTimeMillis()
+            layout.setViewVisibility(R.id.rest_clock, if (running) View.VISIBLE else View.GONE)
+            layout.setViewVisibility(R.id.rest_zero, if (running) View.GONE else View.VISIBLE)
+            layout.setChronometer(R.id.rest_clock,
+                SystemClock.elapsedRealtime() + (deadline - System.currentTimeMillis()).coerceAtLeast(0), null, running)
+            layout.setChronometerCountDown(R.id.rest_clock, true)
+            val detail = target?.optString("exerciseName")?.takeIf { it.isNotBlank() } ?: name
+            val number = target?.optString("setNumber")?.takeIf { it.isNotBlank() }
+            layout.setTextViewText(R.id.rest_detail, detail)
+            layout.setTextViewText(R.id.rest_next, number?.let { if (expanded) "次：${it}セット目" else "次：$it" } ?: "休憩")
+            if (expanded) layout.setTextViewText(R.id.rest_label, if (running) "休憩タイマー" else "休憩終了")
+            else {
+                layout.setViewVisibility(R.id.rest_complete, if (complete == null) View.GONE else View.VISIBLE)
+                if (complete != null) layout.setOnClickPendingIntent(R.id.rest_complete, complete)
+            }
+            return layout
+        }
+        builder.setStyle(Notification.DecoratedCustomViewStyle())
+            .setCustomContentView(view(false)).setCustomBigContentView(view(true))
+            .setCustomHeadsUpContentView(view(false))
+    }
+
     fun show(c: Context) {
         val p = prefs(c)
         val deadline = p.getLong("deadline", 0)
@@ -159,23 +197,22 @@ object RestTimerState {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         fun actionIntent(action: String, code: Int) = PendingIntent.getBroadcast(c, code,
-            Intent(c, RestTimerReceiver::class.java).setAction(action).putExtra("timerId", p.getString("timerId", "")),
+            Intent(c, RestTimerReceiver::class.java).setAction(action)
+                .setData(android.net.Uri.parse("musclemory://rest-action/${p.getString("timerId", "")}/$action"))
+                .putExtra("timerId", p.getString("timerId", "")),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle("MUSCLEMORY · 休憩タイマー")
+        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle("休憩タイマー")
             .setContentText("残り時間 · ${p.getString("exerciseName", "")}").setContentIntent(open)
             .setStyle(Notification.BigTextStyle().bigText("休憩タイマー — 残り時間\n${p.getString("exerciseName", "")}"))
             .setCategory(Notification.CATEGORY_STATUS).setVisibility(Notification.VISIBILITY_PUBLIC)
             .setOngoing(true).setOnlyAlertOnce(true).setWhen(deadline).setShowWhen(true).setUsesChronometer(true)
             .addAction(Notification.Action.Builder(null, "停止", actionIntent(STOP, 7343)).build())
             .addAction(Notification.Action.Builder(null, "+30秒", actionIntent(EXTEND, 7344)).build())
-        if (Build.VERSION.SDK_INT >= 36) {
-            // API 36's public promotion extra (Builder convenience arrives in
-            // a later SDK revision). No reflection/custom RemoteViews required.
-            builder.addExtras(android.os.Bundle().apply {
-                putBoolean("android.requestPromotedOngoing", true)
-            })
-            RestTimerDiagnostics.set("canPostPromotedNotifications", manager(c).canPostPromotedNotifications())
-        }
+        val id = p.getString("timerId", "") ?: ""
+        val target = WorkoutNotificationState.valid(c, id)
+        val complete = target?.let { completeIntent(c, id, it) }
+        if (complete != null) builder.addAction(Notification.Action.Builder(null, "セット完了", complete).build())
+        timerLayout(c, builder, deadline, target, complete, p.getString("exerciseName", "") ?: "")
         if (Build.VERSION.SDK_INT >= 24) builder.setChronometerCountDown(true)
         // No timeout: completion replaces this same slot with the set action.
         try { manager(c).notify(ONGOING, builder.build()) } catch (_: SecurityException) { }
@@ -185,22 +222,18 @@ object RestTimerState {
         val channel = if (alert) RestTimerFeedback.CHANNEL else CHANNEL
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(c, channel) else Notification.Builder(c)
         if (alert && Build.VERSION.SDK_INT < 26) builder.setSound(RestTimerFeedback.sound(c)).setVibrate(RestTimerFeedback.vibration)
-        // Unique data URI keeps an old captured PendingIntent bound to its set.
-        val actionIntent = Intent(c, RestTimerReceiver::class.java).setAction(WorkoutNotificationState.COMPLETE)
-            .setData(android.net.Uri.parse("musclemory://rest-action/$id"))
-            .putExtra("timerId", id).putExtra("targetSetId", target.getString("targetSetId"))
-        val complete = PendingIntent.getBroadcast(c, 7345, actionIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val complete = completeIntent(c, id, target)
         val open = PendingIntent.getActivity(c, ONGOING, Intent(c, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle("MUSCLEMORY · 休憩終了")
+        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle("休憩終了")
             .setContentText("次のセットを行ってください")
             .setStyle(Notification.BigTextStyle().bigText("次のセットを行ってください"))
             .setContentIntent(open).setOngoing(true).setOnlyAlertOnce(!alert)
             .setVisibility(Notification.VISIBILITY_PUBLIC).setUsesChronometer(false).setShowWhen(false)
             .addAction(Notification.Action.Builder(null, "セット完了", complete).build())
+        timerLayout(c, builder, 0, target, complete, target.optString("exerciseName"))
         return builder.build()
     }
     fun showReady(c: Context, id: String) {

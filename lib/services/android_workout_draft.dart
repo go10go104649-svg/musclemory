@@ -8,6 +8,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AndroidWorkoutDraft {
   static const key = 'active_workout_draft';
   static const channel = MethodChannel('com.musclememory/rest_timer');
+  static Future<Map<String, String>?> nextTarget(
+    String session,
+    String exercise,
+  ) => channel.invokeMapMethod<String, String>('nextWorkoutTarget', {
+    'sessionId': session,
+    'exerciseInstanceId': exercise,
+  });
+
   static Future<String?> freezeActions() async {
     if (!Platform.isAndroid) return null;
     return channel.invokeMethod<String>('freezeWorkoutActions');

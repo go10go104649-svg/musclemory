@@ -69,10 +69,10 @@ void main() {
       await AndroidWorkoutDraft.write(jsonEncode(fixture()));
       debugPrint('QA_REST_PERMISSION_READY');
       await Future<void>.delayed(const Duration(seconds: 2));
+      final before = (await channel.invokeMapMethod<String, dynamic>(
+        'debugStatus',
+      ))!;
       final id = await start();
-      await action(id, 'set_1'); // still resting
-      expect((await draft())['lockRevision'], 0);
-      await Future<void>.delayed(const Duration(seconds: 3));
       final status = (await channel.invokeMapMethod<String, dynamic>(
         'debugStatus',
       ))!;
@@ -91,6 +91,13 @@ void main() {
       expect(sets[1]['distanceKm'], 1.2);
       expect(saved['note'], 'keep');
       expect(saved['lockRevision'], 1);
+      final afterAction = (await channel.invokeMapMethod<String, dynamic>(
+        'debugStatus',
+      ))!;
+      expect(
+        afterAction['completionCount'] ?? 0,
+        before['completionCount'] ?? 0,
+      );
       final next = (await RestNotificationService.state())!;
       expect(next['timerId'], isNot(id));
       expect(
@@ -102,6 +109,13 @@ void main() {
       saved = await draft();
       expect(saved['exercises'][0]['sets'][2]['completed'], true);
       expect(saved['lockRevision'], 2);
+      final afterExpiry = (await channel.invokeMapMethod<String, dynamic>(
+        'debugStatus',
+      ))!;
+      expect(
+        afterExpiry['completionCount'],
+        (before['completionCount'] ?? 0) + 1,
+      );
       expect((await RestNotificationService.state())!['endsAtMilliseconds'], 0);
       // A queued Flutter snapshot must not undo a committed background completion.
       await AndroidWorkoutDraft.write(jsonEncode(fixture()));
@@ -111,8 +125,75 @@ void main() {
       await AndroidWorkoutDraft.clear();
     },
   );
+  testWidgets('native action moves across exercises and skips completed sets', (
+    t,
+  ) async {
+    await t.pumpWidget(const MaterialApp(home: Scaffold()));
+    await AndroidWorkoutDraft.clear();
+    final data = fixture();
+    data['exercises'][0]['sets'][2]['completed'] = true;
+    final second = Map<String, Object>.from(data['exercises'][0]);
+    second['instanceId'] = 'second';
+    second['name'] = 'ダンベルカール';
+    second['exerciseId'] = 'dumbbell_curl';
+    second['sets'] = [
+      {'setId': 'second_0', 'weight': 12, 'reps': 8, 'completed': false},
+    ];
+    data['exercises'].add(second);
+    await AndroidWorkoutDraft.write(jsonEncode(data));
+    final id = await start();
+    await action(id, 'set_1');
+    final next = (await RestNotificationService.state())!;
+    expect(next['target']['targetSetId'], 'second_0');
+    expect(next['exerciseName'], 'ダンベルカール');
+    await action(id, 'set_1');
+    expect((await draft())['exercises'][1]['sets'][0]['completed'], false);
+    await action(
+      next['timerId'],
+      'second_0',
+    ); // Replacement arriving during a double tap.
+    expect((await draft())['exercises'][1]['sets'][0]['completed'], false);
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
+    await action(next['timerId'], 'second_0');
+    expect((await draft())['exercises'][1]['sets'][0]['completed'], true);
+    expect((await RestNotificationService.state())!['endsAtMilliseconds'], 0);
+    await AndroidWorkoutDraft.clear();
+  });
   testWidgets(
-    'foreground edits and removal invalidate old notification actions',
+    'extended action replaces stale generation and stop stays silent',
+    (t) async {
+      await t.pumpWidget(const MaterialApp(home: Scaffold()));
+      await AndroidWorkoutDraft.clear();
+      await AndroidWorkoutDraft.write(jsonEncode(fixture()));
+      final oldId = await start();
+      final before = (await RestNotificationService.state())!;
+      await channel.invokeMethod<void>('debugRestAction', {'action': 'extend'});
+      final extended = (await RestNotificationService.state())!;
+      expect(
+        extended['endsAtMilliseconds'],
+        before['endsAtMilliseconds'] + 30000,
+      );
+      await action(oldId, 'set_1');
+      expect((await draft())['lockRevision'], 0);
+      await action(extended['timerId'], 'set_1');
+      expect((await draft())['lockRevision'], 1);
+      await channel.invokeMethod<void>('debugRestAction', {'action': 'stop'});
+      final status = (await channel.invokeMapMethod<String, dynamic>(
+        'debugStatus',
+      ))!;
+      await Future<void>.delayed(const Duration(seconds: 3));
+      final after = (await channel.invokeMapMethod<String, dynamic>(
+        'debugStatus',
+      ))!;
+      expect(after['completionCount'], status['completionCount']);
+      expect(after['delivered'], isNot(contains(7340)));
+      await action(extended['timerId'], 'set_1');
+      expect((await draft())['lockRevision'], 1);
+      await AndroidWorkoutDraft.clear();
+    },
+  );
+  testWidgets(
+    'value edits preserve bound action while removal invalidates it',
     (t) async {
       await t.pumpWidget(const MaterialApp(home: Scaffold()));
       await AndroidWorkoutDraft.write(jsonEncode(fixture()));
@@ -122,6 +203,24 @@ void main() {
         jsonEncode(fixture()..['note'] = 'edited'),
       );
       await action(id, 'set_1');
+      expect((await draft())['exercises'][0]['sets'][1]['completed'], true);
+      expect((await draft())['note'], 'edited');
+      await AndroidWorkoutDraft.clear();
+      await AndroidWorkoutDraft.write(jsonEncode(fixture()));
+      final removalId = await start();
+      final removed = fixture();
+      removed['exercises'][0]['sets'].removeAt(1);
+      await AndroidWorkoutDraft.write(jsonEncode(removed));
+      await action(removalId, 'set_1');
+      expect((await draft())['exercises'][0]['sets'].length, 2);
+      expect((await draft())['exercises'][0]['sets'][1]['completed'], false);
+      await AndroidWorkoutDraft.clear();
+      await AndroidWorkoutDraft.write(jsonEncode(fixture()));
+      final undoId = await start();
+      final undone = fixture();
+      undone['exercises'][0]['sets'][0]['completed'] = false;
+      await AndroidWorkoutDraft.write(jsonEncode(undone));
+      await action(undoId, 'set_1');
       expect((await draft())['exercises'][0]['sets'][1]['completed'], false);
       await AndroidWorkoutDraft.clear();
       await action(id, 'set_1');
@@ -184,6 +283,75 @@ void main() {
       await t.pumpWidget(const SizedBox());
     },
   );
+  testWidgets('manual start and app checks use the same next-exercise policy', (
+    t,
+  ) async {
+    await AndroidWorkoutDraft.clear();
+    WorkoutUiPreference.completionCheckEnabled = true;
+    WorkoutUiPreference.workoutTimerEnabled = false;
+    WorkoutUiPreference.workoutDurationEnabled = false;
+    RestTimerPreference.enabled = true;
+    RestTimerPreference.seconds = 90;
+    await t.pumpWidget(
+      MaterialApp(
+        home: WorkoutPage(
+          gymName: '自宅',
+          resumeDraft: false,
+          initialWorkout: WorkoutRecord(
+            date: DateTime.now(),
+            sets: const [
+              RecordedSet(
+                exerciseName: 'ベンチプレス',
+                exerciseId: 'bench_press',
+                weight: 80,
+                reps: 10,
+                completed: false,
+              ),
+              RecordedSet(
+                exerciseName: 'ダンベルカール',
+                exerciseId: 'dumbbell_curl',
+                weight: 10,
+                reps: 10,
+                completed: false,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await t.pumpAndSettle();
+    final start = find.byKey(const Key('startRestTimerButton'));
+    await t.ensureVisible(start);
+    await t.tap(start);
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    var status = (await channel.invokeMapMethod<String, dynamic>(
+      'debugStatus',
+    ))!;
+    expect(
+      (status['ongoingDetails'] as List).single['actions'],
+      contains('セット完了'),
+    );
+    final first = find.byKey(const Key('toggleSet0_1'));
+    await t.ensureVisible(first);
+    await t.pumpAndSettle();
+    await t.tap(first);
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    expect((await RestNotificationService.state())!['exerciseName'], 'ダンベルカール');
+    final last = find.byKey(const Key('toggleSet1_1'));
+    await t.scrollUntilVisible(
+      last,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await t.pumpAndSettle();
+    await t.tap(last);
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    expect((await RestNotificationService.state())!['endsAtMilliseconds'], 0);
+    status = (await channel.invokeMapMethod<String, dynamic>('debugStatus'))!;
+    expect(status['delivered'], isNot(contains(7340)));
+    await t.pumpWidget(const SizedBox());
+    await AndroidWorkoutDraft.clear();
+  });
   testWidgets(
     'notification PendingIntent completes a set without foregrounding the app',
     (t) async {
@@ -198,7 +366,7 @@ void main() {
       final details = (running['ongoingDetails'] as List).single as Map;
       expect(details['chronometer'], true);
       expect(details['countdown'], true);
-      expect(details['requestedPromotion'], true);
+      expect(details['actions'], ['停止', '+30秒', 'セット完了']);
       debugPrint('QA_REST_BOUNDARY_lock');
       await Future<void>.delayed(const Duration(seconds: 4));
       final before = (await channel.invokeMapMethod<String, dynamic>(
