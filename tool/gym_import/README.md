@@ -53,19 +53,20 @@ that every listed store has a complete equipment inventory.
 
 ## Mapping updates (2026-09-24)
 
-The mapping file now covers 185 of 219 equipment IDs with 271 equipment-exercise
+The mapping file now covers 191 of 219 equipment IDs with 278 equipment-exercise
 rows. The reviewed T-bar variants, plate-loaded machines, selectorized machines,
 cardio equipment, cable stations and clearly identified single-purpose equipment
 are linked to existing catalog exercise IDs while keeping equipment identity/load
 type separate from exercise identity.
 
-34 equipment IDs remain intentionally unmapped. They are either source rows marked
+28 equipment IDs remain intentionally unmapped. They are either source rows marked
 `needs_review`, generic benches/racks that require another piece of equipment,
 or names whose exact movement/load variant is ambiguous. They are not auto-mapped
 just to increase coverage because the current store filter is a union of mappings
 and cannot express multi-equipment prerequisites. Apply migrations
 `202609240002_fitplace_tbar_mapping.sql` and
-`202609240003_fitplace_equipment_mapping_batch.sql` (or rerun the importer with
+`202609240003_fitplace_equipment_mapping_batch.sql` and
+`202609240004_fitplace_researched_equipment_mapping.sql` (or rerun the importer with
 `--apply`) before treating the expanded counts as live linked-project data.
 
 ## Search and reports
