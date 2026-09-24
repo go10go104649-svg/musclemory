@@ -584,5 +584,23 @@
       "rotary_torso"
     ],
     "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+  },
+  {
+    "equipment_id": "fp_eq_93cafce3bb2c",
+    "expected_name": "Tバーロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "t_bar_row"
+    ],
+    "rationale": "設備名がTバーローを明示し、既存種目 t_bar_row と同一動作。店舗設備の負荷方式と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_aa7f2abd2795",
+    "expected_name": "Tバーロー（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "t_bar_row"
+    ],
+    "rationale": "設備名がTバーロー（プレートロード）を明示し、既存種目 t_bar_row と同一動作。プレートロード設備であっても種目IDは共通とし、設備分類と種目分類は分離して扱う。"
   }
 ]
