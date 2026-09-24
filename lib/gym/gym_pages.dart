@@ -370,7 +370,12 @@ class _GymStoreEquipmentPageState extends State<GymStoreEquipmentPage> {
                     subtitle: Text(
                       [
                         if (e.quantity != null) '${e.quantity}台',
-                        if (e.exerciseIds.isEmpty) '対応種目は現在準備中です',
+                        if (e.exerciseIds.isEmpty &&
+                            e.compositeRuleIds.isNotEmpty)
+                          '他の設備と組み合わせて対応',
+                        if (e.exerciseIds.isEmpty &&
+                            e.compositeRuleIds.isEmpty)
+                          '対応種目は現在準備中です',
                       ].join(' ・ '),
                     ),
                     trailing: const Icon(Icons.chevron_right),
@@ -466,9 +471,13 @@ class _GymEquipmentExercisesPageState extends State<GymEquipmentExercisesPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             if (forms.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Text('対応種目は現在準備中です'),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Text(
+                  widget.equipment.compositeRuleIds.isNotEmpty
+                      ? 'この設備は、ラック＋ベンチなど他の設備との組み合わせで対応種目を判定します。'
+                      : '対応種目は現在準備中です',
+                ),
               ),
             for (final f in forms)
               Card(
