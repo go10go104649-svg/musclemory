@@ -50,11 +50,13 @@ class GymEquipment {
     this.manufacturer,
     this.model,
     this.exerciseIds = const {},
+    this.compositeRuleIds = const {},
   });
   final String id, name, category;
   final int? quantity;
   final String? manufacturer, model;
   final Set<String> exerciseIds;
+  final Set<String> compositeRuleIds;
   factory GymEquipment.fromJson(Map<String, dynamic> row) {
     final e = Map<String, dynamic>.from(row['equipment'] as Map);
     return GymEquipment(
@@ -67,6 +69,10 @@ class GymEquipment {
       exerciseIds: {
         for (final m in e['equipment_exercise_mapping'] as List? ?? const [])
           m['exercise_id'] as String,
+      },
+      compositeRuleIds: {
+        for (final m in e['exercise_equipment_rule_items'] as List? ?? const [])
+          m['rule_id'] as String,
       },
     );
   }
@@ -128,13 +134,26 @@ class SupabaseGymRepository extends GymRepository {
     final rows = await _client
         .from('gym_store_equipment')
         .select(
-          'quantity,equipment!inner(id,name,category,manufacturer,model,equipment_exercise_mapping(exercise_id))',
+          'quantity,equipment!inner(id,name,category,manufacturer,model,equipment_exercise_mapping(exercise_id),exercise_equipment_rule_items(rule_id))',
         )
         .eq('store_id', storeId)
         .eq('available', true)
         .order('equipment_id')
         .range(offset, offset + 49);
     return rows.map(GymEquipment.fromJson).toList();
+  }
+
+  @override
+  Future<Set<String>> exerciseIds(String storeId) async {
+    final rows = await _client.rpc(
+      'gym_store_exercise_ids',
+      params: {'target_store_id': storeId},
+    );
+    return {
+      for (final row in rows as List)
+        if (row is Map && row['exercise_id'] is String)
+          row['exercise_id'] as String,
+    };
   }
 
   // Guest registrations stay on this device. Signed-in registrations are RLS
