@@ -1,4 +1,5 @@
 import copy
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -37,6 +38,55 @@ class ImportTests(unittest.TestCase):
         self.assertEqual(normalized(' ＡＢＣ　 24 '),'ABC 24')
         t=copy.deepcopy(self.tables);t['設備マスター'].append(dict(t['設備マスター'][0],equipment_id='e2'))
         self.assertEqual(len(self.payload(t)['equipment']),2)
+    def test_tbar_equipment_variants_share_exercise_without_merging(self):
+        mapping_path = Path(__file__).with_name('fitplace_mappings.json')
+        all_mappings = json.loads(mapping_path.read_text())
+        wanted = {
+            'fp_eq_93cafce3bb2c',
+            'fp_eq_aa7f2abd2795',
+        }
+        mappings = [m for m in all_mappings if m['equipment_id'] in wanted]
+        self.assertEqual({m['equipment_id'] for m in mappings}, wanted)
+
+        t = copy.deepcopy(self.tables)
+        t['設備マスター'] = [
+            dict(
+                equipment_id='fp_eq_93cafce3bb2c',
+                normalized_name='Tバーロー',
+                category='フリーウェイト',
+                load_type='not_specified',
+                needs_review=False,
+            ),
+            dict(
+                equipment_id='fp_eq_aa7f2abd2795',
+                normalized_name='Tバーロー（プレートロード）',
+                category='フリーウェイト',
+                load_type='plate_loaded_explicit',
+                needs_review=False,
+            ),
+        ]
+        t['店舗設備'] = [
+            dict(
+                gym_id='s',
+                equipment_id=e['equipment_id'],
+                raw_name=e['normalized_name'],
+                available=True,
+                quantity=None,
+            )
+            for e in t['設備マスター']
+        ]
+        payload = prepare(
+            t,
+            'gym',
+            'Gym',
+            mappings,
+            {'exercises': [dict(exerciseId='t_bar_row')]},
+        )
+        links = payload['equipment_exercise_mapping']
+        self.assertEqual(len(links), 2)
+        self.assertEqual({link['exercise_id'] for link in links}, {'t_bar_row'})
+        self.assertEqual(len({link['equipment_id'] for link in links}), 2)
+
     def test_read_xlsx_without_modification(self):
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/'input.xlsx';w=Workbook();w.remove(w.active)
