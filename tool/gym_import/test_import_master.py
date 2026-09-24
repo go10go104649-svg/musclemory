@@ -100,12 +100,77 @@ class ImportTests(unittest.TestCase):
         equipment_ids = [m['equipment_id'] for m in mappings]
         self.assertEqual(len(equipment_ids), len(set(equipment_ids)))
         self.assertEqual(len(mappings), 191)
-        self.assertEqual(sum(len(m['exercise_ids']) for m in mappings), 278)
+        self.assertEqual(sum(len(m['exercise_ids']) for m in mappings), 329)
         for mapping in mappings:
             self.assertTrue(mapping['exercise_ids'])
             self.assertEqual(len(mapping['exercise_ids']), len(set(mapping['exercise_ids'])))
             for exercise_id in mapping['exercise_ids']:
                 self.assertIn(exercise_id, selectable)
+
+    def test_requirement_rules_validate_and_generate_idempotent_sql(self):
+        t = copy.deepcopy(self.tables)
+        t['設備マスター'].append(
+            dict(
+                equipment_id='e2',
+                normalized_name='ベンチ',
+                category='フリーウェイト',
+                load_type='bench',
+                needs_review=False,
+            )
+        )
+        t['店舗設備'].append(
+            dict(
+                gym_id='s',
+                equipment_id='e2',
+                raw_name='ベンチ',
+                available=True,
+                quantity=None,
+            )
+        )
+        rules = [
+            dict(
+                rule_id='rack_bench',
+                exercise_id='curl',
+                equipment_ids=['e', 'e2'],
+                rationale='both required',
+            )
+        ]
+        payload = prepare(t, 'gym', 'Gym', [], self.catalog, rules)
+        self.assertEqual(payload['exercise_equipment_rules'][0]['id'], 'rack_bench')
+        self.assertEqual(
+            {r['equipment_id'] for r in payload['exercise_equipment_rule_items']},
+            {'gym:e', 'gym:e2'},
+        )
+        sql = sql_for(payload)
+        self.assertIn('on conflict (rule_id,equipment_id) do nothing', sql)
+        self.assertNotIn('do update set ;', sql)
+
+        bad = copy.deepcopy(t)
+        bad['設備マスター'][1]['needs_review'] = True
+        with self.assertRaises(ValueError):
+            prepare(bad, 'gym', 'Gym', [], self.catalog, rules)
+
+    def test_fitplace_requirement_rule_file_is_unique_and_valid(self):
+        requirement_path = Path(__file__).with_name('fitplace_requirement_rules.json')
+        rules = json.loads(requirement_path.read_text())
+        catalog_path = Path(__file__).resolve().parents[1] / 'exercise_forms' / 'catalog.json'
+        catalog = json.loads(catalog_path.read_text())
+        selectable = {
+            e['exerciseId']
+            for e in catalog['exercises']
+            if not e.get('canonicalExerciseId') and e.get('selectable', True)
+        }
+        rule_ids = [r['rule_id'] for r in rules]
+        self.assertEqual(len(rules), 163)
+        self.assertEqual(len(rule_ids), len(set(rule_ids)))
+        self.assertEqual(sum(len(r['equipment_ids']) for r in rules), 326)
+        for rule in rules:
+            self.assertIn(rule['exercise_id'], selectable)
+            self.assertGreaterEqual(len(rule['equipment_ids']), 2)
+            self.assertEqual(
+                len(rule['equipment_ids']),
+                len(set(rule['equipment_ids'])),
+            )
 
     def test_read_xlsx_without_modification(self):
         with tempfile.TemporaryDirectory() as d:
