@@ -18,7 +18,8 @@ recorded. With Python + openpyxl and an authenticated, linked Supabase CLI:
 ```sh
 python3 tool/gym_import/import_master.py --input /path/to/master.xlsx \
   --chain-id fit-place24 --chain-name 'FIT PLACE24' \
-  --mapping tool/gym_import/fitplace_mappings.json
+  --mapping tool/gym_import/fitplace_mappings.json \
+  --requirements tool/gym_import/fitplace_requirement_rules.json
 # Review counts and validation, then use the same command with --apply.
 ```
 
@@ -53,22 +54,26 @@ that every listed store has a complete equipment inventory.
 
 ## Mapping updates (2026-09-24)
 
-The mapping file now covers 191 of 219 equipment IDs with 278 equipment-exercise
-rows. The reviewed T-bar variants, plate-loaded machines, selectorized machines,
-cardio equipment, cable stations and clearly identified single-purpose equipment
-are linked to existing catalog exercise IDs while keeping equipment identity/load
-type separate from exercise identity.
+Direct equipment mappings cover 191 of 219 equipment IDs with 329
+equipment-exercise rows. In addition, 163 multi-equipment rules / 326 rule items
+model combinations such as rack + bench and dumbbell + adjustable bench.
 
-28 equipment IDs remain intentionally unmapped. They are either source rows marked
-`needs_review`, generic benches/racks that require another piece of equipment,
-or names whose exact movement/load variant is ambiguous. They are not auto-mapped
-just to increase coverage because the current store filter is a union of mappings
-and cannot express multi-equipment prerequisites. Apply migrations
-`202609240002_fitplace_tbar_mapping.sql` and
-`202609240003_fitplace_equipment_mapping_batch.sql` and
-`202609240004_fitplace_researched_equipment_mapping.sql` (or rerun the importer with
-`--apply`) before treating the expanded counts as live linked-project data.
+Generic racks are direct sources for barbell movements that do not require a bench.
+Bench-press variants are only considered available when a compatible rack and bench
+are both present. Dumbbell press/fly variants likewise require dumbbells plus the
+appropriate bench angle. Generic curl benches no longer imply preacher curls by
+themselves; they require dumbbells or a rack/barbell source.
 
+28 equipment IDs still have no direct mapping. Some are intentionally represented
+only through combination rules (generic benches), while others remain source rows
+marked `needs_review` or are too ambiguous to infer safely. The store filter uses
+the server-side `gym_store_exercise_ids` function to union direct mappings with
+satisfied combination rules.
+
+Apply migrations through
+`202609240005_gym_multi_equipment_rules.sql` (or rerun the importer with both
+`--mapping` and `--requirements`) before treating these counts as live
+linked-project data.
 ## Search and reports
 
 Public search is server-paged (30), equipment is store-scoped/paged (50). Search
