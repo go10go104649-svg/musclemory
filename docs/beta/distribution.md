@@ -1,3 +1,11 @@
+# 店舗検索対応のAndroid更新版（2026-09-24）
+
+店舗検索・アカウント機能を利用する版は、Git対象外の接続設定を
+`--dart-define-from-file` で必ず指定する。`tool/build_android_beta.sh` は
+`MUSCLEMORY_SUPABASE_CONFIG`（省略時 `supabase.json`）を検査し、設定なしでは生成しない。
+旧版の「接続情報を組み込まない」という記述は過去の配布履歴であり、現在の手順ではない。
+署名は従来の配布鍵を継続し、更新時にアプリを先に削除しない。
+
 # 最新版：ベータ5（1.0.0 / ビルド5）
 
 ファイル: `MUSCLEMORY-beta5-1.0.0-5.apk`。

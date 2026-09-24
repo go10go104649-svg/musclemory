@@ -25,7 +25,7 @@ const storeB = GymStore(
 
 class FakeGyms extends GymRepository {
   List<GymStore> saved = [];
-  bool fail = false;
+  bool fail = false, failRegistered = false;
   String query = '';
   final reports = <String>[];
   @override
@@ -41,7 +41,11 @@ class FakeGyms extends GymRepository {
   }
 
   @override
-  Future<List<GymStore>> registered() async => saved;
+  Future<List<GymStore>> registered() async {
+    if (failRegistered) throw StateError('registration unavailable');
+    return saved;
+  }
+
   @override
   Future<void> register(GymStore s) async {
     if (!saved.any((e) => e.id == s.id)) saved.add(s);
@@ -111,6 +115,19 @@ void main() {
     await t.pumpAndSettle();
     expect(find.byKey(const Key('selectGymStoreb')), findsOneWidget);
   });
+  testWidgets('registered gym failure does not block public store search', (
+    t,
+  ) async {
+    repo.failRegistered = true;
+    await page(t, const GymStoreSearchPage());
+    expect(find.byKey(const Key('selectGymStorea')), findsOneWidget);
+    expect(find.text('登録済みの利用ジムを読み込めませんでした。店舗検索は利用できます。'), findsOneWidget);
+    await t.enterText(find.byKey(const Key('gymStoreSearchField')), '松戸');
+    await t.pump(const Duration(milliseconds: 350));
+    await t.pumpAndSettle();
+    expect(find.byKey(const Key('selectGymStorea')), findsOneWidget);
+  });
+
   testWidgets('multiple registered gyms can be added and removed', (t) async {
     await page(t, const RegisteredGymsPage());
     for (final id in ['a', 'b']) {

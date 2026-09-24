@@ -1,7 +1,7 @@
 name: muscle_memory
 description: "MUSCLEMORY - トレーニングの記録を次の成長につなげるアプリ。"
 publish_to: 'none'
-version: 1.0.0+6
+version: 1.0.0+7
 
 environment:
   sdk: ^3.13.3

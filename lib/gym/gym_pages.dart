@@ -3,13 +3,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../exercise_form_catalog.dart';
+import '../config/supabase_config.dart';
 import 'gym_repository.dart';
 
 Widget gymError(VoidCallback retry) => Padding(
   padding: const EdgeInsets.all(16),
   child: Column(
     children: [
-      const Text('店舗情報を取得できませんでした。通信状態を確認してください。'),
+      Text(
+        GymServices.override == null && !SupabaseConfig.initialized
+            ? '店舗情報への接続設定が読み込まれていません。アカウント画面の状態も確認してください。アプリの再起動で改善しない場合は、接続設定を含むアプリへの更新が必要です。'
+            : '店舗情報を取得できませんでした。通信状態を確認してください。',
+      ),
       TextButton(onPressed: retry, child: const Text('再読み込み')),
     ],
   ),
@@ -28,6 +33,7 @@ class _GymStoreSearchPageState extends State<GymStoreSearchPage> {
   List<GymStore> _stores = [], _registered = [];
   bool _busy = true, _failed = false, _more = false;
   int _request = 0;
+  bool _registeredFailed = false;
   @override
   void initState() {
     super.initState();
@@ -48,7 +54,17 @@ class _GymStoreSearchPageState extends State<GymStoreSearchPage> {
       _failed = false;
     });
     try {
-      final registered = more ? _registered : await _repo.registered();
+      var registered = _registered;
+      var registeredFailed = _registeredFailed;
+      if (!more) {
+        try {
+          registered = await _repo.registered();
+          registeredFailed = false;
+        } catch (_) {
+          registered = [];
+          registeredFailed = true;
+        }
+      }
       final rows = await _repo.search(
         _controller.text,
         offset: more ? _stores.length : 0,
@@ -56,6 +72,7 @@ class _GymStoreSearchPageState extends State<GymStoreSearchPage> {
       if (!mounted || request != _request) return;
       setState(() {
         _registered = registered;
+        _registeredFailed = registeredFailed;
         _stores = more ? [..._stores, ...rows] : rows;
         _more = rows.length == 30;
       });
@@ -119,6 +136,11 @@ class _GymStoreSearchPageState extends State<GymStoreSearchPage> {
                   ..._registered.map(_tile),
                   const Divider(),
                 ],
+                if (_registeredFailed && !_failed)
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text('登録済みの利用ジムを読み込めませんでした。店舗検索は利用できます。'),
+                  ),
                 if (_failed) gymError(() => _load()),
                 if (!_busy && !_failed && _stores.isEmpty)
                   const Padding(
