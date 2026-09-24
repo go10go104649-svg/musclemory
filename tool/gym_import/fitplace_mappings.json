@@ -1749,5 +1749,60 @@
       "rear_delt"
     ],
     "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_995bf2a31e42",
+    "expected_name": "4WAYロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "plate_loaded_seated_row"
+    ],
+    "rationale": "メーカー製品情報とFIT PLACE掲載名を照合し、プレートロード式のロー動作として既存種目へ紐付け。"
+  },
+  {
+    "equipment_id": "fp_eq_f8d1b24f62dd",
+    "expected_name": "4WAYロー（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_seated_row"
+    ],
+    "rationale": "メーカー製品情報とFIT PLACE掲載名を照合し、プレートロード式のロー動作として既存種目へ紐付け。"
+  },
+  {
+    "equipment_id": "fp_eq_8cbf5d2d7ec7",
+    "expected_name": "インクラインチェストプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "plate_loaded_incline_chest_press"
+    ],
+    "rationale": "FIT PLACE系の同名設備とメーカー製品情報を照合し、プレートロード式インクラインチェストプレスとして紐付け。"
+  },
+  {
+    "equipment_id": "fp_eq_560e50e62b3c",
+    "expected_name": "チェスト&デクラインコンボ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "plate_loaded_chest_press",
+      "decline_press_machine"
+    ],
+    "rationale": "製品仕様でフラットからデクラインのプレス動作を行うプレートロード式コンボ機であることを確認し、両対応種目へ紐付け。"
+  },
+  {
+    "equipment_id": "fp_eq_1405e4e81b19",
+    "expected_name": "フロントロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "plate_loaded_seated_row"
+    ],
+    "rationale": "メーカー製品情報でプレートロード式ロー動作を確認し、既存のプレートロードシーテッドロー種目へ紐付け。"
+  },
+  {
+    "equipment_id": "fp_eq_eba9225f81e6",
+    "expected_name": "ワイドプルダウン",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "plate_loaded_lat_pulldown"
+    ],
+    "rationale": "メーカー製品情報でプレートロード式ワイドプルダウンを確認し、既存のプレートロードラットプルダウン種目へ紐付け。"
   }
 ]
