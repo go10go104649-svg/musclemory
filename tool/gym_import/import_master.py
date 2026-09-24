@@ -61,7 +61,7 @@ def validate(tables):
         if not isinstance(row.get('available'),bool):
             raise ValueError('Invalid availability')
 
-def prepare(tables, chain_id, chain_name, mappings, catalog):
+def prepare(tables, chain_id, chain_name, mappings, catalog, requirements=None):
     validate(tables)
     if not chain_id or any(r['gym_chain'] != chain_name for r in tables['店舗']):
         raise ValueError('Chain must match the workbook')
@@ -91,12 +91,35 @@ def prepare(tables, chain_id, chain_name, mappings, catalog):
             links.append(dict(equipment_id=prefix(row['equipment_id']),exercise_id=id,rationale=m['rationale']))
     if len({(r['equipment_id'],r['exercise_id']) for r in links}) != len(links):
         raise ValueError('Duplicate exercise mapping')
+
+    rules, rule_items = [], []
+    seen_rules = set()
+    for rule in requirements or []:
+        rule_id = rule.get('rule_id')
+        exercise_id = rule.get('exercise_id')
+        equipment_ids = rule.get('equipment_ids')
+        if not isinstance(rule_id, str) or not rule_id.strip() or rule_id in seen_rules:
+            raise ValueError('Invalid or duplicate equipment requirement rule')
+        if exercise_id not in by_id or by_id[exercise_id].get('canonicalExerciseId') or not by_id[exercise_id].get('selectable', True):
+            raise ValueError(f'Invalid exercise ID: {exercise_id}')
+        if (not isinstance(equipment_ids, list) or not equipment_ids or
+                len(equipment_ids) != len(set(equipment_ids))):
+            raise ValueError(f'Invalid equipment requirement: {rule_id}')
+        for equipment_id in equipment_ids:
+            row = source_equipment.get(equipment_id)
+            if row is None or row.get('needs_review'):
+                raise ValueError(f'Invalid requirement equipment: {equipment_id}')
+            rule_items.append(dict(rule_id=rule_id,equipment_id=prefix(equipment_id)))
+        seen_rules.add(rule_id)
+        rules.append(dict(id=rule_id,exercise_id=exercise_id,rationale=rule.get('rationale','')))
     return {'gym_chains':[dict(id=chain_id,name=chain_name)],'gym_stores':stores,'equipment':equipment,
-            'gym_store_equipment':relations,'equipment_exercise_mapping':links}
+            'gym_store_equipment':relations,'equipment_exercise_mapping':links,
+            'exercise_equipment_rules':rules,'exercise_equipment_rule_items':rule_items}
 
 TYPES = {'source':'jsonb','needs_review':'boolean','available':'boolean','quantity':'integer','checked_at':'timestamptz'}
 KEYS = {'gym_chains':['id'],'gym_stores':['id'],'equipment':['id'],
-        'gym_store_equipment':['store_id','equipment_id'],'equipment_exercise_mapping':['equipment_id','exercise_id']}
+        'gym_store_equipment':['store_id','equipment_id'],'equipment_exercise_mapping':['equipment_id','exercise_id'],
+        'exercise_equipment_rules':['id'],'exercise_equipment_rule_items':['rule_id','equipment_id']}
 
 def sql_for(payload):
     statements = ['begin;']
@@ -106,7 +129,8 @@ def sql_for(payload):
         updates = ','.join(f'{c}=excluded.{c}' for c in columns if c not in keys)
         data = json.dumps(rows,ensure_ascii=False).replace("'", "''")
         definitions = ','.join(f'{c} {TYPES.get(c,"text")}' for c in columns)
-        statements.append(f"insert into public.{table} ({','.join(columns)}) select {','.join(columns)} from jsonb_to_recordset('{data}'::jsonb) as r({definitions}) on conflict ({','.join(keys)}) do update set {updates};")
+        conflict = (f"do update set {updates}" if updates else "do nothing")
+        statements.append(f"insert into public.{table} ({','.join(columns)}) select {','.join(columns)} from jsonb_to_recordset('{data}'::jsonb) as r({definitions}) on conflict ({','.join(keys)}) {conflict};")
     statements.append('commit;')
     return '\n'.join(statements)
 
@@ -124,12 +148,15 @@ def summary(tables,payload):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--input',type=Path,required=True)
     p.add_argument('--chain-id',required=True);p.add_argument('--chain-name',required=True)
-    p.add_argument('--mapping',type=Path,required=True);p.add_argument('--apply',action='store_true')
+    p.add_argument('--mapping',type=Path,required=True)
+    p.add_argument('--requirements',type=Path)
+    p.add_argument('--apply',action='store_true')
     args=p.parse_args()
     before=hashlib.sha256(args.input.read_bytes()).hexdigest()
     tables=read_master(args.input)
+    requirements = json.loads(args.requirements.read_text()) if args.requirements else []
     payload=prepare(tables,args.chain_id,args.chain_name,json.loads(args.mapping.read_text()),
-      json.loads((ROOT/'tool/exercise_forms/catalog.json').read_text()))
+      json.loads((ROOT/'tool/exercise_forms/catalog.json').read_text()),requirements)
     report=summary(tables,payload);report['input_sha256']=before
     if args.apply:
         # Temporary SQL is not retained or added to Git; argv never contains credentials.
