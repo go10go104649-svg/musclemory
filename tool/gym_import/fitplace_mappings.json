@@ -1855,5 +1855,27 @@
       "barbell_shrug"
     ],
     "rationale": "ラック設備をバーベル系フリーウェイト種目の起点として扱う。ベンチが必要な種目は複数設備ルールで判定する。"
+  },
+  {
+    "equipment_id": "fp_eq_6648753b6736",
+    "expected_name": "スパインベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "bench_press",
+      "close_grip_bench_press",
+      "skull_crusher"
+    ],
+    "rationale": "BULL公式製品情報でラック一体型のベンチプレス用設備であることを確認。フラットベンチ＋バーベルラックを内包する種目へ紐付け。"
+  },
+  {
+    "equipment_id": "fp_eq_1a79fd7858b1",
+    "expected_name": "セーフティスパインベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "bench_press",
+      "close_grip_bench_press",
+      "skull_crusher"
+    ],
+    "rationale": "設備名と同系統スパインベンチ製品仕様から、セーフティ付きラック一体型ベンチプレス設備として紐付け。"
   }
 ]
