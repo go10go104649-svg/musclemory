@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../exercise_form_catalog.dart';
 import 'custom_gym_preference.dart';
@@ -11,8 +13,10 @@ import 'gym_pages.dart';
 Future<String?> selectPlaceExercise(
   BuildContext context, {
   Set<String>? allowed,
-}) => showDialog<String>(
+}) => showModalBottomSheet<String>(
   context: context,
+  isScrollControlled: true,
+  useSafeArea: true,
   builder: (_) => _ExerciseChoice(allowed: allowed),
 );
 
@@ -25,54 +29,88 @@ class _ExerciseChoice extends StatefulWidget {
 
 class _ExerciseChoiceState extends State<_ExerciseChoice> {
   String query = '';
+  String? category;
   @override
   Widget build(BuildContext context) {
+    final source = availableForms(
+      widget.allowed ??
+          ExerciseFormCatalog.entries.map((e) => e.exerciseId).toSet(),
+    );
+    final categories = source.map((e) => e.category).toSet().toList()..sort();
     final forms =
-        availableForms(
-              widget.allowed ??
-                  ExerciseFormCatalog.entries.map((e) => e.exerciseId).toSet(),
-            )
+        source
             .where(
-              (e) => '${e.exerciseName} ${e.englishName} ${e.equipmentLabel}'
-                  .toLowerCase()
-                  .contains(query.toLowerCase()),
+              (e) =>
+                  (category == null || e.category == category) &&
+                  '${e.exerciseName} ${e.englishName} ${e.equipmentLabel} ${e.aliases.join(' ')}'
+                      .toLowerCase()
+                      .contains(query.trim().toLowerCase()),
             )
             .toList()
           ..sort((a, b) => a.exerciseName.compareTo(b.exerciseName));
-    return AlertDialog(
-      title: const Text('種目を選択'),
-      content: SizedBox(
-        width: 420,
-        height: 380,
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: FractionallySizedBox(
+        heightFactor: 0.9,
         child: Column(
           children: [
-            TextField(
-              key: const Key('placeExerciseSearch'),
-              decoration: const InputDecoration(labelText: '種目を検索'),
-              onChanged: (v) => setState(() => query = v),
+            ListTile(
+              title: const Text('種目を選択'),
+              trailing: IconButton(
+                tooltip: '閉じる',
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
-            Expanded(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                key: const Key('placeExerciseSearch'),
+                decoration: const InputDecoration(
+                  labelText: '種目名・器具で検索',
+                  prefixIcon: Icon(Icons.search),
+                ),
+                onChanged: (v) => setState(() => query = v),
+              ),
+            ),
+            SizedBox(
+              height: 48,
               child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
-                  for (final e in forms)
-                    ListTile(
-                      key: ValueKey('choosePlaceExercise${e.exerciseId}'),
-                      title: Text(e.exerciseName),
-                      subtitle: Text(e.equipmentLabel),
-                      onTap: () => Navigator.pop(context, e.exerciseId),
+                  for (final c in <String?>[null, ...categories])
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(c ?? 'すべて'),
+                        selected: category == c,
+                        onSelected: (_) => setState(() => category = c),
+                      ),
                     ),
                 ],
               ),
             ),
+            Expanded(
+              child: forms.isEmpty
+                  ? const Center(child: Text('該当する種目がありません'))
+                  : ListView.builder(
+                      key: const Key('placeExerciseResults'),
+                      itemCount: forms.length,
+                      itemBuilder: (context, index) {
+                        final e = forms[index];
+                        return ListTile(
+                          key: ValueKey('choosePlaceExercise${e.exerciseId}'),
+                          title: Text(e.exerciseName),
+                          subtitle: Text('${e.category} ・ ${e.equipmentLabel}'),
+                          onTap: () => Navigator.pop(context, e.exerciseId),
+                        );
+                      },
+                    ),
+            ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('キャンセル'),
-        ),
-      ],
     );
   }
 }
@@ -138,7 +176,16 @@ class _ExerciseReportState extends State<_ExerciseReport> {
         comment: comment.text,
       );
       if (mounted) Navigator.pop(context, true);
-    } catch (_) {
+    } catch (exception) {
+      if (kDebugMode) {
+        if (exception is PostgrestException) {
+          debugPrint(
+            'Exercise report: ${exception.code}: ${exception.message}; ${exception.details}; ${exception.hint}',
+          );
+        } else {
+          debugPrint('Exercise report failed: ${exception.runtimeType}');
+        }
+      }
       if (mounted) {
         setState(() {
           busy = false;
@@ -178,7 +225,7 @@ class _ExerciseReportState extends State<_ExerciseReport> {
                   }),
           ),
           if (kind != 'other')
-            TextButton(
+            OutlinedButton(
               key: const Key('exerciseReportTarget'),
               onPressed: busy
                   ? null
@@ -195,18 +242,18 @@ class _ExerciseReportState extends State<_ExerciseReport> {
                     },
               child: Text(
                 exerciseId == null
-                    ? '対象種目を選択'
-                    : ExerciseFormCatalog.byId[exerciseId]?.exerciseName ??
-                          exerciseId!,
+                    ? '対象種目（必須）\n種目を選択してください  ＞'
+                    : '対象種目（必須）\n${ExerciseFormCatalog.byId[exerciseId]?.exerciseName ?? exerciseId!}  ＞',
               ),
             ),
           TextField(
             key: const Key('exerciseReportComment'),
             controller: comment,
+            onChanged: (_) => setState(() {}),
             maxLength: 2000,
             maxLines: 3,
             decoration: InputDecoration(
-              labelText: kind == 'other' ? '内容' : 'コメント（任意）',
+              labelText: kind == 'other' ? '内容（必須）' : 'コメント（任意）',
             ),
           ),
           if (error != null) Text(error!),
@@ -220,7 +267,13 @@ class _ExerciseReportState extends State<_ExerciseReport> {
       ),
       FilledButton(
         key: const Key('sendExerciseReport'),
-        onPressed: busy ? null : send,
+        onPressed:
+            busy ||
+                (kind == 'other'
+                    ? comment.text.trim().isEmpty
+                    : exerciseId == null)
+            ? null
+            : send,
         child: Text(busy ? '送信中…' : '報告を送信'),
       ),
     ],

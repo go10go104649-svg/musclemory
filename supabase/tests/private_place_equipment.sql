@@ -21,6 +21,7 @@ update public.user_custom_place_equipment set quantity=2 where id='r';
 insert into public.gym_exercise_reports(store_id,exercise_id,report_kind) values ('qa-private-store','bench_press','missing_exercise'),('qa-private-store','bench_press','missing_exercise'),('qa-private-store','barbell_squat','incorrect_exercise');
 insert into public.gym_exercise_reports(store_id,report_kind,comment) values ('qa-private-store','other','確認してください'),('qa-private-store','other','別の確認事項');
 do $$ begin
+ if not exists(select 1 from public.gym_exercise_reports where store_id='qa-private-store' and exercise_id='bench_press' and status='pending' and user_id=auth.uid()) then raise exception 'Report payload/defaults failed';end if;
  if (select count(*) from public.gym_exercise_reports where store_id='qa-private-store')<>4 then raise exception 'Report duplication/types failed';end if;
  if not exists(select 1 from public.gym_store_exercise_ids('qa-private-store') where exercise_id='barbell_squat') then raise exception 'Report changed master';end if;
  begin

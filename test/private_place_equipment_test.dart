@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:muscle_memory/main.dart';
@@ -12,6 +13,7 @@ import 'gym_integration_test.dart' show FakeGyms, storeA;
 
 class EquipmentRepo extends FakeGyms {
   final exerciseReports = <String>[];
+  bool failReports = false;
   @override
   Future<List<GymEquipment>> searchEquipment(
     String query, {
@@ -40,6 +42,11 @@ class EquipmentRepo extends FakeGyms {
     String? exerciseId,
     required String comment,
   }) async {
+    if (failReports)
+      throw const PostgrestException(
+        message: 'QA permission denied',
+        code: '42501',
+      );
     final key = '$storeId/$kind/$exerciseId/$comment';
     if (!exerciseReports.contains(key)) exerciseReports.add(key);
   }
@@ -396,6 +403,52 @@ void main() {
     );
   }
 
+  testWidgets('exercise report failure stays open and permits retry', (
+    t,
+  ) async {
+    repo.failReports = true;
+    await t.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () =>
+                  showStoreExerciseReport(context, storeA.id, {'bench_press'}),
+              child: const Text('報告'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await t.tap(find.text('報告'));
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const Key('exerciseReportKind')));
+    await t.pumpAndSettle();
+    await t.tap(find.text('その他').last);
+    await t.pumpAndSettle();
+    await t.enterText(find.byKey(const Key('exerciseReportComment')), '   ');
+    await t.pump();
+    expect(
+      t
+          .widget<FilledButton>(find.byKey(const Key('sendExerciseReport')))
+          .onPressed,
+      isNull,
+    );
+    await t.enterText(
+      find.byKey(const Key('exerciseReportComment')),
+      '確認してください',
+    );
+    await t.pump();
+    await t.tap(find.byKey(const Key('sendExerciseReport')));
+    await t.pumpAndSettle();
+    expect(find.text('報告を送信できませんでした。再度お試しください。'), findsOneWidget);
+    expect(t.takeException(), isNull);
+    repo.failReports = false;
+    await t.tap(find.byKey(const Key('sendExerciseReport')));
+    await t.pumpAndSettle();
+    expect(repo.exerciseReports.length, 1);
+  });
+
   for (final kind in ['missing_exercise', 'incorrect_exercise', 'other']) {
     testWidgets(
       'exercise report sends $kind without changing shared equipment',
@@ -422,9 +475,35 @@ void main() {
           await t.tap(find.text(kind == 'other' ? 'その他' : '表示されているができない').last);
           await t.pumpAndSettle();
         }
+        expect(
+          t
+              .widget<FilledButton>(find.byKey(const Key('sendExerciseReport')))
+              .onPressed,
+          isNull,
+        );
         if (kind != 'other') {
+          expect(find.textContaining('対象種目（必須）'), findsOneWidget);
           await t.tap(find.byKey(const Key('exerciseReportTarget')));
           await t.pumpAndSettle();
+          expect(find.byType(BottomSheet), findsOneWidget);
+          if (kind == 'incorrect_exercise') {
+            expect(
+              find
+                  .byType(ListTile)
+                  .evaluate()
+                  .where(
+                    (e) => (e.widget as ListTile).key.toString().contains(
+                      'choosePlaceExercise',
+                    ),
+                  )
+                  .length,
+              1,
+            );
+            expect(
+              find.byKey(const Key('choosePlaceExercisebarbell_squat')),
+              findsNothing,
+            );
+          }
           await t.enterText(
             find.byKey(const Key('placeExerciseSearch')),
             'ベンチプレス',
@@ -446,9 +525,19 @@ void main() {
           find.byKey(const Key('exerciseReportComment')),
           '確認お願いします',
         );
+        await t.pump();
+        expect(
+          t
+              .widget<FilledButton>(find.byKey(const Key('sendExerciseReport')))
+              .onPressed,
+          isNotNull,
+        );
         await t.tap(find.byKey(const Key('sendExerciseReport')));
         await t.pumpAndSettle();
-        expect(repo.exerciseReports.single, contains('/$kind/'));
+        expect(
+          repo.exerciseReports.single,
+          contains('/$kind/${kind == 'other' ? 'null' : 'bench_press'}/'),
+        );
         expect(find.text('報告を受け付けました。確認後に対応種目情報を更新します。'), findsOneWidget);
         expect(repo.reports, isEmpty);
         expect((await repo.equipment(storeA.id)).length, 3);
