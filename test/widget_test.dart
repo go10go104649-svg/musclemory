@@ -1382,8 +1382,9 @@ void main() {
     expect(find.byKey(const Key('trainerQrButton')), findsOneWidget);
     expect(find.byKey(const Key('contactButton')), findsOneWidget);
     expect(find.byKey(const Key('appAboutButton')), findsOneWidget);
-    expect(find.byKey(const Key('locationSettingsButton')), findsOneWidget);
-    expect(find.text('いつもの場所'), findsOneWidget);
+    expect(find.byKey(const Key('locationSettingsButton')), findsNothing);
+    expect(find.byKey(const Key('registeredGymsButton')), findsOneWidget);
+    expect(find.text('いつもの場所'), findsNothing);
     expect(find.text('カスタム場所'), findsNothing);
     expect(find.text('重量の単位'), findsNothing);
     expect(find.byKey(const Key('savedMenuManagementButton')), findsNothing);
@@ -1707,7 +1708,7 @@ void main() {
     expect(preferences.getString('custom_gyms'), contains('以前の体育館'));
   });
 
-  testWidgets('saved custom gyms appear in the location picker', (
+  testWidgets('legacy custom gyms stay stored but are not new location candidates', (
     tester,
   ) async {
     _setExistingUserPreferences({
@@ -1736,13 +1737,14 @@ void main() {
     );
     await tester.tap(find.text('場所を選ぶ'));
     await tester.pumpAndSettle();
-    expect(find.text('中央体育館'), findsOneWidget);
-    expect(find.text('会社のジム'), findsOneWidget);
-    expect(find.text('場所を追加'), findsOneWidget);
+    expect(find.text('中央体育館'), findsNothing);
+    expect(find.text('会社のジム'), findsNothing);
+    expect(find.text('ジムを追加'), findsOneWidget);
 
-    await tester.tap(find.text('会社のジム'));
+    await tester.tap(find.byKey(const Key('selectTrainingPlaceHome')));
     await tester.pumpAndSettle();
-    expect(selected, '会社のジム');
+    expect(selected, '自宅');
+    expect(CustomGymPreference.gyms, ['中央体育館', '会社のジム']);
   });
 
   testWidgets('location settings chooses a usual place without adding there', (

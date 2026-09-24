@@ -1,3 +1,4 @@
+import 'gym/training_place_preference.dart';
 import 'gym/gym_repository.dart';
 import 'gym/gym_pages.dart';
 import 'trainer_qr_page.dart';
@@ -863,6 +864,7 @@ class _HomeShellState extends State<HomeShell> {
         !CustomGymPreference.gyms.contains(selectedGym)) {
       await CustomGymPreference.add(selectedGym);
     }
+    final defaultPlace = await TrainingPlacePreference.load();
     final workoutDraft = WorkoutDraftSummary.tryParse(
       preferences.getString(activeWorkoutDraftStorageKey),
     );
@@ -871,7 +873,7 @@ class _HomeShellState extends State<HomeShell> {
     setState(() {
       _history = items;
       _bodyWeights = bodyWeights;
-      _selectedGym = selectedGym;
+      _selectedGym = defaultPlace.name;
       _workoutTemplates = workoutTemplates;
       _workoutDraft = workoutDraft;
     });
@@ -1297,6 +1299,7 @@ class DashboardPage extends StatelessWidget {
           history: history,
           initialWorkout: initialWorkout,
           gymName: selectedGym,
+          useDefaultPlace: true,
           onSave: onWorkoutCompleted,
         ),
       ),
@@ -4870,6 +4873,7 @@ class WorkoutDetailPage extends StatelessWidget {
                       history: [workout],
                       initialWorkout: workout,
                       gymName: selectedGym,
+                      useDefaultPlace: true,
                       onSave: onWorkoutCompleted,
                     ),
                   ),
@@ -5167,6 +5171,7 @@ class WorkoutPage extends StatefulWidget {
     this.initialWorkout,
     this.isEditing = false,
     this.gymName,
+    this.useDefaultPlace = false,
     this.onSave,
   });
 
@@ -5174,6 +5179,7 @@ class WorkoutPage extends StatefulWidget {
   final WorkoutRecord? initialWorkout;
   final bool isEditing;
   final String? gymName;
+  final bool useDefaultPlace;
 
   /// Host persists locally before the completion dialog opens.
   final Future<void> Function(WorkoutRecord)? onSave;
@@ -5275,8 +5281,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       text: widget.isEditing ? widget.initialWorkout?.note ?? '' : '',
     );
     _noteController.addListener(_saveDraft);
-    if (!widget.isEditing && widget.initialWorkout == null) {
-      _loadDraft();
+    if (!widget.isEditing) {
+      _initializePlaceAndDraft();
     }
     if (widget.isEditing) {
       _elapsed = Duration(seconds: widget.initialWorkout!.durationSeconds);
@@ -5288,6 +5294,18 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         }
       });
     }
+  }
+
+  Future<void> _initializePlaceAndDraft() async {
+    if (widget.useDefaultPlace) {
+      final place = await TrainingPlacePreference.load();
+      if (!mounted) return;
+      setState(() {
+        _gymName = place.name;
+        _gymStore = place.store;
+      });
+    }
+    if (widget.initialWorkout == null) await _loadDraft();
   }
 
   @override
@@ -5694,10 +5712,14 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
           final gym = draft['gymName'];
           if (gym == null || gym is String) _gymName = gym as String?;
         }
-        final storeId = draft['gymStoreId'] as String?;
-        _gymStore = storeId == null
-            ? null
-            : GymStore(id: storeId, chainName: '', name: _gymName ?? '店舗');
+        // Name-only legacy drafts stay name-only. Drafts predating location
+        // storage keep the caller's default name and store ID together.
+        if (draft.containsKey('gymName') || draft.containsKey('gymStoreId')) {
+          final storeId = draft['gymStoreId'] as String?;
+          _gymStore = storeId == null
+              ? null
+              : GymStore(id: storeId, chainName: '', name: _gymName ?? '店舗');
+        }
         _noteController.text = draft['note'] as String? ?? '';
         final savedDate = draft['date'] as String?;
         if (savedDate != null) _workoutDate = DateTime.parse(savedDate);
@@ -5722,10 +5744,11 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     final selected = await showGymPicker(
       context,
       _gymName,
+      currentStoreId: _gymStore?.id,
       onStoreSelected: (value) => store = value,
     );
     if (!mounted || selected == null) return;
-    if (store == null && selected == _gymName) return;
+    if (store?.id == _gymStore?.id && selected == _gymName) return;
     setState(() {
       _gymName = selected;
       _gymStore = store;
@@ -10114,76 +10137,19 @@ Future<String?> _addCustomGym(BuildContext context) async {
 Future<String?> showGymPicker(
   BuildContext context,
   String? currentGym, {
+  String? currentStoreId,
   ValueChanged<GymStore>? onStoreSelected,
-}) {
-  final gyms = [
-    ...standardGyms,
-    ...CustomGymPreference.gyms,
-    if (currentGym != null &&
-        !standardGyms.contains(currentGym) &&
-        !CustomGymPreference.gyms.contains(currentGym))
-      currentGym,
-  ];
-  return showModalBottomSheet<String>(
+}) async {
+  final place = await showModalBottomSheet<TrainingPlace>(
     context: context,
     showDragHandle: true,
-    builder: (context) => SafeArea(
-      child: ListView(
-        shrinkWrap: true,
-        padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(12, 4, 12, 12),
-            child: Text(
-              'トレーニング場所',
-              style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
-            ),
-          ),
-          ListTile(
-            key: const Key('searchRegisteredGymStores'),
-            leading: const Icon(Icons.search),
-            title: const Text('登録店舗から探す'),
-            subtitle: const Text('店名・市区町村・駅名で検索'),
-            onTap: () async {
-              final store = await Navigator.push<GymStore>(
-                context,
-                MaterialPageRoute(builder: (_) => const GymStoreSearchPage()),
-              );
-              if (store != null && context.mounted) {
-                onStoreSelected?.call(store);
-                Navigator.pop(context, store.displayName);
-              }
-            },
-          ),
-          ListTile(
-            key: const Key('addWorkoutGymButton'),
-            leading: const Icon(Icons.add_rounded),
-            title: const Text('場所を追加'),
-            onTap: () async {
-              final name = await _addCustomGym(context);
-              if (name != null && context.mounted) Navigator.pop(context, name);
-            },
-          ),
-          ...gyms.map(
-            (gym) => ListTile(
-              leading: const Icon(Icons.location_on_outlined),
-              title: Text(
-                gym,
-                style: const TextStyle(fontWeight: FontWeight.w800),
-              ),
-              trailing: gym == currentGym
-                  ? const Icon(
-                      Icons.check_circle_rounded,
-                      color: Color(0xFF83AD30),
-                    )
-                  : null,
-              onTap: () => Navigator.pop(context, gym),
-            ),
-          ),
-        ],
-      ),
+    builder: (_) => TrainingPlacePicker(
+      currentName: currentGym,
+      currentStoreId: currentStoreId,
     ),
   );
+  if (place?.store != null) onStoreSelected?.call(place!.store!);
+  return place?.name;
 }
 
 Future<String?> _showCustomGymDialog(
@@ -10772,21 +10738,26 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
           ),
+          _sectionTitle('トレーニング設定'),
+          _trainingSettingsCard(context),
+          _sectionTitle('利用場所'),
           Card(
             child: ListTile(
               key: const Key('registeredGymsButton'),
               leading: const Icon(Icons.location_on_outlined),
-              title: const Text('利用ジム'),
-              subtitle: const Text('店舗を登録・設備を見る（自分だけに表示）'),
+              title: const Text('利用場所'),
+              subtitle: const Text('自宅・登録店舗・いつもの場所を設定'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.push<void>(
-                context,
-                MaterialPageRoute(builder: (_) => const RegisteredGymsPage()),
-              ),
+              onTap: () async {
+                await Navigator.push<void>(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RegisteredGymsPage()),
+                );
+                final place = await TrainingPlacePreference.load();
+                if (context.mounted) await onSelectedGymChanged(place.name);
+              },
             ),
           ),
-          _sectionTitle('トレーニング設定'),
-          _trainingSettingsCard(context),
           _sectionTitle('Trainer連携'),
           Card(
             child: ListTile(
@@ -10867,24 +10838,6 @@ class ProfilePage extends StatelessWidget {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
     child: Column(
       children: [
-        ListTile(
-          key: const Key('locationSettingsButton'),
-          leading: const Icon(Icons.location_on_outlined),
-          title: const Text('いつもの場所'),
-          subtitle: Text(selectedGym ?? 'いつもの場所は未選択'),
-          trailing: const Icon(Icons.chevron_right_rounded),
-          onTap: () async {
-            await Navigator.of(context).push<void>(
-              MaterialPageRoute(
-                builder: (_) => CustomGymManagementPage(
-                  selectedGym: selectedGym,
-                  onSelectedGymChanged: onSelectedGymChanged,
-                ),
-              ),
-            );
-          },
-        ),
-        const Divider(height: 1),
         ListTile(
           key: const Key('trainingSettingsButton'),
           leading: const Icon(Icons.fitness_center_rounded),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../exercise_form_catalog.dart';
 import '../config/supabase_config.dart';
 import 'gym_repository.dart';
+import 'training_place_preference.dart';
 
 Widget gymError(VoidCallback retry) => Padding(
   padding: const EdgeInsets.all(16),
@@ -132,14 +133,14 @@ class _GymStoreSearchPageState extends State<GymStoreSearchPage> {
               children: [
                 if (_controller.text.trim().isEmpty &&
                     _registered.isNotEmpty) ...[
-                  const ListTile(title: Text('登録済みの利用ジム')),
+                  const ListTile(title: Text('登録済み店舗')),
                   ..._registered.map(_tile),
                   const Divider(),
                 ],
                 if (_registeredFailed && !_failed)
                   const Padding(
                     padding: EdgeInsets.all(16),
-                    child: Text('登録済みの利用ジムを読み込めませんでした。店舗検索は利用できます。'),
+                    child: Text('登録済み店舗を読み込めませんでした。店舗検索は利用できます。'),
                   ),
                 if (_failed) gymError(() => _load()),
                 if (!_busy && !_failed && _stores.isEmpty)
@@ -177,6 +178,7 @@ class RegisteredGymsPage extends StatefulWidget {
 class _RegisteredGymsPageState extends State<RegisteredGymsPage> {
   final _repo = GymServices.repository;
   List<GymStore> _stores = [];
+  TrainingPlace _defaultPlace = const TrainingPlace.home();
   bool _busy = true, _failed = false;
   @override
   void initState() {
@@ -190,8 +192,16 @@ class _RegisteredGymsPageState extends State<RegisteredGymsPage> {
       _failed = false;
     });
     try {
+      final savedPlace = await TrainingPlacePreference.load();
+      if (mounted) setState(() => _defaultPlace = savedPlace);
       final stores = await _repo.registered();
-      if (mounted) setState(() => _stores = stores);
+      final place = await TrainingPlacePreference.reconcile(stores);
+      if (mounted) {
+        setState(() {
+          _stores = stores;
+          _defaultPlace = place;
+        });
+      }
     } catch (_) {
       if (mounted) setState(() => _failed = true);
     } finally {
@@ -217,7 +227,7 @@ class _RegisteredGymsPageState extends State<RegisteredGymsPage> {
       if (mounted) {
         setState(() => _busy = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('利用ジムを保存できませんでした。再度お試しください。')),
+          const SnackBar(content: Text('利用場所を保存できませんでした。再度お試しください。')),
         );
       }
     }
@@ -225,7 +235,7 @@ class _RegisteredGymsPageState extends State<RegisteredGymsPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('利用ジム')),
+    appBar: AppBar(title: const Text('利用場所')),
     body: SafeArea(
       child: ListView(
         padding: const EdgeInsets.all(16),
@@ -233,30 +243,77 @@ class _RegisteredGymsPageState extends State<RegisteredGymsPage> {
           const Text('登録した店舗は本人だけに表示されます。未ログイン時はこの端末に保存します。'),
           if (_busy) const LinearProgressIndicator(),
           if (_failed) gymError(_load),
-          if (!_busy && !_failed && _stores.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Text('利用ジムはまだ登録されていません'),
+          Card(
+            child: ListTile(
+              key: const Key('trainingPlaceHome'),
+              leading: const Icon(Icons.home_outlined),
+              title: const Text('自宅'),
+              subtitle: Text(
+                _defaultPlace.storeId == null ? 'いつもの場所 ✓' : 'いつもの場所に設定',
+              ),
+              onTap: _busy
+                  ? null
+                  : () => _change(
+                      () => TrainingPlacePreference.save(
+                        const TrainingPlace.home(),
+                      ),
+                    ),
             ),
+          ),
           for (final store in _stores)
             Card(
-              child: ListTile(
-                title: Text(store.displayName),
-                subtitle: const Text('設備を見る'),
-                onTap: () => Navigator.push<void>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => GymStoreEquipmentPage(store: store),
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(store.displayName),
+                    subtitle: Text(
+                      _defaultPlace.storeId == store.id
+                          ? 'いつもの場所 ✓ ・ 設備を見る'
+                          : '設備を見る',
+                    ),
+                    onTap: () => Navigator.push<void>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GymStoreEquipmentPage(store: store),
+                      ),
+                    ),
+                    trailing: IconButton(
+                      key: ValueKey('removeRegisteredGym${store.id}'),
+                      tooltip: '利用場所から削除',
+                      icon: const Icon(Icons.remove_circle_outline),
+                      onPressed: _busy
+                          ? null
+                          : () => _change(() async {
+                              await _repo.unregister(store.id);
+                              if (_defaultPlace.storeId == store.id) {
+                                await TrainingPlacePreference.save(
+                                  const TrainingPlace.home(),
+                                );
+                              }
+                            }),
+                    ),
                   ),
-                ),
-                trailing: IconButton(
-                  key: ValueKey('removeRegisteredGym${store.id}'),
-                  tooltip: '利用ジムから削除',
-                  icon: const Icon(Icons.remove_circle_outline),
-                  onPressed: _busy
-                      ? null
-                      : () => _change(() => _repo.unregister(store.id)),
-                ),
+                  TextButton.icon(
+                    key: ValueKey('defaultTrainingPlace${store.id}'),
+                    onPressed: _busy || _defaultPlace.storeId == store.id
+                        ? null
+                        : () => _change(
+                            () => TrainingPlacePreference.save(
+                              TrainingPlace.store(store),
+                            ),
+                          ),
+                    icon: Icon(
+                      _defaultPlace.storeId == store.id
+                          ? Icons.check
+                          : Icons.push_pin_outlined,
+                    ),
+                    label: Text(
+                      _defaultPlace.storeId == store.id
+                          ? 'いつもの場所'
+                          : 'いつもの場所に設定',
+                    ),
+                  ),
+                ],
               ),
             ),
           FilledButton.icon(
@@ -373,8 +430,7 @@ class _GymStoreEquipmentPageState extends State<GymStoreEquipmentPage> {
                         if (e.exerciseIds.isEmpty &&
                             e.compositeRuleIds.isNotEmpty)
                           '他の設備と組み合わせて対応',
-                        if (e.exerciseIds.isEmpty &&
-                            e.compositeRuleIds.isEmpty)
+                        if (e.exerciseIds.isEmpty && e.compositeRuleIds.isEmpty)
                           '対応種目は現在準備中です',
                       ].join(' ・ '),
                     ),
@@ -678,6 +734,104 @@ class _ReportDialogState extends State<_ReportDialog> {
           key: const Key('submitGymEquipmentReport'),
           onPressed: _busy ? null : _send,
           child: Text(_busy ? '送信中…' : '報告を送信'),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Same registered-store repository as the management page; no brand-only or
+/// legacy name matching. A one-workout selection never changes the default.
+class TrainingPlacePicker extends StatefulWidget {
+  const TrainingPlacePicker({super.key, this.currentStoreId, this.currentName});
+  final String? currentStoreId, currentName;
+  @override
+  State<TrainingPlacePicker> createState() => _TrainingPlacePickerState();
+}
+
+class _TrainingPlacePickerState extends State<TrainingPlacePicker> {
+  final _repo = GymServices.repository;
+  List<GymStore> _stores = [];
+  bool _busy = true, _failed = false;
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _busy = true;
+      _failed = false;
+    });
+    try {
+      final stores = await _repo.registered();
+      if (mounted) setState(() => _stores = stores);
+    } catch (_) {
+      if (mounted) setState(() => _failed = true);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _add() async {
+    final store = await Navigator.push<GymStore>(
+      context,
+      MaterialPageRoute(builder: (_) => const GymStoreSearchPage()),
+    );
+    if (store == null || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      await _repo.register(store);
+      if (mounted) Navigator.pop(context, TrainingPlace.store(store));
+    } catch (_) {
+      if (mounted) {
+        setState(() => _busy = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('店舗を登録できませんでした。再度お試しください。')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    child: ListView(
+      shrinkWrap: true,
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
+      children: [
+        const ListTile(
+          title: Text(
+            'トレーニング場所',
+            style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
+          ),
+        ),
+        ListTile(
+          key: const Key('selectTrainingPlaceHome'),
+          title: const Text('自宅'),
+          leading: const Icon(Icons.home_outlined),
+          trailing: widget.currentStoreId == null && widget.currentName == '自宅'
+              ? const Icon(Icons.check_circle_outline)
+              : null,
+          onTap: () => Navigator.pop(context, const TrainingPlace.home()),
+        ),
+        if (_busy) const LinearProgressIndicator(),
+        if (_failed) gymError(_load),
+        for (final store in _stores)
+          ListTile(
+            key: ValueKey('selectRegisteredPlace${store.id}'),
+            title: Text(store.displayName),
+            leading: const Icon(Icons.location_on_outlined),
+            trailing: widget.currentStoreId == store.id
+                ? const Icon(Icons.check_circle_outline)
+                : null,
+            onTap: () => Navigator.pop(context, TrainingPlace.store(store)),
+          ),
+        ListTile(
+          key: const Key('searchRegisteredGymStores'),
+          title: const Text('ジムを追加'),
+          leading: const Icon(Icons.add),
+          onTap: _busy ? null : _add,
         ),
       ],
     ),

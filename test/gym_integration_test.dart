@@ -127,7 +127,7 @@ void main() {
     repo.failRegistered = true;
     await page(t, const GymStoreSearchPage());
     expect(find.byKey(const Key('selectGymStorea')), findsOneWidget);
-    expect(find.text('登録済みの利用ジムを読み込めませんでした。店舗検索は利用できます。'), findsOneWidget);
+    expect(find.text('登録済み店舗を読み込めませんでした。店舗検索は利用できます。'), findsOneWidget);
     await t.enterText(find.byKey(const Key('gymStoreSearchField')), '松戸');
     await t.pump(const Duration(milliseconds: 350));
     await t.pumpAndSettle();
