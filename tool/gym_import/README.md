@@ -90,6 +90,7 @@ reads/deletes. Account deletion cascades personal registrations and reports.
 ```sh
 python3 -m unittest discover -s tool/gym_import -p 'test_*.py'
 supabase db query --linked --file supabase/tests/gym_equipment.sql
+supabase db query --linked --file supabase/tests/gym_multi_equipment_rules.sql
 flutter test --no-pub test/gym_integration_test.dart test/fitplace_catalog_test.dart test/workout_gym_test.dart
 flutter analyze --no-pub
 ```
