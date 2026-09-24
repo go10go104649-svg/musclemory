@@ -12,7 +12,11 @@ void main() {
       final form = ExerciseFormCatalog.byId['incline_fly_machine']!;
       expect(form.exerciseName, 'インクラインフライマシン');
       expect(
-        exerciseDisplayName(form.exerciseName, languageCode: 'en'),
+        exerciseDisplayName(
+          form.exerciseName,
+          exerciseId: form.exerciseId,
+          languageCode: 'en',
+        ),
         'Incline Fly Machine',
       );
       expect(form.available, isFalse);
