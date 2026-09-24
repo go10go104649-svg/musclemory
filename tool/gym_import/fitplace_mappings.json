@@ -602,5 +602,1152 @@
       "t_bar_row"
     ],
     "rationale": "設備名がTバーロー（プレートロード）を明示し、既存種目 t_bar_row と同一動作。プレートロード設備であっても種目IDは共通とし、設備分類と種目分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_900229060f8e",
+    "expected_name": "FORGE PLATE シーテッドカーフ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "seated_calf_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_8a351801c486",
+    "expected_name": "FORGE PLATE ベルトスクワット",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "belt_squat"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_f476c413c7c8",
+    "expected_name": "Vスクワット",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "v_squat"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_eaf8f69e619f",
+    "expected_name": "Vスクワット（2way）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "v_squat"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_f7119aae149e",
+    "expected_name": "アイソラテラルローロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "low_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_999e7b88bccd",
+    "expected_name": "アジャスタブル アームカールラック",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "preacher_curl"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_c2dc562978d1",
+    "expected_name": "アジャスタブルシットアップベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "sit_up",
+      "decline_sit_up"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_61654b38fe1e",
+    "expected_name": "アブクランチベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "crunch",
+      "sit_up"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_d8110ff0eecf",
+    "expected_name": "アングルドレッグプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_5354722256ab",
+    "expected_name": "アームカールラック",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "preacher_curl"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_81c024ca585c",
+    "expected_name": "インクラインプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_incline_chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_ef5e379c086a",
+    "expected_name": "インクラインベンチ（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_incline_chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_ff1ab0de49f1",
+    "expected_name": "エクストリームロー（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_seated_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_f7733cb40b58",
+    "expected_name": "オリンピックベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "bench_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_0785e0c3e79f",
+    "expected_name": "オリンピックベンチプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "bench_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_53beebd50e63",
+    "expected_name": "カールベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "preacher_curl"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_0bde3364df24",
+    "expected_name": "クランチベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "crunch",
+      "sit_up"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_9c56ecc38f1c",
+    "expected_name": "シットアップベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "sit_up",
+      "decline_sit_up"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_3e294640eceb",
+    "expected_name": "シーテッドカーフ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "seated_calf_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_bafef8661d3a",
+    "expected_name": "スクワットプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_acd4b8c20aff",
+    "expected_name": "スクワットプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_495afc6630ee",
+    "expected_name": "スタンディングアウターサイ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "standing_hip_abduction"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_7315bdfc7fc2",
+    "expected_name": "スパインベンチプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "bench_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_974d9fac8877",
+    "expected_name": "スーパーホリゾンタルベンチプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_f4420dba5a4d",
+    "expected_name": "チン/ディップ/レッグレイズ（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "chin_up",
+      "dips",
+      "hanging_leg_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_374eadfaf804",
+    "expected_name": "デクラインベンチ（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "decline_press_machine"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_ab0321696455",
+    "expected_name": "デッドリフトマシン",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "deadlift_machine"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_04417d322f92",
+    "expected_name": "デュアルパワースミス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "smith_bench_press",
+      "smith_incline_press",
+      "smith_decline_press",
+      "smith_shoulder_press",
+      "smith_squat",
+      "smith_bulgarian_split_squat"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_7b54c0c12bf8",
+    "expected_name": "ハックスクワット",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hack_squat"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_d52441b4f6a6",
+    "expected_name": "ハックスライド",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hack_squat"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_777f00f621f2",
+    "expected_name": "ハックスライド（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "hack_squat"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_852416d8d40e",
+    "expected_name": "パワーレッグプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_ead62d79c7ae",
+    "expected_name": "パワーレッグプレス45DEG",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_07465594e563",
+    "expected_name": "パワーレッグプレス45DEG（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_10495c100734",
+    "expected_name": "パワーレッグプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_241f9ce20ca7",
+    "expected_name": "ピュアプレート ハイロー",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "high_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_1e5e1e2ecc53",
+    "expected_name": "ピュアプレート ハックスクワット",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "hack_squat"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_37e8280d1386",
+    "expected_name": "ピュアプレート ヒップスラスト",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "machine_hip_thrust"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_c475597276e0",
+    "expected_name": "ピュアプレート フロントロー",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_seated_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_3d716a2c9eb3",
+    "expected_name": "ピュアプレート ラテラルレイズ",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "machine_lateral_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_e805cac4af11",
+    "expected_name": "ピュアプレート ロータリープルダウン",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_lat_pulldown"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_12d1dda6bbe2",
+    "expected_name": "ピュアプレート ローロー",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "low_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_c24a2357564f",
+    "expected_name": "フラットベンチ（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_d28c64530587",
+    "expected_name": "フロントロー（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_seated_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_62b81961ac5d",
+    "expected_name": "プルオーバー（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "machine_pullover"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_7d511941de18",
+    "expected_name": "プルダウン（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_lat_pulldown"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_8c92d62487e8",
+    "expected_name": "ベンチプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "bench_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_72c008058f4c",
+    "expected_name": "ペクトラルフライ（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "pec_fly"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_c4147b4e27e6",
+    "expected_name": "ペックデックフライ（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "pec_fly"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_5cd552b25b25",
+    "expected_name": "ペンデュラムスクワット（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "pendulum_squat"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_931c48931c93",
+    "expected_name": "ラテラルレイズ（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "machine_lateral_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_850514660f68",
+    "expected_name": "リンクヒップアブダクション",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "hip_abduction"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_7498d6d15d4e",
+    "expected_name": "リンクヒップアブダクション（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "hip_abduction"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_fb49b30d40d9",
+    "expected_name": "レッグエクステンション（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "leg_extension"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_e506f8d1ce18",
+    "expected_name": "レッグプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_bf37ca32509b",
+    "expected_name": "レバレッジチェストプレス（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_28da465b023b",
+    "expected_name": "ロータリープルダウン（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_lat_pulldown"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_4573368b2f52",
+    "expected_name": "ローロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "low_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_7b6c1f290af2",
+    "expected_name": "ローロー（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "low_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_2c02d5d9cb4d",
+    "expected_name": "ローワーバックベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "back_extension",
+      "weighted_back_extension"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_0295744ab28f",
+    "expected_name": "ワイドプルダウン（プレートロード）",
+    "expected_load_type": "plate_loaded_explicit",
+    "exercise_ids": [
+      "plate_loaded_lat_pulldown"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_6116e487128e",
+    "expected_name": "クライム",
+    "expected_load_type": "cardio",
+    "exercise_ids": [
+      "stair_climber"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_9e5f2af09f27",
+    "expected_name": "クライムマシン",
+    "expected_load_type": "cardio",
+    "exercise_ids": [
+      "stair_climber"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_9aa90f373d8e",
+    "expected_name": "ステアマスター",
+    "expected_load_type": "cardio",
+    "exercise_ids": [
+      "stair_climber"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_15e9cc9f036d",
+    "expected_name": "ALPHA BETA オムニシーテッドケーブルロー",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "cable_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_21c6673c148f",
+    "expected_name": "ALPHA BETA チェストプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_0e96d273de43",
+    "expected_name": "INFINITY オムニ ラットプルダウン/ロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "lat_pulldown",
+      "seated_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_d26a3e6b52c2",
+    "expected_name": "INFINITY オムニ レッグプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_e23d8f7a1f91",
+    "expected_name": "INFINITY サポーテッドロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "seated_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_aea617a59364",
+    "expected_name": "INFINITY チェストプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_47f0c8d652f8",
+    "expected_name": "INFINITY ペック/リアデルト",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "pec_fly",
+      "rear_delt"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_e5bcaedce680",
+    "expected_name": "INFINITY ラットマシン",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "lat_pulldown"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_235b2bc85863",
+    "expected_name": "ISOバイセップカール",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_arm_curl"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_dbf506f49562",
+    "expected_name": "アブクランチベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "crunch",
+      "sit_up"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_92290a388416",
+    "expected_name": "アブドミナル",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "abdominal_crunch"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_e89c6eb2eb8d",
+    "expected_name": "アブドミナル&バックエクステンション",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "abdominal_crunch",
+      "back_extension_machine"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_f03b6a55e179",
+    "expected_name": "アブドミナル/バックエクステンション デュアル",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "abdominal_crunch",
+      "back_extension_machine"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_980743687ce2",
+    "expected_name": "アームカール",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_arm_curl"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_420ed45cadd2",
+    "expected_name": "インクラインチェストプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "selectorized_incline_chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_9c275ad7f831",
+    "expected_name": "インクラインプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "selectorized_incline_chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_50e09aff07e5",
+    "expected_name": "グルート",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "glute_kickback_machine"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_942b682a79da",
+    "expected_name": "グルートマシン",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "glute_kickback_machine"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_546b9ca02b75",
+    "expected_name": "コンバージングインクラインチェストプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "selectorized_incline_chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_79a049bab8ce",
+    "expected_name": "コンバージングショルダープレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "shoulder_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_01f68a69b5a5",
+    "expected_name": "コンバージングチェストプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_0ad74f66ef54",
+    "expected_name": "ショルダープレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "shoulder_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_9ca6c9f86826",
+    "expected_name": "シーテッドチェストプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_725765b8d1fe",
+    "expected_name": "シーテッドチェストプレス（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_d91facf6aa26",
+    "expected_name": "シーテッドディップ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "seated_dip_machine"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_df0b02e63072",
+    "expected_name": "シーテッドラテラルレイズ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_lateral_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_643af5c350de",
+    "expected_name": "シーテッドレッグプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_a9b8eb6ac7de",
+    "expected_name": "シーテッドロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "seated_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_a4bc4fa4951a",
+    "expected_name": "スクワット&カーフ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_press",
+      "standing_calf_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_cf97cd768191",
+    "expected_name": "スクワット/カーフ デュアル",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_press",
+      "standing_calf_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_51f6aeb0403d",
+    "expected_name": "スタンディングマルチフライ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "standing_machine_fly"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_1caec5a7c3b6",
+    "expected_name": "スタンディングラテラルレイズ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_lateral_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_07e390e0f56c",
+    "expected_name": "スタンディングラテラルレイズ/フライ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_lateral_raise",
+      "standing_machine_fly"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_71c1607ac59a",
+    "expected_name": "スタンディングラテラルレイズ/ペックフライ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_lateral_raise",
+      "standing_machine_fly"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_72c38ceaa2bb",
+    "expected_name": "チェストプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chest_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_2617f81df245",
+    "expected_name": "デュアルプーリー",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "cable_fly",
+      "cable_curl",
+      "rope_pushdown",
+      "straight_bar_pushdown",
+      "face_pull",
+      "cable_lateral_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_76d531fa47b2",
+    "expected_name": "トライセプスカール（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_triceps_extension"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_1112b516f6b2",
+    "expected_name": "バイセップカール",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_arm_curl"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_2f033c3cda33",
+    "expected_name": "バイセプスカール（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_arm_curl"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_f7a344c7c227",
+    "expected_name": "バタフライ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "pec_fly"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_f32f7076c6a6",
+    "expected_name": "バタフライ/リアデルト",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "pec_fly",
+      "rear_delt"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_e7770dba9fda",
+    "expected_name": "バックエクステンション",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "back_extension_machine"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_7db705aa26cf",
+    "expected_name": "バックエクステンションベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "back_extension",
+      "weighted_back_extension"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_5c972c565334",
+    "expected_name": "バーティカルトラクション",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "lat_pulldown"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_b74c97b496bb",
+    "expected_name": "ヒップスラストマシン",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_hip_thrust"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_96997a69561d",
+    "expected_name": "フロントプルダウン（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "lat_pulldown"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_769c331d158c",
+    "expected_name": "プーリー",
+    "expected_load_type": "cable_named",
+    "exercise_ids": [
+      "cable_fly",
+      "cable_curl",
+      "rope_pushdown",
+      "straight_bar_pushdown",
+      "face_pull",
+      "cable_lateral_raise"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_f9234ea2e3c8",
+    "expected_name": "ペクトラル/リバースフライ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "pec_fly",
+      "rear_delt"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_06ffdba2f9aa",
+    "expected_name": "マルチプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "chest_press",
+      "shoulder_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_b05260146fd7",
+    "expected_name": "ラットプルダウン/ローロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "lat_pulldown",
+      "low_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_b944beb79bbd",
+    "expected_name": "ラテラルレイズ/フライ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "machine_lateral_raise",
+      "standing_machine_fly"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_f7e93c6fdcb7",
+    "expected_name": "ラテラルロー（デュアルスタック）",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "seated_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_3810bb5f16f1",
+    "expected_name": "レッグプレス",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "leg_press"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_d442ebd4c75f",
+    "expected_name": "ロングプル",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "cable_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_d9b17c861272",
+    "expected_name": "ロングプル/ラットプルダウン デュアル",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "cable_row",
+      "lat_pulldown"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_91a080bf7a8d",
+    "expected_name": "ローロー",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "low_row"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_d1d756af5522",
+    "expected_name": "ローワーバック",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "back_extension_machine"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_c16a25a58d3c",
+    "expected_name": "ローワーバックベンチ",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "back_extension",
+      "weighted_back_extension"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
+  },
+  {
+    "equipment_id": "fp_eq_a829e2e475a3",
+    "expected_name": "ワイドペックフライ/リアデルト",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "pec_fly",
+      "rear_delt"
+    ],
+    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
   }
 ]
