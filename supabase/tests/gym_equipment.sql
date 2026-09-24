@@ -8,8 +8,8 @@ insert into gym_store_equipment(store_id,equipment_id,raw_name) values ('qa-stor
 set local role anon;
 do $$ begin
   if (select count(*) from public.search_gym_stores('店舗テスト'))<>1 or
-     (select count(*) from public.search_gym_stores('市区町村テスト'))<>1 or
-     (select count(*) from public.search_gym_stores('駅テスト'))<>1 then raise exception 'Search failed'; end if;
+     (select count(*) from public.search_gym_stores('市区町村テスト'))<>0 or
+     (select count(*) from public.search_gym_stores('駅テスト'))<>0 then raise exception 'Search failed'; end if;
   begin insert into public.gym_chains(id,name) values ('bad','bad'); raise exception 'Anon wrote master'; exception when insufficient_privilege then null; end;
 end $$;
 reset role;
@@ -20,7 +20,8 @@ insert into public.gym_equipment_reports(store_id,equipment_id,kind) values ('qa
 do $$ begin
   if not exists(select 1 from public.user_gym_stores where store_id='qa-store') then raise exception 'Owner read failed'; end if;
   if not exists(select 1 from public.gym_store_equipment where store_id='qa-store') then raise exception 'Report changed master'; end if;
-  begin insert into public.gym_equipment_reports(store_id,equipment_id,kind) values ('qa-store','qa-e','removed'); raise exception 'Rate limit failed' using errcode='22000'; exception when raise_exception then null; end;
+  insert into public.gym_equipment_reports(store_id,equipment_id,kind) values ('qa-store','qa-e','removed');
+  if (select count(*) from public.gym_equipment_reports where store_id='qa-store')<>1 then raise exception 'Duplicate report inserted'; end if;
   begin insert into public.gym_equipment_reports(store_id,kind) values ('qa-store','added'); raise exception 'Null name accepted'; exception when check_violation then null; end;
   begin insert into public.gym_equipment_reports(store_id,kind,status) values ('qa-store','other','approved'); raise exception 'Self approval allowed'; exception when insufficient_privilege then null; end;
 end $$;

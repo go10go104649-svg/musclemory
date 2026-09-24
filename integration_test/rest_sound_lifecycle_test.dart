@@ -44,6 +44,10 @@ void main() {
       await RestNotificationService.schedule(60);
       await Future<void>.delayed(const Duration(seconds: 5));
       await RestNotificationService.cancel();
+      // Permission UI may resume the workout while the 60-second probe is active.
+      // Resync after cancelling that setup probe before testing the real timer.
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pumpAndSettle();
       debugPrint(
         'QA_SOUND_START lifecycle=${WidgetsBinding.instance.lifecycleState}',

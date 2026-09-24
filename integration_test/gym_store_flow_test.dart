@@ -7,6 +7,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:muscle_memory/main.dart';
 import 'package:muscle_memory/config/supabase_config.dart';
 import 'package:muscle_memory/gym/gym_repository.dart';
+import 'package:muscle_memory/gym/place_equipment_pages.dart';
+import 'package:muscle_memory/gym/training_place_preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -14,9 +16,9 @@ void main() {
   testWidgets('live FIT PLACE search equipment exercise and workout draft', (
     t,
   ) async {
+    SharedPreferences.setMockInitialValues({});
     await SupabaseConfig.initialize();
     expect(SupabaseConfig.initialized, isTrue);
-    SharedPreferences.setMockInitialValues({});
     WorkoutUiPreference.workoutTimerEnabled = false;
     WorkoutUiPreference.workoutDurationEnabled = false;
     RestTimerPreference.enabled = false;
@@ -51,6 +53,8 @@ void main() {
     await settleUntil(find.byKey(Key('selectGymStore${store.id}')));
     await t.tap(find.byKey(Key('selectGymStore${store.id}')));
     await t.pumpAndSettle();
+    await t.tap(find.byKey(const Key('confirmGymStoreSelection')));
+    await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('workoutGymEquipmentButton')));
     await t.pump();
     await settleUntil(
@@ -63,7 +67,9 @@ void main() {
     await t.scrollUntilVisible(
       find.byKey(Key('gymEquipment${target.id}')),
       300,
-      scrollable: find.byType(Scrollable),
+      scrollable: find.byWidgetPredicate(
+        (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+      ),
     );
     await t.ensureVisible(find.byKey(Key('gymEquipment${target.id}')));
     await t.tap(find.byKey(Key('gymEquipment${target.id}')));
@@ -71,6 +77,8 @@ void main() {
     final add = find.byKey(Key('addGymExercise$exerciseId'));
     await t.ensureVisible(add);
     await t.tap(add);
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const Key('addSelectedGymExercises')));
     await t.pumpAndSettle();
     await t.pageBack();
     await t.pumpAndSettle();
@@ -90,4 +98,78 @@ void main() {
     await t.pumpWidget(const SizedBox());
     await t.pumpAndSettle();
   });
+  testWidgets(
+    'private equipment uses live master and rules without shared writes',
+    (t) async {
+      SharedPreferences.setMockInitialValues({});
+      await SupabaseConfig.initialize();
+      await CustomGymPreference.load();
+      await CustomGymPreference.add('QA本人専用場所');
+      final id = CustomGymPreference.idFor('QA本人専用場所')!;
+      final repo = SupabaseGymRepository();
+      final rack = (await repo.searchEquipment('BULL パワーラック'))
+          .firstWhere((e) => e.id == 'kanekin:bull-power-rack');
+      final bench = (await repo.searchEquipment('BULL アジャスタブルベンチ'))
+          .firstWhere((e) => e.id == 'kanekin:bull-adjustable-bench');
+      await repo.savePrivateEquipment(
+        id,
+        PrivatePlaceEquipment(
+          id: 'rack',
+          equipmentId: rack.id,
+          name: rack.name,
+        ),
+      );
+      expect(
+        (await repo.privateEvidence(id))
+            .any((e) => e.exerciseId == 'incline_barbell_press'),
+        isFalse,
+      );
+      await repo.savePrivateEquipment(
+        id,
+        PrivatePlaceEquipment(
+          id: 'bench',
+          equipmentId: bench.id,
+          name: bench.name,
+        ),
+      );
+      expect(
+        (await repo.privateEvidence(id))
+            .any((e) => e.exerciseId == 'incline_barbell_press'),
+        isTrue,
+      );
+      await t.pumpWidget(
+        MaterialApp(
+          home: PrivatePlaceEquipmentPage(placeId: id, name: 'QA本人専用場所'),
+        ),
+      );
+      for (
+        var i = 0;
+        i < 80 &&
+            find.byKey(const Key('privateEquipmentrack')).evaluate().isEmpty;
+        i++
+      ) {
+        await t.pump(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      }
+      await t.pumpAndSettle();
+      expect(find.byKey(const Key('privateEquipmentrack')), findsOneWidget);
+      expect(find.byKey(const Key('reportGymEquipment')), findsNothing);
+      await TrainingPlacePreference.save(
+        const TrainingPlace.manual('QA本人専用場所'),
+      );
+      await t.pumpWidget(const SizedBox());
+      await t.pumpWidget(
+        const MaterialApp(home: WorkoutPage(useDefaultPlace: true)),
+      );
+      await t.pumpAndSettle();
+      expect(find.text('この場所の設備から種目を追加'), findsOneWidget);
+      if (Platform.isAndroid) {
+        await binding.convertFlutterSurfaceToImage();
+        await t.pumpAndSettle();
+      }
+      await binding.takeScreenshot('private_place_workout');
+      expect(t.takeException(), isNull);
+      await t.pumpWidget(const SizedBox());
+    },
+  );
 }

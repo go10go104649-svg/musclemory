@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Galaxyで起動（Supabase・Release）",
+      "type": "shell",
+      "command": "flutter run -d RFCY31C098T --dart-define-from-file=supabase.json",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "iPhoneで起動（Supabase・Release）",
+      "type": "shell",
+      "command": "flutter run --release -d 00008110-000648EC360640 --dart-define-from-file=supabase.json",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}

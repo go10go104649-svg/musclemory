@@ -16,6 +16,7 @@ dependencies:
   shared_preferences: ^2.5.5
   share_plus: ^13.3.0
   supabase_flutter: ^2.17.2
+  url_launcher: ^6.3.2
   interactive_3d:
     path: packages/interactive_3d
   image_picker: ^1.2.3

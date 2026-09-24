@@ -63,11 +63,25 @@ class MainActivity : FlutterActivity() {
                             result.success(null)
                         }
                     }
+                    "debugRestAlarm" -> {
+                        if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE == 0) result.notImplemented()
+                        else {
+                            RestTimerReceiver().onReceive(this, Intent(this, RestTimerReceiver::class.java)
+                                .putExtra("timerId", call.argument<String>("timerId"))
+                                .putExtra("deadline", call.argument<Number>("deadline")?.toLong() ?: 0))
+                            result.success(null)
+                        }
+                    }
                     "debugStatus" -> {
                         if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE == 0) {
                             result.notImplemented()
                         } else {
-                            result.success(mapOf("playing" to RestTimerFeedback.isPlaying, "deadline" to getSharedPreferences("rest_timer", MODE_PRIVATE).getLong("deadline", 0),
+                            val p = getSharedPreferences("rest_timer", MODE_PRIVATE)
+                            result.success(RestTimerDiagnostics.snapshot() + RestTimerFeedback.status(this) + mapOf(
+                                "playing" to RestTimerFeedback.isPlaying, "deadline" to p.getLong("deadline", 0),
+                                "timerId" to (p.getString("timerId", "") ?: ""),
+                                "lastCompletionTimerId" to (p.getString("lastCompletionTimerId", "") ?: ""),
+                                "lastCompletionAt" to p.getLong("lastCompletionAt", 0),
                                 "delivered" to (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).activeNotifications.map { it.id }))
                         }
                     }
@@ -83,6 +97,11 @@ class MainActivity : FlutterActivity() {
                     "cancel" -> {
                         RestTimerState.cancel(this, call.argument<Int>("remainingSeconds") ?: 0)
                         result.success(null)
+                    }
+                    "completeIfDue" -> {
+                        val deadline = call.argument<Number>("endsAtMilliseconds")?.toLong() ?: 0
+                        result.success(deadline > 0 && RestTimerState.completeIfDue(this,
+                            expectedDeadline = deadline, source = "flutter_deadline"))
                     }
                     "state" -> result.success(RestTimerState.snapshot(this))
                     "playCompletionFeedback" -> {

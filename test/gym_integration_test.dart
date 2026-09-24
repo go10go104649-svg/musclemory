@@ -37,7 +37,7 @@ class FakeGyms extends GymRepository {
     return [
       storeA,
       storeB,
-    ].where((s) => '${s.name} ${s.city} ${s.station}'.contains(q)).toList();
+    ].where((s) => '${s.chainName} ${s.name}'.contains(q)).toList();
   }
 
   @override
@@ -100,11 +100,11 @@ void main() {
     await t.pumpAndSettle();
   }
 
-  testWidgets('gym search supports store city station and network retry', (
+  testWidgets('gym search supports store chain and network retry', (
     t,
   ) async {
     await page(t, const GymStoreSearchPage());
-    for (final q in ['松戸店', '松戸市', '松戸駅']) {
+    for (final q in ['松戸店', 'FIT PLACE24']) {
       await t.enterText(find.byKey(const Key('gymStoreSearchField')), q);
       await t.pump(const Duration(milliseconds: 350));
       await t.pumpAndSettle();
@@ -141,6 +141,8 @@ void main() {
       await t.pumpAndSettle();
       await t.tap(find.byKey(Key('selectGymStore$id')));
       await t.pumpAndSettle();
+      await t.tap(find.byKey(const Key('confirmGymStoreSelection')));
+      await t.pumpAndSettle();
     }
     expect(repo.saved.length, 2);
     await t.tap(find.byKey(const Key('removeRegisteredGyma')));
@@ -159,27 +161,31 @@ void main() {
         ),
       );
       expect(find.text('フリーウェイト'), findsOneWidget);
-      expect(find.text('対応種目は現在準備中です'), findsOneWidget);
-      expect(find.text('他の設備と組み合わせて対応'), findsOneWidget);
+      expect(find.textContaining('対応種目は現在準備中です'), findsWidgets);
+
+      await t.scrollUntilVisible(find.byKey(const Key('gymEquipmentc')),150,scrollable:find.byType(Scrollable).last);
       await t.tap(find.byKey(const Key('gymEquipmentc')));
       await t.pumpAndSettle();
       expect(
-        find.text('この設備は、ラック＋ベンチなど他の設備との組み合わせで対応種目を判定します。'),
+        find.text('対応種目は現在準備中です'),
         findsOneWidget,
       );
       await t.pageBack();
       await t.pumpAndSettle();
+      await t.scrollUntilVisible(find.byKey(const Key('gymEquipmente')),150,scrollable:find.byType(Scrollable).last);
       await t.tap(find.byKey(const Key('gymEquipmente')));
       await t.pumpAndSettle();
       await t.tap(find.byKey(const Key('addGymExercisedumbbell_curl')));
       await t.pumpAndSettle();
+      await t.tap(find.byKey(const Key('addSelectedGymExercises')));
+      await t.pumpAndSettle();
       expect(added, {'dumbbell_curl'});
       expect(
         t
-            .widget<TextButton>(
+            .widget<ListTile>(
               find.byKey(const Key('addGymExercisedumbbell_curl')),
             )
-            .onPressed,
+            .onTap,
         isNull,
       );
       expect(

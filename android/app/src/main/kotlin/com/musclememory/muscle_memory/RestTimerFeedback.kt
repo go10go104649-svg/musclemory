@@ -54,43 +54,97 @@ internal object RestTimerFeedback {
         return manager.getNotificationChannel(CHANNEL)
     }
 
-    fun play(context: Context) {
-        stop(context)
+    enum class Output { STARTED, SUPPRESSED, FAILED }
+
+    fun status(context: Context): Map<String, Any> {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val audio = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val channel = ensureChannel(context)
-        if (!manager.areNotificationsEnabled() || channel?.importance == NotificationManager.IMPORTANCE_NONE ||
-            audio.ringerMode == AudioManager.RINGER_MODE_SILENT ||
-            manager.currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_ALL) return
-        if (audio.ringerMode == AudioManager.RINGER_MODE_NORMAL &&
-            (channel == null || channel.sound != null)) {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    focus = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
-                        .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
-                        .setOnAudioFocusChangeListener(focusListener).build()
-                    audio.requestAudioFocus(focus!!)
-                } else {
-                    @Suppress("DEPRECATION")
-                    audio.requestAudioFocus(focusListener, AudioManager.STREAM_NOTIFICATION,
-                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
-                }
-                player = MediaPlayer().apply {
-                    setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
-                    setDataSource(context.applicationContext, channel?.sound ?: sound(context))
-                    setOnCompletionListener { finished ->
-                        if (player === finished) {
-                            player = null
-                            releaseFocus(context)
-                        }
-                        finished.release()
-                    }
-                    prepare()
-                    start()
-                }
-            } catch (_: Exception) { player?.release(); player = null; releaseFocus(context) }
+        return mapOf("foreground" to foreground, "notificationPermission" to manager.areNotificationsEnabled(),
+            "channelImportance" to (channel?.importance ?: NotificationManager.IMPORTANCE_HIGH),
+            "channelHasSound" to (channel == null || channel.sound != null),
+            "channelVibrates" to (channel?.shouldVibrate() != false),
+            "ringerMode" to audio.ringerMode, "interruptionFilter" to manager.currentInterruptionFilter,
+            "notificationVolume" to audio.getStreamVolume(AudioManager.STREAM_NOTIFICATION))
+    }
+
+    fun suppression(context: Context): String? {
+        val s = status(context)
+        return when {
+            s["notificationPermission"] != true -> "notification_permission"
+            (s["channelImportance"] as Int) < NotificationManager.IMPORTANCE_DEFAULT -> "channel_importance"
+            s["channelHasSound"] != true -> "channel_sound_none"
+            s["ringerMode"] != AudioManager.RINGER_MODE_NORMAL -> "ringer_mode"
+            s["interruptionFilter"] != NotificationManager.INTERRUPTION_FILTER_ALL -> "do_not_disturb"
+            s["notificationVolume"] == 0 -> "notification_volume_zero"
+            else -> null
+        }
+    }
+
+    fun play(context: Context, timerId: String? = null): Output {
+        stop(context)
+        RestTimerDiagnostics.now("lastSoundAttemptAt")
+        RestTimerDiagnostics.set("lastSoundTimerId", timerId ?: "explicit_feedback")
+        RestTimerDiagnostics.set("lastSoundError", "")
+        RestTimerDiagnostics.log(context, timerId, "sound attempt")
+        val reason = suppression(context)
+        if (reason != null) {
+            RestTimerDiagnostics.set("lastSuppressedReason", reason)
+            RestTimerDiagnostics.log(context, timerId, "suppressed reason=$reason")
+            return Output.SUPPRESSED
+        }
+        val audio = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val channel = ensureChannel(context)
+        val attributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
+        try {
+            val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                focus = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                    .setAudioAttributes(attributes).setOnAudioFocusChangeListener(focusListener).build()
+                audio.requestAudioFocus(focus!!)
+            } else {
+                @Suppress("DEPRECATION")
+                audio.requestAudioFocus(focusListener, AudioManager.STREAM_NOTIFICATION,
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+            }
+            RestTimerDiagnostics.set("audioFocusResult", focusResult)
+            RestTimerDiagnostics.log(context, timerId, "audio focus result=$focusResult")
+            if (focusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                RestTimerDiagnostics.set("lastSoundError", "audio_focus_denied")
+                releaseFocus(context)
+                return Output.FAILED // Lifecycle boundary: notification is still a valid output.
+            }
+            val cue = MediaPlayer()
+            player = cue // assign before prepare so every failure can release it
+            RestTimerDiagnostics.log(context, timerId, "media player created")
+            cue.setAudioAttributes(attributes)
+            RestTimerDiagnostics.log(context, timerId, "audio attributes set")
+            cue.setDataSource(context.applicationContext, channel?.sound ?: sound(context))
+            RestTimerDiagnostics.log(context, timerId, "data source set")
+            cue.setOnCompletionListener { finished ->
+                RestTimerDiagnostics.now("lastSoundCompletedAt")
+                RestTimerDiagnostics.log(context, timerId, "media player complete")
+                if (player === finished) { player = null; releaseFocus(context) }
+                finished.release()
+            }
+            cue.setOnErrorListener { failed, what, extra ->
+                RestTimerDiagnostics.set("lastSoundError", "media_error:$what/$extra")
+                RestTimerDiagnostics.log(context, timerId, "media player error=$what/$extra")
+                if (player === failed) { player = null; releaseFocus(context) }
+                failed.release()
+                true // Do not replay after possibly audible playback.
+            }
+            cue.prepare()
+            RestTimerDiagnostics.log(context, timerId, "media player prepared")
+            cue.start()
+            RestTimerDiagnostics.now("lastSoundStartedAt")
+            RestTimerDiagnostics.increment("soundStartCount")
+            RestTimerDiagnostics.log(context, timerId, "media player start")
+        } catch (error: Exception) {
+            RestTimerDiagnostics.set("lastSoundError", "${error.javaClass.simpleName}: ${error.message}")
+            RestTimerDiagnostics.log(context, timerId, "sound failed: $error")
+            player?.release(); player = null; releaseFocus(context)
+            return Output.FAILED
         }
         if (channel?.shouldVibrate() != false) {
             val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -101,9 +155,14 @@ internal object RestTimerFeedback {
                 vibrator.vibrate(vibration, -1)
             }
         }
+        return Output.STARTED
     }
 
     fun stop(context: Context) {
+        if (player != null) {
+            RestTimerDiagnostics.now("lastSoundStoppedAt")
+            RestTimerDiagnostics.log(context, null, "media player stopped explicitly")
+        }
         releaseFocus(context)
         player?.release()
         player = null

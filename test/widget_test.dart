@@ -1708,7 +1708,7 @@ void main() {
     expect(preferences.getString('custom_gyms'), contains('以前の体育館'));
   });
 
-  testWidgets('legacy custom gyms stay stored but are not new location candidates', (
+  testWidgets('legacy custom gyms remain selectable as manual places', (
     tester,
   ) async {
     _setExistingUserPreferences({
@@ -1737,8 +1737,8 @@ void main() {
     );
     await tester.tap(find.text('場所を選ぶ'));
     await tester.pumpAndSettle();
-    expect(find.text('中央体育館'), findsNothing);
-    expect(find.text('会社のジム'), findsNothing);
+    expect(find.text('中央体育館'), findsOneWidget);
+    expect(find.text('会社のジム'), findsOneWidget);
     expect(find.text('ジムを追加'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('selectTrainingPlaceHome')));

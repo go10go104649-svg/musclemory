@@ -79,14 +79,43 @@ Apply migrations through
 linked-project data.
 ## Search and reports
 
-Public search is server-paged (30), equipment is store-scoped/paged (50). Search
-matches store name, city or station, with literal wildcard escaping. Trigram/FK
-indexes cover lookups. Reports require login, are inserted as `pending`, and never
-mutate the master. Only administrators can approve/reject/resolve. The database
-serializes each user's reports and rejects repeated same-store/equipment/type
-reports within 5 minutes, and more than 5 reports per user in 5 minutes. New-equipment
-reports require a name. RLS and column grants prevent self-approval and cross-user
-reads/deletes. Account deletion cascades personal registrations and reports.
+Public search is server-paged (30). It matches **store/chain names only**,
+including explicit chain aliases and width/spacing normalization, ranked exact,
+prefix, then substring. City is displayed for disambiguation, not searched.
+The optional chain filter uses the same generic endpoint for every chain.
+
+Migration 202609240008 is additive. `gym_store_detail` returns one store's metadata,
+equipment and the same satisfied evidence used by `gym_store_exercise_ids`.
+No mapping/rule IDs were replaced. Public equipment snapshots are cached locally
+for 24 hours; stale snapshots render immediately while a refresh runs. Failed
+refreshes retain the last snapshot; Pull-to-Refresh forces a fetch. Reports and
+private registrations are not included in this cache. Unknown confirmation dates,
+manufacturers, models and quantities remain unknown. Import time is not an
+equipment confirmation date.
+
+Reports require login and never mutate the master. Statuses are pending,
+reviewing, resolved/rejected (legacy approved remains readable as awaiting
+resolution). A per-user advisory lock coalesces identical open reports without
+creating another row. Resolved/rejected reports allow a later new report; the
+five-new-reports-per-five-minutes rate cap remains. RLS and column grants prevent
+self-approval and cross-user access.
+
+Administrators manage availability using `available` and, only for a known
+quantity, `unavailable_quantity`. The evidence RPC excludes wholly unavailable
+equipment but accepts remaining working units. To remove equipment from a store,
+delete only its `gym_store_equipment` relation, never the shared equipment master.
+Insert/update/delete snapshots are recorded in private `gym_equipment_changes`.
+Source priority is admin > official > confirmed_report > unconfirmed_report;
+lower-priority updates cannot replace a reviewed row. Imports explicitly identify
+their source as official. Unknown or missing workbook rows do not imply removal.
+Display names/aliases are separate from original names/categories and stable IDs.
+No weekly crawler or equipment-photo feature is installed.
+
+Utilization places use the existing registration repository plus an account-scoped
+local default. Preferred store comes first, then home, then other stores; home is
+never duplicated or removable. A workout-specific choice does not change the
+default. Store removal does not touch workout history. Legacy names without IDs
+are preserved, never matched heuristically to a store.
 
 ## Verification
 
@@ -94,6 +123,7 @@ reads/deletes. Account deletion cascades personal registrations and reports.
 python3 -m unittest discover -s tool/gym_import -p 'test_*.py'
 supabase db query --linked --file supabase/tests/gym_equipment.sql
 supabase db query --linked --file supabase/tests/gym_multi_equipment_rules.sql
+supabase db query --linked --file supabase/tests/gym_places_details.sql
 flutter test --no-pub test/gym_integration_test.dart test/fitplace_catalog_test.dart test/workout_gym_test.dart
 flutter analyze --no-pub
 ```

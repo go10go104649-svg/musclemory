@@ -1,4 +1,8 @@
+import 'gym/place_equipment_pages.dart';
+import 'gym/custom_gym_preference.dart';
+export 'gym/custom_gym_preference.dart';
 import 'gym/training_place_preference.dart';
+import 'gym/gym_equipment_cache.dart';
 import 'gym/gym_repository.dart';
 import 'gym/gym_pages.dart';
 import 'trainer_qr_page.dart';
@@ -171,6 +175,19 @@ class RestNotificationService {
       });
     } on PlatformException catch (error) {
       debugPrint('Rest notification scheduling failed: $error');
+    }
+  }
+
+  /// Android alone owns natural completion output. This requests the same
+  /// native claim as AlarmManager; it is neither cancel nor explicit test sound.
+  static Future<void> completeIfDue(DateTime deadline) async {
+    if (!Platform.isAndroid) return;
+    try {
+      await _channel.invokeMethod<bool>('completeIfDue', {
+        'endsAtMilliseconds': deadline.millisecondsSinceEpoch,
+      });
+    } on PlatformException catch (error) {
+      debugPrint('Rest completion claim failed: $error');
     }
   }
 
@@ -864,6 +881,7 @@ class _HomeShellState extends State<HomeShell> {
         !CustomGymPreference.gyms.contains(selectedGym)) {
       await CustomGymPreference.add(selectedGym);
     }
+    await TrainingPlacePreference.migrateKanekinPlace(GymServices.repository);
     final defaultPlace = await TrainingPlacePreference.load();
     final workoutDraft = WorkoutDraftSummary.tryParse(
       preferences.getString(activeWorkoutDraftStorageKey),
@@ -1252,7 +1270,7 @@ class DashboardPage extends StatelessWidget {
           if (workoutDraft != null) ...[
             ActiveWorkoutDraftCard(
               summary: workoutDraft!,
-              onResume: () => _openWorkout(context),
+              onResume: () => _openWorkout(context, resumeDraft: true),
             ),
             const SizedBox(height: 14),
           ],
@@ -1292,13 +1310,17 @@ class DashboardPage extends StatelessWidget {
   Future<void> _openWorkout(
     BuildContext context, {
     WorkoutRecord? initialWorkout,
+    bool resumeDraft = false,
   }) async {
+    final place = await TrainingPlacePreference.forNewWorkout();
+    if (!context.mounted) return;
     await Navigator.of(context).push<WorkoutRecord>(
       MaterialPageRoute(
         builder: (_) => WorkoutPage(
           history: history,
           initialWorkout: initialWorkout,
-          gymName: selectedGym,
+          initialPlace: place,
+          resumeDraft: resumeDraft,
           useDefaultPlace: true,
           onSave: onWorkoutCompleted,
         ),
@@ -1566,10 +1588,10 @@ class _SavedMenuManagementPageState extends State<SavedMenuManagementPage> {
     }
     final selections = await showModalBottomSheet<List<ExerciseSelection>>(
       context: context,
-      showDragHandle: true,
+      showDragHandle: false,
       isScrollControlled: true,
-      builder: (context) => FractionallySizedBox(
-        heightFactor: 0.82,
+      useSafeArea: true,
+      builder: (context) => _ExercisePickerViewport(
         child: ExercisePickerSheet(existingNames: const {}, menus: const []),
       ),
     );
@@ -4867,13 +4889,16 @@ class WorkoutDetailPage extends StatelessWidget {
               onPressed: () async {
                 final canStart = await discardDraftBeforeNewWorkout(context);
                 if (!canStart || !context.mounted) return;
+                final place = await TrainingPlacePreference.forNewWorkout();
+                if (!context.mounted) return;
                 await Navigator.of(context).push<WorkoutRecord>(
                   MaterialPageRoute(
                     builder: (_) => WorkoutPage(
                       history: [workout],
                       initialWorkout: workout,
-                      gymName: selectedGym,
+                      initialPlace: place,
                       useDefaultPlace: true,
+                      resumeDraft: false,
                       onSave: onWorkoutCompleted,
                     ),
                   ),
@@ -5172,6 +5197,8 @@ class WorkoutPage extends StatefulWidget {
     this.isEditing = false,
     this.gymName,
     this.useDefaultPlace = false,
+    this.initialPlace,
+    this.resumeDraft = true,
     this.onSave,
   });
 
@@ -5180,6 +5207,8 @@ class WorkoutPage extends StatefulWidget {
   final bool isEditing;
   final String? gymName;
   final bool useDefaultPlace;
+  final TrainingPlace? initialPlace;
+  final bool resumeDraft;
 
   /// Host persists locally before the completion dialog opens.
   final Future<void> Function(WorkoutRecord)? onSave;
@@ -5194,6 +5223,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   late DateTime _workoutDate;
   String? _gymName;
   GymStore? _gymStore;
+  String? _customPlaceId;
+  bool _placeInitializing = false;
+  Future<void>? _placeInitialization;
   Timer? _timer;
   Timer? _restTimer;
   Duration _elapsed = Duration.zero;
@@ -5266,6 +5298,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     _gymName = widget.isEditing
         ? widget.initialWorkout?.gymName
         : widget.gymName;
+    _customPlaceId = widget.isEditing
+        ? widget.initialWorkout?.customPlaceId
+        : null;
     final storeId = widget.isEditing ? widget.initialWorkout?.gymStoreId : null;
     if (storeId != null) {
       _gymStore = GymStore(id: storeId, chainName: '', name: _gymName ?? '店舗');
@@ -5282,7 +5317,14 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     );
     _noteController.addListener(_saveDraft);
     if (!widget.isEditing) {
-      _initializePlaceAndDraft();
+      final place = widget.initialPlace;
+      if (place != null) {
+        _gymName = place.name;
+        _gymStore = place.store;
+        _customPlaceId = place.customPlaceId;
+      }
+      _placeInitializing = true;
+      _placeInitialization = _initializePlaceAndDraft();
     }
     if (widget.isEditing) {
       _elapsed = Duration(seconds: widget.initialWorkout!.durationSeconds);
@@ -5297,15 +5339,23 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   }
 
   Future<void> _initializePlaceAndDraft() async {
-    if (widget.useDefaultPlace) {
-      final place = await TrainingPlacePreference.load();
-      if (!mounted) return;
-      setState(() {
-        _gymName = place.name;
-        _gymStore = place.store;
-      });
+    try {
+      if (widget.initialPlace == null &&
+          (widget.useDefaultPlace || widget.gymName == null)) {
+        final place = await TrainingPlacePreference.forNewWorkout();
+        if (!mounted) return;
+        setState(() {
+          _gymName = place.name;
+          _gymStore = place.store;
+          _customPlaceId = place.customPlaceId;
+        });
+      }
+      if (widget.initialWorkout == null && widget.resumeDraft) {
+        await _loadDraft();
+      }
+    } finally {
+      _placeInitializing = false;
     }
-    if (widget.initialWorkout == null) await _loadDraft();
   }
 
   @override
@@ -5341,6 +5391,16 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       return;
     }
     if (native != null) {
+      // Native may claim completion before this lifecycle/state callback. Show
+      // the in-app message without cancelling its already-started sound.
+      if (Platform.isAndroid &&
+          _restEndsAt != null &&
+          native['lastCompletionDeadline'] ==
+              _restEndsAt!.millisecondsSinceEpoch &&
+          (native['endsAtMilliseconds'] as num? ?? 0) == 0) {
+        _finishRestTimer(notify: false);
+        return;
+      }
       _restRevision++;
       _restTimer?.cancel();
       final deadline = (native['endsAtMilliseconds'] as num?)?.toInt() ?? 0;
@@ -5563,13 +5623,18 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
 
   void _finishRestTimer({bool notify = true}) {
     if (_restEndsAt == null) return;
+    final deadline = _restEndsAt!;
     final revision = ++_restRevision;
     final foreground =
         WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     _restTimer?.cancel();
     _restTimer = null;
     _restEndsAt = null;
-    if (foreground) {
+    if (Platform.isAndroid) {
+      // Never cancel on natural expiry: cancel also stops native playback and
+      // removes the Alarm. Duplicate due requests are ignored by the native claim.
+      unawaited(RestNotificationService.completeIfDue(deadline));
+    } else if (foreground) {
       unawaited(
         RestNotificationService.cancel().then((_) async {
           if (mounted && notify && revision == _restRevision) {
@@ -5625,24 +5690,22 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   }
 
   Future<void> _addExercise() async {
+    await _placeInitialization;
+    if (!mounted) return;
     final existingIdentities = _exercises.map((item) => item.identity).toSet();
     final menus = await WorkoutTemplatePreference.load();
     if (!mounted) return;
     final selected = await showModalBottomSheet<List<ExerciseSelection>>(
       context: context,
-      showDragHandle: true,
+      showDragHandle: false,
       isScrollControlled: true,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.viewInsetsOf(context).bottom,
-        ),
-        child: FractionallySizedBox(
-          heightFactor: 0.82,
-          child: ExercisePickerSheet(
-            existingIdentities: existingIdentities,
-            gymStoreId: _gymStore?.id,
-            menus: menus,
-          ),
+      useSafeArea: true,
+      builder: (context) => _ExercisePickerViewport(
+        child: ExercisePickerSheet(
+          existingIdentities: existingIdentities,
+          gymStoreId: _gymStore?.id,
+          customPlaceId: _customPlaceId,
+          menus: menus,
         ),
       ),
     );
@@ -5715,6 +5778,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         // Name-only legacy drafts stay name-only. Drafts predating location
         // storage keep the caller's default name and store ID together.
         if (draft.containsKey('gymName') || draft.containsKey('gymStoreId')) {
+          _customPlaceId = draft['customPlaceId'] as String?;
           final storeId = draft['gymStoreId'] as String?;
           _gymStore = storeId == null
               ? null
@@ -5740,52 +5804,77 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   }
 
   Future<void> _selectWorkoutGym() async {
+    await _placeInitialization;
+    if (!mounted) return;
     GymStore? store;
+    String? customId;
     final selected = await showGymPicker(
       context,
       _gymName,
       currentStoreId: _gymStore?.id,
+      currentCustomPlaceId: _customPlaceId,
       onStoreSelected: (value) => store = value,
+      onPlaceSelected: (value) => customId = value.customPlaceId,
     );
     if (!mounted || selected == null) return;
-    if (store?.id == _gymStore?.id && selected == _gymName) return;
+    if (store?.id == _gymStore?.id &&
+        customId == _customPlaceId &&
+        selected == _gymName) {
+      return;
+    }
     setState(() {
       _gymName = selected;
       _gymStore = store;
+      _customPlaceId = customId;
     });
     await _saveDraft();
   }
 
   Future<void> _openGymEquipment() async {
     final store = _gymStore;
-    if (store == null) return;
+    if (store == null && _customPlaceId == null) return;
+    Future<void> add(Set<String> ids) async {
+      if (!mounted) return;
+      _applyExerciseSelection(
+        exerciseTemplates
+            .where((e) => ids.contains(e.exerciseId))
+            .map((e) => ExerciseSelection(e))
+            .toList(),
+      );
+      await _saveDraft();
+    }
+
+    final existing = _exercises
+        .map((e) => e.exerciseId)
+        .whereType<String>()
+        .map(ExerciseFormCatalog.canonicalId)
+        .toSet();
     await Navigator.push<void>(
       context,
       MaterialPageRoute(
-        builder: (_) => GymStoreEquipmentPage(
-          store: store,
-          existingIds: _exercises
-              .map((e) => e.exerciseId)
-              .whereType<String>()
-              .map(ExerciseFormCatalog.canonicalId)
-              .toSet(),
-          onAdd: (ids) async {
-            if (!mounted) return;
-            _applyExerciseSelection(
-              exerciseTemplates
-                  .where((e) => ids.contains(e.exerciseId))
-                  .map((e) => ExerciseSelection(e))
-                  .toList(),
-            );
-            await _saveDraft();
-          },
-        ),
+        builder: (_) => store != null
+            ? GymStoreEquipmentPage(
+                store: store,
+                existingIds: existing,
+                onAdd: add,
+              )
+            : PrivatePlaceEquipmentPage(
+                placeId: _customPlaceId!,
+                name: _gymName ?? '利用場所',
+                existingIds: existing,
+                onAdd: add,
+              ),
       ),
     );
   }
 
   Future<void> _saveDraft() async {
-    if (widget.isEditing || _restoringDraft || _draftStore.isClosed) return;
+    if (widget.isEditing ||
+        _placeInitializing ||
+        _restoringDraft ||
+        _draftStore.isClosed) {
+      return;
+    }
     final encodedDraft = jsonEncode({
       'startedAt': _startedAt.toIso8601String(),
       'elapsedSeconds': _elapsed.inSeconds,
@@ -5794,6 +5883,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       'note': _noteController.text,
       'gymName': _gymName,
       'gymStoreId': _gymStore?.id,
+      if (_customPlaceId != null) 'customPlaceId': _customPlaceId,
       'exercises': _exercises
           .map(
             (exercise) => {
@@ -6103,12 +6193,16 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                         trailing: const Icon(Icons.chevron_right_rounded),
                         onTap: _selectWorkoutGym,
                       ),
-                      if (_gymStore != null)
+                      if (_gymStore != null || _customPlaceId != null)
                         OutlinedButton.icon(
                           key: const Key('workoutGymEquipmentButton'),
                           onPressed: _openGymEquipment,
                           icon: const Icon(Icons.fitness_center),
-                          label: const Text('この店舗の設備から種目を追加'),
+                          label: Text(
+                            _gymStore != null
+                                ? 'この店舗の設備から種目を追加'
+                                : 'この場所の設備から種目を追加',
+                          ),
                         ),
                       if (WorkoutUiPreference.workoutTimerEnabled ||
                           (widget.isEditing &&
@@ -6456,6 +6550,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               : 0,
           gymName: _gymName,
           gymStoreId: _gymStore?.id,
+          customPlaceId: _customPlaceId,
           note: _noteController.text.trim(),
         );
     setState(() => _completing = true);
@@ -7342,6 +7437,42 @@ String exerciseSortKey(String name) => String.fromCharCodes(
   ),
 );
 
+/// The keyboard inset is applied once, before sizing the picker. Use all
+/// remaining height while typing rather than shrinking it by another 18%.
+class _ExercisePickerViewport extends StatelessWidget {
+  const _ExercisePickerViewport({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: keyboard),
+      child: FractionallySizedBox(
+        heightFactor: keyboard > 0 ? 1 : 0.82,
+        child: Column(
+          children: [
+            if (keyboard == 0)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Container(
+                  width: 32,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant
+                        .withAlpha(100),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            Expanded(child: child),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ExercisePickerSheet extends StatefulWidget {
   const ExercisePickerSheet({
     super.key,
@@ -7349,8 +7480,10 @@ class ExercisePickerSheet extends StatefulWidget {
     this.existingNames = const {},
     this.menus = const [],
     this.gymStoreId,
+    this.customPlaceId,
   });
   final String? gymStoreId;
+  final String? customPlaceId;
   final Set<String> existingIdentities;
   // Compatibility for old name-only callers; never use names for ID variants.
   final Set<String> existingNames;
@@ -7362,6 +7495,7 @@ class ExercisePickerSheet extends StatefulWidget {
 class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
   bool _storeOnly = false, _storeLoading = false, _storeFailed = false;
   Set<String>? _storeIds;
+  List<GymExerciseEvidence> _storeEvidence = [];
   int _storeRequest = 0;
   Future<void> _filterStore(bool enabled) async {
     final request = ++_storeRequest;
@@ -7381,10 +7515,19 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
       _storeFailed = false;
     });
     try {
-      final ids = await GymServices.repository.exerciseIds(widget.gymStoreId!);
+      final evidence = widget.gymStoreId != null
+          ? (await GymEquipmentCache.load(
+              GymServices.repository,
+              GymStore(id: widget.gymStoreId!, chainName: '', name: '店舗'),
+            )).evidence
+          : await GymServices.repository.privateEvidence(widget.customPlaceId!);
+      final ids = availableForms(evidence.map((e) => e.exerciseId))
+          .map((f) => f.exerciseId)
+          .toSet();
       if (mounted && request == _storeRequest) {
         setState(() {
           _storeIds = ids;
+          _storeEvidence = evidence;
           _storeOnly = true;
         });
       }
@@ -7544,6 +7687,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final typing = MediaQuery.viewInsetsOf(context).bottom > 0;
     final menuList = _showMenus && _activeMenu == null;
     final background =
         Theme.of(context).bottomSheetTheme.backgroundColor ??
@@ -7583,52 +7727,73 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
           fixedArea(
             'exercisePickerHeader',
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
-              child: Row(
-                children: [
-                  if (browsing)
-                    IconButton(
-                      key: const Key('backToExerciseCategories'),
-                      onPressed: () => setState(() {
-                        if (_activeMenu != null) {
-                          _activeMenu = null;
-                        } else {
-                          _selectedCategory = null;
-                          _showMenus = false;
-                        }
-                        _searchController.clear();
-                        _query = '';
-                      }),
-                      icon: const Icon(Icons.arrow_back_rounded),
-                    ),
-                  Expanded(
-                    child: Text(
-                      _activeMenu?.name ??
-                          (_showMenus
-                              ? 'マイメニュー'
-                              : (_selectedCategory == null
-                                    ? '部位・カテゴリを選択'
-                                    : '${_categoryLabel(_selectedCategory!)}の種目')),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.w900,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: IconButtonTheme(
+                data: IconButtonThemeData(
+                  style: IconButton.styleFrom(
+                    minimumSize: const Size(40, 40),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    padding: const EdgeInsets.all(8),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    if (browsing)
+                      IconButton(
+                        key: const Key('backToExerciseCategories'),
+                        onPressed: () => setState(() {
+                          if (_activeMenu != null) {
+                            _activeMenu = null;
+                          } else {
+                            _selectedCategory = null;
+                            _showMenus = false;
+                          }
+                          _searchController.clear();
+                          _query = '';
+                        }),
+                        icon: const Icon(Icons.arrow_back_rounded),
+                      ),
+                    Expanded(
+                      child: Text(
+                        _activeMenu?.name ??
+                            (_showMenus
+                                ? 'マイメニュー'
+                                : (_selectedCategory == null
+                                      ? '部位・カテゴリを選択'
+                                      : '${_categoryLabel(_selectedCategory!)}の種目')),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
-                  ),
-                  if (_selectedCategory != null)
-                    IconButton(
-                      key: const Key('addCustomExerciseForCategory'),
-                      tooltip: '${_categoryLabel(_selectedCategory!)}の種目を作る',
-                      onPressed: _createCustomExercise,
-                      icon: const Icon(Icons.add_rounded),
-                    ),
-                ],
+                    if (_storeOnly && widget.gymStoreId != null && !menuList)
+                      IconButton(
+                        key: const Key('reportStoreExercises'),
+                        tooltip: '対応種目を報告',
+                        icon: const Icon(Icons.outlined_flag, size: 20),
+                        onPressed: () => showStoreExerciseReport(
+                          context,
+                          widget.gymStoreId!,
+                          _storeIds ?? {},
+                        ),
+                      ),
+                    if (_selectedCategory != null)
+                      IconButton(
+                        key: const Key('addCustomExerciseForCategory'),
+                        tooltip: '${_categoryLabel(_selectedCategory!)}の種目を作る',
+                        onPressed: _createCustomExercise,
+                        icon: const Icon(Icons.add_rounded),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
-          if (widget.gymStoreId != null && !menuList)
+          if ((widget.gymStoreId != null || widget.customPlaceId != null) &&
+              !menuList)
             fixedArea(
               'exercisePickerStoreFilter',
               Column(
@@ -7637,13 +7802,18 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                     spacing: 8,
                     children: [
                       ChoiceChip(
+                        visualDensity: VisualDensity.compact,
                         label: const Text('全種目'),
                         selected: !_storeOnly,
                         onSelected: (_) => _filterStore(false),
                       ),
                       ChoiceChip(
                         key: const Key('storeExerciseFilter'),
-                        label: const Text('この店舗でできる'),
+                        visualDensity: VisualDensity.compact,
+                        tooltip: '登録設備から可能な種目だけ表示します',
+                        label: Text(
+                          widget.gymStoreId != null ? 'この店舗でできる' : 'この場所でできる',
+                        ),
                         selected: _storeOnly,
                         onSelected: _storeLoading
                             ? null
@@ -7652,12 +7822,6 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                     ],
                   ),
                   if (_storeLoading) const LinearProgressIndicator(),
-                  if (_storeFailed) const Text('設備情報を取得できませんでした。全種目から追加できます。'),
-                  if (_storeOnly)
-                    const Text(
-                      '登録済み設備と、ラック＋ベンチなどの組み合わせ条件を満たす種目のみ表示します。未掲載の種目は「全種目」から追加できます。',
-                      style: TextStyle(fontSize: 12),
-                    ),
                 ],
               ),
             ),
@@ -7665,12 +7829,13 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
             fixedArea(
               'exercisePickerSearchArea',
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
                 child: TextField(
                   controller: _searchController,
                   key: const Key('exerciseSearchField'),
                   onChanged: (value) => setState(() => _query = value.trim()),
                   decoration: InputDecoration(
+                    isDense: true,
                     hintText: '種目名・器具で検索',
                     prefixIcon: const Icon(Icons.search_rounded),
                     suffixIcon: _query.isEmpty
@@ -7701,6 +7866,18 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                   ),
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                   children: [
+                    if (_storeFailed ||
+                        (_storeOnly && (_storeIds?.isEmpty ?? true)))
+                      const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Text('対応種目を取得できませんでした。「全種目」からも追加できます。'),
+                      ),
+                    if (_storeOnly && (_storeIds?.isEmpty ?? true))
+                      TextButton(
+                        key: const Key('showAllStoreExercises'),
+                        onPressed: () => _filterStore(false),
+                        child: const Text('全種目を見る'),
+                      ),
                     if (!browsing) ...[
                       Card(
                         margin: const EdgeInsets.only(bottom: 10),
@@ -7789,18 +7966,71 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                             added ? '追加済み' : '${e.bodyPart} ・ ${e.equipment}',
                           ),
                           trailing:
-                              ExerciseFormCatalog.resolve(
-                                    e.exerciseId,
-                                    e.name,
-                                  )?.available ==
-                                  true
-                              ? _Exercise3dBadge(
-                                  key: Key(
-                                    'exerciseMuscles${e.exerciseId ?? e.name}',
-                                  ),
-                                  onPressed: () => _showExerciseMuscles(e),
-                                )
-                              : null,
+                              !_storeOnly &&
+                                  ExerciseFormCatalog.resolve(
+                                        e.exerciseId,
+                                        e.name,
+                                      )?.available !=
+                                      true
+                              ? null
+                              : Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (_storeOnly)
+                                      IconButton(
+                                        key: Key(
+                                          'exerciseEquipment${e.exerciseId ?? e.name}',
+                                        ),
+                                        tooltip: 'この店舗で使う設備',
+                                        icon: const Icon(Icons.info_outline),
+                                        onPressed: () =>
+                                            showModalBottomSheet<void>(
+                                              context: context,
+                                              showDragHandle: true,
+                                              builder: (_) => SafeArea(
+                                                child: SingleChildScrollView(
+                                                  padding: const EdgeInsets.all(
+                                                    20,
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        e.name,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleMedium,
+                                                      ),
+                                                      const Text('この店舗で使用可能'),
+                                                      GymEvidenceList(
+                                                        evidence: _evidenceFor(
+                                                          e,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                      ),
+                                    if (ExerciseFormCatalog.resolve(
+                                          e.exerciseId,
+                                          e.name,
+                                        )?.available ==
+                                        true)
+                                      _Exercise3dBadge(
+                                        key: Key(
+                                          'exerciseMuscles${e.exerciseId ?? e.name}',
+                                        ),
+                                        onPressed: () =>
+                                            _showExerciseMuscles(e),
+                                      ),
+                                  ],
+                                ),
                           onTap: added ? null : () => _toggle(item),
                         );
                       }),
@@ -7812,20 +8042,21 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
           fixedArea(
             'exercisePickerFooter',
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              padding: EdgeInsets.fromLTRB(16, 0, 16, typing ? 4 : 12),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '${_selected.length}種目選択中',
-                          key: const Key('selectedExerciseCount'),
+                  if (!typing)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${_selected.length}種目選択中',
+                            key: const Key('selectedExerciseCount'),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
@@ -7876,10 +8107,21 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
     }
   }
 
+  List<GymExerciseEvidence> _evidenceFor(ExerciseTemplate e) => _storeEvidence
+      .where(
+        (r) =>
+            ExerciseFormCatalog.canonicalDefinition(r.exerciseId)?.exerciseId ==
+            e.exerciseId,
+      )
+      .toList();
+
   Future<void> _showExerciseMuscles(ExerciseTemplate template) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
-        builder: (_) => ExerciseMuscleDetailPage(exercise: template),
+        builder: (_) => ExerciseMuscleDetailPage(
+          exercise: template,
+          storeEvidence: _storeOnly ? _evidenceFor(template) : const [],
+        ),
       ),
     );
   }
@@ -7969,7 +8211,12 @@ class _Exercise3dBadgePainter extends CustomPainter {
 }
 
 class ExerciseMuscleDetailPage extends StatelessWidget {
-  const ExerciseMuscleDetailPage({super.key, required this.exercise});
+  const ExerciseMuscleDetailPage({
+    super.key,
+    required this.exercise,
+    this.storeEvidence = const [],
+  });
+  final List<GymExerciseEvidence> storeEvidence;
 
   final ExerciseTemplate exercise;
 
@@ -8003,6 +8250,10 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
+          if (storeEvidence.isNotEmpty) ...[
+            const Text('この店舗で使用可能'),
+            GymEvidenceList(evidence: storeEvidence),
+          ],
           if ((form?.available == true) &&
               (Platform.isIOS || Platform.isAndroid))
             ExerciseFormView(
@@ -9092,6 +9343,7 @@ class WorkoutRecord {
     this.durationSeconds = 0,
     this.gymName,
     this.gymStoreId,
+    this.customPlaceId,
     this.note = '',
   });
 
@@ -9100,6 +9352,7 @@ class WorkoutRecord {
   final int durationSeconds;
   final String? gymName;
   final String? gymStoreId;
+  final String? customPlaceId;
   final String note;
 
   Map<String, List<RecordedSet>> get exerciseGroups => groupRecordedSets(sets);
@@ -9163,6 +9416,7 @@ class WorkoutRecord {
     durationSeconds: (json['durationSeconds'] as num?)?.toInt() ?? 0,
     gymName: json['gymName'] as String?,
     gymStoreId: json['gymStoreId'] as String?,
+    customPlaceId: json['customPlaceId'] as String?,
     note: json['note'] as String? ?? '',
     sets: (json['sets'] as List<dynamic>)
         .map((item) => RecordedSet.fromJson(item as Map<String, dynamic>))
@@ -9184,6 +9438,7 @@ class WorkoutRecord {
     'durationSeconds': durationSeconds,
     'gymName': gymName,
     if (gymStoreId != null) 'gymStoreId': gymStoreId,
+    if (customPlaceId != null) 'customPlaceId': customPlaceId,
     'note': note,
     'sets': sets.map((set) => set.toJson()).toList(),
   };
@@ -10054,91 +10309,13 @@ class _ValueBoxState extends State<ValueBox> {
   }
 }
 
-const standardGyms = ['自宅', 'エニタイムフィットネス', 'ゴールドジム', 'FIT PLACE24'];
-
-List<String> decodeCustomGyms(Object? source) {
-  if (source is! List<dynamic>) return [];
-  final unique = <String, String>{};
-  for (final item in source.whereType<String>()) {
-    final name = item.trim();
-    if (name.isEmpty || standardGyms.contains(name)) continue;
-    unique.putIfAbsent(name.toLowerCase(), () => name);
-  }
-  return unique.values.toList(growable: false);
-}
-
-class CustomGymPreference {
-  CustomGymPreference._();
-
-  static const _storageKey = 'custom_gyms';
-  static List<String> gyms = [];
-
-  static Future<void> load() async {
-    final preferences = await SharedPreferences.getInstance();
-    final encoded = preferences.getString(_storageKey);
-    if (encoded == null) {
-      gyms = [];
-      return;
-    }
-    try {
-      gyms = decodeCustomGyms(jsonDecode(encoded));
-    } catch (_) {
-      gyms = [];
-    }
-  }
-
-  static bool contains(String name, {String? excludingName}) {
-    final normalized = name.trim().toLowerCase();
-    return standardGyms.any((item) => item.toLowerCase() == normalized) ||
-        gyms.any(
-          (item) => item != excludingName && item.toLowerCase() == normalized,
-        );
-  }
-
-  static Future<bool> add(String name) async {
-    final trimmed = name.trim();
-    if (trimmed.isEmpty || standardGyms.contains(trimmed)) return false;
-    if (gyms.any((item) => item.toLowerCase() == trimmed.toLowerCase())) {
-      return false;
-    }
-    await replaceAll([...gyms, trimmed]);
-    return true;
-  }
-
-  static Future<bool> update(String originalName, String updatedName) async {
-    final trimmed = updatedName.trim();
-    if (trimmed.isEmpty || contains(trimmed, excludingName: originalName)) {
-      return false;
-    }
-    if (!gyms.contains(originalName)) return false;
-    await replaceAll(
-      gyms.map((item) => item == originalName ? trimmed : item).toList(),
-    );
-    return true;
-  }
-
-  static Future<void> remove(String name) async {
-    await replaceAll(gyms.where((item) => item != name).toList());
-  }
-
-  static Future<void> replaceAll(List<String> updated) async {
-    gyms = decodeCustomGyms(updated);
-    final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(_storageKey, jsonEncode(gyms));
-  }
-}
-
-Future<String?> _addCustomGym(BuildContext context) async {
-  final name = await _showCustomGymDialog(context);
-  if (name == null) return null;
-  return await CustomGymPreference.add(name) ? name : null;
-}
-
 Future<String?> showGymPicker(
   BuildContext context,
   String? currentGym, {
   String? currentStoreId,
+  String? currentCustomPlaceId,
   ValueChanged<GymStore>? onStoreSelected,
+  ValueChanged<TrainingPlace>? onPlaceSelected,
 }) async {
   final place = await showModalBottomSheet<TrainingPlace>(
     context: context,
@@ -10146,95 +10323,12 @@ Future<String?> showGymPicker(
     builder: (_) => TrainingPlacePicker(
       currentName: currentGym,
       currentStoreId: currentStoreId,
+      currentCustomPlaceId: currentCustomPlaceId,
     ),
   );
   if (place?.store != null) onStoreSelected?.call(place!.store!);
+  if (place != null) onPlaceSelected?.call(place);
   return place?.name;
-}
-
-Future<String?> _showCustomGymDialog(
-  BuildContext context, {
-  String? initialName,
-}) {
-  return showDialog<String>(
-    context: context,
-    builder: (_) => _CustomGymDialog(initialName: initialName),
-  );
-}
-
-class _CustomGymDialog extends StatefulWidget {
-  const _CustomGymDialog({this.initialName});
-
-  final String? initialName;
-
-  @override
-  State<_CustomGymDialog> createState() => _CustomGymDialogState();
-}
-
-class _CustomGymDialogState extends State<_CustomGymDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.initialName ?? '');
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _save() {
-    if (!_formKey.currentState!.validate()) return;
-    Navigator.pop(context, _controller.text.trim());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.initialName == null ? '場所を追加' : '場所名を変更'),
-      content: Form(
-        key: _formKey,
-        child: TextFormField(
-          key: const Key('customGymNameField'),
-          controller: _controller,
-          autofocus: true,
-          maxLength: 40,
-          textInputAction: TextInputAction.done,
-          validator: (value) {
-            final name = value?.trim() ?? '';
-            if (name.isEmpty) return '場所の名前を入力してください';
-            if (CustomGymPreference.contains(
-              name,
-              excludingName: widget.initialName,
-            )) {
-              return '同じ名前の場所があります';
-            }
-            return null;
-          },
-          decoration: const InputDecoration(
-            labelText: '場所の名前',
-            hintText: '例：近所の体育館',
-          ),
-          onFieldSubmitted: (_) => _save(),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('キャンセル'),
-        ),
-        FilledButton(
-          key: const Key('saveCustomGymButton'),
-          onPressed: _save,
-          child: const Text('保存'),
-        ),
-      ],
-    );
-  }
 }
 
 class CustomGymManagementPage extends StatefulWidget {
@@ -10270,14 +10364,14 @@ class _CustomGymManagementPageState extends State<CustomGymManagementPage> {
   }
 
   Future<void> _add() async {
-    final name = await _addCustomGym(context);
+    final name = await addCustomGym(context);
     if (!mounted || name == null) return;
     setState(() {});
     await _notifyChanged();
   }
 
   Future<void> _edit(String originalName) async {
-    final name = await _showCustomGymDialog(context, initialName: originalName);
+    final name = await showCustomGymDialog(context, initialName: originalName);
     if (name == null || name == originalName) return;
     final updated = await CustomGymPreference.update(originalName, name);
     if (!updated || !mounted) return;

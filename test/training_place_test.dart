@@ -12,6 +12,11 @@ import 'package:muscle_memory/gym/training_place_preference.dart';
 
 import 'gym_integration_test.dart' show FakeGyms, storeA, storeB;
 
+class MissingDefaultStoreRepository extends FakeGyms {
+  @override
+  Future<GymStore?> storeById(String id) async => null;
+}
+
 void main() {
   late FakeGyms repo;
   setUp(() {
@@ -44,6 +49,145 @@ void main() {
     expect((await TrainingPlacePreference.reconcile([storeB])).name, '自宅');
     expect((await TrainingPlacePreference.load()).storeId, isNull);
   });
+
+  test(
+    'new workout validates registered default and repairs removed stores',
+    () async {
+      await TrainingPlacePreference.save(const TrainingPlace.store(storeA));
+      expect(
+        (await TrainingPlacePreference.forNewWorkout()).storeId,
+        storeA.id,
+      );
+      repo.saved = [storeB];
+      expect((await TrainingPlacePreference.forNewWorkout()).isHome, isTrue);
+      expect((await TrainingPlacePreference.load()).isHome, isTrue);
+    },
+  );
+
+  test(
+    'manual default follows its ID through rename but not replacement',
+    () async {
+      await CustomGymPreference.load();
+      await CustomGymPreference.add('体育館');
+      final id = CustomGymPreference.idFor('体育館');
+      await TrainingPlacePreference.save(
+        TrainingPlace.manual('体育館', storedCustomPlaceId: id),
+      );
+      await CustomGymPreference.update('体育館', '市民体育館');
+      final renamed = await TrainingPlacePreference.forNewWorkout();
+      expect(renamed.name, '市民体育館');
+      expect(renamed.customPlaceId, id);
+      expect(renamed.storeId, isNull);
+      await CustomGymPreference.remove('市民体育館');
+      await CustomGymPreference.add('市民体育館');
+      expect((await TrainingPlacePreference.forNewWorkout()).isHome, isTrue);
+      expect((await TrainingPlacePreference.load()).isHome, isTrue);
+    },
+  );
+
+  testWidgets(
+    'new workout ignores stale draft while resume retains its place',
+    (t) async {
+      await TrainingPlacePreference.save(const TrainingPlace.store(storeA));
+      final p = await SharedPreferences.getInstance();
+      await p.setString(
+        activeWorkoutDraftStorageKey,
+        jsonEncode({
+          'gymName': storeB.displayName,
+          'gymStoreId': storeB.id,
+          'exercises': [],
+        }),
+      );
+      await t.pumpWidget(
+        const MaterialApp(
+          home: WorkoutPage(useDefaultPlace: true, resumeDraft: false),
+        ),
+      );
+      await t.pumpAndSettle();
+      expect(find.text(storeA.displayName), findsOneWidget);
+      await t.tap(find.byKey(const Key('workoutGymButton')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const Key('selectRegisteredPlaceb')));
+      await t.pumpAndSettle();
+      expect((await TrainingPlacePreference.load()).storeId, storeA.id);
+      expect(
+        jsonDecode(p.getString(activeWorkoutDraftStorageKey)!)['gymStoreId'],
+        storeB.id,
+      );
+      await t.pumpWidget(const SizedBox());
+      await t.pumpWidget(
+        const MaterialApp(home: WorkoutPage(useDefaultPlace: true)),
+      );
+      await t.pumpAndSettle();
+      expect(find.text(storeB.displayName), findsOneWidget);
+      await t.pumpWidget(const SizedBox());
+      await t.pumpWidget(
+        const MaterialApp(
+          home: WorkoutPage(useDefaultPlace: true, resumeDraft: false),
+        ),
+      );
+      await t.pumpAndSettle();
+      expect(find.text(storeA.displayName), findsOneWidget);
+      await t.pumpWidget(const SizedBox());
+    },
+  );
+
+  test(
+    'missing database store falls back even with a cached registration',
+    () async {
+      GymServices.override = MissingDefaultStoreRepository()..saved = [storeA];
+      await TrainingPlacePreference.save(const TrainingPlace.store(storeA));
+      expect((await TrainingPlacePreference.forNewWorkout()).isHome, isTrue);
+      expect((await TrainingPlacePreference.load()).isHome, isTrue);
+    },
+  );
+
+  test('temporary network failure does not erase the default store', () async {
+    await TrainingPlacePreference.save(const TrainingPlace.store(storeA));
+    repo.failRegistered = true;
+    expect((await TrainingPlacePreference.forNewWorkout()).storeId, storeA.id);
+    expect((await TrainingPlacePreference.load()).storeId, storeA.id);
+  });
+
+  testWidgets(
+    'history edit and picker retain recorded place instead of default',
+    (t) async {
+      await TrainingPlacePreference.save(const TrainingPlace.store(storeA));
+      final original = WorkoutRecord(
+        date: DateTime(2026, 9, 24),
+        sets: const [],
+        gymName: storeB.displayName,
+        gymStoreId: storeB.id,
+      );
+      await t.pumpWidget(
+        MaterialApp(
+          home: WorkoutPage(
+            isEditing: true,
+            initialWorkout: original,
+            useDefaultPlace: true,
+          ),
+        ),
+      );
+      await t.pumpAndSettle();
+      expect(find.text(storeB.displayName), findsOneWidget);
+      await t.tap(find.byKey(const Key('workoutGymButton')));
+      await t.pumpAndSettle();
+      expect(
+        t
+            .widget<ListTile>(find.byKey(const Key('selectRegisteredPlaceb')))
+            .trailing,
+        isNotNull,
+      );
+      expect(
+        t
+            .widget<ListTile>(find.byKey(const Key('selectRegisteredPlacea')))
+            .trailing,
+        isNull,
+      );
+      expect((await TrainingPlacePreference.load()).storeId, storeA.id);
+      await t.pumpWidget(const SizedBox());
+    },
+  );
 
   testWidgets('one default place persists and removing it preserves history', (
     t,
@@ -181,6 +325,11 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.byIcon(Icons.home_outlined));
     await t.pumpAndSettle();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      activeWorkoutDraftStorageKey,
+      jsonEncode({'gymName': '自宅', 'exercises': []}),
+    );
     await t.ensureVisible(find.byKey(const Key('startWorkoutButton')));
     await t.tap(find.byKey(const Key('startWorkoutButton')));
     await t.pumpAndSettle();

@@ -68,13 +68,13 @@ def prepare(tables, chain_id, chain_name, mappings, catalog, requirements=None):
     prefix = lambda key: f'{chain_id}:{key}'
     stores = [dict(id=prefix(r['gym_id']),chain_id=chain_id,source_id=r['gym_id'],name=r['gym_name'],
       prefecture=r.get('prefecture'),city=r.get('municipality'),address=r.get('address_raw'),
-      station=r.get('station'),official_url=r.get('official_url'),equipment_status=r['machine_data_status'],source=r)
+      checked_at=r.get('equipment_checked_at'),station=r.get('station'),official_url=r.get('official_url'),equipment_status=r['machine_data_status'],source=r)
       for r in tables['店舗']]
     equipment = [dict(id=prefix(r['equipment_id']),name=r['normalized_name'],normalized_name=normalized(r['normalized_name']),
       category=r['category'],load_type=r['load_type'],manufacturer=r.get('manufacturer_id'),model=r.get('model_name'),
       needs_review=bool(r.get('needs_review')),source=r) for r in tables['設備マスター']]
     relations = [dict(store_id=prefix(r['gym_id']),equipment_id=prefix(r['equipment_id']),quantity=int(r['quantity']) if r.get('quantity') is not None else None,
-      available=r['available'],raw_name=r['raw_name'],source_url=r.get('source_url'),checked_at=r.get('checked_at'),source=r)
+      available=r['available'],source_kind='official',raw_name=r['raw_name'],source_url=r.get('source_url'),checked_at=r.get('checked_at'),source=r)
       for r in tables['店舗設備']]
     by_id = {e['exerciseId']:e for e in catalog['exercises']}
     source_equipment = {r['equipment_id']:r for r in tables['設備マスター']}

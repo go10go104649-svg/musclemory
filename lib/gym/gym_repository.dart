@@ -13,10 +13,16 @@ class GymStore {
     this.city,
     this.address,
     this.station,
+    this.chainId,
+    this.officialUrl,
+    this.checkedAt,
+    this.active = true,
     this.equipmentStatus = 'not_collected',
   });
   final String id, chainName, name, equipmentStatus;
-  final String? city, address, station;
+  final String? city, address, station, chainId, officialUrl;
+  final DateTime? checkedAt;
+  final bool active;
   String get displayName => '$chainName $name'.trim();
   factory GymStore.fromJson(Map<String, dynamic> j) => GymStore(
     id: j['id'] as String,
@@ -28,6 +34,10 @@ class GymStore {
     city: j['city'] as String?,
     address: j['address'] as String?,
     station: j['station'] as String?,
+    chainId: j['chain_id'] as String?,
+    officialUrl: j['official_url'] as String?,
+    checkedAt: DateTime.tryParse(j['checked_at'] as String? ?? ''),
+    active: j['active'] != false,
     equipmentStatus: j['equipment_status'] as String? ?? 'not_collected',
   );
   Map<String, dynamic> toJson() => {
@@ -37,6 +47,10 @@ class GymStore {
     'city': city,
     'address': address,
     'station': station,
+    'chain_id': chainId,
+    'official_url': officialUrl,
+    'checked_at': checkedAt?.toIso8601String(),
+    'active': active,
     'equipment_status': equipmentStatus,
   };
 }
@@ -49,19 +63,59 @@ class GymEquipment {
     this.quantity,
     this.manufacturer,
     this.model,
+    this.rawName,
+    this.loadType,
+    this.aliases = const [],
+    this.available = true,
+    this.unavailableQuantity,
+    this.checkedAt,
     this.exerciseIds = const {},
     this.compositeRuleIds = const {},
   });
   final String id, name, category;
   final int? quantity;
-  final String? manufacturer, model;
+  final String? manufacturer, model, rawName, loadType;
+  final List<String> aliases;
+  final bool available;
+  final int? unavailableQuantity;
+  final DateTime? checkedAt;
+  bool get usable =>
+      available &&
+      (quantity == null || quantity! - (unavailableQuantity ?? 0) > 0);
+  String get displayCategory => switch (loadType) {
+    'plate_loaded' || 'plate_loaded_explicit' => 'プレートロード',
+    'cable' || 'cable_named' => 'ケーブル',
+    'free_weight' => 'フリーウェイト',
+    'cardio' => '有酸素',
+    'selectorized' => 'マシン',
+    _ => category == '筋トレ' ? 'マシン' : category,
+  };
+  bool matches(String query) {
+    String normalize(String value) => value
+        .toLowerCase()
+        .replaceAll(RegExp(r'[\s　]'), '')
+        .replaceAll('ロウ', 'ロー');
+    final q = normalize(query);
+    return [
+      name,
+      rawName ?? '',
+      ...aliases,
+    ].any((v) => normalize(v).contains(q));
+  }
+
   final Set<String> exerciseIds;
   final Set<String> compositeRuleIds;
   factory GymEquipment.fromJson(Map<String, dynamic> row) {
     final e = Map<String, dynamic>.from(row['equipment'] as Map);
     return GymEquipment(
       id: e['id'] as String,
-      name: e['name'] as String,
+      name: e['display_name'] as String? ?? e['name'] as String,
+      rawName: row['raw_name'] as String? ?? e['name'] as String?,
+      loadType: e['load_type'] as String?,
+      aliases: List<String>.from(e['aliases'] as List? ?? []),
+      available: row['available'] != false,
+      unavailableQuantity: (row['unavailable_quantity'] as num?)?.toInt(),
+      checkedAt: DateTime.tryParse(row['checked_at'] as String? ?? ''),
       category: e['category'] as String,
       quantity: (row['quantity'] as num?)?.toInt(),
       manufacturer: e['manufacturer'] as String?,
@@ -76,10 +130,170 @@ class GymEquipment {
       },
     );
   }
+  Map<String, dynamic> toJson() => {
+    'quantity': quantity,
+    'raw_name': rawName,
+    'available': available,
+    'unavailable_quantity': unavailableQuantity,
+    'checked_at': checkedAt?.toIso8601String(),
+    'equipment': {
+      'id': id,
+      'name': name,
+      'category': category,
+      'manufacturer': manufacturer,
+      'model': model,
+      'load_type': loadType,
+      'aliases': aliases,
+      'equipment_exercise_mapping': [
+        for (final id in exerciseIds) {'exercise_id': id},
+      ],
+      'exercise_equipment_rule_items': [
+        for (final id in compositeRuleIds) {'rule_id': id},
+      ],
+    },
+  };
+}
+
+class PrivatePlaceEquipment {
+  const PrivatePlaceEquipment({
+    required this.id,
+    required this.name,
+    this.equipmentId,
+    this.quantity,
+    this.exerciseIds = const {},
+  });
+  final String id, name;
+  final String? equipmentId;
+  final int? quantity;
+  final Set<String> exerciseIds;
+  factory PrivatePlaceEquipment.fromJson(Map<String, dynamic> j) =>
+      PrivatePlaceEquipment(
+        id: j['id'] as String,
+        name: j['name'] as String,
+        equipmentId: j['equipment_id'] as String?,
+        quantity: j['quantity'] as int?,
+        exerciseIds: Set<String>.from(j['exercise_ids'] as List? ?? []),
+      );
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'equipment_id': equipmentId,
+    'quantity': quantity,
+    'exercise_ids': exerciseIds.toList(),
+  };
 }
 
 abstract class GymRepository {
+  Future<List<GymEquipment>> searchEquipment(
+    String query, {
+    int offset = 0,
+  }) async => [];
+  Future<List<GymExerciseEvidence>> equipmentEvidence(Set<String> ids) async =>
+      [];
+  Future<List<PrivatePlaceEquipment>> privateEquipment(String placeId) async {
+    final p = await SharedPreferences.getInstance();
+    return (jsonDecode(p.getString('guest_place_equipment_$placeId') ?? '[]')
+            as List)
+        .map(
+          (j) => PrivatePlaceEquipment.fromJson(
+            Map<String, dynamic>.from(j as Map),
+          ),
+        )
+        .toList();
+  }
+
+  Future<void> savePrivateEquipment(
+    String placeId,
+    PrivatePlaceEquipment item,
+  ) async {
+    final items = await privateEquipment(placeId);
+    items.removeWhere(
+      (e) =>
+          e.id == item.id ||
+          (item.equipmentId != null && item.equipmentId == e.equipmentId),
+    );
+    items.add(item);
+    final p = await SharedPreferences.getInstance();
+    if (!await p.setString(
+      'guest_place_equipment_$placeId',
+      jsonEncode(items.map((e) => e.toJson()).toList()),
+    )) {
+      throw StateError('保存できませんでした');
+    }
+  }
+
+  Future<void> deletePrivateEquipment(String placeId, {String? itemId}) async {
+    final p = await SharedPreferences.getInstance();
+    if (itemId == null) {
+      await p.remove('guest_place_equipment_$placeId');
+      return;
+    }
+    final items = await privateEquipment(placeId);
+    items.removeWhere((e) => e.id == itemId);
+    if (!await p.setString(
+      'guest_place_equipment_$placeId',
+      jsonEncode(items.map((e) => e.toJson()).toList()),
+    )) {
+      throw StateError('削除できませんでした');
+    }
+  }
+
+  Future<List<GymExerciseEvidence>> privateEvidence(String placeId) async {
+    final items = await privateEquipment(placeId);
+    final ids = items.map((e) => e.equipmentId).whereType<String>().toSet();
+    return [
+      if (ids.isNotEmpty) ...await equipmentEvidence(ids),
+      for (final e in items.where((e) => e.equipmentId == null))
+        for (final id in e.exerciseIds)
+          GymExerciseEvidence(id, [e.id], [e.name]),
+    ];
+  }
+
+  Future<void> reportExercise({
+    required String storeId,
+    required String kind,
+    String? exerciseId,
+    required String comment,
+  }) async {
+    throw StateError('対応種目の報告を利用できません');
+  }
+
   Future<List<GymStore>> search(String query, {int offset = 0});
+  Future<List<GymStore>> searchStores(
+    String query, {
+    int offset = 0,
+    String? chainId,
+  }) async => (await search(
+    query,
+    offset: offset,
+  )).where((s) => chainId == null || s.chainId == chainId).toList();
+  Future<GymStore?> storeById(String id) async {
+    for (final store in await registered()) {
+      if (store.id == id) return store;
+    }
+    return null;
+  }
+
+  Future<Map<String, String>> chains() async => {};
+  Future<Set<String>> pendingEquipment(String storeId) async => {};
+  Future<GymStoreDetail> detail(GymStore store) async {
+    final items = <GymEquipment>[];
+    for (var offset = 0; ; offset += 50) {
+      final page = await equipment(store.id, offset: offset);
+      items.addAll(page);
+      if (page.length < 50) break;
+    }
+    return GymStoreDetail(
+      store: store,
+      equipment: items,
+      evidence: [
+        for (final e in items.where((e) => e.usable))
+          for (final id in e.exerciseIds)
+            GymExerciseEvidence(id, [e.id], [e.name]),
+      ],
+    );
+  }
+
   Future<List<GymStore>> registered();
   Future<void> register(GymStore store);
   Future<void> unregister(String storeId);
@@ -96,7 +310,7 @@ abstract class GymRepository {
     final ids = <String>{};
     for (var offset = 0; ; offset += 50) {
       final page = await equipment(storeId, offset: offset);
-      ids.addAll(page.expand((e) => e.exerciseIds));
+      ids.addAll(page.where((e) => e.usable).expand((e) => e.exerciseIds));
       if (page.length < 50) return ids;
     }
   }
@@ -119,10 +333,107 @@ class SupabaseGymRepository extends GymRepository {
   @override
   bool get canReport => _userId != null;
   @override
-  Future<List<GymStore>> search(String query, {int offset = 0}) async {
+  Future<List<GymEquipment>> searchEquipment(
+    String query, {
+    int offset = 0,
+  }) async {
     final rows = await _client.rpc(
-      'search_gym_stores',
-      params: {'search_query': query.trim(), 'page_offset': offset},
+      'search_equipment',
+      params: {'search_query': query, 'page_offset': offset},
+    );
+    return (rows as List)
+        .map((j) => GymEquipment.fromJson(Map<String, dynamic>.from(j as Map)))
+        .toList();
+  }
+
+  @override
+  Future<List<GymExerciseEvidence>> equipmentEvidence(Set<String> ids) async {
+    final rows = await _client.rpc(
+      'equipment_exercise_evidence',
+      params: {'selected_equipment_ids': ids.toList()},
+    );
+    return (rows as List)
+        .map(
+          (j) =>
+              GymExerciseEvidence.fromJson(Map<String, dynamic>.from(j as Map)),
+        )
+        .toList();
+  }
+
+  @override
+  Future<List<PrivatePlaceEquipment>> privateEquipment(String placeId) async {
+    if (_userId == null) return super.privateEquipment(placeId);
+    final rows = await _client
+        .from('user_custom_place_equipment')
+        .select()
+        .eq('user_id', _userId!)
+        .eq('custom_place_id', placeId)
+        .order('created_at');
+    return rows.map(PrivatePlaceEquipment.fromJson).toList();
+  }
+
+  @override
+  Future<void> savePrivateEquipment(
+    String placeId,
+    PrivatePlaceEquipment item,
+  ) async {
+    if (_userId == null) return super.savePrivateEquipment(placeId, item);
+    await _client.from('user_custom_place_equipment').upsert({
+      ...item.toJson(),
+      'user_id': _userId!,
+      'custom_place_id': placeId,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }, onConflict: 'user_id,custom_place_id,id');
+  }
+
+  @override
+  Future<void> deletePrivateEquipment(String placeId, {String? itemId}) async {
+    if (_userId == null) {
+      return super.deletePrivateEquipment(placeId, itemId: itemId);
+    }
+    var query = _client
+        .from('user_custom_place_equipment')
+        .delete()
+        .eq('user_id', _userId!)
+        .eq('custom_place_id', placeId);
+    if (itemId != null) query = query.eq('id', itemId);
+    await query;
+  }
+
+  @override
+  Future<void> reportExercise({
+    required String storeId,
+    required String kind,
+    String? exerciseId,
+    required String comment,
+  }) async {
+    if (!canReport) throw StateError('報告にはログインが必要です');
+    await _client.from('gym_exercise_reports').insert({
+      'store_id': storeId,
+      'exercise_id': exerciseId,
+      'report_kind': kind,
+      'comment': comment.trim(),
+    });
+  }
+
+  @override
+  Future<List<GymStore>> search(String query, {int offset = 0}) async {
+    return searchStores(query, offset: offset);
+  }
+
+  @override
+  Future<List<GymStore>> searchStores(
+    String query, {
+    int offset = 0,
+    String? chainId,
+  }) async {
+    final rows = await _client.rpc(
+      'search_gym_stores_v2',
+      params: {
+        'search_query': query.trim(),
+        'page_offset': offset,
+        'selected_chain': chainId,
+      },
     );
     return (rows as List)
         .map((j) => GymStore.fromJson(Map<String, dynamic>.from(j as Map)))
@@ -130,14 +441,56 @@ class SupabaseGymRepository extends GymRepository {
   }
 
   @override
+  Future<GymStore?> storeById(String id) async {
+    final row = await _client
+        .from('gym_stores')
+        .select('*,gym_chains(name)')
+        .eq('id', id)
+        .maybeSingle();
+    return row == null ? null : GymStore.fromJson(row);
+  }
+
+  @override
+  Future<Map<String, String>> chains() async {
+    final rows = await _client
+        .from('gym_chains')
+        .select('id,name')
+        .order('name');
+    return {for (final row in rows) row['id'] as String: row['name'] as String};
+  }
+
+  @override
+  Future<GymStoreDetail> detail(GymStore store) async {
+    final json = await _client.rpc(
+      'gym_store_detail',
+      params: {'target_store_id': store.id},
+    );
+    return GymStoreDetail.fromJson(Map<String, dynamic>.from(json as Map));
+  }
+
+  @override
+  Future<Set<String>> pendingEquipment(String storeId) async {
+    if (!canReport) return {};
+    final rows = await _client
+        .from('gym_equipment_reports')
+        .select('equipment_id')
+        .eq('store_id', storeId)
+        .eq('user_id', _userId!)
+        .inFilter('status', ['pending', 'reviewing', 'approved']);
+    return {
+      for (final row in rows)
+        if (row['equipment_id'] is String) row['equipment_id'] as String,
+    };
+  }
+
+  @override
   Future<List<GymEquipment>> equipment(String storeId, {int offset = 0}) async {
     final rows = await _client
         .from('gym_store_equipment')
         .select(
-          'quantity,equipment!inner(id,name,category,manufacturer,model,equipment_exercise_mapping(exercise_id),exercise_equipment_rule_items(rule_id))',
+          'quantity,raw_name,available,unavailable_quantity,checked_at,equipment!inner(id,name,display_name,aliases,load_type,category,manufacturer,model,equipment_exercise_mapping(exercise_id),exercise_equipment_rule_items(rule_id))',
         )
         .eq('store_id', storeId)
-        .eq('available', true)
         .order('equipment_id')
         .range(offset, offset + 49);
     return rows.map(GymEquipment.fromJson).toList();
@@ -181,7 +534,28 @@ class SupabaseGymRepository extends GymRepository {
   @override
   Future<List<GymStore>> registered() async {
     final user = _userId;
-    if (user == null) return _guestStores();
+    if (user == null) {
+      final stored = await _guestStores();
+      if (!SupabaseConfig.initialized || stored.isEmpty) return stored;
+      try {
+        final fresh = <GymStore>[];
+        for (var i = 0; i < stored.length; i += 50) {
+          final batch = stored.skip(i).take(50).map((s) => s.id).toList();
+          final rows = await _client
+              .from('gym_stores')
+              .select('*,gym_chains(name)')
+              .inFilter('id', batch);
+          fresh.addAll(rows.map(GymStore.fromJson));
+        }
+        // Keep registration membership/order, refresh known store metadata only.
+        final byId = {for (final s in fresh) s.id: s};
+        final updated = [for (final s in stored) byId[s.id] ?? s];
+        await _saveGuest(updated);
+        return updated;
+      } catch (_) {
+        return stored;
+      }
+    }
     final rows = await _client
         .from('user_gym_stores')
         .select('gym_stores(*,gym_chains(name))')
@@ -248,4 +622,59 @@ class SupabaseGymRepository extends GymRepository {
       'comment': comment.trim(),
     });
   }
+}
+
+class GymExerciseEvidence {
+  const GymExerciseEvidence(
+    this.exerciseId,
+    this.equipmentIds,
+    this.equipmentNames, {
+    this.ruleId,
+  });
+  final String exerciseId;
+  final List<String> equipmentIds, equipmentNames;
+  final String? ruleId;
+  factory GymExerciseEvidence.fromJson(Map<String, dynamic> j) =>
+      GymExerciseEvidence(
+        j['exercise_id'] as String,
+        List<String>.from(j['equipment_ids'] as List),
+        List<String>.from(j['equipment_names'] as List),
+        ruleId: j['rule_id'] as String?,
+      );
+  Map<String, dynamic> toJson() => {
+    'exercise_id': exerciseId,
+    'equipment_ids': equipmentIds,
+    'equipment_names': equipmentNames,
+    'rule_id': ruleId,
+  };
+}
+
+class GymStoreDetail {
+  const GymStoreDetail({
+    required this.store,
+    required this.equipment,
+    required this.evidence,
+  });
+  final GymStore store;
+  final List<GymEquipment> equipment;
+  final List<GymExerciseEvidence> evidence;
+  Set<String> get exerciseIds => evidence.map((e) => e.exerciseId).toSet();
+  List<GymExerciseEvidence> forEquipment(String id) =>
+      evidence.where((e) => e.equipmentIds.contains(id)).toList();
+  factory GymStoreDetail.fromJson(Map<String, dynamic> j) => GymStoreDetail(
+    store: GymStore.fromJson(Map<String, dynamic>.from(j['store'] as Map)),
+    equipment: [
+      for (final e in j['equipment'] as List)
+        GymEquipment.fromJson(Map<String, dynamic>.from(e as Map)),
+    ],
+    evidence: [
+      for (final e in j['evidence'] as List)
+        GymExerciseEvidence.fromJson(Map<String, dynamic>.from(e as Map)),
+    ],
+  );
+  Map<String, dynamic> toJson() => {
+    'store': store.toJson(),
+    'equipment': equipment.map((e) => e.toJson()).toList(),
+    'evidence': evidence.map((e) => e.toJson()).toList(),
+  };
 }

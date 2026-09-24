@@ -27,7 +27,8 @@ Future<void> selectPickerExercise(WidgetTester tester, String id) async {
   await tester.pumpAndSettle();
   final row = find.byKey(Key('selectExercise$id'));
   await tester.scrollUntilVisible(row, 100, scrollable: exercisePickerScrollable());
-  await tester.tap(row);
+  await tester.pumpAndSettle();
+  await tester.tap(find.descendant(of: row, matching: find.byType(Text)).first);
   await tester.pumpAndSettle();
 }
 

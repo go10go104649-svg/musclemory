@@ -208,6 +208,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('selectGymStoreb')));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('confirmGymStoreSelection')));
+    await tester.pumpAndSettle();
     expect(gymLabel(storeB.displayName), findsOneWidget);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString('selected_gym'), '自宅');
