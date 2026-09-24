@@ -251,6 +251,11 @@ void main() {
       await t.tap(find.byKey(const Key('clearExerciseSearch')));
       await t.pumpAndSettle();
       final armCard = find.byKey(const Key('exerciseCategory腕'));
+      await t.scrollUntilVisible(
+        armCard,
+        180,
+        scrollable: find.byType(Scrollable).last,
+      );
       expect(
         find.descendant(of: armCard, matching: find.text('2種目')),
         findsOneWidget,
