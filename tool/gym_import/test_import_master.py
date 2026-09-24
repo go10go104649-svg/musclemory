@@ -99,8 +99,8 @@ class ImportTests(unittest.TestCase):
         }
         equipment_ids = [m['equipment_id'] for m in mappings]
         self.assertEqual(len(equipment_ids), len(set(equipment_ids)))
-        self.assertEqual(len(mappings), 191)
-        self.assertEqual(sum(len(m['exercise_ids']) for m in mappings), 329)
+        self.assertEqual(len(mappings), 193)
+        self.assertEqual(sum(len(m['exercise_ids']) for m in mappings), 335)
         for mapping in mappings:
             self.assertTrue(mapping['exercise_ids'])
             self.assertEqual(len(mapping['exercise_ids']), len(set(mapping['exercise_ids'])))
