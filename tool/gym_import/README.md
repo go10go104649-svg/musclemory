@@ -54,7 +54,7 @@ that every listed store has a complete equipment inventory.
 
 ## Mapping updates (2026-09-24)
 
-Direct equipment mappings cover 193 of 219 equipment IDs with 335
+Direct equipment mappings cover 205 of 219 equipment IDs with 349
 equipment-exercise rows. In addition, 163 multi-equipment rules / 326 rule items
 model combinations such as rack + bench and dumbbell + adjustable bench.
 
@@ -64,7 +64,10 @@ are both present. Dumbbell press/fly variants likewise require dumbbells plus th
 appropriate bench angle. Generic curl benches no longer imply preacher curls by
 themselves; they require dumbbells or a rack/barbell source.
 
-26 equipment IDs still have no direct mapping. Some are intentionally represented
+14 equipment IDs still have no direct mapping. Explicit manual review can resolve a source row
+that is still marked `needs_review` by setting `reviewed_source_override: true`
+on that exact mapping entry; the importer rejects implicit overrides and rejects
+using the flag on clean source rows. Some are intentionally represented
 only through combination rules (generic benches), while others remain source rows
 marked `needs_review` or are too ambiguous to infer safely. The store filter uses
 the server-side `gym_store_exercise_ids` function to union direct mappings with
