@@ -34,8 +34,9 @@ import 'muscle_targets.dart';
 import 'services/supabase_sync_service.dart';
 import 'services/account_auth_service.dart';
 import 'services/workout_draft_store.dart';
+import 'services/android_workout_draft.dart';
 
-const activeWorkoutDraftStorageKey = 'active_workout_draft';
+const activeWorkoutDraftStorageKey = AndroidWorkoutDraft.key;
 const appDisplayName = 'MUSCLEMORY';
 const appVersion = '1.0.0';
 
@@ -117,10 +118,7 @@ String formatVolumeKg(double volume) {
 }
 
 Future<bool> discardDraftBeforeNewWorkout(BuildContext context) async {
-  final preferences = await SharedPreferences.getInstance();
-  final draft = WorkoutDraftSummary.tryParse(
-    preferences.getString(activeWorkoutDraftStorageKey),
-  );
+  final draft = WorkoutDraftSummary.tryParse(await AndroidWorkoutDraft.read());
   if (draft == null) return true;
   if (!context.mounted) return false;
   final confirmed = await showDialog<bool>(
@@ -141,7 +139,7 @@ Future<bool> discardDraftBeforeNewWorkout(BuildContext context) async {
     ),
   );
   if (confirmed != true) return false;
-  await preferences.remove(activeWorkoutDraftStorageKey);
+  await AndroidWorkoutDraft.clear();
   return true;
 }
 
@@ -163,11 +161,15 @@ class RestNotificationService {
     int seconds, {
     DateTime? endsAt,
     String exerciseName = '',
+    Map<String, String>? target,
+    int? restSeconds,
   }) async {
     if (!(Platform.isIOS || Platform.isAndroid)) return;
     try {
       await _channel.invokeMethod<void>('schedule', {
         'seconds': seconds,
+        'target': ?target,
+        'restSeconds': ?restSeconds,
         'exerciseName': exerciseName,
         'endsAtMilliseconds':
             (endsAt ?? DateTime.now().add(Duration(seconds: seconds)))
@@ -884,7 +886,7 @@ class _HomeShellState extends State<HomeShell> {
     await TrainingPlacePreference.migrateKanekinPlace(GymServices.repository);
     final defaultPlace = await TrainingPlacePreference.load();
     final workoutDraft = WorkoutDraftSummary.tryParse(
-      preferences.getString(activeWorkoutDraftStorageKey),
+      await AndroidWorkoutDraft.read(),
     );
     if (!mounted) return;
     final items = sortWorkoutsNewestFirst(decodeWorkoutHistory(encoded));
@@ -898,16 +900,14 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _refreshWorkoutDraft() async {
-    final preferences = await SharedPreferences.getInstance();
     final draft = WorkoutDraftSummary.tryParse(
-      preferences.getString(activeWorkoutDraftStorageKey),
+      await AndroidWorkoutDraft.read(),
     );
     if (mounted) setState(() => _workoutDraft = draft);
   }
 
   Future<void> _discardWorkoutDraft() async {
-    final preferences = await SharedPreferences.getInstance();
-    await preferences.remove(activeWorkoutDraftStorageKey);
+    await AndroidWorkoutDraft.clear();
     if (mounted) setState(() => _workoutDraft = null);
   }
 
@@ -5273,20 +5273,36 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   bool _exiting = false;
   bool _completing = false;
   WorkoutRecord? _savedRecord;
-  final _draftStore = WorkoutDraftStore(
+  late final _draftStore = WorkoutDraftStore(
     write: (value) async {
-      final preferences = await SharedPreferences.getInstance();
-      if (!await preferences.setString(activeWorkoutDraftStorageKey, value)) {
-        throw StateError('Workout draft could not be saved');
-      }
+      final saved = await AndroidWorkoutDraft.write(value);
+      _applyLockCompletions(saved);
     },
-    remove: () async {
-      final preferences = await SharedPreferences.getInstance();
-      if (!await preferences.remove(activeWorkoutDraftStorageKey)) {
-        throw StateError('Workout draft could not be removed');
-      }
-    },
+    remove: AndroidWorkoutDraft.clear,
   );
+  String _sessionId = _newWorkoutIdentity();
+  int _lockRevision = 0;
+  Map<String, String>? _restTarget;
+
+  void _applyLockCompletions(String? encoded) {
+    if (encoded == null || !mounted || widget.isEditing || _exiting) return;
+    final draft = jsonDecode(encoded) as Map<String, dynamic>;
+    if (draft['sessionId'] != _sessionId) return;
+    final revision = (draft['lockRevision'] as num?)?.toInt() ?? 0;
+    if (revision <= _lockRevision) return;
+    final completed = draft['lockCompleted'] as Map<String, dynamic>? ?? {};
+    setState(() {
+      for (final exercise in _exercises) {
+        for (final set in exercise.sets) {
+          if ((completed[set.setId] as num? ?? 0) > _lockRevision) {
+            set.completed = true;
+          }
+        }
+      }
+      _lockRevision = revision;
+    });
+  }
+
   late final TextEditingController _noteController;
   late final List<WorkoutExercise> _exercises;
 
@@ -5382,6 +5398,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
 
   Future<void> _syncRestState() async {
     if (widget.isEditing || _exiting) return;
+    if (Platform.isAndroid) {
+      _applyLockCompletions(await AndroidWorkoutDraft.read());
+    }
     final requested = _restRevision;
     final native = await RestNotificationService.state();
     if (!mounted || _exiting || requested != _restRevision) return;
@@ -5391,6 +5410,10 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       return;
     }
     if (native != null) {
+      if (Platform.isAndroid && native['target'] is Map) {
+        final target = Map<String, String>.from(native['target'] as Map);
+        _restTarget = target['sessionId'] == _sessionId ? target : null;
+      }
       // Native may claim completion before this lifecycle/state callback. Show
       // the in-app message without cancelling its already-started sound.
       if (Platform.isAndroid &&
@@ -5530,22 +5553,40 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       );
   }
 
-  void _toggleSet(int exerciseIndex, int setIndex) {
-    final set = _exercises[exerciseIndex].sets[setIndex];
+  Future<void> _toggleSet(int exerciseIndex, int setIndex) async {
+    final exercise = _exercises[exerciseIndex];
+    final set = exercise.sets[setIndex];
     setState(() => set.completed = !set.completed);
-    unawaited(_saveDraft());
+    if (Platform.isAndroid) {
+      await _saveDraft();
+    } else {
+      unawaited(_saveDraft());
+    }
+    if (!mounted ||
+        _exiting ||
+        !_exercises.contains(exercise) ||
+        !exercise.sets.contains(set)) {
+      return;
+    }
+    setIndex = exercise.sets.indexOf(set);
     if (set.completed) HapticFeedback.mediumImpact();
     if (set.completed &&
         !widget.isEditing &&
         WorkoutUiPreference.completionCheckEnabled &&
         RestTimerPreference.enabled) {
-      if (setIndex == _exercises[exerciseIndex].sets.length - 1) {
+      if (setIndex == exercise.sets.length - 1) {
         _skipRest();
       } else {
         _restExerciseName = exerciseDisplayName(
-          _exercises[exerciseIndex].name,
-          exerciseId: _exercises[exerciseIndex].exerciseId,
+          exercise.name,
+          exerciseId: exercise.exerciseId,
         );
+        _restTarget = {
+          'sessionId': _sessionId,
+          'exerciseInstanceId': exercise.instanceId,
+          'previousSetId': set.setId,
+          'targetSetId': exercise.sets[setIndex + 1].setId,
+        };
         _startRestTimer();
       }
     }
@@ -5606,6 +5647,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
         duration,
         endsAt: _restEndsAt,
         exerciseName: _restExerciseName,
+        target: _restTarget,
+        restSeconds: RestTimerPreference.seconds,
       ),
     );
     _watchRestDeadline();
@@ -5734,11 +5777,12 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadDraft() async {
-    final preferences = await SharedPreferences.getInstance();
-    final encoded = preferences.getString(activeWorkoutDraftStorageKey);
+    final encoded = await AndroidWorkoutDraft.read();
     if (encoded == null || !mounted || _draftStore.isClosed || _exiting) return;
     try {
       final draft = jsonDecode(encoded) as Map<String, dynamic>;
+      _sessionId = draft['sessionId'] as String? ?? _sessionId;
+      _lockRevision = (draft['lockRevision'] as num?)?.toInt() ?? 0;
       final exercises = (draft['exercises'] as List<dynamic>)
           .map((item) => _exerciseFromDraft(item as Map<String, dynamic>))
           .toList();
@@ -5746,7 +5790,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       if (exercises.isEmpty &&
           (draft['gymName'] is! String ||
               (draft['gymName'] as String).trim().isEmpty)) {
-        await preferences.remove(activeWorkoutDraftStorageKey);
+        await AndroidWorkoutDraft.clear();
         return;
       }
       _restoringDraft = true;
@@ -5797,7 +5841,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
             .showSnackBar(const SnackBar(content: Text('入力途中のトレーニングを再開しました')));
       }
     } catch (_) {
-      await preferences.remove(activeWorkoutDraftStorageKey);
+      await AndroidWorkoutDraft.clear();
     } finally {
       _restoringDraft = false;
     }
@@ -5876,6 +5920,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       return;
     }
     final encodedDraft = jsonEncode({
+      if (Platform.isAndroid) 'sessionId': _sessionId,
+      if (Platform.isAndroid) 'lockRevision': _lockRevision,
       'startedAt': _startedAt.toIso8601String(),
       'elapsedSeconds': _elapsed.inSeconds,
       'timerStopped': _workoutTimerStopped,
@@ -5887,6 +5933,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       'exercises': _exercises
           .map(
             (exercise) => {
+              if (Platform.isAndroid) 'instanceId': exercise.instanceId,
               'name': exercise.name,
               if (exercise.exerciseId != null)
                 'exerciseId': exercise.exerciseId,
@@ -5897,6 +5944,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
               'sets': exercise.sets
                   .map(
                     (set) => {
+                      if (Platform.isAndroid) 'setId': set.setId,
                       'weight': set.weight,
                       'reps': set.reps,
                       'durationSeconds': set.durationSeconds,
@@ -5920,6 +5968,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
 
   WorkoutExercise _exerciseFromDraft(Map<String, dynamic> json) {
     return WorkoutExercise(
+      instanceId: json['instanceId'] as String?,
       name: json['name'] as String,
       exerciseId: json['exerciseId'] as String?,
       distanceUnit: json['distanceUnit'] as String? ?? 'km',
@@ -5935,6 +5984,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       sets: (json['sets'] as List<dynamic>).map((item) {
         final setJson = item as Map<String, dynamic>;
         return WorkoutSet(
+          setId: setJson['setId'] as String?,
           weight: (setJson['weight'] as num?)?.toDouble() ?? 0,
           reps: (setJson['reps'] as num?)?.toInt() ?? 0,
           durationSeconds: (setJson['durationSeconds'] as num?)?.toInt() ?? 0,
@@ -6487,6 +6537,22 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
 
   Future<void> _completeWorkout() async {
     if (_completing || _exiting) return;
+    if (Platform.isAndroid && !widget.isEditing) {
+      setState(() => _completing = true);
+      try {
+        _applyLockCompletions(await AndroidWorkoutDraft.freezeActions());
+      } catch (_) {
+        if (mounted) {
+          setState(() => _completing = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('記録を確認できませんでした。もう一度お試しください。')),
+          );
+        }
+        return;
+      }
+      if (!mounted) return;
+      setState(() => _completing = false);
+    }
     _formKey.currentState?.save();
     final completedSets = <RecordedSet>[
       for (final exercise in _exercises)
@@ -8731,8 +8797,12 @@ const exerciseEquipmentOptions = [
   'その他',
 ];
 
+String _newWorkoutIdentity() =>
+    '${DateTime.now().microsecondsSinceEpoch}-${math.Random.secure().nextInt(1 << 32)}';
+
 class WorkoutExercise {
   WorkoutExercise({
+    String? instanceId,
     required this.name,
     this.exerciseId,
     this.distanceUnit = 'km',
@@ -8740,8 +8810,9 @@ class WorkoutExercise {
     required this.equipment,
     required this.recordType,
     required this.sets,
-  });
+  }) : instanceId = instanceId ?? _newWorkoutIdentity();
 
+  final String instanceId;
   final String name;
   final String? exerciseId;
   final String distanceUnit;
@@ -9129,6 +9200,7 @@ String formatPace(int seconds) =>
 
 class WorkoutSet {
   WorkoutSet({
+    String? setId,
     required this.weight,
     required this.reps,
     this.durationSeconds = 0,
@@ -9137,8 +9209,9 @@ class WorkoutSet {
     this.inclinePercent = 0,
     this.resistanceLevel = 0,
     this.paceSecondsPerKm = 0,
-  });
+  }) : setId = setId ?? _newWorkoutIdentity();
 
+  final String setId;
   double weight;
   int reps;
   int durationSeconds;

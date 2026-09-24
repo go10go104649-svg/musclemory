@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import java.util.UUID
+import org.json.JSONObject
 
 /** One persisted wall-clock deadline, shared by Flutter and notification actions. */
 object RestTimerState {
@@ -28,13 +29,14 @@ object RestTimerState {
         deadlineTask = null
     }
 
-    fun schedule(c: Context, deadline: Long, name: String = "") {
+    fun schedule(c: Context, deadline: Long, name: String = "", target: JSONObject? = null, restSeconds: Int = 90) {
         clearDeadlineTask()
         RestTimerFeedback.stop(c)
         val id = UUID.randomUUID().toString()
         prefs(c).edit().putLong("deadline", deadline).putInt("remainingSeconds", 0)
             .putString("exerciseName", name).putString("timerId", id).commit()
         manager(c).cancel(7341)
+        WorkoutNotificationState.arm(c, target, id, restSeconds)
         if (deadline <= System.currentTimeMillis()) {
             completeIfDue(c, id, deadline, "schedule_due")
             return
@@ -60,6 +62,7 @@ object RestTimerState {
     }
 
     fun cancel(c: Context, remaining: Int = 0) {
+        WorkoutNotificationState.invalidate(c)
         clearDeadlineTask()
         RestTimerDiagnostics.log(c, prefs(c).getString("timerId", null), "cancelled")
         RestTimerDiagnostics.set("lastCancellationAt", System.currentTimeMillis())
@@ -98,7 +101,7 @@ object RestTimerState {
         }
         clearDeadlineTask()
         alarm(c).cancel(alarmIntent(c))
-        manager(c).cancel(ONGOING)
+        if (WorkoutNotificationState.valid(c, id) == null) manager(c).cancel(ONGOING)
         RestTimerDiagnostics.increment("completionCount")
         RestTimerDiagnostics.log(c, id, "completion claimed")
         RestTimerReceiver.deliverCompletion(c, id)
@@ -110,7 +113,10 @@ object RestTimerState {
         completeIfDue(c)
         val p = prefs(c)
         val deadline = p.getLong("deadline", 0)
-        return mapOf("timerId" to (p.getString("timerId", "") ?: ""),
+        val pending = WorkoutNotificationState.pending(c)
+        val target = listOf("sessionId", "exerciseInstanceId", "previousSetId", "targetSetId")
+            .associateWith { pending?.optString(it) ?: "" }
+        return mapOf("target" to target, "timerId" to (p.getString("timerId", "") ?: ""),
             "lastCompletionTimerId" to (p.getString("lastCompletionTimerId", "") ?: ""),
             "lastCompletionAt" to p.getLong("lastCompletionAt", 0),
             "lastCompletionDeadline" to p.getLong("lastCompletionDeadline", 0), "endsAtMilliseconds" to deadline, "remainingSeconds" to p.getInt("remainingSeconds", 0),
@@ -124,7 +130,10 @@ object RestTimerState {
         val deadline = p.getLong("deadline", 0)
         if (deadline <= System.currentTimeMillis()) return true
         if (intent.action == STOP) cancel(c, ((deadline - System.currentTimeMillis() + 999) / 1000).toInt())
-        else schedule(c, deadline + 30_000, p.getString("exerciseName", "") ?: "")
+        else {
+            val target = WorkoutNotificationState.pending(c)
+            schedule(c, deadline + 30_000, p.getString("exerciseName", "") ?: "", target, target?.optInt("restSeconds", 90) ?: 90)
+        }
         onChanged?.invoke()
         return true
     }
@@ -134,7 +143,10 @@ object RestTimerState {
         val deadline = p.getLong("deadline", 0)
         if (deadline <= System.currentTimeMillis()) {
             if (deadline > 0) completeIfDue(c, source = "display_resume")
-            manager(c).cancel(ONGOING)
+            val id = p.getString("lastCompletionTimerId", "") ?: ""
+            if (WorkoutNotificationState.valid(c, id) != null) {
+                if (manager(c).activeNotifications.none { it.id == ONGOING }) showReady(c, id)
+            } else manager(c).cancel(ONGOING)
             return
         }
         if (Build.VERSION.SDK_INT >= 26) {
@@ -150,13 +162,50 @@ object RestTimerState {
             Intent(c, RestTimerReceiver::class.java).setAction(action).putExtra("timerId", p.getString("timerId", "")),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle("MUSCLEMORY · 休憩タイマー")
-            .setContentText(p.getString("exerciseName", "")).setContentIntent(open)
+            .setContentText("残り時間 · ${p.getString("exerciseName", "")}").setContentIntent(open)
+            .setStyle(Notification.BigTextStyle().bigText("休憩タイマー — 残り時間\n${p.getString("exerciseName", "")}"))
             .setCategory(Notification.CATEGORY_STATUS).setVisibility(Notification.VISIBILITY_PUBLIC)
             .setOngoing(true).setOnlyAlertOnce(true).setWhen(deadline).setShowWhen(true).setUsesChronometer(true)
             .addAction(Notification.Action.Builder(null, "停止", actionIntent(STOP, 7343)).build())
             .addAction(Notification.Action.Builder(null, "+30秒", actionIntent(EXTEND, 7344)).build())
+        if (Build.VERSION.SDK_INT >= 36) {
+            // API 36's public promotion extra (Builder convenience arrives in
+            // a later SDK revision). No reflection/custom RemoteViews required.
+            builder.addExtras(android.os.Bundle().apply {
+                putBoolean("android.requestPromotedOngoing", true)
+            })
+            RestTimerDiagnostics.set("canPostPromotedNotifications", manager(c).canPostPromotedNotifications())
+        }
         if (Build.VERSION.SDK_INT >= 24) builder.setChronometerCountDown(true)
-        if (Build.VERSION.SDK_INT >= 26) builder.setTimeoutAfter(deadline - System.currentTimeMillis())
+        // No timeout: completion replaces this same slot with the set action.
         try { manager(c).notify(ONGOING, builder.build()) } catch (_: SecurityException) { }
     }
+    fun readyNotification(c: Context, id: String, alert: Boolean = false): Notification? {
+        val target = WorkoutNotificationState.valid(c, id) ?: return null
+        val channel = if (alert) RestTimerFeedback.CHANNEL else CHANNEL
+        val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(c, channel) else Notification.Builder(c)
+        if (alert && Build.VERSION.SDK_INT < 26) builder.setSound(RestTimerFeedback.sound(c)).setVibrate(RestTimerFeedback.vibration)
+        // Unique data URI keeps an old captured PendingIntent bound to its set.
+        val actionIntent = Intent(c, RestTimerReceiver::class.java).setAction(WorkoutNotificationState.COMPLETE)
+            .setData(android.net.Uri.parse("musclemory://rest-action/$id"))
+            .putExtra("timerId", id).putExtra("targetSetId", target.getString("targetSetId"))
+        val complete = PendingIntent.getBroadcast(c, 7345, actionIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val open = PendingIntent.getActivity(c, ONGOING, Intent(c, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle("MUSCLEMORY · 休憩終了")
+            .setContentText("次のセットを行ってください")
+            .setStyle(Notification.BigTextStyle().bigText("次のセットを行ってください"))
+            .setContentIntent(open).setOngoing(true).setOnlyAlertOnce(!alert)
+            .setVisibility(Notification.VISIBILITY_PUBLIC).setUsesChronometer(false).setShowWhen(false)
+            .addAction(Notification.Action.Builder(null, "セット完了", complete).build())
+        return builder.build()
+    }
+    fun showReady(c: Context, id: String) {
+        val notification = readyNotification(c, id) ?: return
+        try { manager(c).notify(ONGOING, notification) } catch (_: SecurityException) { }
+    }
+
 }

@@ -10,6 +10,14 @@ import android.os.Build
 
 class RestTimerReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == WorkoutNotificationState.COMPLETE) {
+            try { WorkoutNotificationState.complete(context, intent) }
+            catch (error: Exception) {
+                RestTimerDiagnostics.set("lastSetActionError", error.javaClass.simpleName)
+                RestTimerDiagnostics.log(context, intent.getStringExtra("timerId"), "set action rejected: ${error.javaClass.simpleName}")
+            }
+            return
+        }
         if (RestTimerState.action(context, intent)) return
         val id = intent.getStringExtra("timerId")
         val deadline = intent.getLongExtra("deadline", 0)
@@ -29,10 +37,12 @@ class RestTimerReceiver : BroadcastReceiver() {
         if (RestTimerFeedback.foreground) {
             when (RestTimerFeedback.play(context, id)) {
                 RestTimerFeedback.Output.STARTED -> {
+                    RestTimerState.showReady(context, id)
                     RestTimerDiagnostics.set("lastCompletionPath", "foreground_native_sound")
                     return
                 }
                 RestTimerFeedback.Output.SUPPRESSED -> {
+                    RestTimerState.showReady(context, id)
                     RestTimerDiagnostics.set("lastCompletionPath", "suppressed_by_os")
                     return
                 }
@@ -71,7 +81,8 @@ class RestTimerReceiver : BroadcastReceiver() {
             RestTimerDiagnostics.log(context, id, "suppressed reason=$suppressed")
         }
         try {
-            manager.notify(7341, notification)
+            val ready = RestTimerState.readyNotification(context, id, alert = true)
+            manager.notify(if (ready != null) RestTimerState.ONGOING else 7341, ready ?: notification)
             RestTimerDiagnostics.now("lastNotificationPostedAt")
             RestTimerDiagnostics.increment("notificationPostCount")
             RestTimerDiagnostics.log(context, id, "notification posted")

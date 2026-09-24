@@ -24,6 +24,19 @@ class MainActivity : FlutterActivity() {
         RestTimerState.onChanged = { restChannel.invokeMethod("stateChanged", null) }
         restChannel.setMethodCallHandler { call, result ->
                 when (call.method) {
+                    "freezeWorkoutActions" -> {
+                        RestTimerState.cancel(this)
+                        result.success(WorkoutNotificationState.read(this))
+                    }
+                    "readWorkoutDraft" -> result.success(WorkoutNotificationState.read(this))
+                    "writeWorkoutDraft" -> {
+                        try { result.success(WorkoutNotificationState.write(this, call.argument<String>("draft")!!)) }
+                        catch (error: Exception) { result.error("DRAFT_WRITE", "記録を保存できませんでした", null) }
+                    }
+                    "clearWorkoutDraft" -> {
+                        WorkoutNotificationState.clear(this)
+                        result.success(null)
+                    }
                     "debugScreenshot" -> {
                         if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE == 0 ||
                             Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -57,6 +70,21 @@ class MainActivity : FlutterActivity() {
                         else {
                             val action = call.argument<String>("action")
                             val p = getSharedPreferences("rest_timer", MODE_PRIVATE)
+                            if (action == "completeNotification") {
+                                val notification = (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                                    .activeNotifications.single { it.id == RestTimerState.ONGOING }.notification
+                                notification.actions.single { it.title.toString() == "セット完了" }.actionIntent.send()
+                                result.success(null)
+                                return@setMethodCallHandler
+                            }
+                            if (action == "complete") {
+                                RestTimerReceiver().onReceive(this, Intent(this, RestTimerReceiver::class.java)
+                                    .setAction(WorkoutNotificationState.COMPLETE)
+                                    .putExtra("timerId", call.argument<String>("timerId"))
+                                    .putExtra("targetSetId", call.argument<String>("targetSetId")))
+                                result.success(null)
+                                return@setMethodCallHandler
+                            }
                             RestTimerState.action(this, Intent(this, RestTimerReceiver::class.java)
                                 .setAction(if (action == "extend") RestTimerState.EXTEND else RestTimerState.STOP)
                                 .putExtra("timerId", p.getString("timerId", "")))
@@ -78,6 +106,15 @@ class MainActivity : FlutterActivity() {
                         } else {
                             val p = getSharedPreferences("rest_timer", MODE_PRIVATE)
                             result.success(RestTimerDiagnostics.snapshot() + RestTimerFeedback.status(this) + mapOf(
+                                "keyguardLocked" to (getSystemService(Context.KEYGUARD_SERVICE) as android.app.KeyguardManager).isKeyguardLocked,
+                                "ongoingDetails" to (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).activeNotifications
+                                    .filter { it.id == RestTimerState.ONGOING }.map { n -> mapOf(
+                                        "actions" to (n.notification.actions?.map { it.title.toString() } ?: emptyList<String>()),
+                                        "chronometer" to n.notification.extras.getBoolean(android.app.Notification.EXTRA_SHOW_CHRONOMETER),
+                                        "countdown" to n.notification.extras.getBoolean("android.chronometerCountDown"),
+                                        "requestedPromotion" to n.notification.extras.getBoolean("android.requestPromotedOngoing"),
+                                        "promoted" to (Build.VERSION.SDK_INT >= 36 && n.notification.flags and android.app.Notification.FLAG_PROMOTED_ONGOING != 0)
+                                    ) },
                                 "playing" to RestTimerFeedback.isPlaying, "deadline" to p.getLong("deadline", 0),
                                 "timerId" to (p.getString("timerId", "") ?: ""),
                                 "lastCompletionTimerId" to (p.getString("lastCompletionTimerId", "") ?: ""),
@@ -91,7 +128,9 @@ class MainActivity : FlutterActivity() {
                         RestTimerFeedback.stop(this)
                         val deadline = call.argument<Number>("endsAtMilliseconds")?.toLong()
                             ?: (System.currentTimeMillis() + seconds.coerceAtLeast(1) * 1000L)
-                        RestTimerState.schedule(this, deadline, call.argument<String>("exerciseName") ?: "")
+                        RestTimerState.schedule(this, deadline, call.argument<String>("exerciseName") ?: "",
+                            call.argument<Map<String, String>>("target")?.let { org.json.JSONObject(it) },
+                            call.argument<Int>("restSeconds") ?: seconds)
                         result.success(null)
                     }
                     "cancel" -> {
