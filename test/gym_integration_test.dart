@@ -64,6 +64,12 @@ class FakeGyms extends GymRepository {
         category: 'フリーウェイト',
         exerciseIds: {'dumbbell_curl', 'hammer_curl'},
       ),
+      GymEquipment(
+        id: 'c',
+        name: 'アジャスタブルベンチ',
+        category: 'フリーウェイト',
+        compositeRuleIds: {'rack_bench_rule'},
+      ),
       GymEquipment(id: 'u', name: '未確認マシン', category: 'その他'),
     ];
   }
@@ -154,6 +160,15 @@ void main() {
       );
       expect(find.text('フリーウェイト'), findsOneWidget);
       expect(find.text('対応種目は現在準備中です'), findsOneWidget);
+      expect(find.text('他の設備と組み合わせて対応'), findsOneWidget);
+      await t.tap(find.byKey(const Key('gymEquipmentc')));
+      await t.pumpAndSettle();
+      expect(
+        find.text('この設備は、ラック＋ベンチなど他の設備との組み合わせで対応種目を判定します。'),
+        findsOneWidget,
+      );
+      await t.pageBack();
+      await t.pumpAndSettle();
       await t.tap(find.byKey(const Key('gymEquipmente')));
       await t.pumpAndSettle();
       await t.tap(find.byKey(const Key('addGymExercisedumbbell_curl')));
@@ -232,6 +247,13 @@ void main() {
       );
       repo.fail = false;
       await t.tap(find.byKey(const Key('storeExerciseFilter')));
+      await t.pumpAndSettle();
+      final armCard = find.byKey(const Key('exerciseCategory腕'));
+      expect(
+        find.descendant(of: armCard, matching: find.text('2種目')),
+        findsOneWidget,
+      );
+      await t.tap(armCard);
       await t.pumpAndSettle();
       final row = find.byKey(const Key('selectExercisedumbbell_curl'));
       expect(row, findsOneWidget);
