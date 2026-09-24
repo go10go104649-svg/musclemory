@@ -188,10 +188,55 @@ void main() {
     await t.tap(find.byKey(const Key('completeAndPreviewShareButton')));
     await t.pumpAndSettle();
     expect(find.byType(WorkoutSharePage), findsOneWidget);
+    expect(find.byType(WorkoutPage, skipOffstage: false), findsNothing);
     expect(saves, 1);
     await t.pageBack();
     await t.pumpAndSettle();
     expect(find.text('開始'), findsOneWidget);
     expect(saves, 1);
   });
+  for (final systemBack in [false, true]) {
+    testWidgets(
+      'completed share returns home with saved history systemBack=$systemBack',
+      (t) async {
+        await t.pumpWidget(const MaterialApp(home: HomeShell()));
+        await t.pumpAndSettle();
+        await t.tap(find.byKey(const Key('activeWorkoutDraftCard')));
+        await t.pumpAndSettle();
+        await t.tap(find.byKey(const Key('completeWorkoutButton')));
+        await t.pumpAndSettle();
+        final prefs = await SharedPreferences.getInstance();
+        expect(
+          decodeWorkoutHistory(prefs.getString('workout_history')),
+          hasLength(1),
+        );
+        expect(prefs.getString(activeWorkoutDraftStorageKey), isNull);
+        await t.tap(find.byKey(const Key('completeAndPreviewShareButton')));
+        await t.pumpAndSettle();
+        expect(find.byType(WorkoutPage, skipOffstage: false), findsNothing);
+        expect(find.byType(WorkoutSharePage), findsOneWidget);
+        if (systemBack) {
+          await t.binding.handlePopRoute();
+        } else {
+          await t.pageBack();
+        }
+        await t.pumpAndSettle();
+        expect(find.byType(DashboardPage), findsOneWidget);
+        expect(find.byType(WorkoutPage, skipOffstage: false), findsNothing);
+        expect(find.byType(WorkoutSharePage), findsNothing);
+        expect(find.byKey(const Key('activeWorkoutDraftCard')), findsNothing);
+        expect(prefs.getString(activeWorkoutDraftStorageKey), isNull);
+        expect(
+          decodeWorkoutHistory(prefs.getString('workout_history')),
+          hasLength(1),
+        );
+        await t.tap(find.byIcon(Icons.calendar_month_outlined));
+        await t.pumpAndSettle();
+        expect(
+          t.widget<MonthlyHistoryPage>(find.byType(MonthlyHistoryPage)).history,
+          hasLength(1),
+        );
+      },
+    );
+  }
 }

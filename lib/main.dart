@@ -6747,12 +6747,15 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                   _exitWorkout(record);
                   return;
                 }
-                await Navigator.of(context).push<void>(
-                  MaterialPageRoute(
+                // Saving and draft cleanup have finished. Replace the ended
+                // workout so every share-page exit returns to its home caller.
+                _exiting = true;
+                Navigator.of(context).pushReplacement<void, WorkoutRecord>(
+                  MaterialPageRoute<void>(
                     builder: (_) => WorkoutSharePage(workout: record),
                   ),
+                  result: record,
                 );
-                if (mounted) _exitWorkout(record);
               },
               child: Text(widget.isEditing ? '閉じる' : '共有画像を確認'),
             ),
