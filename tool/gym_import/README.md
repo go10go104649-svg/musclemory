@@ -47,9 +47,10 @@ then supply its own chain ID and reviewed mapping file.
 244 stores, 219 equipment IDs, 1,582 store-equipment pairs, no duplicate keys or
 orphan references. Equipment coverage: 35 published, 3 not published, 206 not
 collected. All 244 station fields and all 219 manufacturer/model fields are absent.
-368 quantities are explicit; 1,214 remain null. 60 equipment IDs have 106 reviewed
-exercise mappings; 159 are unmapped. This is partial equipment coverage, not a claim
-that every listed store has a complete equipment inventory.
+368 quantities are explicit; 1,214 remain null. 62 equipment IDs have 108 reviewed
+exercise mappings; 157 are unmapped. Both reviewed T-bar equipment variants map to
+`t_bar_row` while keeping their equipment identities/load types separate. This is partial
+equipment coverage, not a claim that every listed store has a complete equipment inventory.
 
 ## Search and reports
 
