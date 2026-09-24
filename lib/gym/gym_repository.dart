@@ -476,7 +476,7 @@ class SupabaseGymRepository extends GymRepository {
         .select('equipment_id')
         .eq('store_id', storeId)
         .eq('user_id', _userId!)
-        .inFilter('status', ['pending', 'reviewing', 'approved']);
+        .inFilter('status', ['pending', 'reviewing']);
     return {
       for (final row in rows)
         if (row['equipment_id'] is String) row['equipment_id'] as String,

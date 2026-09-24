@@ -100,9 +100,7 @@ void main() {
     await t.pumpAndSettle();
   }
 
-  testWidgets('gym search supports store chain and network retry', (
-    t,
-  ) async {
+  testWidgets('gym search supports store chain and network retry', (t) async {
     await page(t, const GymStoreSearchPage());
     for (final q in ['松戸店', 'FIT PLACE24']) {
       await t.enterText(find.byKey(const Key('gymStoreSearchField')), q);
@@ -163,16 +161,21 @@ void main() {
       expect(find.text('フリーウェイト'), findsOneWidget);
       expect(find.textContaining('対応種目は現在準備中です'), findsWidgets);
 
-      await t.scrollUntilVisible(find.byKey(const Key('gymEquipmentc')),150,scrollable:find.byType(Scrollable).last);
+      await t.scrollUntilVisible(
+        find.byKey(const Key('gymEquipmentc')),
+        150,
+        scrollable: find.byType(Scrollable).last,
+      );
       await t.tap(find.byKey(const Key('gymEquipmentc')));
       await t.pumpAndSettle();
-      expect(
-        find.text('対応種目は現在準備中です'),
-        findsOneWidget,
-      );
+      expect(find.text('対応種目は現在準備中です'), findsOneWidget);
       await t.pageBack();
       await t.pumpAndSettle();
-      await t.scrollUntilVisible(find.byKey(const Key('gymEquipmente')),150,scrollable:find.byType(Scrollable).last);
+      await t.scrollUntilVisible(
+        find.byKey(const Key('gymEquipmente')),
+        150,
+        scrollable: find.byType(Scrollable).last,
+      );
       await t.tap(find.byKey(const Key('gymEquipmente')));
       await t.pumpAndSettle();
       await t.tap(find.byKey(const Key('addGymExercisedumbbell_curl')));
@@ -246,7 +249,7 @@ void main() {
       repo.fail = true;
       await t.tap(find.byKey(const Key('storeExerciseFilter')));
       await t.pumpAndSettle();
-      expect(find.text('設備情報を取得できませんでした。全種目から追加できます。'), findsOneWidget);
+      expect(find.text('対応種目を取得できませんでした。「全種目」からも追加できます。'), findsOneWidget);
       expect(
         find.byKey(const Key('selectExercisedumbbell_curl')),
         findsOneWidget,

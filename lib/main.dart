@@ -1,3 +1,4 @@
+import 'admin/report_management_page.dart';
 import 'gym/place_equipment_pages.dart';
 import 'gym/custom_gym_preference.dart';
 export 'gym/custom_gym_preference.dart';
@@ -10960,6 +10961,7 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
           ),
+          const ReportAdminEntry(),
           _sectionTitle('トレーニング設定'),
           _trainingSettingsCard(context),
           _sectionTitle('利用場所'),

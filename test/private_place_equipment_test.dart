@@ -42,11 +42,12 @@ class EquipmentRepo extends FakeGyms {
     String? exerciseId,
     required String comment,
   }) async {
-    if (failReports)
+    if (failReports) {
       throw const PostgrestException(
         message: 'QA permission denied',
         code: '42501',
       );
+    }
     final key = '$storeId/$kind/$exerciseId/$comment';
     if (!exerciseReports.contains(key)) exerciseReports.add(key);
   }

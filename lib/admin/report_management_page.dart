@@ -1,0 +1,418 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+
+import 'report_repository.dart';
+import '../gym/gym_repository.dart';
+import '../gym/gym_pages.dart';
+
+/// Visibility is only a convenience; every read/write is authorized by the DB.
+class ReportAdminEntry extends StatefulWidget {
+  const ReportAdminEntry({super.key});
+  @override
+  State<ReportAdminEntry> createState() => _ReportAdminEntryState();
+}
+
+class _ReportAdminEntryState extends State<ReportAdminEntry> {
+  final repo = ReportServices.repository;
+  StreamSubscription<void>? subscription;
+  bool admin = false;
+  int request = 0;
+  @override
+  void initState() {
+    super.initState();
+    refresh();
+    subscription = repo.authChanges.listen((_) {
+      refresh();
+    });
+  }
+
+  Future<void> refresh() async {
+    final version = ++request;
+    if (mounted) setState(() => admin = false);
+    try {
+      final allowed = await repo.isAdmin();
+      if (mounted && version == request) setState(() => admin = allowed);
+    } catch (_) {
+      /* Fail closed. */
+    }
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => !admin
+      ? const SizedBox.shrink()
+      : Card(
+          child: ListTile(
+            key: const Key('reportAdminEntry'),
+            leading: const Icon(Icons.admin_panel_settings_outlined),
+            title: const Text('報告管理'),
+            subtitle: const Text('管理者専用'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () async {
+              await Navigator.push<void>(
+                context,
+                MaterialPageRoute(builder: (_) => const ReportManagementPage()),
+              );
+              refresh();
+            },
+          ),
+        );
+}
+
+class ReportManagementPage extends StatefulWidget {
+  const ReportManagementPage({super.key});
+  @override
+  State<ReportManagementPage> createState() => _ReportManagementPageState();
+}
+
+class _ReportManagementPageState extends State<ReportManagementPage> {
+  final repo = ReportServices.repository;
+  final search = TextEditingController();
+  StreamSubscription<void>? subscription;
+  Timer? debounce;
+  String type = 'exercise';
+  String? status = 'pending', error;
+  List<AdminReport> rows = [];
+  Map<String, int> counts = {};
+  bool busy = true, admin = false, more = false;
+  int request = 0;
+  @override
+  void initState() {
+    super.initState();
+    load();
+    subscription = repo.authChanges.listen((_) {
+      setState(() => admin = false);
+      load();
+    });
+  }
+
+  Future<void> load({bool append = false}) async {
+    final version = ++request;
+    setState(() {
+      busy = true;
+      error = null;
+      if (!append) {
+        rows = [];
+        counts = {};
+      }
+    });
+    try {
+      final allowed = await repo.isAdmin();
+      if (!mounted || version != request) return;
+      if (!allowed) {
+        setState(() {
+          admin = false;
+          busy = false;
+          rows = [];
+        });
+        return;
+      }
+      final batch = await repo.list(
+        type,
+        status,
+        search.text,
+        append ? rows.length : 0,
+      );
+      if (!mounted || version != request) return;
+      setState(() {
+        admin = true;
+        rows = append ? [...rows, ...batch.rows] : batch.rows;
+        counts = batch.counts;
+        more = batch.rows.length == 50;
+        busy = false;
+      });
+    } catch (_) {
+      if (mounted && version == request) {
+        setState(() {
+          busy = false;
+          error = '報告を取得できませんでした。再度お試しください。';
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    debounce?.cancel();
+    subscription?.cancel();
+    search.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: const Text('報告管理'),
+      actions: [
+        IconButton(
+          onPressed: busy ? null : () => load(),
+          icon: const Icon(Icons.refresh),
+          tooltip: '再読み込み',
+        ),
+      ],
+    ),
+    body: SafeArea(
+      child: Column(
+        children: [
+          if (busy) const LinearProgressIndicator(),
+          if (error != null)
+            Padding(padding: const EdgeInsets.all(16), child: Text(error!)),
+          if (!busy && error == null && !admin)
+            const Padding(
+              padding: EdgeInsets.all(24),
+              child: Text('管理者のみ利用できます'),
+            ),
+          if (admin) ...[
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(value: 'exercise', label: Text('対応種目')),
+                  ButtonSegment(value: 'equipment', label: Text('設備情報')),
+                ],
+                selected: {type},
+                onSelectionChanged: busy
+                    ? null
+                    : (v) {
+                        type = v.single;
+                        load();
+                      },
+              ),
+            ),
+            SizedBox(
+              height: 48,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (final entry in {...reportStatuses, 'all': 'すべて'}.entries)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: ChoiceChip(
+                        key: ValueKey('reportStatus${entry.key}'),
+                        label: Text(
+                          '${entry.value} ${entry.key == 'all' ? counts.values.fold(0, (a, b) => a + b) : counts[entry.key] ?? 0}',
+                        ),
+                        selected: (status ?? 'all') == entry.key,
+                        onSelected: busy
+                            ? null
+                            : (_) {
+                                status = entry.key == 'all' ? null : entry.key;
+                                load();
+                              },
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: TextField(
+                controller: search,
+                key: const Key('reportAdminSearch'),
+                decoration: const InputDecoration(
+                  labelText: '店舗名・種目名・設備名で検索',
+                  prefixIcon: Icon(Icons.search),
+                ),
+                onChanged: (_) {
+                  debounce?.cancel();
+                  debounce = Timer(
+                    const Duration(milliseconds: 300),
+                    () => load(),
+                  );
+                },
+              ),
+            ),
+            Expanded(
+              child: rows.isEmpty
+                  ? const Center(child: Text('報告はありません'))
+                  : ListView.builder(
+                      itemCount: rows.length + (more ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == rows.length) {
+                          return TextButton(
+                            onPressed: busy ? null : () => load(append: true),
+                            child: const Text('さらに表示'),
+                          );
+                        }
+                        final r = rows[index];
+                        return ListTile(
+                          key: ValueKey('adminReport${r.id}'),
+                          title: Text('${r.storeName}\n${r.targetName}'),
+                          subtitle: Text(
+                            '${r.kindLabel}\n${r.data['comment']}\n${r.dateLabel} ・ ${reportStatuses[r.status]}',
+                          ),
+                          isThreeLine: true,
+                          onTap: () async {
+                            await Navigator.push<void>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    _ReportDetail(report: r, repo: repo),
+                              ),
+                            );
+                            if (mounted) load();
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
+class _ReportDetail extends StatefulWidget {
+  const _ReportDetail({required this.report, required this.repo});
+  final AdminReport report;
+  final ReportRepository repo;
+  @override
+  State<_ReportDetail> createState() => _ReportDetailState();
+}
+
+class _ReportDetailState extends State<_ReportDetail> {
+  late final note = TextEditingController(text: widget.report.note);
+  bool busy = false;
+  String? error;
+  @override
+  void dispose() {
+    note.dispose();
+    super.dispose();
+  }
+
+  Future<void> update(String status) async {
+    if (busy) return;
+    if (status == 'rejected' && note.text.trim().isEmpty) {
+      setState(() => error = '却下理由を管理者メモに入力してください');
+      return;
+    }
+    if (status == 'applied' || status == 'rejected') {
+      final yes = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('この報告を${reportStatuses[status]}にしますか？'),
+          content: const Text('設備・対応種目のマスターは変更されません。'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('キャンセル'),
+            ),
+            FilledButton(
+              key: const Key('confirmReportReview'),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('確定'),
+            ),
+          ],
+        ),
+      );
+      if (yes != true || !mounted) return;
+    }
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    try {
+      await widget.repo.update(widget.report, status, note.text);
+      if (mounted) Navigator.pop(context);
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          busy = false;
+          error = '更新できませんでした。権限または最新の状態を確認して再度お試しください。';
+        });
+      }
+    }
+  }
+
+  Future<void> openStore() async {
+    setState(() => busy = true);
+    try {
+      final store = await GymServices.repository.storeById(
+        widget.report.storeId,
+      );
+      if (!mounted) return;
+      if (store == null) throw StateError('Store unavailable');
+      await Navigator.push<void>(
+        context,
+        MaterialPageRoute(builder: (_) => GymStoreEquipmentPage(store: store)),
+      );
+    } catch (_) {
+      if (mounted) setState(() => error = '店舗情報を取得できませんでした');
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final r = widget.report;
+    return Scaffold(
+      appBar: AppBar(title: const Text('報告詳細')),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Text(r.storeName, style: Theme.of(context).textTheme.titleLarge),
+            Text('店舗ID: ${r.storeId}'),
+            TextButton(
+              onPressed: busy ? null : openStore,
+              child: const Text('店舗情報を見る'),
+            ),
+            Text(r.targetName, style: Theme.of(context).textTheme.titleMedium),
+            Text('種目・設備ID: ${r.data['target_id'] ?? '指定なし'}'),
+            if (r.data['entered_name'] != null)
+              Text('ユーザー入力設備名: ${r.data['entered_name']}'),
+            Text('報告種類: ${r.kindLabel}'),
+            Text('コメント: ${r.data['comment']}'),
+            Text('報告日時: ${r.dateLabel}'),
+            Text('状態: ${reportStatuses[r.status]}'),
+            if (r.data['reviewed_at'] != null)
+              Text('最終確認: ${r.data['reviewed_at']}'),
+            TextField(
+              key: const Key('reportAdminNote'),
+              controller: note,
+              enabled: !busy,
+              maxLines: 4,
+              maxLength: 4000,
+              decoration: const InputDecoration(labelText: '管理者メモ（却下時は必須）'),
+            ),
+            if (error != null)
+              Text(
+                error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            if (r.status == 'pending')
+              FilledButton(
+                key: const Key('startReportReview'),
+                onPressed: busy ? null : () => update('reviewing'),
+                child: const Text('確認を開始'),
+              ),
+            if (r.status == 'reviewing')
+              FilledButton(
+                key: const Key('applyReportReview'),
+                onPressed: busy ? null : () => update('applied'),
+                child: const Text('反映済みにする'),
+              ),
+            if (r.status == 'pending' || r.status == 'reviewing')
+              TextButton(
+                key: const Key('rejectReportReview'),
+                onPressed: busy ? null : () => update('rejected'),
+                child: const Text('却下'),
+              ),
+            OutlinedButton(
+              onPressed: busy ? null : () => update(r.status),
+              child: const Text('メモを保存'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
