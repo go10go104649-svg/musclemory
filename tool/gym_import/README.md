@@ -47,10 +47,16 @@ then supply its own chain ID and reviewed mapping file.
 244 stores, 219 equipment IDs, 1,582 store-equipment pairs, no duplicate keys or
 orphan references. Equipment coverage: 35 published, 3 not published, 206 not
 collected. All 244 station fields and all 219 manufacturer/model fields are absent.
-368 quantities are explicit; 1,214 remain null. 62 equipment IDs have 108 reviewed
-exercise mappings; 157 are unmapped. Both reviewed T-bar equipment variants map to
-`t_bar_row` while keeping their equipment identities/load types separate. This is partial
-equipment coverage, not a claim that every listed store has a complete equipment inventory.
+368 quantities are explicit; 1,214 remain null. 60 equipment IDs have 106 reviewed
+exercise mappings; 159 are unmapped. This is partial equipment coverage, not a claim
+that every listed store has a complete equipment inventory.
+
+## Mapping updates (2026-09-24)
+
+The mapping file now covers 62 equipment IDs / 108 equipment-exercise rows. Both
+reviewed T-bar equipment variants map to `t_bar_row` while keeping their equipment
+identities and load types separate. Apply the latest migration (or rerun the importer
+with `--apply`) before treating those updated counts as live linked-project data.
 
 ## Search and reports
 
