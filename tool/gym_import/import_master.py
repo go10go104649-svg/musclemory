@@ -83,8 +83,13 @@ def prepare(tables, chain_id, chain_name, mappings, catalog, requirements=None):
         row = source_equipment.get(m['equipment_id'])
         if row is None or row['normalized_name'] != m['expected_name'] or row['load_type'] != m['expected_load_type']:
             raise ValueError(f'Mapping source changed: {m["equipment_id"]}')
-        if row['needs_review']:
+        review_override = m.get('reviewed_source_override', False)
+        if not isinstance(review_override, bool):
+            raise ValueError('Invalid reviewed_source_override')
+        if row['needs_review'] and not review_override:
             raise ValueError('Unreviewed equipment cannot be automatically mapped')
+        if not row['needs_review'] and review_override:
+            raise ValueError('reviewed_source_override is only valid for needs_review equipment')
         for id in m['exercise_ids']:
             if id not in by_id or by_id[id].get('canonicalExerciseId') or not by_id[id].get('selectable',True):
                 raise ValueError(f'Invalid exercise ID: {id}')
