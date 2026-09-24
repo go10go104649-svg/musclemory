@@ -87,6 +87,26 @@ class ImportTests(unittest.TestCase):
         self.assertEqual({link['exercise_id'] for link in links}, {'t_bar_row'})
         self.assertEqual(len({link['equipment_id'] for link in links}), 2)
 
+    def test_mapping_file_has_unique_equipment_and_valid_exercises(self):
+        mapping_path = Path(__file__).with_name('fitplace_mappings.json')
+        mappings = json.loads(mapping_path.read_text())
+        catalog_path = Path(__file__).resolve().parents[1] / 'exercise_forms' / 'catalog.json'
+        catalog = json.loads(catalog_path.read_text())
+        selectable = {
+            e['exerciseId']
+            for e in catalog['exercises']
+            if not e.get('canonicalExerciseId') and e.get('selectable', True)
+        }
+        equipment_ids = [m['equipment_id'] for m in mappings]
+        self.assertEqual(len(equipment_ids), len(set(equipment_ids)))
+        self.assertEqual(len(mappings), 185)
+        self.assertEqual(sum(len(m['exercise_ids']) for m in mappings), 271)
+        for mapping in mappings:
+            self.assertTrue(mapping['exercise_ids'])
+            self.assertEqual(len(mapping['exercise_ids']), len(set(mapping['exercise_ids'])))
+            for exercise_id in mapping['exercise_ids']:
+                self.assertIn(exercise_id, selectable)
+
     def test_read_xlsx_without_modification(self):
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/'input.xlsx';w=Workbook();w.remove(w.active)
