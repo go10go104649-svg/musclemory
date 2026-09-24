@@ -7632,7 +7632,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                   if (_storeFailed) const Text('設備情報を取得できませんでした。全種目から追加できます。'),
                   if (_storeOnly)
                     const Text(
-                      '登録済み設備の対応種目のみ。未掲載の種目は「全種目」から追加できます。',
+                      '登録済み設備と、ラック＋ベンチなどの組み合わせ条件を満たす種目のみ表示します。未掲載の種目は「全種目」から追加できます。',
                       style: TextStyle(fontSize: 12),
                     ),
                 ],
@@ -7695,7 +7695,13 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                           category: category,
                           label: _categoryLabel(category),
                           count: _catalog
-                              .where((e) => e.bodyPart == category)
+                              .where(
+                                (e) =>
+                                    e.bodyPart == category &&
+                                    (!_storeOnly ||
+                                        (_storeIds?.contains(e.exerciseId) ??
+                                            false)),
+                              )
                               .length,
                           onTap: () =>
                               setState(() => _selectedCategory = category),
