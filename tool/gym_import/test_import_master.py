@@ -99,13 +99,38 @@ class ImportTests(unittest.TestCase):
         }
         equipment_ids = [m['equipment_id'] for m in mappings]
         self.assertEqual(len(equipment_ids), len(set(equipment_ids)))
-        self.assertEqual(len(mappings), 193)
-        self.assertEqual(sum(len(m['exercise_ids']) for m in mappings), 335)
+        self.assertEqual(len(mappings), 205)
+        self.assertEqual(sum(len(m['exercise_ids']) for m in mappings), 349)
         for mapping in mappings:
             self.assertTrue(mapping['exercise_ids'])
             self.assertEqual(len(mapping['exercise_ids']), len(set(mapping['exercise_ids'])))
             for exercise_id in mapping['exercise_ids']:
                 self.assertIn(exercise_id, selectable)
+
+    def test_reviewed_source_override_is_explicit_and_scoped(self):
+        t = copy.deepcopy(self.tables)
+        t['設備マスター'][0]['needs_review'] = True
+        mapping = dict(
+            equipment_id='e',
+            expected_name='ダンベル',
+            expected_load_type='free_weight',
+            exercise_ids=['curl'],
+            rationale='reviewed',
+        )
+        with self.assertRaises(ValueError):
+            self.payload(t, [mapping])
+        mapping['reviewed_source_override'] = True
+        payload = self.payload(t, [mapping])
+        self.assertEqual(payload['equipment_exercise_mapping'][0]['exercise_id'], 'curl')
+
+        clean = copy.deepcopy(self.tables)
+        with self.assertRaises(ValueError):
+            self.payload(clean, [mapping])
+
+        invalid = copy.deepcopy(t)
+        mapping['reviewed_source_override'] = 'yes'
+        with self.assertRaises(ValueError):
+            self.payload(invalid, [mapping])
 
     def test_requirement_rules_validate_and_generate_idempotent_sql(self):
         t = copy.deepcopy(self.tables)
