@@ -89,9 +89,24 @@
       "lateral_raise",
       "front_raise",
       "one_arm_dumbbell_row",
-      "goblet_squat"
+      "goblet_squat",
+      "dumbbell_shoulder_press",
+      "rear_raise",
+      "dumbbell_shrug",
+      "concentration_curl",
+      "zottman_curl",
+      "french_press",
+      "triceps_kickback",
+      "lunge",
+      "reverse_lunge",
+      "walking_lunge",
+      "split_squat",
+      "single_leg_rdl",
+      "weighted_crunch",
+      "russian_twist",
+      "arnold_press"
     ],
-    "rationale": "原本の明示された器具・動作・負荷区分と既存exerciseId定義を照合。別設備との統合は行わない。"
+    "rationale": "ダンベル単体で実施できる種目を紐付け。ベンチ等が必要な種目は複数設備ルールで判定する。"
   },
   {
     "equipment_id": "fp_eq_86a486d021ac",
@@ -649,15 +664,6 @@
     "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
   },
   {
-    "equipment_id": "fp_eq_999e7b88bccd",
-    "expected_name": "アジャスタブル アームカールラック",
-    "expected_load_type": "not_specified",
-    "exercise_ids": [
-      "preacher_curl"
-    ],
-    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
-  },
-  {
     "equipment_id": "fp_eq_c2dc562978d1",
     "expected_name": "アジャスタブルシットアップベンチ",
     "expected_load_type": "not_specified",
@@ -683,15 +689,6 @@
     "expected_load_type": "not_specified",
     "exercise_ids": [
       "leg_press"
-    ],
-    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
-  },
-  {
-    "equipment_id": "fp_eq_5354722256ab",
-    "expected_name": "アームカールラック",
-    "expected_load_type": "not_specified",
-    "exercise_ids": [
-      "preacher_curl"
     ],
     "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
   },
@@ -737,15 +734,6 @@
     "expected_load_type": "not_specified",
     "exercise_ids": [
       "bench_press"
-    ],
-    "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
-  },
-  {
-    "equipment_id": "fp_eq_53beebd50e63",
-    "expected_name": "カールベンチ",
-    "expected_load_type": "not_specified",
-    "exercise_ids": [
-      "preacher_curl"
     ],
     "rationale": "設備名・負荷区分から動作を一意に確認できるため、既存の対応種目IDへ紐付け。店舗設備の分類と種目マスターの器具分類は分離して扱う。"
   },
@@ -1804,5 +1792,68 @@
       "plate_loaded_lat_pulldown"
     ],
     "rationale": "メーカー製品情報でプレートロード式ワイドプルダウンを確認し、既存のプレートロードラットプルダウン種目へ紐付け。"
+  },
+  {
+    "equipment_id": "fp_eq_d45213d7da37",
+    "expected_name": "ハーフラック",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "barbell_squat",
+      "front_squat",
+      "rack_pull",
+      "good_morning",
+      "military_press",
+      "bent_over_row",
+      "pendlay_row",
+      "deadlift",
+      "romanian_deadlift",
+      "sumo_deadlift",
+      "barbell_curl",
+      "upright_row",
+      "barbell_shrug"
+    ],
+    "rationale": "ラック設備をバーベル系フリーウェイト種目の起点として扱う。ベンチが必要な種目は複数設備ルールで判定する。"
+  },
+  {
+    "equipment_id": "fp_eq_0b00220775cb",
+    "expected_name": "パワーラック",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "barbell_squat",
+      "front_squat",
+      "rack_pull",
+      "good_morning",
+      "military_press",
+      "bent_over_row",
+      "pendlay_row",
+      "deadlift",
+      "romanian_deadlift",
+      "sumo_deadlift",
+      "barbell_curl",
+      "upright_row",
+      "barbell_shrug"
+    ],
+    "rationale": "ラック設備をバーベル系フリーウェイト種目の起点として扱う。ベンチが必要な種目は複数設備ルールで判定する。"
+  },
+  {
+    "equipment_id": "fp_eq_0287f92794a6",
+    "expected_name": "マルチラック",
+    "expected_load_type": "not_specified",
+    "exercise_ids": [
+      "barbell_squat",
+      "front_squat",
+      "rack_pull",
+      "good_morning",
+      "military_press",
+      "bent_over_row",
+      "pendlay_row",
+      "deadlift",
+      "romanian_deadlift",
+      "sumo_deadlift",
+      "barbell_curl",
+      "upright_row",
+      "barbell_shrug"
+    ],
+    "rationale": "ラック設備をバーベル系フリーウェイト種目の起点として扱う。ベンチが必要な種目は複数設備ルールで判定する。"
   }
 ]
