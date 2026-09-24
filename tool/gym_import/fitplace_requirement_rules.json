@@ -1,0 +1,1469 @@
+[
+  {
+    "rule_id": "rack_flat_bench_press_half_adj_incline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "bench_press は half と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_half_flat_incline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "bench_press は half と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_half_adjustable",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "bench_press は half と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_half_multi_decline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "bench_press は half と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_half_multi_adj_decline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "bench_press は half と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_half_decline_flat",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "bench_press は half と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_half_flat",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "bench_press は half と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_power_adj_incline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "bench_press は power と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_power_flat_incline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "bench_press は power と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_power_adjustable",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "bench_press は power と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_power_multi_decline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "bench_press は power と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_power_multi_adj_decline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "bench_press は power と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_power_decline_flat",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "bench_press は power と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_power_flat",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "bench_press は power と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_multi_adj_incline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "bench_press は multi と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_multi_flat_incline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "bench_press は multi と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_multi_adjustable",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "bench_press は multi と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_multi_multi_decline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "bench_press は multi と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_multi_multi_adj_decline",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "bench_press は multi と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_multi_decline_flat",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "bench_press は multi と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_bench_press_multi_flat",
+    "exercise_id": "bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "bench_press は multi と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_half_adj_incline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "close_grip_bench_press は half と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_half_flat_incline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "close_grip_bench_press は half と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_half_adjustable",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "close_grip_bench_press は half と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_half_multi_decline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "close_grip_bench_press は half と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_half_multi_adj_decline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "close_grip_bench_press は half と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_half_decline_flat",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "close_grip_bench_press は half と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_half_flat",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "close_grip_bench_press は half と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_power_adj_incline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "close_grip_bench_press は power と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_power_flat_incline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "close_grip_bench_press は power と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_power_adjustable",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "close_grip_bench_press は power と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_power_multi_decline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "close_grip_bench_press は power と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_power_multi_adj_decline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "close_grip_bench_press は power と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_power_decline_flat",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "close_grip_bench_press は power と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_power_flat",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "close_grip_bench_press は power と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_multi_adj_incline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "close_grip_bench_press は multi と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_multi_flat_incline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "close_grip_bench_press は multi と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_multi_adjustable",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "close_grip_bench_press は multi と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_multi_multi_decline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "close_grip_bench_press は multi と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_multi_multi_adj_decline",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "close_grip_bench_press は multi と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_multi_decline_flat",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "close_grip_bench_press は multi と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_close_grip_bench_press_multi_flat",
+    "exercise_id": "close_grip_bench_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "close_grip_bench_press は multi と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_half_adj_incline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "skull_crusher は half と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_half_flat_incline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "skull_crusher は half と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_half_adjustable",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "skull_crusher は half と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_half_multi_decline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "skull_crusher は half と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_half_multi_adj_decline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "skull_crusher は half と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_half_decline_flat",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "skull_crusher は half と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_half_flat",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "skull_crusher は half と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_power_adj_incline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "skull_crusher は power と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_power_flat_incline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "skull_crusher は power と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_power_adjustable",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "skull_crusher は power と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_power_multi_decline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "skull_crusher は power と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_power_multi_adj_decline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "skull_crusher は power と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_power_decline_flat",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "skull_crusher は power と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_power_flat",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "skull_crusher は power と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_multi_adj_incline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "skull_crusher は multi と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_multi_flat_incline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "skull_crusher は multi と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_multi_adjustable",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "skull_crusher は multi と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_multi_multi_decline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "skull_crusher は multi と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_multi_multi_adj_decline",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "skull_crusher は multi と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_multi_decline_flat",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "skull_crusher は multi と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_skull_crusher_multi_flat",
+    "exercise_id": "skull_crusher",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "skull_crusher は multi と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_half_adj_incline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "hip_thrust は half と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_half_flat_incline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "hip_thrust は half と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_half_adjustable",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "hip_thrust は half と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_half_multi_decline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "hip_thrust は half と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_half_multi_adj_decline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "hip_thrust は half と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_half_decline_flat",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "hip_thrust は half と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_half_flat",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "hip_thrust は half と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_power_adj_incline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "hip_thrust は power と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_power_flat_incline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "hip_thrust は power と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_power_adjustable",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "hip_thrust は power と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_power_multi_decline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "hip_thrust は power と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_power_multi_adj_decline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "hip_thrust は power と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_power_decline_flat",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "hip_thrust は power と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_power_flat",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "hip_thrust は power と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_multi_adj_incline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "hip_thrust は multi と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_multi_flat_incline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "hip_thrust は multi と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_multi_adjustable",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "hip_thrust は multi と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_multi_multi_decline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "hip_thrust は multi と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_multi_multi_adj_decline",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "hip_thrust は multi と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_multi_decline_flat",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "hip_thrust は multi と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_flat_hip_thrust_multi_flat",
+    "exercise_id": "hip_thrust",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "hip_thrust は multi と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_incline_incline_barbell_press_half_adj_incline",
+    "exercise_id": "incline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "incline_barbell_press は half と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_incline_incline_barbell_press_half_flat_incline",
+    "exercise_id": "incline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "incline_barbell_press は half と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_incline_incline_barbell_press_half_adjustable",
+    "exercise_id": "incline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "incline_barbell_press は half と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_incline_incline_barbell_press_power_adj_incline",
+    "exercise_id": "incline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "incline_barbell_press は power と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_incline_incline_barbell_press_power_flat_incline",
+    "exercise_id": "incline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "incline_barbell_press は power と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_incline_incline_barbell_press_power_adjustable",
+    "exercise_id": "incline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "incline_barbell_press は power と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_incline_incline_barbell_press_multi_adj_incline",
+    "exercise_id": "incline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "incline_barbell_press は multi と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_incline_incline_barbell_press_multi_flat_incline",
+    "exercise_id": "incline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "incline_barbell_press は multi と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_incline_incline_barbell_press_multi_adjustable",
+    "exercise_id": "incline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "incline_barbell_press は multi と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_decline_decline_barbell_press_half_multi_decline",
+    "exercise_id": "decline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "decline_barbell_press は half と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_decline_decline_barbell_press_half_multi_adj_decline",
+    "exercise_id": "decline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "decline_barbell_press は half と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_decline_decline_barbell_press_half_decline_flat",
+    "exercise_id": "decline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "decline_barbell_press は half と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_decline_decline_barbell_press_power_multi_decline",
+    "exercise_id": "decline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "decline_barbell_press は power と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_decline_decline_barbell_press_power_multi_adj_decline",
+    "exercise_id": "decline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "decline_barbell_press は power と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_decline_decline_barbell_press_power_decline_flat",
+    "exercise_id": "decline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "decline_barbell_press は power と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_decline_decline_barbell_press_multi_multi_decline",
+    "exercise_id": "decline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "decline_barbell_press は multi と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_decline_decline_barbell_press_multi_multi_adj_decline",
+    "exercise_id": "decline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "decline_barbell_press は multi と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "rack_decline_decline_barbell_press_multi_decline_flat",
+    "exercise_id": "decline_barbell_press",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "decline_barbell_press は multi と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_flat_dumbbell_press_db_adj_incline",
+    "exercise_id": "flat_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "flat_dumbbell_press は db と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_flat_dumbbell_press_db_flat_incline",
+    "exercise_id": "flat_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "flat_dumbbell_press は db と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_flat_dumbbell_press_db_adjustable",
+    "exercise_id": "flat_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "flat_dumbbell_press は db と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_flat_dumbbell_press_db_multi_decline",
+    "exercise_id": "flat_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "flat_dumbbell_press は db と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_flat_dumbbell_press_db_multi_adj_decline",
+    "exercise_id": "flat_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "flat_dumbbell_press は db と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_flat_dumbbell_press_db_decline_flat",
+    "exercise_id": "flat_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "flat_dumbbell_press は db と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_flat_dumbbell_press_db_flat",
+    "exercise_id": "flat_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "flat_dumbbell_press は db と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_fly_db_adj_incline",
+    "exercise_id": "dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "dumbbell_fly は db と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_fly_db_flat_incline",
+    "exercise_id": "dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "dumbbell_fly は db と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_fly_db_adjustable",
+    "exercise_id": "dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "dumbbell_fly は db と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_fly_db_multi_decline",
+    "exercise_id": "dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "dumbbell_fly は db と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_fly_db_multi_adj_decline",
+    "exercise_id": "dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "dumbbell_fly は db と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_fly_db_decline_flat",
+    "exercise_id": "dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "dumbbell_fly は db と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_fly_db_flat",
+    "exercise_id": "dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "dumbbell_fly は db と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_pullover_db_adj_incline",
+    "exercise_id": "dumbbell_pullover",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "dumbbell_pullover は db と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_pullover_db_flat_incline",
+    "exercise_id": "dumbbell_pullover",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "dumbbell_pullover は db と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_pullover_db_adjustable",
+    "exercise_id": "dumbbell_pullover",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "dumbbell_pullover は db と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_pullover_db_multi_decline",
+    "exercise_id": "dumbbell_pullover",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "dumbbell_pullover は db と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_pullover_db_multi_adj_decline",
+    "exercise_id": "dumbbell_pullover",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "dumbbell_pullover は db と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_pullover_db_decline_flat",
+    "exercise_id": "dumbbell_pullover",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "dumbbell_pullover は db と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_dumbbell_pullover_db_flat",
+    "exercise_id": "dumbbell_pullover",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "dumbbell_pullover は db と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_bulgarian_split_squat_db_adj_incline",
+    "exercise_id": "bulgarian_split_squat",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "bulgarian_split_squat は db と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_bulgarian_split_squat_db_flat_incline",
+    "exercise_id": "bulgarian_split_squat",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "bulgarian_split_squat は db と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_bulgarian_split_squat_db_adjustable",
+    "exercise_id": "bulgarian_split_squat",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "bulgarian_split_squat は db と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_bulgarian_split_squat_db_multi_decline",
+    "exercise_id": "bulgarian_split_squat",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "bulgarian_split_squat は db と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_bulgarian_split_squat_db_multi_adj_decline",
+    "exercise_id": "bulgarian_split_squat",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "bulgarian_split_squat は db と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_bulgarian_split_squat_db_decline_flat",
+    "exercise_id": "bulgarian_split_squat",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "bulgarian_split_squat は db と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_flat_bulgarian_split_squat_db_flat",
+    "exercise_id": "bulgarian_split_squat",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_3e928d59ac6c"
+    ],
+    "rationale": "bulgarian_split_squat は db と flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_incline_dumbbell_press_db_adj_incline",
+    "exercise_id": "incline_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "incline_dumbbell_press は db と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_incline_dumbbell_press_db_flat_incline",
+    "exercise_id": "incline_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "incline_dumbbell_press は db と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_incline_dumbbell_press_db_adjustable",
+    "exercise_id": "incline_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "incline_dumbbell_press は db と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_incline_dumbbell_fly_db_adj_incline",
+    "exercise_id": "incline_dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "incline_dumbbell_fly は db と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_incline_dumbbell_fly_db_flat_incline",
+    "exercise_id": "incline_dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "incline_dumbbell_fly は db と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_incline_dumbbell_fly_db_adjustable",
+    "exercise_id": "incline_dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "incline_dumbbell_fly は db と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_chest_supported_dumbbell_row_db_adj_incline",
+    "exercise_id": "chest_supported_dumbbell_row",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "chest_supported_dumbbell_row は db と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_chest_supported_dumbbell_row_db_flat_incline",
+    "exercise_id": "chest_supported_dumbbell_row",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "chest_supported_dumbbell_row は db と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_chest_supported_dumbbell_row_db_adjustable",
+    "exercise_id": "chest_supported_dumbbell_row",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "chest_supported_dumbbell_row は db と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_incline_dumbbell_curl_db_adj_incline",
+    "exercise_id": "incline_dumbbell_curl",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "incline_dumbbell_curl は db と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_incline_dumbbell_curl_db_flat_incline",
+    "exercise_id": "incline_dumbbell_curl",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "incline_dumbbell_curl は db と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_incline_dumbbell_curl_db_adjustable",
+    "exercise_id": "incline_dumbbell_curl",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "incline_dumbbell_curl は db と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_spider_curl_db_adj_incline",
+    "exercise_id": "spider_curl",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_0b7ade05c9c0"
+    ],
+    "rationale": "spider_curl は db と adj_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_spider_curl_db_flat_incline",
+    "exercise_id": "spider_curl",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_f03fe62567c5"
+    ],
+    "rationale": "spider_curl は db と flat_incline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_incline_spider_curl_db_adjustable",
+    "exercise_id": "spider_curl",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_c66a841e9ed5"
+    ],
+    "rationale": "spider_curl は db と adjustable の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_decline_decline_dumbbell_press_db_multi_decline",
+    "exercise_id": "decline_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "decline_dumbbell_press は db と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_decline_decline_dumbbell_press_db_multi_adj_decline",
+    "exercise_id": "decline_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "decline_dumbbell_press は db と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_decline_decline_dumbbell_press_db_decline_flat",
+    "exercise_id": "decline_dumbbell_press",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "decline_dumbbell_press は db と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_decline_decline_dumbbell_fly_db_multi_decline",
+    "exercise_id": "decline_dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_538b557739d4"
+    ],
+    "rationale": "decline_dumbbell_fly は db と multi_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_decline_decline_dumbbell_fly_db_multi_adj_decline",
+    "exercise_id": "decline_dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_453fcb2d0cc8"
+    ],
+    "rationale": "decline_dumbbell_fly は db と multi_adj_decline の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "dumbbell_decline_decline_dumbbell_fly_db_decline_flat",
+    "exercise_id": "decline_dumbbell_fly",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_57ab45d08062"
+    ],
+    "rationale": "decline_dumbbell_fly は db と decline_flat の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_db_preacher_curl_db_adj_arm",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_999e7b88bccd"
+    ],
+    "rationale": "preacher_curl は db と adj_arm の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_db_preacher_curl_db_arm",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_5354722256ab"
+    ],
+    "rationale": "preacher_curl は db と arm の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_db_preacher_curl_db_curl",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_693fa2dd0404",
+      "fp_eq_53beebd50e63"
+    ],
+    "rationale": "preacher_curl は db と curl の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_rack_preacher_curl_half_adj_arm",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_999e7b88bccd"
+    ],
+    "rationale": "preacher_curl は half と adj_arm の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_rack_preacher_curl_half_arm",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_5354722256ab"
+    ],
+    "rationale": "preacher_curl は half と arm の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_rack_preacher_curl_half_curl",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_d45213d7da37",
+      "fp_eq_53beebd50e63"
+    ],
+    "rationale": "preacher_curl は half と curl の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_rack_preacher_curl_power_adj_arm",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_999e7b88bccd"
+    ],
+    "rationale": "preacher_curl は power と adj_arm の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_rack_preacher_curl_power_arm",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_5354722256ab"
+    ],
+    "rationale": "preacher_curl は power と arm の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_rack_preacher_curl_power_curl",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_0b00220775cb",
+      "fp_eq_53beebd50e63"
+    ],
+    "rationale": "preacher_curl は power と curl の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_rack_preacher_curl_multi_adj_arm",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_999e7b88bccd"
+    ],
+    "rationale": "preacher_curl は multi と adj_arm の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_rack_preacher_curl_multi_arm",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_5354722256ab"
+    ],
+    "rationale": "preacher_curl は multi と arm の両設備がある場合のみ店舗対応と判定する。"
+  },
+  {
+    "rule_id": "preacher_rack_preacher_curl_multi_curl",
+    "exercise_id": "preacher_curl",
+    "equipment_ids": [
+      "fp_eq_0287f92794a6",
+      "fp_eq_53beebd50e63"
+    ],
+    "rationale": "preacher_curl は multi と curl の両設備がある場合のみ店舗対応と判定する。"
+  }
+]
