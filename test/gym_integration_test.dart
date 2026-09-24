@@ -260,7 +260,10 @@ void main() {
         find.descendant(of: armCard, matching: find.text('2種目')),
         findsOneWidget,
       );
-      await t.tap(armCard);
+      await t.enterText(
+        find.byKey(const Key('exerciseSearchField')),
+        'ダンベルカール',
+      );
       await t.pumpAndSettle();
       final row = find.byKey(const Key('selectExercisedumbbell_curl'));
       expect(row, findsOneWidget);
