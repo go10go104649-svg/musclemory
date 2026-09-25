@@ -6,6 +6,10 @@ import 'package:flutter/services.dart';
 /// Today all chunks are bundled; no network or persistent cache is introduced.
 Future<Uint8List> loadFormAsset(String path, {AssetBundle? bundle}) async {
   final source = bundle ?? rootBundle;
+  // Recipe references are root-relative within the same Flutter package.
+  final packagePrefix =
+      RegExp(r'^packages/[^/]+/').firstMatch(path)?.group(0) ?? '';
+
   if (!path.endsWith('.form.json')) {
     final bytes = await source.load(path);
     return bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
@@ -32,7 +36,7 @@ Future<Uint8List> loadFormAsset(String path, {AssetBundle? bundle}) async {
     }
     var data = loaded[asset];
     if (data == null) {
-      final value = await source.load(asset);
+      final value = await source.load('$packagePrefix$asset');
       data = value.buffer.asUint8List(value.offsetInBytes, value.lengthInBytes);
       loaded[asset] = data;
     }

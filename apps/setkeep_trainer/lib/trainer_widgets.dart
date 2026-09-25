@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:setkeep/trainer/trainer_repository.dart';
-import 'package:setkeep/main.dart' show WorkoutRecord;
+import 'package:setkeep/main.dart' show WorkoutRecord, BodyMapPage, RecordedSet;
 
 String tr(BuildContext context, String ja, String en) =>
     Localizations.localeOf(context).languageCode == 'ja' ? ja : en;
@@ -115,13 +115,23 @@ class MenuCard extends StatelessWidget {
   Widget build(BuildContext context) => Card(
     child: ExpansionTile(
       title: Text(menu['name'] as String),
-      subtitle: Text(clientName ?? dateLabel(menu['created_at'])),
+      subtitle: Text(
+        '${clientName ?? dateLabel(menu['created_at'])} · ${menu['status'] ?? 'planned'} · ${menu['schedule'] ?? 'single'}',
+      ),
       children: [
         for (final i in menu['items'] as List)
           ListTile(
             title: Text('${i['exercise_name']}'),
             subtitle: Text(
-              '${i['sets']} ${tr(context, 'セット', 'sets')} · ${i['target_weight']} kg × ${i['target_reps']}',
+              i['set_values'] is List
+                  ? (i['set_values'] as List)
+                        .map(
+                          (s) => RecordedSet.fromJson(
+                            Map<String, dynamic>.from(s as Map),
+                          ).displaySummary,
+                        )
+                        .join(' / ')
+                  : '${i['sets']} ${tr(context, 'セット', 'sets')} · ${i['target_weight']} kg × ${i['target_reps']}',
             ),
           ),
         if ('${menu['note']}'.isNotEmpty)
@@ -138,37 +148,41 @@ class HeatmapPage extends StatelessWidget {
   const HeatmapPage({super.key, required this.workouts});
   final List<Map<String, dynamic>> workouts;
   @override
-  Widget build(BuildContext context) {
-    final counts = <String, int>{};
-    for (final row in workouts) {
-      for (final set in decodeWorkout(row).sets) {
-        counts.update(set.bodyPart, (n) => n + 1, ifAbsent: () => 1);
-      }
-    }
-    final max = counts.values.fold<int>(1, (a, b) => a > b ? a : b);
-    return Scaffold(
-      appBar: AppBar(title: Text(tr(context, '部位ヒートマップ', 'Body-part heatmap'))),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          Text(
-            tr(
-              context,
-              '読み込み済み${workouts.length}件の部位別セット数（簡易表示）',
-              'Sets by body part across ${workouts.length} loaded workouts',
-            ),
-          ),
-          for (final entry in counts.entries)
-            ListTile(
-              title: Text(entry.key),
-              subtitle: LinearProgressIndicator(
-                value: entry.value / max,
-                minHeight: 12,
-              ),
-              trailing: Text('${entry.value}'),
-            ),
-        ],
-      ),
-    );
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: Text(tr(context, '部位ヒートマップ', 'Body-part heatmap'))),
+    body: BodyMapPage(
+      history: workouts
+          .where((w) => w['canceled_at'] == null)
+          .map(decodeWorkout)
+          .toList(),
+    ),
+  );
+}
+
+class TextPromptDialog extends StatefulWidget {
+  const TextPromptDialog({super.key, required this.title});
+  final String title;
+  @override
+  State<TextPromptDialog> createState() => _TextPromptDialogState();
+}
+
+class _TextPromptDialogState extends State<TextPromptDialog> {
+  final controller = TextEditingController();
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: Text(widget.title),
+    content: TextField(controller: controller, maxLength: 10000, maxLines: 3),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context, controller.text),
+        child: Text(tr(context, '保存', 'Save')),
+      ),
+    ],
+  );
 }

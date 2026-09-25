@@ -184,8 +184,8 @@ class _TrainerSharingPageState extends State<TrainerSharingPage> {
                           ),
                           Text(
                             text(
-                              '承認すると、表示名とクラウド上のトレーニング履歴をこのトレーナーに共有します。端末内の記録は下で選択して送信できます。体重は共有しません。履歴から運動した部位も分かります。',
-                              'Approval shares your display name and cloud workout history with this trainer. Select local records below to publish them. Body weight stays private. Workout history also reveals exercised body parts.',
+                              '承認すると、表示名とクラウド上のトレーニング履歴をこのテナントの担当トレーナーに共有します。端末内の記録は下で選択して送信できます。体重は共有しません。履歴から運動した部位も分かります。',
+                              'Approval shares your display name and cloud workout history with assigned trainers in this tenant. Select local records below to publish them. Body weight stays private. Workout history also reveals exercised body parts.',
                             ),
                           ),
                           TextField(
@@ -276,7 +276,7 @@ class _TrainerSharingPageState extends State<TrainerSharingPage> {
                               content: Text(
                                 text(
                                   '今後の履歴閲覧と代理記録を停止します。既に閲覧された情報やトレーナーのメモは消去されません。',
-                                  'This stops future history access and recording. Information already viewed and private trainer notes are not erased.',
+                                  'This stops future history access and recording. Information already viewed and tenant coaching notes are not erased.',
                                 ),
                               ),
                               actions: [

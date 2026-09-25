@@ -1,3 +1,5 @@
+import 'design/family_theme.dart';
+
 import 'package:flutter/material.dart';
 
 /// Consistent human renders for body-part and activity categories.
@@ -31,7 +33,7 @@ class BodyPartIllustration extends StatelessWidget {
                   color: Color(0xFFD4162A),
                 )
               : Image.asset(
-                  'assets/category_muscles/$asset.png',
+                  '${FamilyPalette.of(context).assetPrefix}assets/category_muscles/$asset.png',
                   fit: BoxFit.contain,
                   filterQuality: FilterQuality.medium,
                 ),

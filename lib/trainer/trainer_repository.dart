@@ -1,3 +1,4 @@
+import 'tenant_repository.dart';
 import 'dart:math';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -6,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class TrainerRepository {
   TrainerRepository(this.client);
   final SupabaseClient client;
+  TrainerRepository forTenant(String tenantId) => TenantRepository(client, tenantId);
   String get userId => client.auth.currentUser!.id;
   Future<Map<String, dynamic>?> profile() => client
       .from('trainer_profiles')
@@ -21,11 +23,17 @@ class TrainerRepository {
       .eq('trainer_id', userId)
       .eq('status', 'active')
       .order('client_name');
-  Future<List<Map<String, dynamic>>> myLinks() => client
-      .from('trainer_client_links')
-      .select('*, trainer_profiles(display_name)')
-      .eq('client_id', userId)
-      .eq('status', 'active');
+  Future<List<Map<String, dynamic>>> myLinks() async =>
+      List<Map<String, dynamic>>.from(
+        await client.rpc('tenant_my_links') as List,
+      );
+  Future<List<Map<String, dynamic>>> tenants() =>
+      client.from('tenants').select().order('created_at');
+  Future<String> createTenant(String name, String kind) async =>
+      await client.rpc(
+        'tenant_create',
+        params: {'p_name': name.trim(), 'p_kind': kind},
+      ) as String;
   Future<String> createInvite() async =>
       await client.rpc('trainer_create_invite') as String;
   Future<String?> previewInvite(String token) async =>
@@ -119,6 +127,7 @@ class TrainerRepository {
       .select('performed_at,duration_seconds,gym_name,sets')
       .eq('user_id', userId)
       .eq('record_source', 'trainer')
+      .isFilter('canceled_at', null)
       .order('performed_at')
       .range(offset, offset + 99);
   static String requestId() {

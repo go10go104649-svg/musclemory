@@ -1,4 +1,6 @@
-# SETKEEP TRAINER 初期実装
+# SETKEEP TRAINER 初期実装（移行前の記録）
+
+**テナント対応の最新ローカル実装・移行手順は [setkeep_trainer_tenants.md](setkeep_trainer_tenants.md) を参照してください。本書の配色・個人紐付け・簡易UIは初期版の履歴です。**
 
 2026-09-25。SETKEEPと同一GitHubリポジトリ内の独立Flutterアプリです。
 

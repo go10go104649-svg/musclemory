@@ -1,3 +1,5 @@
+import 'design/family_theme.dart';
+
 import 'package:flutter/material.dart';
 import 'package:interactive_3d/interactive_3d.dart';
 
@@ -103,7 +105,8 @@ class _BenchPressFormViewState extends State<ExerciseFormView>
                     key: ValueKey(form.assetPath),
                     child: Interactive3d(
                       key: const Key('benchPressNativeScene'),
-                      modelPath: form.assetPath,
+                      modelPath:
+                          '${FamilyPalette.of(context).assetPrefix}${form.assetPath}',
                       formCamera: form.camera,
                       solidBackgroundColor: const [0.067, 0.094, 0.125, 1],
                       backgroundColor: const Color(0xFF111820),

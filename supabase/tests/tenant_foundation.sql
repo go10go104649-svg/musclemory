@@ -1,0 +1,122 @@
+-- Disposable database only; fixtures are rolled back. Run after both trainer migrations.
+begin;
+create function pg_temp.ok(v boolean,label text) returns void language plpgsql as $$begin if v is distinct from true then raise exception 'FAILED: %',label; end if; end$$;
+create function pg_temp.denied(q text) returns boolean language plpgsql as $$begin execute q;return false;exception when others then return true;end$$;
+insert into auth.users(id,email,email_confirmed_at) select ('10000000-0000-0000-0000-'||lpad(n::text,12,'0'))::uuid,'person'||n||'@test.invalid',now() from generate_series(1,9)n;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
+select public.tenant_create('Personal A') as a \gset
+select public.tenant_create('Gym B','gym') as b \gset
+select public.tenant_mutate(:'a','client','{"name":"Offline"}')->>'id' as c \gset
+select pg_temp.ok((select count(*)=2 from public.tenants),'multi tenant membership');
+select pg_temp.ok((select count(*)=1 from public.tenant_members(:'a')),'member directory scoped to tenant');
+select pg_temp.ok((public.tenant_billing_summary(:'a')->>'monthly_jpy')::int=3980,'base price');
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_mutate(%L,%L,%L)',:'b','comment',jsonb_build_object('client_id',:'c','body','cross'))),'cross tenant UUID denied');
+select public.tenant_mutate(:'a','menu',jsonb_build_object('client_id',:'c','name','Plan','items','[{"exercise_id":"bench_press","exercise_name":"Bench","record_type":"weightReps","set_values":[{"weight":20,"reps":10},{"weight":25,"reps":8}]}]'::jsonb))->>'id' as menu \gset
+select pg_temp.ok((select count(*)=2 from public.tenant_menu_sets),'per-set targets');
+select public.tenant_mutate(:'a','menu_status',jsonb_build_object('id',:'menu','client_id',:'c','version',1,'status','completed'));
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_mutate(%L,%L,%L)',:'a','menu',jsonb_build_object('id',:'menu','client_id',:'c','version',2,'name','overwritten'))),'completed menu cannot be edited');
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_mutate(%L,%L,%L)',:'a','menu_status',jsonb_build_object('id',:'menu','client_id',:'c','version',2,'status','planned'))),'completed menu cannot reopen to bypass edit guard');
+select public.tenant_mutate(:'a','menu_status',jsonb_build_object('id',:'menu','client_id',:'c','version',2,'status','canceled'));
+select public.tenant_mutate(:'a','menu_status',jsonb_build_object('id',:'menu','client_id',:'c','version',3,'status','planned'));
+select pg_temp.ok((select status='completed' from public.tenant_menus where id=:'menu'),'restore preserves completed state');
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_mutate(%L,%L,%L)',:'a','menu_status',jsonb_build_object('id',:'menu','client_id',:'c','status','canceled'))),'missing version cannot bypass optimistic lock');
+select public.tenant_mutate(:'a','comment',jsonb_build_object('client_id',:'c','menu_id',:'menu','body','Form cue'));
+select public.tenant_mutate(:'a','comment',jsonb_build_object('client_id',:'c','date','2026-09-25','body','Daily cue'));
+select public.tenant_record(:'a',:'c','20000000-0000-0000-0000-000000000001',now(),'[{"exerciseId":"bench_press","exerciseName":"Bench","recordType":"weightReps","weight":20,"reps":10,"completed":true}]') as record \gset
+select public.tenant_record(:'a',:'c','20000000-0000-0000-0000-000000000001',now(),'[{"exerciseId":"bench_press","exerciseName":"Bench","recordType":"weightReps","weight":20,"reps":10,"completed":true}]');
+select pg_temp.ok((select count(*)=1 from public.tenant_workouts(:'a',:'c')),'offline history + idempotency');
+select public.tenant_mutate(:'a','client_invite',jsonb_build_object('client_id',:'c'))->>'id' as client_invite \gset
+select public.tenant_mutate(:'a','staff_invite','{"email":"person2@test.invalid","admin":true,"trainer":false}')->>'id' as admin_invite \gset
+select public.tenant_mutate(:'a','staff_invite','{"email":"person3@test.invalid","admin":false,"trainer":true}')->>'id' as trainer_invite \gset
+select pg_temp.ok((public.tenant_billing_summary(:'a')->>'active_trainers')::int=1,'pending invitations do not count');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000009',true);
+select pg_temp.ok((select count(*)=0 from public.tenants),'outsider cannot enumerate tenants');
+select pg_temp.ok((select count(*)=0 from public.tenant_menus),'outsider cannot enumerate menus');
+select pg_temp.ok(pg_temp.denied(format('select * from public.tenant_workouts(%L,%L)',:'a',:'c')),'outsider workout denied');
+select pg_temp.ok(pg_temp.denied(format('select public.trainer_accept_invite(%L,%L)',:'admin_invite','intruder')),'staff email mismatch denied');
+select pg_temp.ok(public.trainer_preview_invite(:'client_invite')='Personal A','QR preview identifies tenant');
+select public.trainer_accept_invite(:'client_invite','Client',false,false);
+select pg_temp.ok(jsonb_array_length(public.tenant_my_links())=1,'client can see/revoke new link');
+select pg_temp.ok((select count(*)=1 from public.workouts),'offline history links to verified user without duplication');
+select pg_temp.ok(pg_temp.denied(format('delete from public.workouts where id=%L',:'record')),'completed history no hard delete');
+select pg_temp.ok(pg_temp.denied(format('select public.trainer_accept_invite(%L,%L)',:'client_invite','again')),'invite replay denied');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000002',true);
+select public.trainer_accept_invite(:'admin_invite','Admin');
+select pg_temp.ok((select count(*)=1 from public.tenant_clients),'admin sees client directory');
+select pg_temp.ok((select count(*)=0 from public.tenant_menus),'admin-only cannot read menus');
+select pg_temp.ok((select count(*)=0 from public.tenant_comments),'admin-only cannot read comments');
+select pg_temp.ok(pg_temp.denied(format('select * from public.tenant_workouts(%L,%L)',:'a',:'c')),'admin-only cannot read workouts');
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_billing_summary(%L)',:'a')),'admin-only cannot administer billing');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
+select public.tenant_mutate(:'a','member','{"user_id":"10000000-0000-0000-0000-000000000002","admin":true,"trainer":false,"status":"removed"}');
+select public.tenant_mutate(:'a','staff_invite','{"email":"person2@test.invalid","admin":false,"trainer":true}')->>'id' as reinvite \gset
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000002',true);
+select public.trainer_accept_invite(:'reinvite','Returning staff');
+select pg_temp.ok(not public.tenant_has_role(:'a','admin') and public.tenant_has_role(:'a','trainer'),'reinvitation must not resurrect removed admin privileges');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
+select public.tenant_mutate(:'a','member','{"user_id":"10000000-0000-0000-0000-000000000002","admin":true,"trainer":false,"status":"active"}');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000003',true);
+select public.trainer_accept_invite(:'trainer_invite','Trainer');
+select pg_temp.ok((select count(*)=0 from public.tenant_menus),'unassigned trainer denied');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
+select pg_temp.ok((public.tenant_billing_summary(:'a')->>'active_trainers')::int=2,'admin-only zero; owner trainer counts once');
+select public.tenant_mutate(:'a','assign',jsonb_build_object('client_id',:'c','user_id','10000000-0000-0000-0000-000000000003'));
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000003',true);
+select pg_temp.ok((select count(*)=1 from public.tenant_menus),'second assigned trainer sees shared menu');
+select pg_temp.ok((select count(*)=2 from public.tenant_comments),'assigned trainers share menu and daily comments');
+select pg_temp.ok((select count(*)=1 from public.tenant_workouts(:'a',:'c')),'consented workouts visible');
+select pg_temp.ok(pg_temp.denied(format('select * from public.tenant_workouts(%L,%L,0,true)',:'a',:'c')),'heatmap permission enforced server-side');
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_record(%L,%L,gen_random_uuid(),now(),%L)',:'a',:'c','[]')),'record permission denied');
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_mutate(%L,%L,%L)',:'a','menu',jsonb_build_object('id',:'menu','client_id',:'c','version',99))),'stale edits denied');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
+select public.tenant_mutate(:'a','client_invite',jsonb_build_object('client_id',:'c'))->>'id' as consent \gset
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000009',true);
+select public.trainer_accept_invite(:'consent','Client',true,true);
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000003',true);
+select pg_temp.ok((select count(*)=1 from public.tenant_workouts(:'a',:'c',0,true)),'heatmap consent granted');
+select public.tenant_cancel_record(:'a',:'c',:'record',true);
+select pg_temp.ok((select canceled_at is not null from public.tenant_workouts(:'a',:'c')),'soft cancel');
+select public.tenant_cancel_record(:'a',:'c',:'record',false);
+select pg_temp.ok((select canceled_at is null from public.tenant_workouts(:'a',:'c')),'restore record');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
+select public.tenant_mutate(:'a','unassign',jsonb_build_object('client_id',:'c','user_id','10000000-0000-0000-0000-000000000003'));
+select public.tenant_mutate(:'a','assign',jsonb_build_object('client_id',:'c','user_id','10000000-0000-0000-0000-000000000003'));
+select public.tenant_mutate(:'a','member','{"user_id":"10000000-0000-0000-0000-000000000003","admin":false,"trainer":true,"status":"removed"}');
+select pg_temp.ok((select count(*)=0 from public.tenant_assignments where user_id='10000000-0000-0000-0000-000000000003'),'membership removal clears assignments; reactivation cannot silently regain clients');
+select pg_temp.ok((public.tenant_billing_summary(:'a')->>'active_trainers')::int=1,'removed trainer not counted');
+select pg_temp.ok(pg_temp.denied(format('update public.tenant_subscriptions set status=%L where tenant_id=%L','active',:'a')),'client cannot grant subscription');
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_apply_billing(%L,%L,%L,%L,%L,true)',:'a','fake','active','cus_fake','sub_fake')),'billing RPC not client callable');
+reset role;
+select pg_temp.ok((select count(*)>=2 from public.tenant_audit where tenant_id=:'a' and action='workouts.update'),'record audit before/after retained');
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_apply_billing(%L,%L,%L,%L,%L,false)',:'a','no-card','trialing','cus_1','sub_1')),'trial requires card');
+select public.tenant_apply_billing(:'a','evt1','trialing','cus_1','sub_1',true);
+select pg_temp.ok((select trial_ends_at=trial_used_at+interval '14 days' from public.tenant_subscriptions where tenant_id=:'a'),'14 day card-backed trial');
+insert into public.tenant_memberships(tenant_id,user_id,is_trainer) select :'a',('10000000-0000-0000-0000-'||lpad(n::text,12,'0'))::uuid,true from generate_series(4,7)n;
+set local role authenticated;
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_mutate(%L,%L,%L)',:'a','member','{"user_id":"10000000-0000-0000-0000-000000000003","admin":false,"trainer":true,"status":"active"}')),'trial sixth trainer rejected');
+reset role;
+select public.tenant_apply_billing(:'a','evt2','active','cus_1','sub_1',true);
+set local role authenticated;
+select public.tenant_mutate(:'a','member','{"user_id":"10000000-0000-0000-0000-000000000003","admin":false,"trainer":true,"status":"active"}');
+select pg_temp.ok((public.tenant_billing_summary(:'a')->>'monthly_jpy')::int=4480,'six active trainers cost 4480');
+select pg_temp.ok((public.tenant_billing_summary(:'b')->>'active_trainers')::int=1,'same user counted independently in each tenant');
+reset role;
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_apply_billing(%L,%L,%L,%L,%L,true)',:'a','evt3','trialing','cus_1','sub_1')),'trial cannot be repeated');
+set local role authenticated;
+select public.tenant_mutate(:'a','owner','{"user_id":"10000000-0000-0000-0000-000000000002"}');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000002',true);
+select public.tenant_mutate(:'a','member','{"user_id":"10000000-0000-0000-0000-000000000002","admin":false,"trainer":false,"status":"active"}');
+select pg_temp.ok(public.tenant_has_role(:'a','owner') and not public.tenant_has_role(:'a','admin') and not public.tenant_has_role(:'a','trainer'),'billing owner is independent of admin/trainer');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
+select pg_temp.ok(pg_temp.denied(format('select public.tenant_billing_summary(%L)',:'a')),'former billing owner loses permission');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000009',true);
+select public.trainer_revoke_link(:'c');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
+select pg_temp.ok(pg_temp.denied(format('select * from public.tenant_workouts(%L,%L)',:'a',:'c')),'revocation stops sharing');
+select pg_temp.ok((select count(*)=0 from public.tenant_menus),'revocation closes coaching access');
+select pg_temp.ok(pg_temp.denied('select public.trainer_create_invite()'),'retired endpoint cannot bypass memberships');
+set local role anon;
+select pg_temp.ok(pg_temp.denied('select public.tenant_create(''anonymous'')'),'anonymous RPC denied');
+select pg_temp.ok(pg_temp.denied('select * from public.tenant_clients'),'anonymous table denied');
+rollback;

@@ -1,3 +1,5 @@
+import 'package:setkeep/trainer/tenant_repository.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:setkeep/trainer/trainer_repository.dart';
 
@@ -36,7 +38,11 @@ class _ClientPageState extends State<ClientPage> {
       error = null;
     });
     try {
-      final w = await widget.repository.workouts(clientId);
+      final w =
+          widget.link['linked_user_id'] != null &&
+              widget.link['share_workouts'] == false
+          ? <Map<String, dynamic>>[]
+          : await widget.repository.workouts(clientId);
       final n = await widget.repository.notes(clientId);
       final m = await widget.repository.menus(clientId: clientId);
       if (mounted) {
@@ -81,6 +87,23 @@ class _ClientPageState extends State<ClientPage> {
     if (mounted) setState(() => busy = false);
   }
 
+  Future<void> comment({String? menu, String? date}) async {
+    final body = await showDialog<String>(
+      context: context,
+      builder: (ctx) => TextPromptDialog(title: tr(ctx, 'コメント', 'Comment')),
+    );
+    if (!mounted || body == null || body.trim().isEmpty) return;
+    await act(() async {
+      await (widget.repository as TenantRepository).mutate('comment', {
+        'client_id': clientId,
+        'menu_id': menu,
+        'date': date,
+        'body': body.trim(),
+      });
+      await reload();
+    });
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -105,6 +128,53 @@ class _ClientPageState extends State<ClientPage> {
                   'Linked ${dateLabel(widget.link['created_at'])}\nBody weight: private',
                 ),
               ),
+              if (widget.repository is TenantRepository &&
+                  widget.link['linked_user_id'] == null)
+                OutlinedButton(
+                  onPressed: () => act(() async {
+                    final token = await (widget.repository as TenantRepository)
+                        .inviteClient(clientId);
+                    if (!context.mounted) return;
+                    await showDialog<void>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text(
+                          tr(
+                            ctx,
+                            '本人のSETKEEPと連携',
+                            'Link the client’s SETKEEP account',
+                          ),
+                        ),
+                        content: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              QrImageView(
+                                data:
+                                    'setkeep://trainer/invite?v=1&token=$token',
+                                size: 180,
+                              ),
+                              SelectableText(token),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: Text(tr(ctx, '閉じる', 'Close')),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  child: Text(
+                    tr(
+                      context,
+                      '本人アカウントへの連携コード',
+                      'Create account linking code',
+                    ),
+                  ),
+                ),
               const SizedBox(height: 16),
               Wrap(
                 spacing: 8,
@@ -123,7 +193,7 @@ class _ClientPageState extends State<ClientPage> {
                                 ),
                               ),
                             );
-                            if (mounted) await reload();
+                            if (context.mounted) await reload();
                           }
                         : null,
                     icon: const Icon(Icons.edit),
@@ -140,18 +210,25 @@ class _ClientPageState extends State<ClientPage> {
                           ),
                         ),
                       );
-                      if (mounted) await reload();
+                      if (context.mounted) await reload();
                     },
                     child: Text(tr(context, 'メニューを作成', 'Create menu')),
                   ),
                   OutlinedButton(
                     onPressed: widget.link['share_heatmap'] == true
-                        ? () => Navigator.push<void>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => HeatmapPage(workouts: workouts),
-                            ),
-                          )
+                        ? () => act(() async {
+                            final repo = widget.repository;
+                            final history = repo is TenantRepository
+                                ? await repo.heatmapHistory(clientId)
+                                : workouts;
+                            if (!context.mounted) return;
+                            await Navigator.push<void>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => HeatmapPage(workouts: history),
+                              ),
+                            );
+                          })
                         : null,
                     child: Text(tr(context, 'ヒートマップ', 'Heatmap')),
                   ),
@@ -166,7 +243,11 @@ class _ClientPageState extends State<ClientPage> {
               ),
               const SizedBox(height: 24),
               Text(
-                tr(context, '指導メモ（自分だけに表示）', 'Coaching notes (private)'),
+                tr(
+                  context,
+                  '指導メモ（担当者間で共有）',
+                  'Coaching notes (assigned trainers)',
+                ),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               TextField(
@@ -197,7 +278,9 @@ class _ClientPageState extends State<ClientPage> {
                 Card(
                   child: ListTile(
                     title: Text(n['body'] as String),
-                    subtitle: Text(dateLabel(n['created_at'])),
+                    subtitle: Text(
+                      '${dateLabel(n['created_at'])}${n['workout_date'] != null ? ' · ${n['workout_date']}' : ''}${n['menu_id'] != null ? ' · ${tr(context, 'メニュー', 'Menu')}' : ''}',
+                    ),
                   ),
                 ),
               const SizedBox(height: 24),
@@ -205,7 +288,63 @@ class _ClientPageState extends State<ClientPage> {
                 tr(context, 'トレーニングメニュー', 'Training menus'),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              for (final m in menus) MenuCard(menu: m),
+              for (final m in menus)
+                Column(
+                  children: [
+                    MenuCard(menu: m),
+                    if (widget.repository is TenantRepository)
+                      Wrap(
+                        children: [
+                          if (m['status'] == 'planned')
+                            TextButton(
+                              onPressed: () async {
+                                await Navigator.push<void>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MenuEditor(
+                                      repository: widget.repository,
+                                      clients: [widget.link],
+                                      existing: m,
+                                    ),
+                                  ),
+                                );
+                                if (context.mounted) await reload();
+                              },
+                              child: Text(tr(context, '編集', 'Edit')),
+                            ),
+                          for (final status in [
+                            'completed',
+                            'canceled',
+                            'planned',
+                          ])
+                            if ((m['status'] == 'planned' &&
+                                    status == 'completed') ||
+                                (m['status'] != 'canceled' &&
+                                    status == 'canceled') ||
+                                (m['status'] == 'canceled' &&
+                                    status == 'planned'))
+                              TextButton(
+                                onPressed: () => act(() async {
+                                  await (widget.repository as TenantRepository)
+                                      .menuStatus(m, status);
+                                  await reload();
+                                }),
+                                child: Text(
+                                  status == 'completed'
+                                      ? tr(context, '実施済み', 'Complete')
+                                      : status == 'canceled'
+                                      ? tr(context, '取消', 'Cancel')
+                                      : tr(context, '復元', 'Restore'),
+                                ),
+                              ),
+                          TextButton(
+                            onPressed: () => comment(menu: m['id'] as String),
+                            child: Text(tr(context, 'コメント', 'Comment')),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
               if (menus.isEmpty)
                 Text(tr(context, 'メニューはまだありません', 'No menus yet')),
               const SizedBox(height: 24),
@@ -221,7 +360,41 @@ class _ClientPageState extends State<ClientPage> {
                     'No shared records. Clients can share workouts from the SETKEEP linking page.',
                   ),
                 ),
-              for (final row in workouts) WorkoutCard(row: row),
+              for (final row in workouts)
+                Column(
+                  children: [
+                    WorkoutCard(row: row),
+                    if (widget.repository is TenantRepository)
+                      Wrap(
+                        children: [
+                          TextButton(
+                            onPressed: () =>
+                                comment(date: dateLabel(row['performed_at'])),
+                            child: Text(
+                              tr(context, 'この日のコメント', 'Comment on this day'),
+                            ),
+                          ),
+                          if (row['record_source'] == 'trainer')
+                            TextButton(
+                              onPressed: () => act(() async {
+                                await (widget.repository as TenantRepository)
+                                    .cancelRecord(
+                                      clientId,
+                                      row['id'] as String,
+                                      row['canceled_at'] == null,
+                                    );
+                                await reload();
+                              }),
+                              child: Text(
+                                row['canceled_at'] == null
+                                    ? tr(context, '記録を取消', 'Cancel record')
+                                    : tr(context, '記録を復元', 'Restore record'),
+                              ),
+                            ),
+                        ],
+                      ),
+                  ],
+                ),
               if (more)
                 TextButton(
                   onPressed: busy
@@ -231,7 +404,7 @@ class _ClientPageState extends State<ClientPage> {
                             clientId,
                             offset: workouts.length,
                           );
-                          if (mounted) {
+                          if (context.mounted) {
                             setState(() {
                               workouts.addAll(next);
                               more = next.length == 100;

@@ -1,3 +1,6 @@
+import 'package:setkeep/design/family_theme.dart';
+
+import 'tenant_gate.dart';
 import 'trainer_widgets.dart';
 import 'client_page.dart';
 import 'menu_editor.dart';
@@ -45,14 +48,7 @@ class TrainerApp extends StatelessWidget {
     debugShowCheckedModeBanner: false,
     supportedLocales: const [Locale('ja'), Locale('en')],
     localizationsDelegates: GlobalMaterialLocalizations.delegates,
-    theme: ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00D084)),
-      scaffoldBackgroundColor: const Color(0xFFF5F7F6),
-      navigationBarTheme: const NavigationBarThemeData(
-        indicatorColor: Color(0xFF00D084),
-      ),
-    ),
+    theme: familyTheme(FamilyPalette.trainer),
     home: auth == null || repository == null
         ? const SetupPage()
         : AuthGate(auth: auth!, repository: repository!),
@@ -105,7 +101,7 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) => widget.auth.isSignedIn
-      ? TrainerShell(
+      ? TenantGate(
           key: ValueKey(widget.repository.userId),
           auth: widget.auth,
           repository: widget.repository,
@@ -160,10 +156,10 @@ class _LoginPageState extends State<LoginPage> {
           shrinkWrap: true,
           padding: const EdgeInsets.all(24),
           children: [
-            const Icon(
+            Icon(
               Icons.fitness_center,
               size: 64,
-              color: Color(0xFF00D084),
+              color: FamilyPalette.trainer.accent,
             ),
             const SizedBox(height: 24),
             Text(
@@ -263,7 +259,9 @@ class _TrainerShellState extends State<TrainerShell> {
     super.dispose();
   }
 
+  int loadGeneration = 0;
   Future<void> reload() async {
+    final generation = ++loadGeneration;
     setState(() {
       loading = true;
       error = null;
@@ -276,7 +274,7 @@ class _TrainerShellState extends State<TrainerShell> {
       final m = p == null
           ? <Map<String, dynamic>>[]
           : await widget.repository.menus();
-      if (mounted) {
+      if (mounted && generation == loadGeneration) {
         setState(() {
           profile = p;
           clients = c;
@@ -292,7 +290,9 @@ class _TrainerShellState extends State<TrainerShell> {
         );
       }
     }
-    if (mounted) setState(() => loading = false);
+    if (mounted && generation == loadGeneration) {
+      setState(() => loading = false);
+    }
   }
 
   Future<void> action(Future<void> Function() work) async {
@@ -498,18 +498,29 @@ class _TrainerShellState extends State<TrainerShell> {
                       child: ListTile(
                         leading: const CircleAvatar(child: Icon(Icons.person)),
                         title: Text(c['client_name'] as String),
-                        subtitle: LatestWorkout(
-                          repository: widget.repository,
-                          clientId: c['client_id'] as String,
-                        ),
+                        subtitle: c['can_coach'] == false
+                            ? Text(
+                                tr(
+                                  context,
+                                  '担当者の割当はテナント管理から変更できます',
+                                  'Manage assignments in tenant settings',
+                                ),
+                              )
+                            : LatestWorkout(
+                                repository: widget.repository,
+                                clientId: c['client_id'] as String,
+                              ),
                         trailing: const Icon(Icons.chevron_right),
-                        onTap: () => openClient(c),
+                        onTap: c['can_coach'] == false
+                            ? null
+                            : () => openClient(c),
                       ),
                     ),
                 ],
                 if (tab == 2) ...[
                   FilledButton.icon(
-                    onPressed: clients.isEmpty
+                    onPressed:
+                        clients.where((c) => c['can_coach'] != false).isEmpty
                         ? null
                         : () async {
                             await Navigator.push<void>(
@@ -517,7 +528,9 @@ class _TrainerShellState extends State<TrainerShell> {
                               MaterialPageRoute(
                                 builder: (_) => MenuEditor(
                                   repository: widget.repository,
-                                  clients: clients,
+                                  clients: clients
+                                      .where((c) => c['can_coach'] != false)
+                                      .toList(),
                                 ),
                               ),
                             );
@@ -556,8 +569,8 @@ class _TrainerShellState extends State<TrainerShell> {
                   Text(
                     tr(
                       context,
-                      'SETKEEPと共通のアカウントです。\n顧客の体重は公開されません。指導メモはあなた専用です。',
-                      'Your account is shared with SETKEEP.\nClient body weight is private. Coaching notes are only visible to you.',
+                      'SETKEEPと共通のアカウントです。\n顧客の体重は公開されません。指導メモは同じ担当者と共有します。',
+                      'Your account is shared with SETKEEP.\nClient body weight is private. Coaching notes are shared with assigned trainers.',
                     ),
                   ),
                   const SizedBox(height: 20),

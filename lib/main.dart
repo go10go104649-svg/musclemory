@@ -1,3 +1,4 @@
+import 'design/family_theme.dart';
 import 'admin/report_management_page.dart';
 import 'gym/place_equipment_pages.dart';
 import 'gym/custom_gym_preference.dart';
@@ -399,22 +400,7 @@ class SetkeepApp extends StatelessWidget {
       locale: const Locale('ja', 'JP'),
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [Locale('ja', 'JP')],
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primaryGreen,
-          primary: AppColors.ink,
-          secondary: AppColors.primaryGreen,
-          surface: AppColors.background,
-        ),
-        scaffoldBackgroundColor: AppColors.background,
-        fontFamily: '.SF Pro Display',
-        cardTheme: const CardThemeData(
-          elevation: 0,
-          margin: EdgeInsets.zero,
-          color: Colors.white,
-        ),
-      ),
+      theme: familyTheme(),
       home: const _OnboardingGate(),
     );
   }
@@ -1168,9 +1154,13 @@ class _HomeShellState extends State<HomeShell> {
         onSyncRequested: _syncHistory,
         onTrainerHistoryReceived: (rows) async {
           final existingDates = _history.map((w) => w.date.toUtc()).toSet();
-          await _importWorkouts(rows.map(WorkoutRecord.tryFromJson)
-              .whereType<WorkoutRecord>()
-              .where((w) => !existingDates.contains(w.date.toUtc())).toList());
+          await _importWorkouts(
+            rows
+                .map(WorkoutRecord.tryFromJson)
+                .whereType<WorkoutRecord>()
+                .where((w) => !existingDates.contains(w.date.toUtc()))
+                .toList(),
+          );
         },
         workoutTemplates: _workoutTemplates,
         bodyWeights: _bodyWeights,
@@ -1599,7 +1589,7 @@ class _SavedMenuManagementPageState extends State<SavedMenuManagementPage> {
       showDragHandle: false,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => _ExercisePickerViewport(
+      builder: (context) => ExercisePickerViewport(
         child: ExercisePickerSheet(existingNames: const {}, menus: const []),
       ),
     );
@@ -2742,7 +2732,7 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
         style: SegmentedButton.styleFrom(
           foregroundColor: Colors.white70,
           selectedForegroundColor: const Color(0xFF101820),
-          selectedBackgroundColor: AppColors.primaryGreen,
+          selectedBackgroundColor: FamilyPalette.of(context).accent,
           visualDensity: VisualDensity.compact,
         ),
         segments: [
@@ -2764,7 +2754,8 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
               child: Interactive3d(
                 key: const ValueKey('body-tab-continuous'),
                 controller: _controller,
-                modelPath: 'assets/models/body_tab.glb',
+                modelPath:
+                    '${FamilyPalette.of(context).assetPrefix}assets/models/body_tab.glb',
                 formAnimation: true,
                 animationPlaying: false,
                 bodyViewAngle: _angle.index,
@@ -5803,7 +5794,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       showDragHandle: false,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => _ExercisePickerViewport(
+      builder: (context) => ExercisePickerViewport(
         child: ExercisePickerSheet(
           existingIdentities: existingIdentities,
           gymStoreId: _gymStore?.id,
@@ -7570,8 +7561,8 @@ String exerciseSortKey(String name) => String.fromCharCodes(
 
 /// The keyboard inset is applied once, before sizing the picker. Use all
 /// remaining height while typing rather than shrinking it by another 18%.
-class _ExercisePickerViewport extends StatelessWidget {
-  const _ExercisePickerViewport({required this.child});
+class ExercisePickerViewport extends StatelessWidget {
+  const ExercisePickerViewport({super.key, required this.child});
   final Widget child;
 
   @override
@@ -8068,7 +8059,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                           ),
                           horizontalTitleGap: 8,
                           selected: added || _selected.containsKey(e.identity),
-                          selectedTileColor: AppColors.primaryGreenSoft,
+                          selectedTileColor: FamilyPalette.of(context).soft,
                           selectedColor: const Color(0xFF101820),
                           leading: IconButton(
                             key: ValueKey('favoriteExercise${e.identity}'),
@@ -8280,7 +8271,7 @@ class _Exercise3dBadge extends StatelessWidget {
       child: SizedBox.square(
         dimension: 30,
         child: CustomPaint(
-          painter: const _Exercise3dBadgePainter(),
+          painter: _Exercise3dBadgePainter(FamilyPalette.of(context).soft),
           child: Align(
             alignment: const Alignment(-0.3, 0.3),
             child: Text(
@@ -8300,7 +8291,8 @@ class _Exercise3dBadge extends StatelessWidget {
 }
 
 class _Exercise3dBadgePainter extends CustomPainter {
-  const _Exercise3dBadgePainter();
+  const _Exercise3dBadgePainter(this.color);
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -8312,7 +8304,7 @@ class _Exercise3dBadgePainter extends CustomPainter {
       ..lineTo(33, 4)
       ..lineTo(26, 11)
       ..close();
-    canvas.drawPath(top, Paint()..color = AppColors.primaryGreenSoft);
+    canvas.drawPath(top, Paint()..color = color);
     final outline = Path()
       ..moveTo(3, 11)
       ..lineTo(10, 4)
@@ -8338,7 +8330,8 @@ class _Exercise3dBadgePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _Exercise3dBadgePainter oldDelegate) => false;
+  bool shouldRepaint(covariant _Exercise3dBadgePainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class ExerciseMuscleDetailPage extends StatelessWidget {
@@ -8902,12 +8895,14 @@ class ExerciseInputCard extends StatelessWidget {
     required this.onSetAllCompleted,
     required this.onValuesChanged,
     this.onRecordTypeChanged,
+    this.showCompletionCheck,
     this.numericNodes,
     this.nextNumeric,
   });
 
   final List<FocusNode> Function(WorkoutSet)? numericNodes;
   final VoidCallback? Function(FocusNode)? nextNumeric;
+  final bool? showCompletionCheck;
   final int exerciseIndex;
   final WorkoutExercise exercise;
   final List<WorkoutRecord> history;
@@ -8947,7 +8942,7 @@ class ExerciseInputCard extends StatelessWidget {
             key: Key('exerciseInputHeader$exerciseIndex'),
             padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
             decoration: BoxDecoration(
-              color: AppColors.primaryGreen,
+              color: FamilyPalette.of(context).accent,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -9024,7 +9019,7 @@ class ExerciseInputCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primaryGreenVerySoft,
+              color: FamilyPalette.of(context).subtle,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -9052,7 +9047,8 @@ class ExerciseInputCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          if (WorkoutUiPreference.completionCheckEnabled &&
+          if ((showCompletionCheck ??
+                  WorkoutUiPreference.completionCheckEnabled) &&
               exercise.recordType.usesSets)
             Row(
               children: [
@@ -9111,7 +9107,9 @@ class ExerciseInputCard extends StatelessWidget {
             ),
           SetHeader(
             recordType: exercise.recordType,
-            showCompletionCheck: WorkoutUiPreference.completionCheckEnabled,
+            showCompletionCheck:
+                (showCompletionCheck ??
+                WorkoutUiPreference.completionCheckEnabled),
           ),
           const SizedBox(height: 8),
           ...List.generate(exercise.sets.length, (setIndex) {
@@ -9131,7 +9129,8 @@ class ExerciseInputCard extends StatelessWidget {
               exerciseId: exercise.exerciseId,
               distanceUnit: exercise.distanceUnit,
               showCompletionCheck:
-                  WorkoutUiPreference.completionCheckEnabled &&
+                  (showCompletionCheck ??
+                      WorkoutUiPreference.completionCheckEnabled) &&
                   exercise.recordType.usesSets,
               onWeightChanged: (value) {
                 set.weight = value;
@@ -9791,7 +9790,7 @@ class SetRow extends StatelessWidget {
                 onPressed: onToggle,
                 style: IconButton.styleFrom(
                   backgroundColor: set.completed
-                      ? AppColors.primaryGreen
+                      ? FamilyPalette.of(context).accent
                       : const Color(0xFFE8EBE5),
                   foregroundColor: const Color(0xFF101820),
                 ),
@@ -10921,7 +10920,8 @@ class ProfilePage extends StatelessWidget {
     required this.onSelectedGymChanged,
   });
 
-  final Future<void> Function(List<Map<String, dynamic>>)? onTrainerHistoryReceived;
+  final Future<void> Function(List<Map<String, dynamic>>)?
+  onTrainerHistoryReceived;
   final String? selectedGym;
   final List<WorkoutRecord> history;
   final Future<int> Function() onSyncRequested;
@@ -11002,10 +11002,12 @@ class ProfilePage extends StatelessWidget {
               subtitle: const Text('招待の承認・記録の共有・代理記録の受信'),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => Navigator.of(context).push<void>(
-                MaterialPageRoute(builder: (_) => TrainerSharingPage(
-                  history: history.map((w) => w.toJson()).toList(),
-                  onReceived: onTrainerHistoryReceived ?? (_) async {},
-                )),
+                MaterialPageRoute(
+                  builder: (_) => TrainerSharingPage(
+                    history: history.map((w) => w.toJson()).toList(),
+                    onReceived: onTrainerHistoryReceived ?? (_) async {},
+                  ),
+                ),
               ),
             ),
           ),
