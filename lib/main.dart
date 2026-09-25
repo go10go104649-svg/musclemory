@@ -403,10 +403,8 @@ class SetkeepApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primaryGreen,
-          primary: AppColors.primaryGreen,
-          onPrimary: AppColors.ink,
+          primary: AppColors.ink,
           secondary: AppColors.primaryGreen,
-          onSecondary: AppColors.ink,
           surface: AppColors.background,
         ),
         scaffoldBackgroundColor: AppColors.background,
@@ -2400,7 +2398,7 @@ class ExerciseLine extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.primaryGreenSoft,
+            color: const Color(0xFFC7F36B).withValues(alpha: 0.35),
             borderRadius: BorderRadius.circular(11),
           ),
           child: const Icon(Icons.fitness_center_rounded, size: 18),
@@ -3413,7 +3411,8 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
                             color: selected
                                 ? const Color(0xFF101820)
                                 : hasWorkout
-                                ? AppColors.primaryGreenSoft
+                                ? const Color(0xFFC7F36B)
+                                      .withValues(alpha: 0.42)
                                 : null,
                             borderRadius: BorderRadius.circular(10),
                           ),

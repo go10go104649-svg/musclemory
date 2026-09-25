@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:setkeep/design/app_colors.dart';
+import 'package:setkeep/main.dart';
 
 (int, int) pngSize(String path) {
   final bytes = File(path).readAsBytesSync();
@@ -12,6 +13,42 @@ import 'package:setkeep/design/app_colors.dart';
 }
 
 void main() {
+  testWidgets('app theme matches the pre-brand-color theme from 1de3c7d', (
+    tester,
+  ) async {
+    late MaterialApp app;
+    await tester.pumpWidget(
+      Builder(
+        builder: (context) {
+          app = const SetkeepApp().build(context) as MaterialApp;
+          return const SizedBox();
+        },
+      ),
+    );
+    // Historical theme: preserve generated foregrounds and disabled states too.
+    expect(
+      app.theme,
+      ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFC7F36B),
+          primary: const Color(0xFF101820),
+          secondary: const Color(0xFFC7F36B),
+          surface: const Color(0xFFF4F5F0),
+        ),
+        scaffoldBackgroundColor: const Color(0xFFF4F5F0),
+        fontFamily: '.SF Pro Display',
+        cardTheme: const CardThemeData(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          color: Colors.white,
+        ),
+      ),
+    );
+    expect(app.themeMode, ThemeMode.system);
+    expect(app.darkTheme, isNull);
+  });
+
   test('SETKEEP green palette uses the approved brand color', () {
     expect(AppColors.primaryGreen, const Color(0xFFC7F36B));
     expect(AppColors.primaryGreenStrong, const Color(0xFF83AD30));
