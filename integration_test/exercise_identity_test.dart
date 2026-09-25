@@ -16,7 +16,7 @@ void main() {
       screenshot: (name) async {
         await t.pumpAndSettle();
         if (Platform.isAndroid) {
-          final bytes = await const MethodChannel('com.musclememory/rest_timer')
+          final bytes = await const MethodChannel('com.setkeep.app/rest_timer')
               .invokeMethod<Uint8List>('debugScreenshot');
           binding.reportData ??= <String, dynamic>{};
           final shots = binding.reportData!.putIfAbsent(

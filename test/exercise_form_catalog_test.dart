@@ -5,8 +5,8 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:interactive_3d/src/form_asset_bundle.dart';
-import 'package:muscle_memory/exercise_form_catalog.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/exercise_form_catalog.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FileFormBundle extends CachingAssetBundle {

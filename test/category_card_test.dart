@@ -2,8 +2,8 @@ import 'support/bulk_exercise_flow.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/body_part_illustration.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/body_part_illustration.dart';
+import 'package:setkeep/main.dart';
 
 void main() {
   testWidgets(

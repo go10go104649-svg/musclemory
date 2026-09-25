@@ -1,6 +1,6 @@
 // Simulator-only fixture. No preferences, storage or network access.
 import 'package:flutter/material.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 
 void main() {
   final now = DateTime.now();

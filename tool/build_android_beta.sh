@@ -2,10 +2,11 @@
 # Local beta build only. Never uploads or installs on a user device.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-: "${MUSCLEMORY_SIGNING_PROPERTIES:?Set the path to private signing.properties}"
-[[ -r "$MUSCLEMORY_SIGNING_PROPERTIES" ]] || { echo 'Private signing file not readable.' >&2; exit 2; }
+export SETKEEP_SIGNING_PROPERTIES=${SETKEEP_SIGNING_PROPERTIES:-${MUSCLEMORY_SIGNING_PROPERTIES:-}}
+: "${SETKEEP_SIGNING_PROPERTIES:?Set the path to private signing.properties}"
+[[ -r "$SETKEEP_SIGNING_PROPERTIES" ]] || { echo 'Private signing file not readable.' >&2; exit 2; }
 qa_flutter=${FLUTTER_BIN:-flutter}
-qa_config=${MUSCLEMORY_SUPABASE_CONFIG:-supabase.json}
+qa_config=${SETKEEP_SUPABASE_CONFIG:-${MUSCLEMORY_SUPABASE_CONFIG:-supabase.json}}
 [[ -r "$qa_config" ]] || { echo 'Supabase build configuration is required.' >&2; exit 2; }
 python3 - "$qa_config" <<'CHECK_CONFIG'
 import json, sys

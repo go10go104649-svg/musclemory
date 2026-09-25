@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/services/account_auth_service.dart';
+import 'package:setkeep/services/account_auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class _Storage extends LocalStorage {

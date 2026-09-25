@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Scope scrolling to the picker list, excluding its text field's Scrollable.
@@ -58,7 +58,7 @@ Future<void> verifyBulkExerciseFlow(
     'legal_consent': acceptedLegalConsentJson,
     'workout_templates': jsonEncode([menu.toJson()]),
   });
-  await tester.pumpWidget(const MuscleMemoryApp());
+  await tester.pumpWidget(const SetkeepApp());
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('startWorkoutButton')));
   await tester.pumpAndSettle();

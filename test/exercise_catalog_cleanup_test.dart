@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/exercise_form_catalog.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/exercise_form_catalog.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 RecordedSet oldSet(String? id, String name, {double weight = 30}) =>
@@ -137,8 +137,8 @@ void main() {
           ], DateTime(2026, 9, 2)),
           0,
         );
-        final backup = MuscleMemoryBackup(workouts: [restored]);
-        final copy = MuscleMemoryBackup.fromJson(
+        final backup = SetkeepBackup(workouts: [restored]);
+        final copy = SetkeepBackup.fromJson(
           jsonDecode(jsonEncode(backup.toJson())),
         );
         expect(copy.workouts.single.toJson(), json);

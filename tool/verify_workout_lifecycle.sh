@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 qa_platform=${1:?Specify ios or android}
 qa_device=${2:?Specify a simulator/emulator device ID}
 qa_flutter=${FLUTTER_BIN:-flutter}
-qa_target=${MUSCLEMORY_QA_TARGET:-integration_test/workout_lifecycle_test.dart}
+qa_target=${SETKEEP_QA_TARGET:-${MUSCLEMORY_QA_TARGET:-integration_test/workout_lifecycle_test.dart}}
 qa_driver=test_driver/workout_lifecycle_driver.dart
 qa_candidates=${FORM_QA_REVIEW_CANDIDATES-}
 if [[ -n "$qa_candidates" ]]; then
@@ -17,11 +17,11 @@ fi
 case "$qa_platform" in
   ios)
     qa_name=$(xcrun simctl list devices -j | python3 -c 'import json,sys; print(next((d["name"] for group in json.load(sys.stdin)["devices"].values() for d in group if d["udid"] == sys.argv[1]), ""))' "$qa_device")
-    [[ "$qa_name" == MUSCLEMORY\ QA* ]] || { echo 'Use a dedicated MUSCLEMORY QA simulator, never a user simulator.' >&2; exit 2; }
+    [[ "$qa_name" == SETKEEP\ QA* || "$qa_name" == MUSCLEMORY\ QA* ]] || { echo 'Use a dedicated SETKEEP QA simulator, never a user simulator.' >&2; exit 2; }
     ;;
   android)
     qa_name=$("${ANDROID_HOME:?Set ANDROID_HOME}/platform-tools/adb" -s "$qa_device" emu avd name | head -1 | tr -d '\r')
-    [[ "$qa_name" == musclemory_qa || "$qa_name" == MUSCLEMORY_Batch_QA ]] || { echo 'Use the dedicated musclemory_qa or MUSCLEMORY_Batch_QA emulator.' >&2; exit 2; }
+    [[ "$qa_name" == setkeep_qa || "$qa_name" == SETKEEP_Batch_QA || "$qa_name" == musclemory_qa || "$qa_name" == MUSCLEMORY_Batch_QA ]] || { echo 'Use a dedicated SETKEEP QA emulator (legacy QA devices also accepted).' >&2; exit 2; }
     ;;
   *) echo 'Platform must be ios or android' >&2; exit 2 ;;
 esac

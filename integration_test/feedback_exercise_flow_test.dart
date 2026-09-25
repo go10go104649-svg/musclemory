@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'exercise_form_expansion_test.dart' as captures;
@@ -17,7 +17,7 @@ void main() {
     });
     await RestTimerPreference.load();
     await WorkoutUiPreference.load();
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
     await tester.pumpAndSettle();

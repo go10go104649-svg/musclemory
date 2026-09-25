@@ -1,4 +1,4 @@
-package com.musclememory.muscle_memory
+package com.setkeep.app
 
 import android.app.*
 import android.content.Context
@@ -16,8 +16,8 @@ import org.json.JSONObject
 object RestTimerState {
     const val ONGOING = 7340
     const val CHANNEL = "rest_timer_running"
-    const val STOP = "musclemory.rest.STOP"
-    const val EXTEND = "musclemory.rest.EXTEND"
+    const val STOP = "setkeep.rest.STOP"
+    const val EXTEND = "setkeep.rest.EXTEND"
     var onChanged: (() -> Unit)? = null
     private fun prefs(c: Context) = c.getSharedPreferences("rest_timer", Context.MODE_PRIVATE)
     private fun manager(c: Context) = c.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -143,7 +143,7 @@ object RestTimerState {
 
     private fun completeIntent(c: Context, id: String, target: JSONObject) = PendingIntent.getBroadcast(c, 7345,
         Intent(c, RestTimerReceiver::class.java).setAction(WorkoutNotificationState.COMPLETE)
-            .setData(android.net.Uri.parse("musclemory://rest-action/$id"))
+            .setData(android.net.Uri.parse("setkeep://rest-action/$id"))
             .putExtra("timerId", id).putExtra("targetSetId", target.getString("targetSetId")),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
@@ -198,7 +198,7 @@ object RestTimerState {
         }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         fun actionIntent(action: String, code: Int) = PendingIntent.getBroadcast(c, code,
             Intent(c, RestTimerReceiver::class.java).setAction(action)
-                .setData(android.net.Uri.parse("musclemory://rest-action/${p.getString("timerId", "")}/$action"))
+                .setData(android.net.Uri.parse("setkeep://rest-action/${p.getString("timerId", "")}/$action"))
                 .putExtra("timerId", p.getString("timerId", "")),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle("休憩タイマー")

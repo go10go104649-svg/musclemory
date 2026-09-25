@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:muscle_memory/config/supabase_config.dart';
-import 'package:muscle_memory/services/account_auth_service.dart';
+import 'package:setkeep/config/supabase_config.dart';
+import 'package:setkeep/services/account_auth_service.dart';
 
 import 'support/legal_consent_fixture.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/body_weight.dart';
-import 'package:muscle_memory/main.dart';
-import 'package:muscle_memory/services/supabase_sync_service.dart';
+import 'package:setkeep/body_weight.dart';
+import 'package:setkeep/main.dart';
+import 'package:setkeep/services/supabase_sync_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeAccountAuth implements AccountAuthService {
@@ -290,7 +290,7 @@ void main() {
         'legal_consent': acceptedLegalConsentJson,
       });
       expect(SupabaseConfig.initialized, isFalse);
-      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpWidget(const SetkeepApp());
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.person_outline_rounded));
       await tester.pumpAndSettle();
@@ -712,7 +712,7 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({'onboarding_completed': true, 'legal_consent': acceptedLegalConsentJson});
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     expect(find.byType(WeeklySummary), findsNothing);
     expect(find.byType(LastWorkoutCard), findsNothing);

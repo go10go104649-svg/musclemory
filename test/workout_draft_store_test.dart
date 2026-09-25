@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/services/workout_draft_store.dart';
+import 'package:setkeep/services/workout_draft_store.dart';
 
 void main() {
   test(

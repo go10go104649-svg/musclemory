@@ -8,13 +8,13 @@ struct RestTimerWidgetBundle: WidgetBundle {
 }
 
 struct RestTimerWidget: Widget {
-  private let lime = Color(red: 0.78, green: 0.95, blue: 0.42)
+  private let brandGreen = Color(red: 0.78, green: 0.95, blue: 0.42)
   var body: some WidgetConfiguration {
     ActivityConfiguration(for: RestTimerAttributes.self) { context in
       HStack(spacing: 16) {
-        Image(systemName: "timer").font(.title).foregroundStyle(lime)
+        Image(systemName: "timer").font(.title).foregroundStyle(brandGreen)
         VStack(alignment: .leading, spacing: 4) {
-          Text("MUSCLEMORY").font(.caption.bold())
+          Text("SETKEEP").font(.caption.bold())
           Text(context.isStale ? "休憩終了" : "休憩タイマー").font(.headline)
           if !context.state.exerciseName.isEmpty {
             Text(context.state.exerciseName).font(.caption).lineLimit(1)
@@ -27,30 +27,30 @@ struct RestTimerWidget: Widget {
       .activityBackgroundTint(Color(red: 0.06, green: 0.09, blue: 0.12))
       .activitySystemActionForegroundColor(.white)
       .foregroundStyle(.white)
-      .widgetURL(URL(string: "musclemory://rest-timer/"))
+      .widgetURL(URL(string: "setkeep://rest-timer/"))
     } dynamicIsland: { context in
       DynamicIsland {
         DynamicIslandExpandedRegion(.leading) {
-          Image(systemName: "timer").foregroundStyle(lime)
+          Image(systemName: "timer").foregroundStyle(brandGreen)
         }
         DynamicIslandExpandedRegion(.trailing) {
           countdown(context).monospacedDigit().frame(width: 75)
         }
         DynamicIslandExpandedRegion(.bottom) {
           VStack(spacing: 3) {
-            Text("MUSCLEMORY · \(context.isStale ? "休憩終了" : "休憩タイマー")").font(.headline)
+            Text("SETKEEP · \(context.isStale ? "休憩終了" : "休憩タイマー")").font(.headline)
             Text(context.state.exerciseName).font(.caption).lineLimit(1)
           }
         }
       } compactLeading: {
-        Image(systemName: "timer").foregroundStyle(lime)
+        Image(systemName: "timer").foregroundStyle(brandGreen)
       } compactTrailing: {
         countdown(context).frame(width: 54)
       } minimal: {
-        Image(systemName: "timer").foregroundStyle(lime)
+        Image(systemName: "timer").foregroundStyle(brandGreen)
       }
-      .widgetURL(URL(string: "musclemory://rest-timer/"))
-      .keylineTint(lime)
+      .widgetURL(URL(string: "setkeep://rest-timer/"))
+      .keylineTint(brandGreen)
     }
   }
 

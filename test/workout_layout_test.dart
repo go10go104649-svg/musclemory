@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/design/app_colors.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 WorkoutRecord layoutFixture({int exercises = 2, int sets = 3}) => WorkoutRecord(
@@ -34,9 +35,9 @@ Widget layoutApp({WorkoutRecord? record, ThemeData? theme}) => MaterialApp(
       ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFC7F36B),
+          seedColor: AppColors.primaryGreen,
           primary: const Color(0xFF101820),
-          secondary: const Color(0xFFC7F36B),
+          secondary: AppColors.primaryGreen,
           surface: const Color(0xFFF4F5F0),
         ),
         scaffoldBackgroundColor: const Color(0xFFF4F5F0),

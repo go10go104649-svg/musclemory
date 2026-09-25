@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 
 // Dedicated QA device only. The native photo picker and photo save are
 // operated manually; fixtures are never written into workout history.
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   testWidgets('native photo picker preview and image save', (tester) async {
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     final context = tester.element(find.byType(HomeShell));
     Navigator.of(context).push(

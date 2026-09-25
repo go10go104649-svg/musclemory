@@ -21,8 +21,8 @@ class BuildConfigTests(unittest.TestCase):
             flutter = root / 'flutter'
             flutter.write_text('#!/bin/sh\nprintf "%s\\n" "$*" >> "$BUILD_TEST_LOG"\n')
             flutter.chmod(0o700)
-            env = dict(os.environ, MUSCLEMORY_SIGNING_PROPERTIES=str(signing),
-                MUSCLEMORY_SUPABASE_CONFIG=str(config_path), FLUTTER_BIN=str(flutter),
+            env = dict(os.environ, SETKEEP_SIGNING_PROPERTIES=str(signing),
+                SETKEEP_SUPABASE_CONFIG=str(config_path), FLUTTER_BIN=str(flutter),
                 BUILD_TEST_LOG=str(log), BUILD_PLAY_BUNDLE='1')
             result = subprocess.run(['bash', str(SCRIPT)], env=env, capture_output=True)
             return result.returncode, log.read_text() if log.exists() else '', str(config_path)

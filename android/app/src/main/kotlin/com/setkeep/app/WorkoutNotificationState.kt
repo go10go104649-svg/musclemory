@@ -1,4 +1,4 @@
-package com.musclememory.muscle_memory
+package com.setkeep.app
 
 import android.content.Context
 import android.content.Intent
@@ -8,7 +8,7 @@ import org.json.JSONObject
  * Receiver commits before returning; no Flutter engine or Activity is required.
  */
 object WorkoutNotificationState {
-    const val COMPLETE = "musclemory.rest.COMPLETE_SET"
+    const val COMPLETE = "setkeep.rest.COMPLETE_SET"
     private const val DRAFT = "flutter.active_workout_draft"
     private const val ACTION = "musclemory.lock_action"
     private const val LAST_ACTION_AT = "musclemory.last_set_action_at"

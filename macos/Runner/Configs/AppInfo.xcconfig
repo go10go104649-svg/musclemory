@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = MUSCLEMORY
+PRODUCT_NAME = SETKEEP
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory
+PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.musclememory. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.setkeep.app. All rights reserved.

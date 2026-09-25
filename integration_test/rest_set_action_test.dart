@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
-import 'package:muscle_memory/services/android_workout_draft.dart';
+import 'package:setkeep/main.dart';
+import 'package:setkeep/services/android_workout_draft.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  const channel = MethodChannel('com.musclememory/rest_timer');
+  const channel = MethodChannel('com.setkeep.app/rest_timer');
   Map<String, dynamic> fixture() => {
     'sessionId': 'qa-workout',
     'lockRevision': 0,

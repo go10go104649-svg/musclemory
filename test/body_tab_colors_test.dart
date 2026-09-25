@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/body_tab_colors.dart';
-import 'package:muscle_memory/muscle_targets.dart';
+import 'package:setkeep/body_tab_colors.dart';
+import 'package:setkeep/muscle_targets.dart';
 
 void main() {
   test(

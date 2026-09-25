@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -33,7 +33,7 @@ void main() {
     WorkoutUiPreference.workoutTimerEnabled = true;
     WorkoutUiPreference.workoutDurationEnabled = true;
     RestTimerPreference.enabled = false;
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
     await tester.pumpAndSettle();
@@ -109,7 +109,7 @@ void main() {
       }),
     });
     RestTimerPreference.enabled = false;
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('activeWorkoutDraftCard')));
     await tester.pumpAndSettle();
@@ -154,7 +154,7 @@ void main() {
       await RestNotificationService.schedule(90);
       await RestNotificationService.cancel();
     }
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
     await tester.pumpAndSettle();
@@ -180,7 +180,7 @@ void main() {
       await tester.pumpAndSettle();
       await RestNotificationService.schedule(90);
       if (Platform.isIOS) {
-        final status = await const MethodChannel('com.musclememory/rest_timer')
+        final status = await const MethodChannel('com.setkeep.app/rest_timer')
             .invokeMapMethod<String, dynamic>('debugStatus');
         debugPrint('QA_NOTIFICATION_STATUS:$status');
         expect(status?['authorization'], 2);

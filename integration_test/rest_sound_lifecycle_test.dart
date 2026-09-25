@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  const native = MethodChannel('com.musclememory/rest_timer');
+  const native = MethodChannel('com.setkeep.app/rest_timer');
   testWidgets(
     'rest completion uses persistent controls and OS-respecting sound',
     (tester) async {

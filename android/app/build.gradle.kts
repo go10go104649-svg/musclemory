@@ -10,7 +10,8 @@ plugins {
 
 // The release key stays outside the repository. Never fall back to debug signing.
 val signingProperties = Properties()
-val signingPath = System.getenv("MUSCLEMORY_SIGNING_PROPERTIES")
+val signingPath = System.getenv("SETKEEP_SIGNING_PROPERTIES")
+    ?: System.getenv("MUSCLEMORY_SIGNING_PROPERTIES") // Existing private build environments.
 val signingFile = signingPath?.let { file(it) } ?: rootProject.file("key.properties")
 if (signingFile.isFile) {
     FileInputStream(signingFile).use { signingProperties.load(it) }
@@ -20,7 +21,7 @@ val hasReleaseSigning = listOf("storeFile", "storePassword", "keyAlias", "keyPas
 
 gradle.taskGraph.whenReady {
     if (allTasks.any { it.project == project && it.name.contains("Release") } && !hasReleaseSigning) {
-        throw GradleException("Release signing is missing. Set MUSCLEMORY_SIGNING_PROPERTIES to your private signing.properties file.")
+        throw GradleException("Release signing is missing. Set SETKEEP_SIGNING_PROPERTIES to your private signing.properties file.")
     }
 }
 
@@ -35,7 +36,7 @@ android {
             }
         }
     }
-    namespace = "com.musclememory.muscle_memory"
+    namespace = "com.setkeep.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -45,7 +46,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.musclememory.muscle_memory"
+        applicationId = "com.setkeep.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

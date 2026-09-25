@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/body_tab_colors.dart';
-import 'package:muscle_memory/main.dart';
-import 'package:muscle_memory/muscle_targets.dart';
+import 'package:setkeep/body_tab_colors.dart';
+import 'package:setkeep/main.dart';
+import 'package:setkeep/muscle_targets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/legal_consent_fixture.dart';
@@ -53,7 +53,7 @@ void main() {
         'legal_consent': acceptedLegalConsentJson,
       });
       CustomExercisePreference.exercises = [];
-      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpWidget(const SetkeepApp());
       await tester.pumpAndSettle();
       Future<void> tap(String key) async {
         final target = find.byKey(Key(key));

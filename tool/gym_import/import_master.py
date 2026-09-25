@@ -165,7 +165,7 @@ def main():
     report=summary(tables,payload);report['input_sha256']=before
     if args.apply:
         # Temporary SQL is not retained or added to Git; argv never contains credentials.
-        with tempfile.TemporaryDirectory(prefix='musclemory-gym-') as temp:
+        with tempfile.TemporaryDirectory(prefix='setkeep-gym-') as temp:
             path=Path(temp)/'import.sql';path.write_text(sql_for(payload))
             result=subprocess.run(['supabase','db','query','--linked','--file',str(path),'--output','json'],cwd=ROOT,capture_output=True,text=True)
             if result.returncode:

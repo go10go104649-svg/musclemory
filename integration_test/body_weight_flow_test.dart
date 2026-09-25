@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
-import 'package:muscle_memory/body_weight.dart';
+import 'package:setkeep/main.dart';
+import 'package:setkeep/body_weight.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Run only through tool/verify_workout_lifecycle.sh on a dedicated QA device.
@@ -18,7 +18,7 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     final originalHistory = prefs.getString('workout_history');
     final before = await BodyWeightPreference.load();
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     Future<void> history() async {
       await tester.tap(find.byIcon(Icons.calendar_month_outlined));
@@ -62,7 +62,7 @@ void main() {
       jsonDecode(prefs.getString(BodyWeightPreference.storageKey)!),
       isA<List>(),
     );
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await history();
     await tester.ensureVisible(find.byKey(const Key('bodyWeightChart')));

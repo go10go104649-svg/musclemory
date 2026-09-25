@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// the existing SharedPreferences path and JSON compatibility.
 class AndroidWorkoutDraft {
   static const key = 'active_workout_draft';
-  static const channel = MethodChannel('com.musclememory/rest_timer');
+  static const channel = MethodChannel('com.setkeep.app/rest_timer');
   static Future<Map<String, String>?> nextTarget(
     String session,
     String exercise,

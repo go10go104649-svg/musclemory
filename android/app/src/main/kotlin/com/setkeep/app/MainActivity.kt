@@ -1,4 +1,4 @@
-package com.musclememory.muscle_memory
+package com.setkeep.app
 
 import android.Manifest
 import android.app.NotificationManager
@@ -15,8 +15,8 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private var notificationPermissionRequested = false
-    private val channelName = "com.musclememory/rest_timer"
-    private val imageChannelName = "com.musclememory/workout_image"
+    private val channelName = "com.setkeep.app/rest_timer"
+    private val imageChannelName = "com.setkeep.app/workout_image"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -205,7 +205,7 @@ class MainActivity : FlutterActivity() {
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                 put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-                put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/MUSCLEMORY")
+                put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/SETKEEP")
                 put(MediaStore.Images.Media.IS_PENDING, 1)
             }
             val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
@@ -225,7 +225,7 @@ class MainActivity : FlutterActivity() {
 
         val pictures = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             ?: throw IllegalStateException("Pictures directory unavailable")
-        val directory = java.io.File(pictures, "MUSCLEMORY").apply { mkdirs() }
+        val directory = java.io.File(pictures, "SETKEEP").apply { mkdirs() }
         val file = java.io.File(directory, fileName)
         file.writeBytes(bytes)
         android.media.MediaScannerConnection.scanFile(

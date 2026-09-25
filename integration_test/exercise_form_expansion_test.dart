@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/bench_press_form.dart';
-import 'package:muscle_memory/exercise_form_catalog.dart';
+import 'package:setkeep/bench_press_form.dart';
+import 'package:setkeep/exercise_form_catalog.dart';
 
 import 'support/form_qa_plan.dart';
 
@@ -149,7 +149,7 @@ Future<List<int>> capture(
     // the scene is still rendering. Retry capture only; never hide load errors.
     for (var attempt = 0; attempt < 3; attempt++) {
       try {
-        bytes = await const MethodChannel('com.musclememory/rest_timer')
+        bytes = await const MethodChannel('com.setkeep.app/rest_timer')
             .invokeMethod<Uint8List>('debugScreenshot');
         break;
       } on PlatformException catch (error) {

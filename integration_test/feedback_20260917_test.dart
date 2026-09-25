@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'exercise_form_expansion_test.dart' as captures;
@@ -26,7 +26,7 @@ void main() {
         for (var attempt = 0; attempt < 120; attempt++) {
           await Future<void>.delayed(const Duration(seconds: 1));
           final status = await const MethodChannel(
-            'com.musclememory/rest_timer',
+            'com.setkeep.app/rest_timer',
           ).invokeMapMethod<String, dynamic>('debugStatus');
           if (status!['authorization'] == 2 &&
               status['applicationState'] == 0) {
@@ -106,7 +106,7 @@ void main() {
       await tester.pump();
       final paused = tester.widget<Text>(find.byKey(const Key('restRemainingLabel'))).data!;
       expect(paused, anyOf('00:34', '00:33'));
-      final channel = const MethodChannel('com.musclememory/rest_timer');
+      final channel = const MethodChannel('com.setkeep.app/rest_timer');
       final stopped = await channel.invokeMapMethod<String, dynamic>(
         'debugStatus',
       );

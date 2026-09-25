@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.musclememory" "\0"
-            VALUE "FileDescription", "MUSCLEMORY" "\0"
+            VALUE "CompanyName", "com.setkeep.app" "\0"
+            VALUE "FileDescription", "SETKEEP" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "muscle_memory" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.musclememory. All rights reserved." "\0"
-            VALUE "OriginalFilename", "muscle_memory.exe" "\0"
-            VALUE "ProductName", "MUSCLEMORY" "\0"
+            VALUE "InternalName", "setkeep" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.setkeep.app. All rights reserved." "\0"
+            VALUE "OriginalFilename", "setkeep.exe" "\0"
+            VALUE "ProductName", "SETKEEP" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

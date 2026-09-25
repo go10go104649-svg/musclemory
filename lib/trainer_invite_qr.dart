@@ -12,7 +12,7 @@ class TrainerInviteQr {
     try {
       final uri = Uri.tryParse(raw);
       if (uri == null ||
-          uri.scheme != 'musclemory' ||
+          !const {'setkeep', 'musclemory'}.contains(uri.scheme) ||
           uri.host != 'trainer' ||
           uri.path != '/invite' ||
           uri.userInfo.isNotEmpty ||

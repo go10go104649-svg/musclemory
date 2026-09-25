@@ -2,7 +2,7 @@
 import os, pathlib, math, bpy
 from mathutils import Vector
 root=pathlib.Path(__file__).resolve().parents[1]
-work=pathlib.Path(os.environ.get('MUSCLEMORY_ART_WORK','/private/tmp/musclemory-3d-tools'))
+work=pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK','/private/tmp/musclemory-3d-tools')))
 bpy.ops.wm.open_mainfile(filepath=str(work/'base.blend'))
 human=bpy.data.objects['Athlete'];scene=bpy.context.scene
 scene.render.engine='CYCLES';scene.cycles.samples=40;scene.cycles.use_denoising=True
@@ -37,7 +37,7 @@ for v in human.data.vertices:
  belly=max(math.exp(-(((x-.040)/.030)**4+((z-cz)/rz)**4)*1.8) for cz,rz in [(1.19,.029),(1.125,.030),(1.06,.029),(1.004,.024)])
  v.co.y-=.006*belly*smooth(-.012,-.045,y)
 human.data.update()
-for category in os.environ.get('MUSCLEMORY_CATEGORIES','chest,back,shoulders,arms,legs,abs').split(','):
+for category in os.environ.get('SETKEEP_CATEGORIES', os.environ.get('MUSCLEMORY_CATEGORIES','chest,back,shoulders,arms,legs,abs')).split(','):
  for v in human.data.vertices:
   x,y,z=abs(v.co.x),v.co.y,v.co.z
   front=smooth(-.012,-.045,y);back=smooth(.005,.04,y)

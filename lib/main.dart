@@ -9,6 +9,7 @@ import 'gym/gym_pages.dart';
 import 'trainer_qr_page.dart';
 import 'exercise_form_catalog.dart';
 import 'body_tab_colors.dart';
+import 'design/app_colors.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -38,7 +39,7 @@ import 'services/workout_draft_store.dart';
 import 'services/android_workout_draft.dart';
 
 const activeWorkoutDraftStorageKey = AndroidWorkoutDraft.key;
-const appDisplayName = 'MUSCLEMORY';
+const appDisplayName = 'SETKEEP';
 const appVersion = '1.0.0';
 
 enum ExerciseRecordType {
@@ -150,13 +151,13 @@ Future<void> main() async {
   await WorkoutUiPreference.load();
   await CustomExercisePreference.load();
   await SupabaseConfig.initialize();
-  runApp(const MuscleMemoryApp());
+  runApp(const SetkeepApp());
 }
 
 class RestNotificationService {
   RestNotificationService._();
 
-  static const _channel = MethodChannel('com.musclememory/rest_timer');
+  static const _channel = MethodChannel('com.setkeep.app/rest_timer');
 
   static Future<void> schedule(
     int seconds, {
@@ -246,7 +247,7 @@ class RestNotificationService {
 class WorkoutImageService {
   WorkoutImageService._();
 
-  static const _channel = MethodChannel('com.musclememory/workout_image');
+  static const _channel = MethodChannel('com.setkeep.app/workout_image');
 
   static Future<void> save(Uint8List bytes) async {
     if (!(Platform.isIOS || Platform.isAndroid)) {
@@ -254,7 +255,7 @@ class WorkoutImageService {
     }
     await _channel.invokeMethod<void>('save', {
       'bytes': bytes,
-      'fileName': 'MUSCLEMORY_${DateTime.now().millisecondsSinceEpoch}.png',
+      'fileName': 'SETKEEP_${DateTime.now().millisecondsSinceEpoch}.png',
     });
   }
 }
@@ -262,7 +263,7 @@ class WorkoutImageService {
 class DeviceInfoService {
   DeviceInfoService._();
 
-  static const _channel = MethodChannel('com.musclememory/workout_image');
+  static const _channel = MethodChannel('com.setkeep.app/workout_image');
 
   static Future<String> summary() async {
     if (!(Platform.isIOS || Platform.isAndroid)) {
@@ -316,7 +317,7 @@ class ProfilePreference {
   ProfilePreference._();
 
   static const _displayNameKey = 'profile_display_name';
-  static const defaultDisplayName = 'MUSCLEMORYユーザー';
+  static const defaultDisplayName = 'SETKEEPユーザー';
 
   static Future<String> load() async {
     final preferences = await SharedPreferences.getInstance();
@@ -387,8 +388,8 @@ class WorkoutUiPreference {
   }
 }
 
-class MuscleMemoryApp extends StatelessWidget {
-  const MuscleMemoryApp({super.key});
+class SetkeepApp extends StatelessWidget {
+  const SetkeepApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -401,12 +402,14 @@ class MuscleMemoryApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFC7F36B),
-          primary: const Color(0xFF101820),
-          secondary: const Color(0xFFC7F36B),
-          surface: const Color(0xFFF4F5F0),
+          seedColor: AppColors.primaryGreen,
+          primary: AppColors.primaryGreen,
+          onPrimary: AppColors.ink,
+          secondary: AppColors.primaryGreen,
+          onSecondary: AppColors.ink,
+          surface: AppColors.background,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF4F5F0),
+        scaffoldBackgroundColor: AppColors.background,
         fontFamily: '.SF Pro Display',
         cardTheme: const CardThemeData(
           elevation: 0,
@@ -587,7 +590,7 @@ class _LegalConsentPageState extends State<_LegalConsentPage> {
             const Icon(
               Icons.fact_check_outlined,
               size: 56,
-              color: Color(0xFF6B8E23),
+              color: AppColors.primaryGreenDeep,
             ),
             const SizedBox(height: 20),
             const Text(
@@ -712,7 +715,7 @@ class _OnboardingPageState extends State<_OnboardingPage> {
       icon: Icons.qr_code_rounded,
       title: 'Trainerと連携',
       body:
-          'Trainerが表示する招待QRコードをMUSCLEMORYで読み取れます。'
+          'Trainerが表示する招待QRコードをSETKEEPで読み取れます。'
           '\nTrainerとの接続や、メニュー・トレーニング情報の共有は今後対応予定です。',
     ),
     (
@@ -776,11 +779,11 @@ class _OnboardingPageState extends State<_OnboardingPage> {
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
-                        const Text('MUSCLEMORY'),
+                        const Text('SETKEEP'),
                         const SizedBox(height: 28),
                         CircleAvatar(
                           radius: 52,
-                          backgroundColor: const Color(0xFFC7F36B),
+                          backgroundColor: AppColors.primaryGreen,
                           child: Icon(slide.icon, size: 48),
                         ),
                         const SizedBox(height: 28),
@@ -1010,7 +1013,7 @@ class _HomeShellState extends State<HomeShell> {
     return addedCount;
   }
 
-  Future<int> _importBackup(MuscleMemoryBackup backup) async {
+  Future<int> _importBackup(SetkeepBackup backup) async {
     final addedCount = await _importWorkouts(backup.workouts);
     if (backup.selectedGym != null) await _saveGym(backup.selectedGym!);
     if (backup.restTimerEnabled != null) {
@@ -1191,7 +1194,7 @@ class _HomeShellState extends State<HomeShell> {
         selectedIndex: _selectedIndex,
         height: 72,
         backgroundColor: Colors.white,
-        indicatorColor: const Color(0xFFC7F36B),
+        indicatorColor: AppColors.primaryGreen,
         onDestinationSelected: (index) {
           setState(() => _selectedIndex = index);
           if (index == 0) unawaited(_refreshWorkoutDraft());
@@ -1441,7 +1444,7 @@ class RecentMenusCard extends StatelessWidget {
               ListTile(
                 key: Key('recentMenu$index'),
                 leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFC7F36B),
+                  backgroundColor: AppColors.primaryGreen,
                   child: Icon(Icons.play_arrow_rounded),
                 ),
                 title: Text(
@@ -1495,7 +1498,7 @@ class SavedMenusCard extends StatelessWidget {
                 key: Key('savedMenu$index'),
                 leading: const CircleAvatar(
                   backgroundColor: Color(0xFF101820),
-                  foregroundColor: Color(0xFFC7F36B),
+                  foregroundColor: AppColors.primaryGreen,
                   child: Icon(Icons.fitness_center_rounded),
                 ),
                 title: Text(
@@ -2027,7 +2030,7 @@ class StartWorkoutCard extends StatelessWidget {
               key: const Key('startWorkoutButton'),
               onPressed: onPressed,
               style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFC7F36B),
+                backgroundColor: AppColors.primaryGreen,
                 foregroundColor: const Color(0xFF101820),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(17),
@@ -2072,7 +2075,7 @@ class ActiveWorkoutDraftCard extends StatelessWidget {
           child: Row(
             children: [
               const CircleAvatar(
-                backgroundColor: Color(0xFFC7F36B),
+                backgroundColor: AppColors.primaryGreen,
                 child: Icon(Icons.edit_note_rounded),
               ),
               const SizedBox(width: 13),
@@ -2357,7 +2360,7 @@ class DateBadge extends StatelessWidget {
       width: 48,
       height: 52,
       decoration: BoxDecoration(
-        color: const Color(0xFFEFF2EA),
+        color: AppColors.primaryGreenVerySoft,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -2391,7 +2394,7 @@ class ExerciseLine extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: const Color(0xFFC7F36B).withValues(alpha: 0.35),
+            color: AppColors.primaryGreenSoft,
             borderRadius: BorderRadius.circular(11),
           ),
           child: const Icon(Icons.fitness_center_rounded, size: 18),
@@ -2735,7 +2738,7 @@ class _MuscleMannequinViewState extends State<MuscleMannequinView> {
         style: SegmentedButton.styleFrom(
           foregroundColor: Colors.white70,
           selectedForegroundColor: const Color(0xFF101820),
-          selectedBackgroundColor: const Color(0xFFC7F36B),
+          selectedBackgroundColor: AppColors.primaryGreen,
           visualDensity: VisualDensity.compact,
         ),
         segments: [
@@ -3404,8 +3407,7 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
                             color: selected
                                 ? const Color(0xFF101820)
                                 : hasWorkout
-                                ? const Color(0xFFC7F36B)
-                                      .withValues(alpha: 0.42)
+                                ? AppColors.primaryGreenSoft
                                 : null,
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -3427,7 +3429,7 @@ class _MonthlyHistoryPageState extends State<MonthlyHistoryPage> {
                                   height: 4,
                                   decoration: BoxDecoration(
                                     color: selected
-                                        ? const Color(0xFFC7F36B)
+                                        ? AppColors.primaryGreen
                                         : const Color(0xFF101820),
                                     shape: BoxShape.circle,
                                   ),
@@ -3623,7 +3625,7 @@ class _BodyWeightTrendSectionState extends State<BodyWeightTrendSection> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE9F4D1),
+                  color: AppColors.primaryGreenSoft,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -3957,7 +3959,7 @@ class BodyWeightChartPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xFF83AD30)
+        ..color = AppColors.primaryGreenStrong
         ..strokeWidth = 3
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke,
@@ -4317,7 +4319,7 @@ class _ExerciseProgressPageState extends State<ExerciseProgressPage> {
               ),
               child: ListTile(
                 leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFC7F36B),
+                  backgroundColor: AppColors.primaryGreen,
                   child: Icon(Icons.fitness_center_rounded),
                 ),
                 title: Text(
@@ -4441,7 +4443,7 @@ class _ExerciseProgressChart extends StatelessWidget {
                           Container(
                             height: 18 + (70 * point.bestWeight / maximum),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFC7F36B),
+                              color: AppColors.primaryGreen,
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
@@ -4871,7 +4873,7 @@ class WorkoutDetailPage extends StatelessWidget {
                             ),
                             const Icon(
                               Icons.check_circle_rounded,
-                              color: Color(0xFF83AD30),
+                              color: AppColors.primaryGreenStrong,
                             ),
                           ],
                         ),
@@ -5065,7 +5067,7 @@ class _WorkoutSharePageState extends State<WorkoutSharePage> {
                               const Text(
                                 appDisplayName,
                                 style: TextStyle(
-                                  color: Color(0xFFC7F36B),
+                                  color: AppColors.primaryGreen,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 1.2,
@@ -6709,7 +6711,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE9F4D1),
+                    color: AppColors.primaryGreenSoft,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
@@ -6970,8 +6972,8 @@ class WorkoutTemplatePreference {
   }
 }
 
-class MuscleMemoryBackup {
-  const MuscleMemoryBackup({
+class SetkeepBackup {
+  const SetkeepBackup({
     required this.workouts,
     this.workoutTemplates = const [],
     this.bodyWeights = const [],
@@ -6997,12 +6999,14 @@ class MuscleMemoryBackup {
   final bool? workoutTimerEnabled;
   final bool? workoutDurationEnabled;
 
-  factory MuscleMemoryBackup.fromJson(Map<String, dynamic> json) {
+  factory SetkeepBackup.fromJson(Map<String, dynamic> json) {
     final version = json['version'] as int?;
     final supportedApp =
-        json['app'] == appDisplayName || json['app'] == 'MuscleMemory';
+        json['app'] == appDisplayName ||
+        json['app'] == 'MUSCLEMORY' ||
+        json['app'] == 'MuscleMemory';
     if (!supportedApp || (version != 1 && version != 2 && version != 3)) {
-      throw const FormatException('Unsupported MUSCLEMORY backup');
+      throw const FormatException('Unsupported SETKEEP backup');
     }
     if (json['workouts'] is! List) {
       throw const FormatException('Invalid workout backup');
@@ -7012,7 +7016,7 @@ class MuscleMemoryBackup {
       throw const FormatException('Invalid backup settings');
     }
     final settings = settingsSource as Map<String, dynamic>? ?? const {};
-    return MuscleMemoryBackup(
+    return SetkeepBackup(
       workouts: decodeWorkoutItems(json['workouts']),
       workoutTemplates: version == 1
           ? const []
@@ -8059,7 +8063,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                           ),
                           horizontalTitleGap: 8,
                           selected: added || _selected.containsKey(e.identity),
-                          selectedTileColor: const Color(0xFFE9F4D1),
+                          selectedTileColor: AppColors.primaryGreenSoft,
                           selectedColor: const Color(0xFF101820),
                           leading: IconButton(
                             key: ValueKey('favoriteExercise${e.identity}'),
@@ -8303,7 +8307,7 @@ class _Exercise3dBadgePainter extends CustomPainter {
       ..lineTo(33, 4)
       ..lineTo(26, 11)
       ..close();
-    canvas.drawPath(top, Paint()..color = const Color(0xFFE9F4D1));
+    canvas.drawPath(top, Paint()..color = AppColors.primaryGreenSoft);
     final outline = Path()
       ..moveTo(3, 11)
       ..lineTo(10, 4)
@@ -8938,7 +8942,7 @@ class ExerciseInputCard extends StatelessWidget {
             key: Key('exerciseInputHeader$exerciseIndex'),
             padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFC7F36B),
+              color: AppColors.primaryGreen,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -9015,7 +9019,7 @@ class ExerciseInputCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF2EA),
+              color: AppColors.primaryGreenVerySoft,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -9782,7 +9786,7 @@ class SetRow extends StatelessWidget {
                 onPressed: onToggle,
                 style: IconButton.styleFrom(
                   backgroundColor: set.completed
-                      ? const Color(0xFFC7F36B)
+                      ? AppColors.primaryGreen
                       : const Color(0xFFE8EBE5),
                   foregroundColor: const Color(0xFF101820),
                 ),
@@ -10618,7 +10622,7 @@ class _CustomGymManagementPageState extends State<CustomGymManagementPage> {
                               ? Icons.check_circle_rounded
                               : Icons.circle_outlined,
                           color: _selectedGym == selectableGyms[index]
-                              ? const Color(0xFF83AD30)
+                              ? AppColors.primaryGreenStrong
                               : null,
                         ),
                       ],
@@ -10844,7 +10848,7 @@ class _ProfileNameCardState extends State<_ProfileNameCard> {
           children: [
             const CircleAvatar(
               radius: 28,
-              backgroundColor: Color(0xFFC7F36B),
+              backgroundColor: AppColors.primaryGreen,
               child: Icon(Icons.person_rounded, size: 30),
             ),
             const SizedBox(width: 14),
@@ -10916,7 +10920,7 @@ class ProfilePage extends StatelessWidget {
   final Future<int> Function() onSyncRequested;
   final List<SavedWorkoutTemplate> workoutTemplates;
   final List<BodyWeightEntry> bodyWeights;
-  final Future<int> Function(MuscleMemoryBackup) onBackupImported;
+  final Future<int> Function(SetkeepBackup) onBackupImported;
   final bool restTimerEnabled;
   final int restTimerSeconds;
   final bool completionCheckEnabled;
@@ -11095,7 +11099,7 @@ class ProfilePage extends StatelessWidget {
   );
 
   String _backupJson() => jsonEncode(
-    MuscleMemoryBackup(
+    SetkeepBackup(
       workouts: history,
       workoutTemplates: workoutTemplates,
       bodyWeights: bodyWeights,
@@ -11115,10 +11119,10 @@ class ProfilePage extends StatelessWidget {
       final now = DateTime.now();
       final date =
           '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
-      final fileName = 'musclemory_backup_$date.json';
+      final fileName = 'setkeep_backup_$date.json';
       await SharePlus.instance.share(
         ShareParams(
-          title: 'MUSCLEMORY バックアップ',
+          title: 'SETKEEP バックアップ',
           files: [
             XFile.fromData(
               Uint8List.fromList(utf8.encode(_backupJson())),
@@ -11138,7 +11142,7 @@ class ProfilePage extends StatelessWidget {
   Future<void> _restoreFromFile(BuildContext context) async {
     try {
       const jsonType = XTypeGroup(
-        label: 'MUSCLEMORY JSON',
+        label: 'SETKEEP JSON',
         extensions: ['json'],
         uniformTypeIdentifiers: ['public.json'],
       );
@@ -11150,7 +11154,7 @@ class ProfilePage extends StatelessWidget {
     } on FormatException {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('このファイルはMUSCLEMORYのバックアップとして読み込めません')),
+        const SnackBar(content: Text('このファイルはSETKEEPのバックアップとして読み込めません')),
       );
     } catch (_) {
       if (!context.mounted) return;
@@ -11165,7 +11169,7 @@ class ProfilePage extends StatelessWidget {
       throw const FormatException('Backup root must be an object');
     }
     final decoded = decodedValue;
-    final backup = MuscleMemoryBackup.fromJson(decoded);
+    final backup = SetkeepBackup.fromJson(decoded);
     if (!context.mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
@@ -11393,7 +11397,7 @@ class _TrainingSettingsPageState extends State<TrainingSettingsPage> {
                 trailing: seconds == _restTimerSeconds
                     ? const Icon(
                         Icons.check_circle_rounded,
-                        color: Color(0xFF83AD30),
+                        color: AppColors.primaryGreenStrong,
                       )
                     : null,
                 onTap: () => Navigator.pop(context, seconds),
@@ -11405,7 +11409,7 @@ class _TrainingSettingsPageState extends State<TrainingSettingsPage> {
               trailing: !durations.contains(_restTimerSeconds)
                   ? const Icon(
                       Icons.check_circle_rounded,
-                      color: Color(0xFF83AD30),
+                      color: AppColors.primaryGreenStrong,
                     )
                   : null,
               onTap: () => Navigator.pop(context, -1),
@@ -12026,7 +12030,7 @@ class AppAboutPage extends StatelessWidget {
                 children: [
                   const CircleAvatar(
                     radius: 34,
-                    backgroundColor: Color(0xFFC7F36B),
+                    backgroundColor: AppColors.primaryGreen,
                     child: Icon(Icons.fitness_center_rounded, size: 34),
                   ),
                   const SizedBox(height: 14),

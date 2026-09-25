@@ -1,6 +1,6 @@
-# MUSCLEMORY
+# SETKEEP
 
-MUSCLEMORYは、トレーニング記録を蓄積し、次のトレーニングにつなげるFlutterアプリです。
+SETKEEPは、トレーニング記録を蓄積し、次のトレーニングにつなげるFlutterアプリです。
 
 ## 対応
 
@@ -70,3 +70,7 @@ flutter run --dart-define-from-file=supabase.json
 - 変更後は関連する解析・テスト・実機またはシミュレーター確認を行う
 
 より詳細な開発ルールは `AGENTS.md` を参照してください。
+
+## SETKEEPへの移行
+
+識別子・旧データ互換性・外部サービス設定・検証結果は [ブランド移行記録](docs/setkeep_migration.md) を参照してください。

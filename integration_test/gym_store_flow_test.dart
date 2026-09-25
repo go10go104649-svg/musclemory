@@ -4,11 +4,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
-import 'package:muscle_memory/config/supabase_config.dart';
-import 'package:muscle_memory/gym/gym_repository.dart';
-import 'package:muscle_memory/gym/place_equipment_pages.dart';
-import 'package:muscle_memory/gym/training_place_preference.dart';
+import 'package:setkeep/main.dart';
+import 'package:setkeep/config/supabase_config.dart';
+import 'package:setkeep/gym/gym_repository.dart';
+import 'package:setkeep/gym/place_equipment_pages.dart';
+import 'package:setkeep/gym/training_place_preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

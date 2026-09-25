@@ -20,7 +20,7 @@ import UserNotifications
     willPresent notification: UNNotification,
     withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
   ) {
-    if notification.request.identifier.hasPrefix("musclemory_rest_timer") {
+    if notification.request.identifier.hasPrefix("setkeep_rest_timer") {
       // Scheduled deadline is suppressed in foreground; Dart cancels it and
       // submits exactly one immediate OS cue. OS owns sound/focus/silent rules.
       completionHandler(notification.request.identifier.hasSuffix("_foreground") ? [.banner, .sound] : [])
@@ -34,7 +34,7 @@ import UserNotifications
     didReceive response: UNNotificationResponse,
     withCompletionHandler completionHandler: @escaping () -> Void
   ) {
-    if response.notification.request.identifier.hasPrefix("musclemory_rest_timer") {
+    if response.notification.request.identifier.hasPrefix("setkeep_rest_timer") {
       completionHandler()
       return
     }
@@ -44,7 +44,7 @@ import UserNotifications
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     let channel = FlutterMethodChannel(
-      name: "com.musclememory/rest_timer",
+      name: "com.setkeep.app/rest_timer",
       binaryMessenger: engineBridge.applicationRegistrar.messenger()
     )
     RestCompletionFeedback.prepareSound()
@@ -63,10 +63,10 @@ import UserNotifications
                   "liveActivities": RestTimerDisplay.shared.activityCount(),
                   "authorization": settings.authorizationStatus.rawValue,
                   "applicationState": UIApplication.shared.applicationState.rawValue,
-                  "pending": pending.filter { $0.identifier.hasPrefix("musclemory_rest_timer") }.map {
+                  "pending": pending.filter { $0.identifier.hasPrefix("setkeep_rest_timer") }.map {
                     ["id": $0.identifier, "trigger": ($0.trigger as? UNTimeIntervalNotificationTrigger)?.nextTriggerDate()?.timeIntervalSince1970 ?? 0] as [String: Any]
                   },
-                  "delivered": delivered.filter { $0.request.identifier.hasPrefix("musclemory_rest_timer") }.map { $0.request.identifier }
+                  "delivered": delivered.filter { $0.request.identifier.hasPrefix("setkeep_rest_timer") }.map { $0.request.identifier }
                 ])
               }
             }
@@ -95,7 +95,7 @@ import UserNotifications
     }
 
     let imageChannel = FlutterMethodChannel(
-      name: "com.musclememory/workout_image",
+      name: "com.setkeep.app/workout_image",
       binaryMessenger: engineBridge.applicationRegistrar.messenger()
     )
     imageChannel.setMethodCallHandler { call, result in
@@ -178,7 +178,7 @@ final class RestTimerNotifications {
   private let center: RestNotificationCenter
   private var revision = 0
   private var activeIdentifier: String?
-  private let prefix = "musclemory_rest_timer"
+  private let prefix = "setkeep_rest_timer"
 
   init(center: RestNotificationCenter) { self.center = center }
 
@@ -205,7 +205,7 @@ final class RestTimerNotifications {
     revision += 1
     let requested = revision
     let content = UNMutableNotificationContent()
-    content.title = "MUSCLEMORY"
+    content.title = "SETKEEP"
     content.body = "休憩終了。次のセットへ！"
     content.sound = UNNotificationSound(named: UNNotificationSoundName("rest_complete.wav"))
     let identifier = "\(prefix)_\(UUID().uuidString)_foreground"
@@ -261,7 +261,7 @@ final class RestTimerNotifications {
               return
             }
             let content = UNMutableNotificationContent()
-            content.title = "MUSCLEMORY"
+            content.title = "SETKEEP"
             content.body = "休憩終了。次のセットへ！"
             content.sound = UNNotificationSound(named: UNNotificationSoundName("rest_complete.wav"))
             let request = UNNotificationRequest(

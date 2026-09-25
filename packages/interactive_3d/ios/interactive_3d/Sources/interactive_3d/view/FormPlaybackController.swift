@@ -36,7 +36,7 @@ final class FormPlaybackController: NSObject {
             if node.light != nil { node.removeFromParentNode() }
         }
         let camera = SCNNode()
-        camera.name = "MUSCLEMORY fixed form camera"
+        camera.name = "SETKEEP fixed form camera"
         camera.camera = SCNCamera()
         camera.camera?.usesOrthographicProjection = true
         camera.camera?.orthographicScale = 1.225

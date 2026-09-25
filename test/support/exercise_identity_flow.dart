@@ -4,7 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> verifyIdentityFlow(
@@ -13,7 +13,7 @@ Future<void> verifyIdentityFlow(
 }) async {
   SharedPreferences.setMockInitialValues({'onboarding_completed': true, 'legal_consent': acceptedLegalConsentJson});
   CustomExercisePreference.exercises = [];
-  await t.pumpWidget(const MuscleMemoryApp());
+  await t.pumpWidget(const SetkeepApp());
   await t.pumpAndSettle();
   Future<void> tap(Key key) async {
     if (find.byKey(key).evaluate().isEmpty) {
@@ -53,7 +53,7 @@ Future<void> verifyIdentityFlow(
   // Re-create the actual app to exercise the existing draft read path.
   await t.pumpWidget(const SizedBox.shrink());
   await t.pumpAndSettle();
-  await t.pumpWidget(const MuscleMemoryApp());
+  await t.pumpWidget(const SetkeepApp());
   await t.pumpAndSettle();
   await tap(const Key('activeWorkoutDraftCard'));
   final cards = t
@@ -75,9 +75,9 @@ Future<void> verifyIdentityFlow(
   final history = decodeWorkoutHistory(prefs.getString('workout_history'));
   expect(history, hasLength(1));
   expect(history.single.exerciseGroups, hasLength(2));
-  final backup = MuscleMemoryBackup(workouts: history);
+  final backup = SetkeepBackup(workouts: history);
   expect(
-    MuscleMemoryBackup.fromJson(jsonDecode(jsonEncode(backup.toJson())))
+    SetkeepBackup.fromJson(jsonDecode(jsonEncode(backup.toJson())))
         .workouts
         .single
         .exerciseGroups,
@@ -102,7 +102,7 @@ Future<void> verifyIdentityFlow(
   await screenshot?.call('same_name_edit');
   await t.pumpWidget(const SizedBox.shrink());
   await t.pumpAndSettle();
-  await t.pumpWidget(const MuscleMemoryApp());
+  await t.pumpWidget(const SetkeepApp());
   await t.pumpAndSettle();
   await tap(const Key('startWorkoutButton'));
   await tap(const Key('addExerciseButton'));

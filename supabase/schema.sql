@@ -1,4 +1,4 @@
--- MUSCLEMORYのクラウド保存用テーブル
+-- SETKEEPのクラウド保存用テーブル
 -- Supabase Dashboard > SQL Editor で実行してください。
 
 create table if not exists public.workouts (

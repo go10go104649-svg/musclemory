@@ -6,6 +6,8 @@ import 'gym_equipment_cache.dart';
 
 import 'package:flutter/material.dart';
 
+import '../design/app_colors.dart';
+
 import '../exercise_form_catalog.dart';
 import '../config/supabase_config.dart';
 import 'gym_repository.dart';
@@ -873,7 +875,7 @@ class _GymEquipmentExercisesPageState extends State<GymEquipmentExercisesPage> {
                 child: ListTile(
                   key: ValueKey('addGymExercise${f.exerciseId}'),
                   selected: _selected.contains(f.exerciseId),
-                  selectedTileColor: const Color(0xFFE9F4D1),
+                  selectedTileColor: AppColors.primaryGreenSoft,
                   title: Text(f.exerciseName),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'design/app_colors.dart';
+
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'trainer_invite_qr.dart';
@@ -108,7 +111,7 @@ class _TrainerQrPageState extends State<TrainerQrPage> {
                                     child: DecoratedBox(
                                       decoration: BoxDecoration(
                                         border: Border.all(
-                                          color: const Color(0xFFC7F36B),
+                                          color: AppColors.primaryGreen,
                                           width: 3,
                                         ),
                                         borderRadius: BorderRadius.circular(20),
@@ -150,7 +153,7 @@ class TrainerCameraUnavailable extends StatelessWidget {
             SizedBox(height: 16),
             Text('カメラを利用できません'),
             SizedBox(height: 12),
-            Text('端末設定でMUSCLEMORYのカメラ権限を確認してください。上部の戻るボタンでマイページへ戻れます。'),
+            Text('端末設定でSETKEEPのカメラ権限を確認してください。上部の戻るボタンでマイページへ戻れます。'),
           ],
         ),
       ),

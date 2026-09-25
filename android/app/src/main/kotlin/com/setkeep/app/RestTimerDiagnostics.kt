@@ -1,4 +1,4 @@
-package com.musclememory.muscle_memory
+package com.setkeep.app
 
 import android.content.Context
 import android.content.pm.ApplicationInfo

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 
 String get acceptedLegalConsentJson => jsonEncode({
   'accepted': true,

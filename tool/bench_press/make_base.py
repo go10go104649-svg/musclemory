@@ -1,11 +1,11 @@
 import os
 import bpy, sys, pathlib, json
-root = pathlib.Path(os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools'))
+root = pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools')))
 ext = root/'extensions'
 ext.mkdir(exist_ok=True)
 link=ext/'mpfb'
 if not link.exists(): link.symlink_to(str(pathlib.Path(os.environ.get('MPFB_REPO', '/private/tmp/musclemory-mpfb2'))/'src/mpfb'), target_is_directory=True)
-repo=bpy.context.preferences.extensions.repos.new(name='MUSCLEMORY Tools', module='musclemory', custom_directory=str(ext))
+repo=bpy.context.preferences.extensions.repos.new(name='SETKEEP Tools', module='musclemory', custom_directory=str(ext))
 bpy.ops.preferences.addon_enable(module='bl_ext.musclemory.mpfb')
 from bl_ext.musclemory.mpfb.services.humanservice import HumanService
 from bl_ext.musclemory.mpfb.services.targetservice import TargetService

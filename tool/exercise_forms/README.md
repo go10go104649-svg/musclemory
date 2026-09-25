@@ -32,7 +32,7 @@ Review emitted camera metadata before overwriting deliberately tuned catalog val
 Run from the repository root using the installed Blender executable:
 
 ```sh
-Blender --background --factory-startup --python-exit-code 1 --python tool/exercise_forms/author_forms.py -- --ids low_row,dy_row --output /tmp/musclemory-preview --preview-only
+Blender --background --factory-startup --python-exit-code 1 --python tool/exercise_forms/author_forms.py -- --ids low_row,dy_row --output /tmp/setkeep-preview --preview-only
 ```
 
 `--preview-only` renders start/mid/end (frames 1/24/47, 420px, 6 Cycles samples) in a fresh `preview-*` subdirectory outside the repository. It still evaluates all 97 motion frames and existing joint/contact checks. Outputs are images, camera/metric data and a per-scene `.preview.json` report written only after all three images exist. No GLB, `.blend`, production recipe/chunk or generated Dart is written. Partial runs have no success report; do not treat older directories as current evidence or feed previews to packing. Static images do not replace full loop/native review.
@@ -62,7 +62,7 @@ Light mode requires explicit IDs and `FORM_QA_BASELINE`, a reference to valid fu
 The existing guarded wrapper forwards the options to the actual build. Example (replace the evidence reference and QA device ID):
 
 ```sh
-MUSCLEMORY_QA_TARGET=integration_test/exercise_form_expansion_test.dart \
+SETKEEP_QA_TARGET=integration_test/exercise_form_expansion_test.dart \
 FORM_QA_MODE=light FORM_QA_IDS=dy_row FORM_QA_BASELINE='QA note for unchanged full checks' \
 ./tool/verify_workout_lifecycle.sh ios QA_DEVICE_ID
 ```
@@ -82,7 +82,7 @@ Reuse `art/bench_press/bench_press.blend` with license/provenance documentation.
 
 ## Candidate route verification
 
-After reference, pose, motion and both native-platform checks, run the guarded wrapper with `MUSCLEMORY_QA_TARGET=integration_test/exercise_form_route_test.dart`, matching `FORM_QA_IDS` and `FORM_QA_REVIEW_CANDIDATES`. It runs analysis/unit tests against the normal catalog, then invokes the generator's `--review-candidates` validation for the route build only. Its EXIT trap restores the normal catalog on success or failure. Do not change catalog/source/assets during the run or run another catalog writer concurrently. Set source `productionRoute`/`verified` only after actual route success. Never ship `TEMPORARY QA CANDIDATES` output.
+After reference, pose, motion and both native-platform checks, run the guarded wrapper with `SETKEEP_QA_TARGET=integration_test/exercise_form_route_test.dart`, matching `FORM_QA_IDS` and `FORM_QA_REVIEW_CANDIDATES`. It runs analysis/unit tests against the normal catalog, then invokes the generator's `--review-candidates` validation for the route build only. Its EXIT trap restores the normal catalog on success or failure. Do not change catalog/source/assets during the run or run another catalog writer concurrently. Set source `productionRoute`/`verified` only after actual route success. Never ship `TEMPORARY QA CANDIDATES` output.
 
 ## Offline 17-form batch (2026-09-22)
 

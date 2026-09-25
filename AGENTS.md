@@ -1,4 +1,4 @@
-# MUSCLEMORY
+# SETKEEP
 
 - 既存設計・UI・命名規則を尊重し、既存実装の再利用を優先する。
 - iOS / Android両対応。日本語 / 英語対応を維持する。

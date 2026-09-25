@@ -7,8 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:interactive_3d/interactive_3d.dart';
 import 'package:interactive_3d/src/form_model.dart';
-import 'package:muscle_memory/bench_press_form.dart';
-import 'package:muscle_memory/exercise_form_catalog.dart';
+import 'package:setkeep/bench_press_form.dart';
+import 'package:setkeep/exercise_form_catalog.dart';
 
 void main() {
   test(

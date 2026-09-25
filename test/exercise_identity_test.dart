@@ -4,9 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/main.dart';
-import 'package:muscle_memory/exercise_form_catalog.dart';
-import 'package:muscle_memory/exercise_form_catalog.g.dart';
+import 'package:setkeep/design/app_colors.dart';
+import 'package:setkeep/main.dart';
+import 'package:setkeep/exercise_form_catalog.dart';
+import 'package:setkeep/exercise_form_catalog.g.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 ExerciseTemplate variant(String id) =>
@@ -50,55 +51,48 @@ void main() {
   });
   tearDown(() => CustomExercisePreference.exercises = []);
 
-  test(
-    'identity catalog source equals generated data and all catalog IDs are unique',
-    () {
-      final source = jsonDecode(
-        File('tool/exercise_forms/catalog.json').readAsStringSync(),
-      ) as Map;
-      expect(exerciseFormData, source['exercises']);
-      final catalogCount = (source['exercises'] as List).length;
-      expect(ExerciseFormCatalog.entries, hasLength(catalogCount));
-      final selectableCount = ExerciseFormCatalog.entries.where((e) => e.selectable).length;
-      expect(exerciseTemplates, hasLength(selectableCount));
-      expect(
-        exerciseTemplates.map((e) => e.identity).toSet(),
-        hasLength(selectableCount),
-      );
-      for (final e in ExerciseFormCatalog.entries) {
-        expect(e.equipmentLabel, isNotEmpty);
-        expect(e.englishName, isNotEmpty);
-        expect(e.primaryMuscles, isNotEmpty);
-        expect(e.primaryMuscleLabels, isNotEmpty);
-        if (e.status == 'planned') expect(e.assetPath, isNull);
-      }
-      for (final name in ['ショルダープレス', 'インクラインチェストプレス', 'チェストプレス']) {
-        final variants = ExerciseFormCatalog.byName[name]!;
-        expect(variants, hasLength(2));
-        expect(variants.map((e) => e.equipmentLabel).toSet(), {
-          'マシン',
-          'プレートロード',
-        });
-        expect(ExerciseFormCatalog.forName(name), isNull);
-      }
-      expect(variant('dumbbell_shoulder_press').equipment, 'ダンベル');
-      expect(variant('plank').matchesQuery('腹筋'), true);
-      expect(variant('chin_up').matchesQuery('懸垂'), true);
-      expect(
-        exerciseDisplayName(
-          'ショルダープレス',
-          exerciseId: 'plate_loaded_shoulder_press',
-          languageCode: 'en',
-        ),
-        'Plate Loaded Shoulder Press',
-      );
-      expect(ExerciseFormCatalog.byId['bench_press']!.available, true);
-      expect(
-        ExerciseFormCatalog.byId['incline_dumbbell_press']!.available,
-        true,
-      );
-    },
-  );
+  test('identity catalog source equals generated data and all catalog IDs are unique', () {
+    final source = jsonDecode(
+      File('tool/exercise_forms/catalog.json').readAsStringSync(),
+    ) as Map;
+    expect(exerciseFormData, source['exercises']);
+    final catalogCount = (source['exercises'] as List).length;
+    expect(ExerciseFormCatalog.entries, hasLength(catalogCount));
+    final selectableCount = ExerciseFormCatalog.entries
+        .where((e) => e.selectable)
+        .length;
+    expect(exerciseTemplates, hasLength(selectableCount));
+    expect(
+      exerciseTemplates.map((e) => e.identity).toSet(),
+      hasLength(selectableCount),
+    );
+    for (final e in ExerciseFormCatalog.entries) {
+      expect(e.equipmentLabel, isNotEmpty);
+      expect(e.englishName, isNotEmpty);
+      expect(e.primaryMuscles, isNotEmpty);
+      expect(e.primaryMuscleLabels, isNotEmpty);
+      if (e.status == 'planned') expect(e.assetPath, isNull);
+    }
+    for (final name in ['ショルダープレス', 'インクラインチェストプレス', 'チェストプレス']) {
+      final variants = ExerciseFormCatalog.byName[name]!;
+      expect(variants, hasLength(2));
+      expect(variants.map((e) => e.equipmentLabel).toSet(), {'マシン', 'プレートロード'});
+      expect(ExerciseFormCatalog.forName(name), isNull);
+    }
+    expect(variant('dumbbell_shoulder_press').equipment, 'ダンベル');
+    expect(variant('plank').matchesQuery('腹筋'), true);
+    expect(variant('chin_up').matchesQuery('懸垂'), true);
+    expect(
+      exerciseDisplayName(
+        'ショルダープレス',
+        exerciseId: 'plate_loaded_shoulder_press',
+        languageCode: 'en',
+      ),
+      'Plate Loaded Shoulder Press',
+    );
+    expect(ExerciseFormCatalog.byId['bench_press']!.available, true);
+    expect(ExerciseFormCatalog.byId['incline_dumbbell_press']!.available, true);
+  });
 
   test(
     'identity HYROX uses appropriate fields and metres; running stays single',
@@ -209,7 +203,7 @@ void main() {
       'completed': true,
     };
     for (final version in [1, 2, 3]) {
-      final backup = MuscleMemoryBackup.fromJson({
+      final backup = SetkeepBackup.fromJson({
         'app': 'MuscleMemory',
         'version': version,
         'workouts': [
@@ -243,7 +237,7 @@ void main() {
         );
       }
       expect(
-        MuscleMemoryBackup.fromJson(jsonDecode(jsonEncode(backup.toJson())))
+        SetkeepBackup.fromJson(jsonDecode(jsonEncode(backup.toJson())))
             .workouts
             .single
             .sets
@@ -374,14 +368,22 @@ void main() {
       expect(find.text('Shoulder Press Machine'), findsOneWidget);
       expect(find.text('Plate Loaded Shoulder Press'), findsOneWidget);
       final machine = find.byKey(const Key('selectExerciseshoulder_press'));
-      final plate = find.byKey(const Key('selectExerciseplate_loaded_shoulder_press'));
+      final plate = find.byKey(
+        const Key('selectExerciseplate_loaded_shoulder_press'),
+      );
       expect(t.widget<ListTile>(machine).onTap, isNull);
       expect(t.widget<ListTile>(plate).selected, false);
       expect(t.widget<ListTile>(plate).onTap, isNotNull);
       expect(t.widget<ListTile>(machine).selected, true);
-      expect(t.widget<ListTile>(machine).selectedTileColor, const Color(0xFFE9F4D1));
+      expect(
+        t.widget<ListTile>(machine).selectedTileColor,
+        AppColors.primaryGreenSoft,
+      );
       await tapVisible(t, const Key('favoriteExerciseid:shoulder_press'));
-      expect(await ExerciseFavoritePreference.load(), contains('id:shoulder_press'));
+      expect(
+        await ExerciseFavoritePreference.load(),
+        contains('id:shoulder_press'),
+      );
       expect(find.text('0種目選択中'), findsOneWidget);
       await tapVisible(
         t,

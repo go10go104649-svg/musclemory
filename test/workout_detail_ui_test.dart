@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/design/app_colors.dart';
+import 'package:setkeep/main.dart';
 
 WorkoutRecord detailFixture({int duration = 60, double weight = 40}) =>
     WorkoutRecord(
@@ -18,35 +19,36 @@ WorkoutDetailPage detailPage(WorkoutRecord record) => WorkoutDetailPage(
   onWorkoutUpdated: (_, _) async {},
   onWorkoutDeleted: (_) async => false,
 );
-Widget headerFixture({List<String> names = const ['ベンチプレス', 'ショルダープレス']}) => MaterialApp(
-  home: Scaffold(
-    body: SingleChildScrollView(
-      child: Column(
-        children: [
-          for (final (index, name) in names.indexed)
-            ExerciseInputCard(
-              exerciseIndex: index,
-              exercise: WorkoutExercise(
-                name: name,
-                bodyPart: index == 0 ? '胸' : '肩',
-                equipment: 'フリーウェイト',
-                recordType: ExerciseRecordType.weightReps,
-                sets: [WorkoutSet(weight: 40, reps: 10)],
-              ),
-              history: const [],
-              onAddSet: () {},
-              onRemoveSet: (_) {},
-              onRemove: () {},
-              onToggleSet: (_) {},
-              onApplyPrevious: (_) {},
-              onSetAllCompleted: (_) {},
-              onValuesChanged: () {},
-            ),
-        ],
+Widget headerFixture({List<String> names = const ['ベンチプレス', 'ショルダープレス']}) =>
+    MaterialApp(
+      home: Scaffold(
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              for (final (index, name) in names.indexed)
+                ExerciseInputCard(
+                  exerciseIndex: index,
+                  exercise: WorkoutExercise(
+                    name: name,
+                    bodyPart: index == 0 ? '胸' : '肩',
+                    equipment: 'フリーウェイト',
+                    recordType: ExerciseRecordType.weightReps,
+                    sets: [WorkoutSet(weight: 40, reps: 10)],
+                  ),
+                  history: const [],
+                  onAddSet: () {},
+                  onRemoveSet: (_) {},
+                  onRemove: () {},
+                  onToggleSet: (_) {},
+                  onApplyPrevious: (_) {},
+                  onSetAllCompleted: (_) {},
+                  onValuesChanged: () {},
+                ),
+            ],
+          ),
+        ),
       ),
-    ),
-  ),
-);
+    );
 void main() {
   setUp(() => WorkoutUiPreference.workoutDurationEnabled = true);
   tearDown(() => WorkoutUiPreference.workoutDurationEnabled = true);
@@ -115,14 +117,19 @@ void main() {
     expect(t.takeException(), isNull);
   });
   for (final width in [320.0, 400.0]) {
-    testWidgets('exercise header titles stay on one line at $width px', (t) async {
+    testWidgets('exercise header titles stay on one line at $width px', (
+      t,
+    ) async {
       t.view.physicalSize = Size(width, 900);
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.resetPhysicalSize);
       addTearDown(t.view.resetDevicePixelRatio);
       double? removeRight;
-      for (final name in ['ベンチプレス', 'インクラインダンベルフライ',
-        'インクラインダンベルプレス・とても長いカスタムトレーニング種目名']) {
+      for (final name in [
+        'ベンチプレス',
+        'インクラインダンベルフライ',
+        'インクラインダンベルプレス・とても長いカスタムトレーニング種目名',
+      ]) {
         await t.pumpWidget(headerFixture(names: [name]));
         await t.pumpAndSettle();
         final titleFinder = find.byKey(const Key('exerciseInputTitle0'));
@@ -134,7 +141,11 @@ void main() {
         if (name == 'ベンチプレス') expect(title.style!.fontSize, 18);
         if (name.contains('とても長い')) expect(title.style!.fontSize, 16);
         final painter = TextPainter(
-          text: TextSpan(text: title.data, style: DefaultTextStyle.of(t.element(titleFinder)).style.merge(title.style)),
+          text: TextSpan(
+            text: title.data,
+            style: DefaultTextStyle.of(t.element(titleFinder)).style
+                .merge(title.style),
+          ),
           textDirection: TextDirection.ltr,
           maxLines: 1,
           ellipsis: '…',
@@ -146,7 +157,10 @@ void main() {
         expect(remove, findsOneWidget);
         removeRight ??= t.getRect(remove).right;
         expect(t.getRect(remove).right, removeRight);
-        expect(t.getRect(titleFinder).right, lessThanOrEqualTo(t.getRect(remove).left));
+        expect(
+          t.getRect(titleFinder).right,
+          lessThanOrEqualTo(t.getRect(remove).left),
+        );
         expect(find.text('胸 ・ フリーウェイト'), findsOneWidget);
         expect(t.takeException(), isNull);
       }
@@ -154,14 +168,14 @@ void main() {
   }
 
   testWidgets(
-    'only exercise headers are lime with readable text and remove icons',
+    'only exercise headers use brand green with readable text and remove icons',
     (t) async {
       await t.pumpWidget(headerFixture());
       await t.pumpAndSettle();
       for (final index in [0, 1]) {
         final header = find.byKey(Key('exerciseInputHeader$index'));
         final box = t.widget<Container>(header).decoration as BoxDecoration;
-        expect(box.color, const Color(0xFFC7F36B));
+        expect(box.color, AppColors.primaryGreen);
         for (final text in t.widgetList<Text>(
           find.descendant(of: header, matching: find.byType(Text)),
         )) {

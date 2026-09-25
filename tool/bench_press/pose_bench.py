@@ -1,7 +1,7 @@
 import os
 import bpy, math, json, pathlib
 from mathutils import Vector, Matrix
-ROOT=pathlib.Path(os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools'))
+ROOT=pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools')))
 bpy.ops.wm.open_mainfile(filepath=str(ROOT/'base.blend'))
 human=bpy.data.objects['Athlete'];rig=bpy.data.objects['Athlete.rig']
 scene=bpy.context.scene

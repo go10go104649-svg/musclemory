@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'gym_integration_test.dart' show FakeGyms, storeA, storeB;
 
-import 'package:muscle_memory/gym/gym_repository.dart';
+import 'package:setkeep/gym/gym_repository.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

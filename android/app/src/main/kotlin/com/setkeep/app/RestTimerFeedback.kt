@@ -1,4 +1,4 @@
-package com.musclememory.muscle_memory
+package com.setkeep.app
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,7 +14,7 @@ import android.os.Vibrator
 
 /** Native lifetime: removing the countdown widget does not cut off the cue. */
 internal object RestTimerFeedback {
-    const val CHANNEL = "musclemory_rest_timer_sound_v3"
+    const val CHANNEL = "setkeep_rest_timer_sound_v3"
     var foreground = false
     private var player: MediaPlayer? = null
     private var focus: AudioFocusRequest? = null
@@ -37,7 +37,8 @@ internal object RestTimerFeedback {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return null
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (manager.getNotificationChannel(CHANNEL) == null) {
-            val previous = manager.getNotificationChannel("musclemory_rest_timer_sound_v2")
+            val previous = manager.getNotificationChannel("musclemory_rest_timer_sound_v3")
+                ?: manager.getNotificationChannel("musclemory_rest_timer_sound_v2")
             manager.createNotificationChannel(NotificationChannel(CHANNEL, "休憩タイマー",
                 previous?.importance ?: NotificationManager.IMPORTANCE_HIGH).apply {
                 description = "セット間の休憩終了を知らせます"

@@ -1,13 +1,13 @@
 // Development-only host for OS notification tap/lifecycle verification.
 import 'package:flutter/material.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('MUSCLEMORY 通知確認')),
+        appBar: AppBar(title: const Text('SETKEEP 通知確認')),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

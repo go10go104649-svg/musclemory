@@ -410,7 +410,7 @@ AB0923000000000000000016 = {isa = PBXTargetDependency; target = AB09230000000000
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -426,7 +426,7 @@ AB0923000000000000000016 = {isa = PBXTargetDependency; target = AB09230000000000
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -443,7 +443,7 @@ AB0923000000000000000016 = {isa = PBXTargetDependency; target = AB09230000000000
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -458,7 +458,7 @@ AB0923000000000000000016 = {isa = PBXTargetDependency; target = AB09230000000000
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -592,7 +592,7 @@ AB0923000000000000000016 = {isa = PBXTargetDependency; target = AB09230000000000
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -615,7 +615,7 @@ AB0923000000000000000016 = {isa = PBXTargetDependency; target = AB09230000000000
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -629,7 +629,7 @@ AB0923000000000000000011 = {isa = XCBuildConfiguration; baseConfigurationReferen
  INFOPLIST_FILE = RestTimerWidget/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 16.2;
  LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
  CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)"; MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
- PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory.RestTimerWidget;
+ PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app.RestTimerWidget;
  PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0;
  TARGETED_DEVICE_FAMILY = "1,2";
  }; name = Debug; };
@@ -639,7 +639,7 @@ AB0923000000000000000012 = {isa = XCBuildConfiguration; baseConfigurationReferen
  INFOPLIST_FILE = RestTimerWidget/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 16.2;
  LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
  CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)"; MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
- PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory.RestTimerWidget;
+ PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app.RestTimerWidget;
  PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0;
  TARGETED_DEVICE_FAMILY = "1,2";
  }; name = Release; };
@@ -649,7 +649,7 @@ AB0923000000000000000013 = {isa = XCBuildConfiguration; baseConfigurationReferen
  INFOPLIST_FILE = RestTimerWidget/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 16.2;
  LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", );
  CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)"; MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
- PRODUCT_BUNDLE_IDENTIFIER = com.musclememory.muscleMemory.RestTimerWidget;
+ PRODUCT_BUNDLE_IDENTIFIER = com.setkeep.app.RestTimerWidget;
  PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0;
  TARGETED_DEVICE_FAMILY = "1,2";
  }; name = Profile; };

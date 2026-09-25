@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/admin/report_repository.dart';
-import 'package:muscle_memory/admin/report_management_page.dart';
+import 'package:setkeep/admin/report_repository.dart';
+import 'package:setkeep/admin/report_management_page.dart';
 
 class FakeReports implements ReportRepository {
   bool admin = true, fail = false;

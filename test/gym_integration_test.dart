@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:muscle_memory/main.dart';
-import 'package:muscle_memory/gym/gym_repository.dart';
-import 'package:muscle_memory/gym/gym_pages.dart';
+import 'package:setkeep/main.dart';
+import 'package:setkeep/gym/gym_repository.dart';
+import 'package:setkeep/gym/gym_pages.dart';
 
 const storeA = GymStore(
   id: 'a',

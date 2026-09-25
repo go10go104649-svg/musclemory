@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/trainer_invite_qr.dart';
-import 'package:muscle_memory/trainer_qr_page.dart';
+import 'package:setkeep/trainer_invite_qr.dart';
+import 'package:setkeep/trainer_qr_page.dart';
 
 void main() {
   test('trainer QR parses only supported invite URLs', () {
     final invite = TrainerInviteQr.parse(
-      'musclemory://trainer/invite?v=1&token=test-token',
+      'setkeep://trainer/invite?v=1&token=test-token',
     );
     expect(invite?.version, 1);
     expect(invite?.token, 'test-token');
     for (final invalid in [
-      'musclemory://trainer/invite?v=1&token=',
-      'musclemory://trainer/invite?v=1&token=%20',
-      'musclemory://trainer/invite?token=test',
-      'musclemory://trainer/invite?v=2&token=test',
-      'musclemory://gym/invite?v=1&token=test',
-      'musclemory://trainer/connect?v=1&token=test',
+      'setkeep://trainer/invite?v=1&token=',
+      'setkeep://trainer/invite?v=1&token=%20',
+      'setkeep://trainer/invite?token=test',
+      'setkeep://trainer/invite?v=2&token=test',
+      'setkeep://gym/invite?v=1&token=test',
+      'setkeep://trainer/connect?v=1&token=test',
       'https://trainer/invite?v=1&token=test',
       'not a URI',
-      'musclemory://[broken',
-      'musclemory://trainer/invite?v=1&token=%ZZ',
-      'musclemory://trainer/invite?v=1&token=a&token=b',
-      'musclemory://trainer/invite?v=1&v=2&token=a',
-      'musclemory://trainer/invite?v=1&token=a&trainerId=123',
-      'musclemory://user@trainer/invite?v=1&token=a',
-      'musclemory://trainer:80/invite?v=1&token=a',
-      'musclemory://trainer/invite?v=1&token=a#fragment',
+      'setkeep://[broken',
+      'setkeep://trainer/invite?v=1&token=%ZZ',
+      'setkeep://trainer/invite?v=1&token=a&token=b',
+      'setkeep://trainer/invite?v=1&v=2&token=a',
+      'setkeep://trainer/invite?v=1&token=a&trainerId=123',
+      'setkeep://user@trainer/invite?v=1&token=a',
+      'setkeep://trainer:80/invite?v=1&token=a',
+      'setkeep://trainer/invite?v=1&token=a#fragment',
     ]) {
       expect(TrainerInviteQr.parse(invalid), isNull, reason: invalid);
     }
@@ -70,8 +70,8 @@ void main() {
     expect(find.byKey(const Key('invalidTrainerQr')), findsOneWidget);
     expect(find.byKey(const Key('fakeCamera')), findsOneWidget);
     expect(tester.takeException(), isNull);
-    detect('musclemory://trainer/invite?v=1&token=secret-token');
-    detect('musclemory://trainer/invite?v=1&token=secret-token');
+    detect('setkeep://trainer/invite?v=1&token=secret-token');
+    detect('setkeep://trainer/invite?v=1&token=secret-token');
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('trainerInviteRecognized')), findsOneWidget);
     expect(find.byKey(const Key('fakeCamera')), findsNothing);

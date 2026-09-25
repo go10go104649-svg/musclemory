@@ -1,0 +1,100 @@
+file	line	reason	reference
+android/app/build.gradle.kts	14	既存署名・QA環境変数/端末名の互換読込	"?: System.getenv(""MUSCLEMORY_SIGNING_PROPERTIES"") // Existing private build environments."
+android/app/src/main/AndroidManifest.xml	40	旧callback/招待QRの移行期間互換	"<data android:scheme=""musclemory"" android:host=""login-callback"" />"
+android/app/src/main/kotlin/com/setkeep/app/RestTimerFeedback.kt	40	既存通知チャンネル設定の互換参照	"val previous = manager.getNotificationChannel(""musclemory_rest_timer_sound_v3"")"
+android/app/src/main/kotlin/com/setkeep/app/RestTimerFeedback.kt	41	既存通知チャンネル設定の互換参照	"?: manager.getNotificationChannel(""musclemory_rest_timer_sound_v2"")"
+android/app/src/main/kotlin/com/setkeep/app/WorkoutNotificationState.kt	13	永続化済み通知アクション状態キーを保持	"private const val ACTION = ""musclemory.lock_action"""
+android/app/src/main/kotlin/com/setkeep/app/WorkoutNotificationState.kt	14	永続化済み通知アクション状態キーを保持	"private const val LAST_ACTION_AT = ""musclemory.last_set_action_at"""
+art/body_tab/asset_report.json	2	過去QA・生成記録の実際の識別子/パスを保持	"""source"": ""/Users/macintosh/Documents/Codex/muscle_memory/art/body_tab/body_tab.blend"","
+docs/beta/distribution.md	15	過去配布ファイル名とビルド実績を保持（現行手順は移行資料を参照）	ファイル: `MUSCLEMORY-beta5-1.0.0-5.apk`。
+docs/beta/distribution.md	24	過去配布ファイル名とビルド実績を保持（現行手順は移行資料を参照）	ファイル: `MUSCLEMORY-beta4-1.0.0-4.apk`。ホーム・体重最新行・3Dカメラ復帰・休憩音とストップ・クラウド領域の整理を反映。
+docs/beta/distribution.md	32	過去配布ファイル名とビルド実績を保持（現行手順は移行資料を参照）	# MUSCLEMORY ベータ1（1.0.0 / ビルド2）
+docs/beta/distribution.md	80	過去配布ファイル名とビルド実績を保持（現行手順は移行資料を参照）	- iOS physical-device release build succeeded WITHOUT signing. Bundle ID `com.musclememory.muscleMemory`, version `1.0.0`, build `2`. No signed IPA, physical installation or TestFlight upload yet.
+docs/qa/android_live_rest_set_2026-09-24.md	46	過去QA・生成記録の実際の識別子/パスを保持	- `android/app/src/main/kotlin/com/musclememory/muscle_memory/MainActivity.kt`
+docs/qa/android_live_rest_set_2026-09-24.md	47	過去QA・生成記録の実際の識別子/パスを保持	- `android/app/src/main/kotlin/com/musclememory/muscle_memory/RestTimerState.kt`
+docs/qa/android_live_rest_set_2026-09-24.md	48	過去QA・生成記録の実際の識別子/パスを保持	- `android/app/src/main/kotlin/com/musclememory/muscle_memory/RestTimerReceiver.kt`
+docs/qa/android_live_rest_set_2026-09-24.md	49	過去QA・生成記録の実際の識別子/パスを保持	- `android/app/src/main/kotlin/com/musclememory/muscle_memory/WorkoutNotificationState.kt`
+docs/qa/android_rest_notification_ui_2026-09-24.md	63	過去QA・生成記録の実際の識別子/パスを保持	- android/app/src/main/kotlin/com/musclememory/muscle_memory/MainActivity.kt
+docs/qa/android_rest_notification_ui_2026-09-24.md	64	過去QA・生成記録の実際の識別子/パスを保持	- android/app/src/main/kotlin/com/musclememory/muscle_memory/RestTimerState.kt
+docs/qa/android_rest_notification_ui_2026-09-24.md	65	過去QA・生成記録の実際の識別子/パスを保持	- android/app/src/main/kotlin/com/musclememory/muscle_memory/WorkoutNotificationState.kt
+docs/qa/bench_press_2026-09-14/final_verification.md	3	過去QA・生成記録の実際の識別子/パスを保持	Executed from /Users/macintosh/Documents/Codex/muscle_memory:
+docs/qa/body_tab_relative_2026-09-14/asset_report.json	2	過去QA・生成記録の実際の識別子/パスを保持	"""source"": ""/Users/macintosh/Documents/Codex/muscle_memory/art/body_tab/body_tab.blend"","
+docs/qa/body_tab_relative_2026-09-14/verification.md	1	過去QA・生成記録の実際の識別子/パスを保持	# MUSCLEMORY 部位タブ：筋肉輪郭と相対比率の修正
+docs/qa/body_weight_2026-09-14/verification.md	3	過去QA・生成記録の実際の識別子/パスを保持	- iOS 26.5 / 専用 MUSCLEMORY QA（iPhone 17）、Android 16 / 専用 musclemory_qa（Pixel 7）。実機は未確認。
+docs/qa/bulk_exercise_ios_2026-09-14/verification.md	6	過去QA・生成記録の実際の識別子/パスを保持	- iOS 26.5 / iPhone 17仕様の専用MUSCLEMORY QA。
+docs/qa/bulk_exercise_ios_2026-09-14/verification.md	7	過去QA・生成記録の実際の識別子/パスを保持	- Android 16 / Pixel 7仕様の専用musclemory_qa。
+docs/qa/forms_batch_2026-09-22.md	1	過去QA・生成記録の実際の識別子/パスを保持	# MUSCLEMORY 17種目量産 — 最終記録（2026-09-22）
+docs/qa/forms_expansion_2026-09-16/progress.md	8	過去QA・生成記録の実際の識別子/パスを保持	- caffeinate PID: `/tmp/musclemory_3d_expansion_caffeinate.pid`。完了・中止時に解除する。
+docs/qa/forms_expansion_2026-09-16/progress.md	33	過去QA・生成記録の実際の識別子/パスを保持	- 最新素材は/tmp/musclemory-form-revision内。制作中の変更をすべてアプリへ反映したわけではない。過去のテスト画像を最新素材の確認済み証拠として扱わない。
+docs/qa/forms_expansion_2026-09-16/progress.md	82	過去QA・生成記録の実際の識別子/パスを保持	- Android release APK build: successful, 102.3MB reported, versionName1.0.0/versionCode5, apksigner verification successful. Saved to `/Users/macintosh/Documents/Codex/2026-09-11/r/beta/1.0.0-5/MUSCLEMORY-beta5-1.0.0-5.apk` with SHA256.txt.
+docs/qa/forms_phase2_2026-09-22.md	91	過去QA・生成記録の実際の識別子/パスを保持	- iOS専用QA Simulator / Android MUSCLEMORY_Batch_QA：元25種と新規11種の読み込み・再生・一時停止・再開・解放を確認。今回公開12種すべて、両OSの通常Picker→詳細の遷移も確認。
+docs/qa/forms_rebuild_2026-09-22.md	96	過去QA・生成記録の実際の識別子/パスを保持	- Android: `android-native-retry.log`。178 Flutterテスト、APKビルド、7種目fullネイティブQA成功。専用AVD `MUSCLEMORY_Batch_QA` のみ使用。
+docs/qa/forms_rebuild_2026-09-22.md	97	過去QA・生成記録の実際の識別子/パスを保持	- iOS第2組: `ios-secondary-native-idle.log`。178 Flutterテスト、ビルド、ケーブルロー・ライナーロウ・旧アシスト候補のfull成功。専用 `MUSCLEMORY QA` のみ使用。
+docs/qa/forms_rebuild_2026-09-22.md	174	過去QA・生成記録の実際の識別子/パスを保持	- 2026-09-23: iOS通常導線8種目成功（`ios-next-eight-route.log`、各種目キャプチャあり）。通常catalogの復元を確認。Android通常導線を専用MUSCLEMORY_Batch_QAで開始。旧caffeinateプロセスが終了していたため再開時に`caffeinate -i -d`を新規起動、PID85014を記録。恒久設定変更なし。
+docs/qa/home_rest_cloud_2026-09-15/verification.md	34	過去QA・生成記録の実際の識別子/パスを保持	- `android/app/src/main/kotlin/com/musclememory/muscle_memory/MainActivity.kt`
+docs/qa/home_rest_cloud_2026-09-15/verification.md	35	過去QA・生成記録の実際の識別子/パスを保持	- `android/app/src/main/kotlin/com/musclememory/muscle_memory/RestTimerFeedback.kt`（追加）
+docs/qa/home_rest_cloud_2026-09-15/verification.md	36	過去QA・生成記録の実際の識別子/パスを保持	- `android/app/src/main/kotlin/com/musclememory/muscle_memory/RestTimerReceiver.kt`
+docs/qa/home_rest_cloud_2026-09-15/verification.md	50	過去QA・生成記録の実際の識別子/パスを保持	- Android API 36 ARM64 / 専用MUSCLEMORY_Batch_QA、iOS 26.5 / 専用MUSCLEMORY QAでホーム・体重編集・クラウドロック・休憩停止の実画面テスト成功。
+docs/qa/home_rest_cloud_2026-09-15/verification.md	90	過去QA・生成記録の実際の識別子/パスを保持	- Android release: 成功。`MUSCLEMORY-beta4-1.0.0-4.apk`（1.0.0 / build 4）。APK v2署名検証成功、16KB zipalign検証成功。90,813,763 bytes。
+docs/qa/home_rest_cloud_2026-09-15/verification.md	94	過去QA・生成記録の実際の識別子/パスを保持	- 配布APKは新規の専用 `MUSCLEMORY_Release_QA`（Android API36）にインストールし、通常ホーム起動を確認。既存アプリの削除は行わず、専用の新規エミュレーターを使用。
+docs/qa/home_rest_cloud_2026-09-15/verification.md	95	過去QA・生成記録の実際の識別子/パスを保持	- iOS最終アプリを専用 `MUSCLEMORY QA` に再インストールし、通常ホーム起動を確認。
+docs/qa/rest_lock_screen_2026-09-23.md	31	過去QA・生成記録の実際の識別子/パスを保持	- Android: MUSCLEMORY_Batch_QA / emulator-5554
+docs/qa/rest_lock_screen_2026-09-23.md	32	過去QA・生成記録の実際の識別子/パスを保持	- iOS: MUSCLEMORY QA / 0B986FD3-05C1-4ECF-8CA8-035433154498 / iOS 26.5
+docs/qa/rest_lock_screen_2026-09-23.md	60	過去QA・生成記録の実際の識別子/パスを保持	- android/app/src/main/kotlin/com/musclememory/muscle_memory/MainActivity.kt
+docs/qa/rest_lock_screen_2026-09-23.md	61	過去QA・生成記録の実際の識別子/パスを保持	- android/app/src/main/kotlin/com/musclememory/muscle_memory/RestTimerState.kt
+docs/qa/seven_items_2026-09-15/verification.md	1	過去QA・生成記録の実際の識別子/パスを保持	# MUSCLEMORY 指定7項目 QA（2026-09-15）
+docs/qa/seven_items_2026-09-15/verification.md	34	過去QA・生成記録の実際の識別子/パスを保持	- Android: `docs/beta/MUSCLEMORY-beta3-1.0.0-3.apk`
+docs/qa/share_photo_2026-09-14/verification.md	5	過去QA・生成記録の実際の識別子/パスを保持	確認済み：静的解析成功、全82テスト成功、iOS debugビルド成功。専用MUSCLEMORY QA / iOS 26.5でSNS画像画面から実際の写真ピッカーを開き、サンプル写真が表示された（native_photo_picker.png）。
+docs/qa/workout_completion_2026-09-23.md	40	過去QA・生成記録の実際の識別子/パスを保持	- Android: MUSCLEMORY_Batch_QA / emulator-5554、am force-stop後の再起動に成功。
+docs/qa/workout_completion_2026-09-23.md	41	過去QA・生成記録の実際の識別子/パスを保持	- iOS: MUSCLEMORY QA / 0B986FD3-05C1-4ECF-8CA8-035433154498、simctl terminate後の再起動に成功。
+docs/qa/workout_layout_2026-09-23.md	23	過去QA・生成記録の実際の識別子/パスを保持	- iOS: 専用MUSCLEMORY QA Simulator / 0B986FD3-05C1-4ECF-8CA8-035433154498。
+docs/qa/workout_layout_2026-09-23.md	24	過去QA・生成記録の実際の識別子/パスを保持	- Android: 専用MUSCLEMORY_Batch_QA / emulator-5554。
+docs/setkeep_migration.md	7	旧→新対応と移行手順の説明	|表示名|MUSCLEMORY|SETKEEP|
+docs/setkeep_migration.md	8	旧→新対応と移行手順の説明	|Dart package|muscle_memory|setkeep|
+docs/setkeep_migration.md	9	旧→新対応と移行手順の説明	|Android applicationId / namespace / Kotlin package|com.musclememory.muscle_memory|com.setkeep.app|
+docs/setkeep_migration.md	10	旧→新対応と移行手順の説明	|iOS / macOS bundle|com.musclememory.muscleMemory|com.setkeep.app|
+docs/setkeep_migration.md	11	旧→新対応と移行手順の説明	|iOS Widget|com.musclememory.muscleMemory.RestTimerWidget|com.setkeep.app.RestTimerWidget|
+docs/setkeep_migration.md	12	旧→新対応と移行手順の説明	|テストbundle|com.musclememory.muscleMemory.RunnerTests|com.setkeep.app.RunnerTests|
+docs/setkeep_migration.md	13	旧→新対応と移行手順の説明	|OAuth callback|musclemory://login-callback/|setkeep://login-callback/|
+docs/setkeep_migration.md	14	旧→新対応と移行手順の説明	|Flutter/native channel|com.musclememory/rest_timer、workout_image|com.setkeep.app/rest_timer、workout_image|
+docs/setkeep_migration.md	15	旧→新対応と移行手順の説明	|新規画像保存先 / ファイル名|MUSCLEMORY|SETKEEP|
+docs/setkeep_migration.md	26	旧→新対応と移行手順の説明	- バックアップの `app` は新規出力SETKEEP、読込はSETKEEP / MUSCLEMORY / MuscleMemoryのv1〜v3を受理。内容・形式は変更しない。
+docs/setkeep_migration.md	39	旧→新対応と移行手順の説明	旧 `musclemory://login-callback/` は旧アプリ利用中は残す。Site URLは他クライアントにも影響するので一括上書きしない。
+ios/Runner/Info.plist	16	旧callback/招待QRの移行期間互換	<string>musclemory</string>
+lib/main.dart	7004	旧バックアップ/QRの互換読込と回帰テスト	json['app'] == 'MUSCLEMORY' ||
+lib/main.dart	7005	旧バックアップ/QRの互換読込と回帰テスト	json['app'] == 'MuscleMemory';
+lib/trainer_invite_qr.dart	15	旧callback/招待QRの移行期間互換	!const {'setkeep', 'musclemory'}.contains(uri.scheme) ||
+supabase/config.toml	162	旧callback/招待QRの移行期間互換	"additional_redirect_urls = [""https://127.0.0.1:3000"", ""setkeep://login-callback/"", ""musclemory://login-callback/""]"
+test/exercise_identity_test.dart	213	旧バックアップ/QRの互換読込と回帰テスト	'app': 'MuscleMemory',
+test/setkeep_brand_test.dart	10	旧バックアップ/QRの互換読込と回帰テスト	for (final brand in ['SETKEEP', 'MUSCLEMORY', 'MuscleMemory']) {
+test/setkeep_brand_test.dart	69	旧バックアップ/QRの互換読込と回帰テスト	for (final scheme in ['setkeep', 'musclemory']) {
+test/widget_test.dart	1860	旧バックアップ/QRの互換読込と回帰テスト	'app': 'MuscleMemory',
+test_driver/workout_lifecycle_driver.dart	8	既存署名・QA環境変数/端末名の互換読込	Platform.environment['MUSCLEMORY_QA_OUTPUT'] ??
+tool/bench_press/export_bench.py	3	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	root=pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools')))
+tool/bench_press/export_incline.py	3	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	root=pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools')))
+tool/bench_press/make_base.py	3	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	root = pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools')))
+tool/bench_press/make_base.py	7	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	if not link.exists(): link.symlink_to(str(pathlib.Path(os.environ.get('MPFB_REPO', '/private/tmp/musclemory-mpfb2'))/'src/mpfb'), target_is_directory=True)
+tool/bench_press/make_base.py	8	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	repo=bpy.context.preferences.extensions.repos.new(name='SETKEEP Tools', module='musclemory', custom_directory=str(ext))
+tool/bench_press/make_base.py	9	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	bpy.ops.preferences.addon_enable(module='bl_ext.musclemory.mpfb')
+tool/bench_press/make_base.py	10	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	from bl_ext.musclemory.mpfb.services.humanservice import HumanService
+tool/bench_press/make_base.py	11	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	from bl_ext.musclemory.mpfb.services.targetservice import TargetService
+tool/bench_press/make_base.py	12	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	from bl_ext.musclemory.mpfb.services.exportservice import ExportService
+tool/bench_press/make_base.py	13	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	from bl_ext.musclemory.mpfb.services.objectservice import ObjectService
+tool/bench_press/make_base.py	21	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	targets=pathlib.Path(os.environ.get('MPFB_REPO', '/private/tmp/musclemory-mpfb2'))/'src/mpfb/data/targets'
+tool/bench_press/pose_bench.py	4	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	ROOT=pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools')))
+tool/bench_press/pose_incline.py	4	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	ROOT=pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools')))
+tool/build_android_beta.sh	5	既存署名・QA環境変数/端末名の互換読込	export SETKEEP_SIGNING_PROPERTIES=${SETKEEP_SIGNING_PROPERTIES:-${MUSCLEMORY_SIGNING_PROPERTIES:-}}
+tool/build_android_beta.sh	9	既存署名・QA環境変数/端末名の互換読込	qa_config=${SETKEEP_SUPABASE_CONFIG:-${MUSCLEMORY_SUPABASE_CONFIG:-supabase.json}}
+tool/exercise_forms/pack_assets.py	52	既存プレビュー成果物の誤公開防止マーカー	if (source / '.musclemory-preview-only').exists():
+tool/exercise_forms/tests/test_qa_mode_wrapper.py	36	既存QA環境変数・端末名の後方互換テスト	print(json.dumps({'devices':{'test':[{'udid':'qa-id','name':os.environ.get('DEVICE_NAME','MUSCLEMORY QA test')}]}}))
+tool/exercise_forms/tests/test_qa_mode_wrapper.py	38	既存QA環境変数・端末名の後方互換テスト	"self.command('adb', ""import os\nprint(os.environ.get('DEVICE_NAME','musclemory_qa'))\n"")"
+tool/exercise_forms/tests/test_qa_mode_wrapper.py	46	既存QA環境変数・端末名の後方互換テスト	for key in ('FORM_QA_MODE','FORM_QA_IDS','FORM_QA_BASELINE','FORM_QA_REVIEW_CANDIDATES','FORM_QA_TEST_SCOPE','MUSCLEMORY_QA_TARGET','FAIL_BUILD','FAIL_CANDIDATE','DEVICE_NAME'):
+tool/exercise_forms/tests/test_qa_mode_wrapper.py	73	既存QA環境変数・端末名の後方互換テスト	MUSCLEMORY_QA_TARGET='integration_test/exercise_form_expansion_test.dart',
+tool/exercise_forms/tests/test_qa_mode_wrapper.py	87	既存QA環境変数・端末名の後方互換テスト	MUSCLEMORY_QA_TARGET='integration_test/exercise_form_expansion_test.dart')
+tool/exercise_forms/tests/test_qa_mode_wrapper.py	125	既存QA環境変数・端末名の後方互換テスト	MUSCLEMORY_QA_TARGET='integration_test/exercise_form_route_test.dart',
+tool/exercise_forms/tests/test_qa_mode_wrapper.py	133	既存QA環境変数・端末名の後方互換テスト	for fields in ({}, {'MUSCLEMORY_QA_TARGET':'integration_test/exercise_form_route_test.dart','FORM_QA_IDS':'high_row'}):
+tool/render_category_muscles.py	5	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	work=pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK','/private/tmp/musclemory-3d-tools')))
+tool/render_category_muscles.py	40	保留中Blender作業領域・MPFB登録名・旧環境変数の互換読込	for category in os.environ.get('SETKEEP_CATEGORIES', os.environ.get('MUSCLEMORY_CATEGORIES','chest,back,shoulders,arms,legs,abs')).split(','):
+tool/verify_workout_lifecycle.sh	9	既存署名・QA環境変数/端末名の互換読込	qa_target=${SETKEEP_QA_TARGET:-${MUSCLEMORY_QA_TARGET:-integration_test/workout_lifecycle_test.dart}}
+tool/verify_workout_lifecycle.sh	20	既存署名・QA環境変数/端末名の互換読込	"[[ ""$qa_name"" == SETKEEP\ QA* || ""$qa_name"" == MUSCLEMORY\ QA* ]] || { echo 'Use a dedicated SETKEEP QA simulator, never a user simulator.' >&2; exit 2; }"
+tool/verify_workout_lifecycle.sh	24	既存署名・QA環境変数/端末名の互換読込	"[[ ""$qa_name"" == setkeep_qa || ""$qa_name"" == SETKEEP_Batch_QA || ""$qa_name"" == musclemory_qa || ""$qa_name"" == MUSCLEMORY_Batch_QA ]] || { echo 'Use a dedicated SETKEEP QA emulator (legacy QA devices also accepted).' >&2; exit 2; }"

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/config/supabase_config.dart';
+import 'package:setkeep/config/supabase_config.dart';
 
 void main() {
   const url = 'https://example.supabase.co';

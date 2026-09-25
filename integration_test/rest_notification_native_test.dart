@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  const channel = MethodChannel('com.musclememory/rest_timer');
+  const channel = MethodChannel('com.setkeep.app/rest_timer');
 
   testWidgets('native rest completion and explicit feedback remain separate', (
     tester,

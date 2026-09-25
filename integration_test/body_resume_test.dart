@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/body_weight.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/body_weight.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -29,7 +29,7 @@ void main() {
           ),
         ),
       });
-      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpWidget(const SetkeepApp());
       await tester.pumpAndSettle();
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.byKey(const Key('editBodyWeightw11')));
@@ -153,7 +153,7 @@ Future<List<int>> captureScreen(
   if (!Platform.isAndroid) return binding.takeScreenshot(name);
   // Do not convert FlutterSurfaceView to ImageView: that changes the surface
   // lifecycle we are testing and can hold an old frame of an external Texture.
-  final bytes = await const MethodChannel('com.musclememory/rest_timer')
+  final bytes = await const MethodChannel('com.setkeep.app/rest_timer')
       .invokeMethod<Uint8List>('debugScreenshot');
   await File('${Directory.systemTemp.path}/$name.png').writeAsBytes(bytes!);
   return bytes;

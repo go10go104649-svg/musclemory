@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/bench_press_form.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/bench_press_form.dart';
+import 'package:setkeep/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -10,7 +10,7 @@ void main() {
 
   testWidgets('Android exercise picker and 3D routes open', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await binding.convertFlutterSurfaceToImage();
     await tester.pumpAndSettle();
@@ -49,7 +49,7 @@ void main() {
 
   testWidgets('Android saves the default SNS image to photos', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await binding.convertFlutterSurfaceToImage();
     await tester.pumpAndSettle();

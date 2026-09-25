@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the original, redistributable MUSCLEMORY segmented mannequin GLB."""
+"""Generate the original, redistributable SETKEEP segmented mannequin GLB."""
 import json, math, struct, subprocess, sys
 from pathlib import Path
 
@@ -133,7 +133,7 @@ for name, center, scale, rot, color in parts:
 camera_node = len(nodes)
 nodes.append({'name': 'Camera', 'camera': 0, 'translation': [0, 0.05, 5.2]})
 gltf = {
-    'asset': {'version': '2.0', 'generator': 'MUSCLEMORY procedural mannequin generator'},
+    'asset': {'version': '2.0', 'generator': 'SETKEEP procedural mannequin generator'},
     'scene': 0,
     'scenes': [{'nodes': list(range(len(nodes)))}],
     'cameras': [

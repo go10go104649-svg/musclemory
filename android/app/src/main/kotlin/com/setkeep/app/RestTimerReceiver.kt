@@ -1,4 +1,4 @@
-package com.musclememory.muscle_memory
+package com.setkeep.app
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -69,7 +69,7 @@ class RestTimerReceiver : BroadcastReceiver() {
         val notification = builder
             .setContentIntent(openApp)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("MUSCLEMORY")
+            .setContentTitle("SETKEEP")
             .setContentText("休憩終了。次のセットへ！")
             .setPriority(Notification.PRIORITY_HIGH)
             .setAutoCancel(true)

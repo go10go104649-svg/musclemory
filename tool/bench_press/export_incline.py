@@ -1,6 +1,6 @@
 import os
 import bpy, pathlib
-root=pathlib.Path(os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools'))
+root=pathlib.Path(os.environ.get('SETKEEP_ART_WORK', os.environ.get('MUSCLEMORY_ART_WORK', '/private/tmp/musclemory-3d-tools')))
 bpy.ops.wm.open_mainfile(filepath=str(root/'incline.blend'))
 bpy.context.scene.frame_set(1)
 human=bpy.data.objects['Athlete']

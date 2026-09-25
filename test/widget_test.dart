@@ -1,14 +1,17 @@
-import 'package:muscle_memory/exercise_form_catalog.dart';
+import 'package:setkeep/exercise_form_catalog.dart';
+
 import 'support/bulk_exercise_flow.dart';
 import 'support/legal_consent_fixture.dart';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:muscle_memory/main.dart';
-import 'package:muscle_memory/body_weight.dart';
-import 'package:muscle_memory/muscle_targets.dart';
+import 'package:setkeep/design/app_colors.dart';
+import 'package:setkeep/main.dart';
+import 'package:setkeep/body_weight.dart';
+import 'package:setkeep/muscle_targets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void _setExistingUserPreferences(Map<String, Object> values) {
@@ -27,17 +30,26 @@ void main() {
       throwsStateError,
     );
     expect(await LegalConsentPreference.load(), isFalse);
-    await LegalConsentPreference.accept(over16: true, terms: true, privacy: true);
+    await LegalConsentPreference.accept(
+      over16: true,
+      terms: true,
+      privacy: true,
+    );
     expect(await LegalConsentPreference.load(), isTrue);
     final preferences = await SharedPreferences.getInstance();
-    final data = jsonDecode(preferences.getString('legal_consent')!) as Map<String, dynamic>;
+    final data = jsonDecode(
+      preferences.getString('legal_consent')!,
+    ) as Map<String, dynamic>;
     expect(data['over16'], isTrue);
     expect(data['accepted'], isTrue);
     expect(DateTime.tryParse(data['acceptedAt'] as String), isNotNull);
     expect(data['termsVersion'], LegalDocuments.termsVersion);
     expect(data['privacyVersion'], LegalDocuments.privacyVersion);
     for (final field in ['termsVersion', 'privacyVersion']) {
-      await preferences.setString('legal_consent', jsonEncode({...data, field: 'old'}));
+      await preferences.setString(
+        'legal_consent',
+        jsonEncode({...data, field: 'old'}),
+      );
       expect(await LegalConsentPreference.load(), isFalse);
     }
     await preferences.setString('legal_consent', 'invalid');
@@ -52,7 +64,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('legalConsent')), findsOneWidget);
     expect(find.byKey(const Key('onboarding')), findsNothing);
@@ -99,69 +111,73 @@ void main() {
     expect(find.byType(HomeShell), findsOneWidget);
     expect(await LegalConsentPreference.load(), isTrue);
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     expect(find.byType(HomeShell), findsOneWidget);
     expect(find.byKey(const Key('legalConsent')), findsNothing);
   });
 
-  testWidgets('onboarding completes only at the last page and stays completed', (
-    tester,
-  ) async {
-    SharedPreferences.setMockInitialValues({'selected_gym': '自宅'});
-    await tester.pumpWidget(const MuscleMemoryApp());
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('onboarding')), findsOneWidget);
-    expect(find.text('ジムと一緒にトレーニングを記録'), findsOneWidget);
-    expect(find.byType(HomeShell), findsNothing);
-    final preferences = await SharedPreferences.getInstance();
-    expect(preferences.getBool('onboarding_completed'), isNull);
-    await tester.tap(find.byKey(const Key('onboardingNext')));
-    await tester.pumpAndSettle();
-    expect(find.text('成長を可視化'), findsOneWidget);
-    await tester.tap(find.byKey(const Key('onboardingBack')));
-    await tester.pumpAndSettle();
-    expect(find.text('1 / 4'), findsOneWidget);
-
-    // Closing before completion must not persist the flag.
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpWidget(const MuscleMemoryApp());
-    await tester.pumpAndSettle();
-    expect(find.text('1 / 4'), findsOneWidget);
-    for (var page = 2; page <= 4; page++) {
+  testWidgets(
+    'onboarding completes only at the last page and stays completed',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({'selected_gym': '自宅'});
+      await tester.pumpWidget(const SetkeepApp());
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('onboarding')), findsOneWidget);
+      expect(find.text('ジムと一緒にトレーニングを記録'), findsOneWidget);
+      expect(find.byType(HomeShell), findsNothing);
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.getBool('onboarding_completed'), isNull);
       await tester.tap(find.byKey(const Key('onboardingNext')));
       await tester.pumpAndSettle();
-      expect(find.text('$page / 4'), findsOneWidget);
-      expect(preferences.getBool('onboarding_completed'), isNull);
-    }
-    expect(find.text('はじめる'), findsOneWidget);
-    await tester.tap(find.text('はじめる'));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('legalConsent')), findsOneWidget);
-    expect(find.byType(HomeShell), findsNothing);
-    for (final key in ['confirmOver16', 'confirmTerms', 'confirmPrivacy']) {
-      await tester.ensureVisible(find.byKey(Key(key)));
-      await tester.tap(find.byKey(Key(key)));
+      expect(find.text('成長を可視化'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('onboardingBack')));
       await tester.pumpAndSettle();
-    }
-    await tester.ensureVisible(find.byKey(const Key('acceptLegalConsent')));
-    await tester.tap(find.byKey(const Key('acceptLegalConsent')));
-    await tester.pumpAndSettle();
-    expect(find.byType(HomeShell), findsOneWidget);
-    expect(preferences.getBool('onboarding_completed'), isTrue);
-    expect(preferences.getString('selected_gym'), '自宅');
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpWidget(const MuscleMemoryApp());
-    await tester.pumpAndSettle();
-    expect(find.byType(HomeShell), findsOneWidget);
-    expect(find.byKey(const Key('onboarding')), findsNothing);
-  });
+      expect(find.text('1 / 4'), findsOneWidget);
+
+      // Closing before completion must not persist the flag.
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(const SetkeepApp());
+      await tester.pumpAndSettle();
+      expect(find.text('1 / 4'), findsOneWidget);
+      for (var page = 2; page <= 4; page++) {
+        await tester.tap(find.byKey(const Key('onboardingNext')));
+        await tester.pumpAndSettle();
+        expect(find.text('$page / 4'), findsOneWidget);
+        expect(preferences.getBool('onboarding_completed'), isNull);
+      }
+      expect(find.text('はじめる'), findsOneWidget);
+      await tester.tap(find.text('はじめる'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('legalConsent')), findsOneWidget);
+      expect(find.byType(HomeShell), findsNothing);
+      for (final key in ['confirmOver16', 'confirmTerms', 'confirmPrivacy']) {
+        await tester.ensureVisible(find.byKey(Key(key)));
+        await tester.tap(find.byKey(Key(key)));
+        await tester.pumpAndSettle();
+      }
+      await tester.ensureVisible(find.byKey(const Key('acceptLegalConsent')));
+      await tester.tap(find.byKey(const Key('acceptLegalConsent')));
+      await tester.pumpAndSettle();
+      expect(find.byType(HomeShell), findsOneWidget);
+      expect(preferences.getBool('onboarding_completed'), isTrue);
+      expect(preferences.getString('selected_gym'), '自宅');
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(const SetkeepApp());
+      await tester.pumpAndSettle();
+      expect(find.byType(HomeShell), findsOneWidget);
+      expect(find.byKey(const Key('onboarding')), findsNothing);
+    },
+  );
 
   testWidgets('onboarding completed preference opens HomeShell directly', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({'onboarding_completed': true, 'legal_consent': acceptedLegalConsentJson});
-    await tester.pumpWidget(const MuscleMemoryApp());
+    SharedPreferences.setMockInitialValues({
+      'onboarding_completed': true,
+      'legal_consent': acceptedLegalConsentJson,
+    });
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     expect(find.byType(HomeShell), findsOneWidget);
     expect(find.byKey(const Key('onboarding')), findsNothing);
@@ -175,7 +191,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     for (var page = 1; page <= 4; page++) {
       expect(find.text('$page / 4'), findsOneWidget);
@@ -186,7 +202,7 @@ void main() {
           findsOneWidget,
         );
       } else if (page == 3) {
-        expect(find.textContaining('招待QRコードをMUSCLEMORYで読み取れます。'), findsOneWidget);
+        expect(find.textContaining('招待QRコードをSETKEEPで読み取れます。'), findsOneWidget);
         expect(find.textContaining('共有は今後対応予定です。'), findsOneWidget);
       }
       expect(tester.takeException(), isNull);
@@ -198,36 +214,49 @@ void main() {
     expect(await OnboardingPreference.load(), isFalse);
   });
 
-  testWidgets(
-    'hidden body model is released and retains the selected angle',
-    (tester) async {
-      Future<void> show(bool active) => tester.pumpWidget(
-        MaterialApp(home: Scaffold(
+  testWidgets('hidden body model is released and retains the selected angle', (
+    tester,
+  ) async {
+    Future<void> show(bool active) => tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
           body: MuscleMannequinView(scores: const {}, active: active),
-        )),
+        ),
+      ),
+    );
+    var expected = MuscleMannequinAngle.front;
+    for (final active in [false, true, false, true]) {
+      await show(active);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('bodyMannequinFallback')),
+        active ? findsOneWidget : findsNothing,
       );
-      var expected = MuscleMannequinAngle.front;
-      for (final active in [false, true, false, true]) {
-        await show(active);
-        await tester.pumpAndSettle();
-        expect(find.byKey(const Key('bodyMannequinFallback')),
-            active ? findsOneWidget : findsNothing);
-        expect(find.byKey(const Key('body-tab-continuous')), findsNothing);
-        final control = find.byKey(const Key('muscleMannequinAngle'));
-        expect(control, active ? findsOneWidget : findsNothing);
-        for (final angle in MuscleMannequinAngle.values) {
-          expect(find.text(angle.label), active ? findsOneWidget : findsNothing);
-        }
-        if (active) {
-          expect(tester.widget<SegmentedButton<MuscleMannequinAngle>>(control).selected, {expected});
-          await tester.tap(find.text('背面'));
-          await tester.pumpAndSettle();
-          expected = MuscleMannequinAngle.back;
-          expect(tester.widget<SegmentedButton<MuscleMannequinAngle>>(control).selected, {expected});
-        }
+      expect(find.byKey(const Key('body-tab-continuous')), findsNothing);
+      final control = find.byKey(const Key('muscleMannequinAngle'));
+      expect(control, active ? findsOneWidget : findsNothing);
+      for (final angle in MuscleMannequinAngle.values) {
+        expect(find.text(angle.label), active ? findsOneWidget : findsNothing);
       }
-    },
-  );
+      if (active) {
+        expect(
+          tester
+              .widget<SegmentedButton<MuscleMannequinAngle>>(control)
+              .selected,
+          {expected},
+        );
+        await tester.tap(find.text('背面'));
+        await tester.pumpAndSettle();
+        expected = MuscleMannequinAngle.back;
+        expect(
+          tester
+              .widget<SegmentedButton<MuscleMannequinAngle>>(control)
+              .selected,
+          {expected},
+        );
+      }
+    }
+  });
 
   test('rest countdown does not finish before its absolute deadline', () {
     final end = DateTime(2026, 9, 14, 12);
@@ -394,93 +423,133 @@ void main() {
     expect(find.byKey(const Key('addSetButton2')), findsNothing);
   });
 
-  testWidgets('exercise picker parent search favorites and row selection are independent', (tester) async {
-    _setExistingUserPreferences({});
-    await CustomExercisePreference.load();
-    Future<void> open() async {
-      await tester.pumpWidget(const MaterialApp(
-        home: Scaffold(body: ExercisePickerSheet()),
-      ));
-      await tester.pumpAndSettle();
-    }
-    await open();
-    expect(find.byKey(const Key('exercisePickerMyMenuEntry')), findsOneWidget);
-    expect(find.text('0メニュー'), findsOneWidget);
-    await tester.tap(find.byKey(const Key('exercisePickerMyMenuEntry')));
-    await tester.pumpAndSettle();
-    expect(find.text('保存したマイメニューはありません'), findsOneWidget);
-    await tester.tap(find.byKey(const Key('backToExerciseCategories')));
-    await tester.pumpAndSettle();
-    final search = find.byKey(const Key('exerciseSearchField'));
-    for (final query in ['ベンチプレス', 'トレッドミル', 'スレッド']) {
-      await tester.enterText(search, query);
-      await tester.pumpAndSettle();
-      expect(find.byKey(const Key('exerciseCategory胸')), findsNothing);
-      expect(find.byType(ListTile), findsWidgets);
-    }
-    await tester.enterText(search, 'ショルダープレス');
-    await tester.pumpAndSettle();
-    final plate = exerciseTemplates.firstWhere((e) => e.exerciseId == 'plate_loaded_shoulder_press');
-    final row = find.byKey(const Key('selectExerciseplate_loaded_shoulder_press'));
-    final star = find.byKey(Key('favoriteExercise${plate.identity}'));
-    await tester.ensureVisible(star);
-    await tester.pumpAndSettle();
-    await tester.tap(star);
-    await tester.pumpAndSettle();
-    expect(find.text('0種目選択中'), findsOneWidget);
-    expect(await ExerciseFavoritePreference.load(), {plate.identity});
-    expect(tester.widget<ListTile>(row).selected, false);
-    expect(find.byType(Checkbox), findsNothing);
-    await tester.ensureVisible(row);
-    await tester.pumpAndSettle();
-    await tester.tap(row);
-    await tester.pumpAndSettle();
-    expect(tester.widget<ListTile>(row).selected, true);
-    expect(find.text('1種目選択中'), findsOneWidget);
-    await tester.ensureVisible(row);
-    await tester.pumpAndSettle();
-    await tester.tap(row);
-    await tester.pumpAndSettle();
-    expect(find.text('0種目選択中'), findsOneWidget);
-    await tester.tap(find.byKey(const Key('clearExerciseSearch')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('exercisePickerMyMenuEntry')), findsOneWidget);
-    await tester.pumpWidget(const SizedBox.shrink());
-    await open();
-    await tester.enterText(search, 'ショルダープレス');
-    await tester.pumpAndSettle();
-    expect(tester.widgetList<ListTile>(find.byType(ListTile)).first.key, row.evaluate().single.widget.key);
-    expect(find.descendant(of: star, matching: find.byIcon(Icons.star_rounded)), findsOneWidget);
-    await tester.tap(star);
-    await tester.pumpAndSettle();
-    expect(await ExerciseFavoritePreference.load(), isEmpty);
-    expect(tester.takeException(), isNull);
-  });
+  testWidgets(
+    'exercise picker parent search favorites and row selection are independent',
+    (tester) async {
+      _setExistingUserPreferences({});
+      await CustomExercisePreference.load();
+      Future<void> open() async {
+        await tester.pumpWidget(
+          const MaterialApp(home: Scaffold(body: ExercisePickerSheet())),
+        );
+        await tester.pumpAndSettle();
+      }
 
-  testWidgets('exercise picker sorts favorites and normal rows by kana', (tester) async {
+      await open();
+      expect(
+        find.byKey(const Key('exercisePickerMyMenuEntry')),
+        findsOneWidget,
+      );
+      expect(find.text('0メニュー'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('exercisePickerMyMenuEntry')));
+      await tester.pumpAndSettle();
+      expect(find.text('保存したマイメニューはありません'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('backToExerciseCategories')));
+      await tester.pumpAndSettle();
+      final search = find.byKey(const Key('exerciseSearchField'));
+      for (final query in ['ベンチプレス', 'トレッドミル', 'スレッド']) {
+        await tester.enterText(search, query);
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('exerciseCategory胸')), findsNothing);
+        expect(find.byType(ListTile), findsWidgets);
+      }
+      await tester.enterText(search, 'ショルダープレス');
+      await tester.pumpAndSettle();
+      final plate = exerciseTemplates.firstWhere(
+        (e) => e.exerciseId == 'plate_loaded_shoulder_press',
+      );
+      final row = find.byKey(
+        const Key('selectExerciseplate_loaded_shoulder_press'),
+      );
+      final star = find.byKey(Key('favoriteExercise${plate.identity}'));
+      await tester.ensureVisible(star);
+      await tester.pumpAndSettle();
+      await tester.tap(star);
+      await tester.pumpAndSettle();
+      expect(find.text('0種目選択中'), findsOneWidget);
+      expect(await ExerciseFavoritePreference.load(), {plate.identity});
+      expect(tester.widget<ListTile>(row).selected, false);
+      expect(find.byType(Checkbox), findsNothing);
+      await tester.ensureVisible(row);
+      await tester.pumpAndSettle();
+      await tester.tap(row);
+      await tester.pumpAndSettle();
+      expect(tester.widget<ListTile>(row).selected, true);
+      expect(find.text('1種目選択中'), findsOneWidget);
+      await tester.ensureVisible(row);
+      await tester.pumpAndSettle();
+      await tester.tap(row);
+      await tester.pumpAndSettle();
+      expect(find.text('0種目選択中'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('clearExerciseSearch')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('exercisePickerMyMenuEntry')),
+        findsOneWidget,
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      await open();
+      await tester.enterText(search, 'ショルダープレス');
+      await tester.pumpAndSettle();
+      expect(
+        tester.widgetList<ListTile>(find.byType(ListTile)).first.key,
+        row.evaluate().single.widget.key,
+      );
+      expect(
+        find.descendant(of: star, matching: find.byIcon(Icons.star_rounded)),
+        findsOneWidget,
+      );
+      await tester.tap(star);
+      await tester.pumpAndSettle();
+      expect(await ExerciseFavoritePreference.load(), isEmpty);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('exercise picker sorts favorites and normal rows by kana', (
+    tester,
+  ) async {
     _setExistingUserPreferences({});
     await CustomExercisePreference.load();
     final items = [
       for (final name in ['ソートラ', 'ソートカ', 'ソートナ', 'ソートア'])
-        ExerciseTemplate(exerciseId: 'custom:$name', name: name, bodyPart: '胸',
-          equipment: 'ダンベル', startWeight: 0, startReps: 10),
+        ExerciseTemplate(
+          exerciseId: 'custom:$name',
+          name: name,
+          bodyPart: '胸',
+          equipment: 'ダンベル',
+          startWeight: 0,
+          startReps: 10,
+        ),
     ];
     for (final item in items) {
       await CustomExercisePreference.add(item);
     }
-    await ExerciseFavoritePreference.save({items[0].identity, items[1].identity});
-    await tester.pumpWidget(const MaterialApp(
-      home: Scaffold(body: ExercisePickerSheet()),
-    ));
+    await ExerciseFavoritePreference.save({
+      items[0].identity,
+      items[1].identity,
+    });
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: ExercisePickerSheet())),
+    );
     await tester.pumpAndSettle();
     Future<void> checkOrder() async {
-      await tester.enterText(find.byKey(const Key('exerciseSearchField')), 'ソート');
+      await tester.enterText(
+        find.byKey(const Key('exerciseSearchField')),
+        'ソート',
+      );
       await tester.pumpAndSettle();
-      expect(tester.widgetList<ListTile>(find.byType(ListTile)).map((row) => row.key), [
-        for (final name in ['ソートカ', 'ソートラ', 'ソートア', 'ソートナ'])
-          ValueKey('selectExercisecustom:$name'),
-      ]);
+      expect(
+        tester
+            .widgetList<ListTile>(find.byType(ListTile))
+            .map((row) => row.key),
+        [
+          for (final name in ['ソートカ', 'ソートラ', 'ソートア', 'ソートナ'])
+            ValueKey('selectExercisecustom:$name'),
+        ],
+      );
     }
+
     await checkOrder();
     await tester.tap(find.byKey(const Key('clearExerciseSearch')));
     await tester.pumpAndSettle();
@@ -496,51 +565,120 @@ void main() {
     expect(exerciseSortKey('あ').compareTo(exerciseSortKey('カ')), lessThan(0));
   });
 
-  testWidgets('exercise picker menus preserve sets order and skip identities', (tester) async {
+  testWidgets('exercise picker menus preserve sets order and skip identities', (
+    tester,
+  ) async {
     _setExistingUserPreferences({});
-    final menu = SavedWorkoutTemplate(name: '肩の日', sets: [
-      for (final id in ['plate_loaded_shoulder_press', 'shoulder_press'])
-        RecordedSet(exerciseId: id, exerciseName: 'ショルダープレス',
-          bodyPart: '肩', equipment: id == 'shoulder_press' ? 'マシン' : 'プレートロード',
-          weight: 25, reps: 8, completed: true),
-    ]);
+    final menu = SavedWorkoutTemplate(
+      name: '肩の日',
+      sets: [
+        for (final id in ['plate_loaded_shoulder_press', 'shoulder_press'])
+          RecordedSet(
+            exerciseId: id,
+            exerciseName: 'ショルダープレス',
+            bodyPart: '肩',
+            equipment: id == 'shoulder_press' ? 'マシン' : 'プレートロード',
+            weight: 25,
+            reps: 8,
+            completed: true,
+          ),
+      ],
+    );
     List<ExerciseSelection>? result;
-    await tester.pumpWidget(MaterialApp(home: Scaffold(body: Builder(builder: (context) =>
-      TextButton(onPressed: () async {
-        result = await Navigator.of(context).push<List<ExerciseSelection>>(MaterialPageRoute(
-          builder: (_) => Scaffold(body: ExercisePickerSheet(menus: [menu, SavedWorkoutTemplate(name: '背中の日', sets: [menu.sets.first, const RecordedSet(exerciseId: 'lat_pulldown', exerciseName: 'ラットプルダウン', bodyPart: '背中', weight: 40, reps: 10, completed: true)])])),
-        ));
-      }, child: const Text('開く')),
-    ))));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => TextButton(
+              onPressed: () async {
+                result = await Navigator.of(context)
+                    .push<List<ExerciseSelection>>(
+                      MaterialPageRoute(
+                        builder: (_) => Scaffold(
+                          body: ExercisePickerSheet(
+                            menus: [
+                              menu,
+                              SavedWorkoutTemplate(
+                                name: '背中の日',
+                                sets: [
+                                  menu.sets.first,
+                                  const RecordedSet(
+                                    exerciseId: 'lat_pulldown',
+                                    exerciseName: 'ラットプルダウン',
+                                    bodyPart: '背中',
+                                    weight: 40,
+                                    reps: 10,
+                                    completed: true,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+              },
+              child: const Text('開く'),
+            ),
+          ),
+        ),
+      ),
+    );
     await tester.tap(find.text('開く'));
     await tester.pumpAndSettle();
     expect(find.text('肩の日'), findsNothing);
     expect(find.text('2メニュー'), findsOneWidget);
     final entry = find.byKey(const Key('exercisePickerMyMenuEntry'));
     expect(entry, findsOneWidget);
-    expect(tester.getTopLeft(find.byKey(const Key('exerciseCategory胸'))).dy -
-        tester.getBottomLeft(entry).dy, greaterThanOrEqualTo(10));
+    expect(
+      tester.getTopLeft(find.byKey(const Key('exerciseCategory胸'))).dy -
+          tester.getBottomLeft(entry).dy,
+      greaterThanOrEqualTo(10),
+    );
     await tester.tap(entry);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('exerciseSearchField')), findsNothing);
     expect(find.byKey(const Key('selectExerciseshoulder_press')), findsNothing);
     expect(find.byKey(const Key('selectExerciselat_pulldown')), findsNothing);
     for (var i = 0; i < 2; i++) {
-      await tester.tap(find.byKey(Key(i == 0 ? 'pickMenu肩の日' : 'pickMenu背中の日')));
+      await tester.tap(
+        find.byKey(Key(i == 0 ? 'pickMenu肩の日' : 'pickMenu背中の日')),
+      );
       await tester.pumpAndSettle();
       expect(find.text(i == 0 ? '2種目選択中' : '3種目選択中'), findsOneWidget);
       expect(find.byKey(const Key('pickMenu肩の日')), findsNothing);
-      expect(find.byKey(const Key('selectExerciseshoulder_press')), i == 0 ? findsOneWidget : findsNothing);
-      expect(find.byKey(const Key('selectExerciselat_pulldown')), i == 0 ? findsNothing : findsOneWidget);
+      expect(
+        find.byKey(const Key('selectExerciseshoulder_press')),
+        i == 0 ? findsOneWidget : findsNothing,
+      );
+      expect(
+        find.byKey(const Key('selectExerciselat_pulldown')),
+        i == 0 ? findsNothing : findsOneWidget,
+      );
       expect(result, isNull);
       // Searching this menu must never bring in exercises from another menu.
-      await tester.enterText(find.byKey(const Key('exerciseSearchField')), i == 0 ? 'ラットプルダウン' : 'マシン');
+      await tester.enterText(
+        find.byKey(const Key('exerciseSearchField')),
+        i == 0 ? 'ラットプルダウン' : 'マシン',
+      );
       await tester.pumpAndSettle();
-      expect(find.byKey(Key(i == 0 ? 'selectExerciselat_pulldown' : 'selectExerciseshoulder_press')), findsNothing);
+      expect(
+        find.byKey(
+          Key(
+            i == 0
+                ? 'selectExerciselat_pulldown'
+                : 'selectExerciseshoulder_press',
+          ),
+        ),
+        findsNothing,
+      );
       await tester.tap(find.byKey(const Key('backToExerciseCategories')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('pickMenu肩の日')), findsOneWidget);
-      expect(find.byKey(const Key('selectExerciseplate_loaded_shoulder_press')), findsNothing);
+      expect(
+        find.byKey(const Key('selectExerciseplate_loaded_shoulder_press')),
+        findsNothing,
+      );
     }
     await tester.tap(find.byKey(const Key('backToExerciseCategories')));
     await tester.pumpAndSettle();
@@ -548,37 +686,64 @@ void main() {
     expect(find.text('3種目選択中'), findsOneWidget);
     await tester.tap(find.byKey(const Key('addSelectedExercises')));
     await tester.pumpAndSettle();
-    expect(result!.map((e) => e.template.exerciseId), ['plate_loaded_shoulder_press', 'shoulder_press', 'lat_pulldown']);
+    expect(result!.map((e) => e.template.exerciseId), [
+      'plate_loaded_shoulder_press',
+      'shoulder_press',
+      'lat_pulldown',
+    ]);
     expect(result!.first.savedSets!.single.weight, 25);
     expect(result!.first.savedSets!.single.reps, 8);
     expect(result!.first.savedSets!.single.completed, true);
   });
 
-  testWidgets('exercise picker clips selected ink below opaque fixed areas', (tester) async {
+  testWidgets('exercise picker clips selected ink below opaque fixed areas', (
+    tester,
+  ) async {
     _setExistingUserPreferences({});
-    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: ExercisePickerSheet())));
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: ExercisePickerSheet())),
+    );
     await tester.pumpAndSettle();
     await openExerciseCategory(tester, '胸');
     await selectPickerExercise(tester, 'bench_press');
     final row = find.byKey(const Key('selectExercisebench_press'));
     expect(tester.widget<ListTile>(row).selected, isTrue);
-    expect(tester.widget<ListTile>(row).selectedTileColor, const Color(0xFFE9F4D1));
-    for (final key in ['exercisePickerHeader', 'exercisePickerSearchArea', 'exercisePickerFooter']) {
+    expect(
+      tester.widget<ListTile>(row).selectedTileColor,
+      AppColors.primaryGreenSoft,
+    );
+    for (final key in [
+      'exercisePickerHeader',
+      'exercisePickerSearchArea',
+      'exercisePickerFooter',
+    ]) {
       expect(tester.widget<ColoredBox>(find.byKey(Key(key))).color.a, 1);
     }
     final clip = find.byKey(const Key('exercisePickerListClip'));
     expect(tester.widget<ClipRect>(clip).clipBehavior, Clip.hardEdge);
     // Ink must paint on a Material INSIDE the clip, not on the bottom sheet.
-    final material = find.ancestor(of: row, matching: find.byType(Material)).first;
+    final material = find
+        .ancestor(of: row, matching: find.byType(Material))
+        .first;
     expect(find.descendant(of: clip, matching: material), findsOneWidget);
     await tester.tap(find.byKey(const Key('clearExerciseSearch')));
     await tester.pumpAndSettle();
     await tester.drag(exercisePickerScrollable(), const Offset(0, -400));
     await tester.pumpAndSettle();
-    expect(tester.getTopLeft(clip).dy,
-        greaterThanOrEqualTo(tester.getBottomLeft(find.byKey(const Key('exercisePickerSearchArea'))).dy));
-    expect(tester.getBottomLeft(clip).dy,
-        lessThanOrEqualTo(tester.getTopLeft(find.byKey(const Key('exercisePickerFooter'))).dy));
+    expect(
+      tester.getTopLeft(clip).dy,
+      greaterThanOrEqualTo(
+        tester
+            .getBottomLeft(find.byKey(const Key('exercisePickerSearchArea')))
+            .dy,
+      ),
+    );
+    expect(
+      tester.getBottomLeft(clip).dy,
+      lessThanOrEqualTo(
+        tester.getTopLeft(find.byKey(const Key('exercisePickerFooter'))).dy,
+      ),
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -602,21 +767,33 @@ void main() {
       expect(find.byKey(Key('bodyPartIllustration$category')), findsOneWidget);
     }
     const assets = {
-      '胸': 'chest', '背中': 'back', '肩': 'shoulders',
-      '腕': 'arms', '脚': 'legs', '腹': 'abs',
-      '有酸素': 'cardio', 'HYROX': 'hyrox',
+      '胸': 'chest',
+      '背中': 'back',
+      '肩': 'shoulders',
+      '腕': 'arms',
+      '脚': 'legs',
+      '腹': 'abs',
+      '有酸素': 'cardio',
+      'HYROX': 'hyrox',
     };
     for (final entry in assets.entries) {
-      final image = tester.widget<Image>(find.descendant(
-        of: find.byKey(Key('bodyPartIllustration${entry.key}')),
-        matching: find.byType(Image),
-      ));
-      expect((image.image as AssetImage).assetName,
-          'assets/category_muscles/${entry.value}.png');
+      final image = tester.widget<Image>(
+        find.descendant(
+          of: find.byKey(Key('bodyPartIllustration${entry.key}')),
+          matching: find.byType(Image),
+        ),
+      );
+      expect(
+        (image.image as AssetImage).assetName,
+        'assets/category_muscles/${entry.value}.png',
+      );
     }
     await openExerciseCategory(tester, '有酸素');
     expect(find.text('有酸素の種目'), findsOneWidget);
-    await tester.enterText(find.byKey(const Key('exerciseSearchField')), 'トレッドミル');
+    await tester.enterText(
+      find.byKey(const Key('exerciseSearchField')),
+      'トレッドミル',
+    );
     await tester.pumpAndSettle();
     expect(find.text('トレッドミル'), findsOneWidget);
     expect(find.byKey(const Key('exerciseSearchField')), findsOneWidget);
@@ -624,12 +801,18 @@ void main() {
     tester.view.physicalSize = const Size(320, 480);
     for (final category in ['有酸素', 'HYROX']) {
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pumpWidget(const MaterialApp(
-        home: Scaffold(body: ExercisePickerSheet(existingNames: <String>{})),
-      ));
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(body: ExercisePickerSheet(existingNames: <String>{})),
+        ),
+      );
       await tester.pumpAndSettle();
       final card = find.byKey(Key('exerciseCategory$category'));
-      await tester.scrollUntilVisible(card, 180, scrollable: exercisePickerScrollable());
+      await tester.scrollUntilVisible(
+        card,
+        180,
+        scrollable: exercisePickerScrollable(),
+      );
       await tester.pumpAndSettle();
       expect(find.byKey(Key('bodyPartIllustration$category')), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -678,33 +861,65 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    final available = exerciseTemplates.where((e) =>
-      ExerciseFormCatalog.resolve(e.exerciseId, e.name)?.available == true,
-    ).take(2).toList();
+    final available = exerciseTemplates
+        .where(
+          (e) =>
+              ExerciseFormCatalog.resolve(e.exerciseId, e.name)?.available ==
+              true,
+        )
+        .take(2)
+        .toList();
     expect(available, hasLength(2));
     for (final exercise in available) {
-      await tester.enterText(find.byKey(const Key('exerciseSearchField')), exercise.name);
+      await tester.enterText(
+        find.byKey(const Key('exerciseSearchField')),
+        exercise.name,
+      );
       await tester.pumpAndSettle();
-      final badge = find.byKey(Key('exerciseMuscles${exercise.exerciseId ?? exercise.name}'));
+      final badge = find.byKey(
+        Key('exerciseMuscles${exercise.exerciseId ?? exercise.name}'),
+      );
       expect(badge, findsOneWidget);
       expect(tester.getSize(badge), const Size.square(44));
-      final mark = find.descendant(of: badge, matching: find.byWidgetPredicate(
-        (widget) => widget is SizedBox && widget.width == 30 && widget.height == 30,
-      ));
+      final mark = find.descendant(
+        of: badge,
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is SizedBox && widget.width == 30 && widget.height == 30,
+        ),
+      );
       expect(tester.getSize(mark), const Size.square(30));
-      final badgeText = tester.widget<Text>(find.descendant(of: badge, matching: find.text('3D')));
+      final badgeText = tester.widget<Text>(
+        find.descendant(of: badge, matching: find.text('3D')),
+      );
       expect(badgeText.style!.fontSize, 9.5);
-      final row = find.byKey(Key('selectExercise${exercise.exerciseId ?? exercise.name}'));
-      expect(tester.getRect(row).right - tester.getRect(badge).right, closeTo(4, .01));
+      final row = find.byKey(
+        Key('selectExercise${exercise.exerciseId ?? exercise.name}'),
+      );
+      expect(
+        tester.getRect(row).right - tester.getRect(badge).right,
+        closeTo(4, .01),
+      );
       final tile = tester.widget<ListTile>(row);
       final favorite = find.byKey(Key('favoriteExercise${exercise.identity}'));
       final title = find.byWidget(tile.title!);
-      expect(tester.getRect(favorite).left - tester.getRect(row).left, closeTo(8, .01));
-      expect(tester.getRect(title).left - tester.getRect(favorite).right, closeTo(8, .01));
+      expect(
+        tester.getRect(favorite).left - tester.getRect(row).left,
+        closeTo(8, .01),
+      );
+      expect(
+        tester.getRect(title).left - tester.getRect(favorite).right,
+        closeTo(8, .01),
+      );
 
-
-      expect(find.descendant(of: badge, matching: find.byType(TextButton)), findsNothing);
-      expect(find.descendant(of: badge, matching: find.text('3D')), findsOneWidget);
+      expect(
+        find.descendant(of: badge, matching: find.byType(TextButton)),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: badge, matching: find.text('3D')),
+        findsOneWidget,
+      );
       final favoritesBefore = await ExerciseFavoritePreference.load();
       await tester.tap(badge);
       await tester.pumpAndSettle();
@@ -717,13 +932,27 @@ void main() {
       expect(find.text('0種目選択中'), findsOneWidget);
       expect(await ExerciseFavoritePreference.load(), favoritesBefore);
     }
-    final unavailable = exerciseTemplates.firstWhere((e) =>
-      ExerciseFormCatalog.resolve(e.exerciseId, e.name)?.available != true,
+    final unavailable = exerciseTemplates.firstWhere(
+      (e) =>
+          ExerciseFormCatalog.resolve(e.exerciseId, e.name)?.available != true,
     );
-    await tester.enterText(find.byKey(const Key('exerciseSearchField')), unavailable.name);
+    await tester.enterText(
+      find.byKey(const Key('exerciseSearchField')),
+      unavailable.name,
+    );
     await tester.pumpAndSettle();
-    expect(find.byKey(Key('selectExercise${unavailable.exerciseId ?? unavailable.name}')), findsOneWidget);
-    expect(find.byKey(Key('exerciseMuscles${unavailable.exerciseId ?? unavailable.name}')), findsNothing);
+    expect(
+      find.byKey(
+        Key('selectExercise${unavailable.exerciseId ?? unavailable.name}'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(
+        Key('exerciseMuscles${unavailable.exerciseId ?? unavailable.name}'),
+      ),
+      findsNothing,
+    );
   });
 
   testWidgets('custom exercise is created from and inherits its category', (
@@ -758,9 +987,19 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('saveCustomExerciseButton')));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byKey(const Key('exerciseSearchField')), 'テスト背中種目');
+    await tester.enterText(
+      find.byKey(const Key('exerciseSearchField')),
+      'テスト背中種目',
+    );
     await tester.pumpAndSettle();
-    expect(find.byKey(Key('selectExercise${CustomExercisePreference.exercises.single.exerciseId}')), findsOneWidget);
+    expect(
+      find.byKey(
+        Key(
+          'selectExercise${CustomExercisePreference.exercises.single.exerciseId}',
+        ),
+      ),
+      findsOneWidget,
+    );
     expect(CustomExercisePreference.exercises.single.bodyPart, '背中');
   });
 
@@ -1143,7 +1382,7 @@ void main() {
   testWidgets('app opens when saved history is corrupted', (tester) async {
     _setExistingUserPreferences({'workout_history': 'broken json'});
 
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     expect(find.text('今日も積み上げよう'), findsNothing);
@@ -1296,7 +1535,7 @@ void main() {
     _setExistingUserPreferences({});
 
     Future<void> openProfile() async {
-      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpWidget(const SetkeepApp());
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.person_outline_rounded));
       await tester.pumpAndSettle();
@@ -1313,12 +1552,11 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    String? shownName() => tester
-        .widget<Text>(find.byKey(const Key('profileDisplayName')))
-        .data;
+    String? shownName() =>
+        tester.widget<Text>(find.byKey(const Key('profileDisplayName'))).data;
 
     await openProfile();
-    expect(shownName(), 'MUSCLEMORYユーザー');
+    expect(shownName(), 'SETKEEPユーザー');
     await saveName('  トレーニング太郎  ');
     expect(shownName(), 'トレーニング太郎');
     final preferences = await SharedPreferences.getInstance();
@@ -1331,9 +1569,11 @@ void main() {
     await tester.tap(find.byKey(const Key('editProfileDisplayName')));
     await tester.pumpAndSettle();
     expect(
-      tester.widget<TextFormField>(
-        find.byKey(const Key('profileDisplayNameField')),
-      ).initialValue,
+      tester
+          .widget<TextFormField>(
+            find.byKey(const Key('profileDisplayNameField')),
+          )
+          .initialValue,
       'トレーニング太郎',
     );
     await tester.enterText(
@@ -1346,11 +1586,11 @@ void main() {
     expect(preferences.getString('profile_display_name'), 'トレーニング太郎');
 
     await saveName('');
-    expect(shownName(), 'MUSCLEMORYユーザー');
+    expect(shownName(), 'SETKEEPユーザー');
     expect(preferences.getString('profile_display_name'), '');
     await saveName('別の名前');
     await saveName('  　 ');
-    expect(shownName(), 'MUSCLEMORYユーザー');
+    expect(shownName(), 'SETKEEPユーザー');
     expect(preferences.getString('profile_display_name'), '');
 
     await saveName(List.filled(30, '長い表示名').join());
@@ -1371,12 +1611,12 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.person_outline_rounded));
     await tester.pumpAndSettle();
 
-    expect(find.text('MUSCLEMORYユーザー'), findsOneWidget);
+    expect(find.text('SETKEEPユーザー'), findsOneWidget);
     expect(find.byKey(const Key('editProfileDisplayName')), findsOneWidget);
     expect(find.byKey(const Key('trainingSettingsButton')), findsOneWidget);
     expect(find.byKey(const Key('trainerQrButton')), findsOneWidget);
@@ -1409,7 +1649,6 @@ void main() {
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
 
-
     await tester.ensureVisible(
       find.byKey(const Key('backupDataManagementButton')),
     );
@@ -1433,7 +1672,7 @@ void main() {
       });
       await RestTimerPreference.load();
       await WorkoutUiPreference.load();
-      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpWidget(const SetkeepApp());
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.person_outline_rounded));
       await tester.pumpAndSettle();
@@ -1511,7 +1750,7 @@ void main() {
       });
       await RestTimerPreference.load();
       await WorkoutUiPreference.load();
-      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpWidget(const SetkeepApp());
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.person_outline_rounded));
       await tester.pumpAndSettle();
@@ -1652,12 +1891,12 @@ void main() {
 
   test('custom rest duration survives the existing backup format', () {
     for (final seconds in [270, 300]) {
-      final json = MuscleMemoryBackup(
+      final json = SetkeepBackup(
         workouts: const [],
         restTimerSeconds: seconds,
       ).toJson();
       expect(json['version'], 3);
-      expect(MuscleMemoryBackup.fromJson(json).restTimerSeconds, seconds);
+      expect(SetkeepBackup.fromJson(json).restTimerSeconds, seconds);
     }
   });
 
@@ -1671,7 +1910,7 @@ void main() {
       });
       await RestTimerPreference.load();
       await WorkoutUiPreference.load();
-      await tester.pumpWidget(const MuscleMemoryApp());
+      await tester.pumpWidget(const SetkeepApp());
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('startWorkoutButton')));
       await tester.pumpAndSettle();
@@ -1700,7 +1939,7 @@ void main() {
     _setExistingUserPreferences({'selected_gym': '以前の体育館'});
     CustomGymPreference.gyms = [];
 
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     expect(CustomGymPreference.gyms, ['以前の体育館']);
@@ -1780,7 +2019,7 @@ void main() {
   });
 
   test('version 3 backup preserves workouts body weights and settings', () {
-    final backup = MuscleMemoryBackup(
+    final backup = SetkeepBackup(
       workouts: [
         WorkoutRecord(
           date: DateTime(2026, 9, 12, 18, 30),
@@ -1830,9 +2069,9 @@ void main() {
       restTimerSeconds: 120,
     );
 
-    final restored = MuscleMemoryBackup.fromJson(backup.toJson());
+    final restored = SetkeepBackup.fromJson(backup.toJson());
 
-    expect(backup.toJson()['app'], 'MUSCLEMORY');
+    expect(backup.toJson()['app'], 'SETKEEP');
     expect(backup.toJson()['version'], 3);
     expect(restored.workouts.single.sets.single.weight, 52.5);
     expect(restored.workoutTemplates.single.name, '胸の日');
@@ -1850,13 +2089,13 @@ void main() {
     (partiallyBroken['customExercises'] as List<dynamic>).add({
       'name': '壊れた種目',
     });
-    final safelyRestored = MuscleMemoryBackup.fromJson(partiallyBroken);
+    final safelyRestored = SetkeepBackup.fromJson(partiallyBroken);
     expect(safelyRestored.workoutTemplates, hasLength(1));
     expect(safelyRestored.customExercises, hasLength(1));
   });
 
   test('old history-only backups remain readable', () {
-    final restored = MuscleMemoryBackup.fromJson({
+    final restored = SetkeepBackup.fromJson({
       'app': 'MuscleMemory',
       'version': 1,
       'workouts': <dynamic>[],
@@ -1869,16 +2108,16 @@ void main() {
 
   test('invalid and unsupported backups are rejected before import', () {
     expect(
-      () => MuscleMemoryBackup.fromJson({
-        'app': 'MUSCLEMORY',
+      () => SetkeepBackup.fromJson({
+        'app': 'SETKEEP',
         'version': 3,
         'workouts': 'invalid',
       }),
       throwsFormatException,
     );
     expect(
-      () => MuscleMemoryBackup.fromJson({
-        'app': 'MUSCLEMORY',
+      () => SetkeepBackup.fromJson({
+        'app': 'SETKEEP',
         'version': 99,
         'workouts': <dynamic>[],
       }),
@@ -1886,11 +2125,11 @@ void main() {
     );
   });
 
-  testWidgets('about page uses the official MUSCLEMORY name', (tester) async {
+  testWidgets('about page uses the official SETKEEP name', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: AppAboutPage()));
     await tester.pumpAndSettle();
 
-    expect(find.text('MUSCLEMORY'), findsOneWidget);
+    expect(find.text('SETKEEP'), findsOneWidget);
     expect(find.text('バージョン 1.0.0'), findsOneWidget);
     expect(find.text('端末内への保存'), findsOneWidget);
     expect(find.text('クラウド同期'), findsOneWidget);
@@ -2096,7 +2335,7 @@ void main() {
     _setExistingUserPreferences({
       'workout_history': jsonEncode([workout.toJson()]),
     });
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('lastWorkoutCard')), findsNothing);
@@ -2208,9 +2447,7 @@ void main() {
         },
       ],
     });
-    _setExistingUserPreferences({
-      activeWorkoutDraftStorageKey: encodedDraft,
-    });
+    _setExistingUserPreferences({activeWorkoutDraftStorageKey: encodedDraft});
     final workout = WorkoutRecord(
       date: DateTime(2025, 3, 15, 19, 30),
       sets: const [
@@ -2515,7 +2752,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     expect(find.text('今日も積み上げよう'), findsNothing);
@@ -2596,7 +2833,7 @@ void main() {
       WorkoutUiPreference.completionCheckEnabled = true;
       WorkoutUiPreference.workoutTimerEnabled = true;
     });
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
     await tester.pumpAndSettle();
@@ -2623,7 +2860,7 @@ void main() {
     _setExistingUserPreferences({});
     WorkoutUiPreference.completionCheckEnabled = true;
     WorkoutUiPreference.workoutTimerEnabled = true;
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
     await tester.pumpAndSettle();
@@ -2665,7 +2902,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     _setExistingUserPreferences({});
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
@@ -2735,7 +2972,7 @@ void main() {
 
   testWidgets('completed workout appears in history', (tester) async {
     _setExistingUserPreferences({});
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
@@ -2809,7 +3046,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.calendar_month_outlined));
     await tester.pumpAndSettle();
@@ -2866,7 +3103,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('savedMenu0')), findsOneWidget);
@@ -2910,7 +3147,7 @@ void main() {
       'rest_timer_seconds': 60,
     });
     await RestTimerPreference.load();
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
@@ -2934,7 +3171,7 @@ void main() {
       'rest_timer_seconds': 1,
     });
     await RestTimerPreference.load();
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
     await tester.pumpAndSettle();
@@ -2968,7 +3205,7 @@ void main() {
   ) async {
     _setExistingUserPreferences({});
     await RestTimerPreference.load();
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('startWorkoutButton')));
@@ -3117,8 +3354,10 @@ void main() {
     preferences = await SharedPreferences.getInstance();
     expect(preferences.getString(activeWorkoutDraftStorageKey), isNull);
     expect(find.text('ラットプルダウン'), findsOneWidget);
-    expect(tester.widget<Text>(find.byKey(const Key('workoutDateValue'))).data,
-      startsWith('${DateTime.now().month}.${DateTime.now().day}（'));
+    expect(
+      tester.widget<Text>(find.byKey(const Key('workoutDateValue'))).data,
+      startsWith('${DateTime.now().month}.${DateTime.now().day}（'),
+    );
     expect(find.text('2024年1月2日'), findsNothing);
 
     await tester.pumpWidget(const SizedBox());
@@ -3186,8 +3425,10 @@ void main() {
     preferences = await SharedPreferences.getInstance();
     expect(preferences.getString(activeWorkoutDraftStorageKey), isNull);
     expect(find.text('スクワット'), findsOneWidget);
-    expect(tester.widget<Text>(find.byKey(const Key('workoutDateValue'))).data,
-      startsWith('${DateTime.now().month}.${DateTime.now().day}（'));
+    expect(
+      tester.widget<Text>(find.byKey(const Key('workoutDateValue'))).data,
+      startsWith('${DateTime.now().month}.${DateTime.now().day}（'),
+    );
 
     await tester.pumpWidget(const SizedBox());
   });
@@ -3212,10 +3453,8 @@ void main() {
           },
         ],
       });
-      _setExistingUserPreferences({
-        activeWorkoutDraftStorageKey: draft,
-      });
-      await tester.pumpWidget(const MuscleMemoryApp());
+      _setExistingUserPreferences({activeWorkoutDraftStorageKey: draft});
+      await tester.pumpWidget(const SetkeepApp());
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('activeWorkoutDraftCard')));
       await tester.pumpAndSettle();
@@ -3251,7 +3490,7 @@ void main() {
         ],
       }),
     });
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('activeWorkoutDraftCard')));
     await tester.pumpAndSettle();
@@ -3291,7 +3530,7 @@ void main() {
         ],
       }),
     });
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('activeWorkoutDraftCard')));
@@ -3438,34 +3677,49 @@ void main() {
     expect(find.byKey(const Key('shareDurationToggle')), findsNothing);
   });
 
-  testWidgets('body weight deletion persists without changing workout history', (tester) async {
-    final history = jsonEncode([
-      WorkoutRecord(date: DateTime(2026, 9, 1), sets: const [
-        RecordedSet(weight: 50, reps: 8, completed: true),
-      ]).toJson(),
-    ]);
-    _setExistingUserPreferences({'workout_history': history});
-    await BodyWeightPreference.save([
-      BodyWeightEntry(id: 'delete-me', recordedAt: DateTime.now(), weightKg: 80),
-    ]);
-    await tester.pumpWidget(const MuscleMemoryApp());
-    await tester.pumpAndSettle();
-    final edit = find.byKey(const Key('editBodyWeightdelete-me'));
-    await tester.scrollUntilVisible(edit, 200, scrollable: find.descendant(
-      of: find.byType(DashboardPage), matching: find.byType(Scrollable),
-    ).first);
-    await tester.pumpAndSettle();
-    await tester.tap(edit);
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('deleteBodyWeightButton')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('confirmDeleteBodyWeightButton')));
-    await tester.pumpAndSettle();
-    expect(await BodyWeightPreference.load(), isEmpty);
-    final preferences = await SharedPreferences.getInstance();
-    expect(preferences.getString('workout_history'), history);
-    expect(find.text('体重を記録するとグラフが表示されます'), findsOneWidget);
-  });
+  testWidgets(
+    'body weight deletion persists without changing workout history',
+    (tester) async {
+      final history = jsonEncode([
+        WorkoutRecord(
+          date: DateTime(2026, 9, 1),
+          sets: const [RecordedSet(weight: 50, reps: 8, completed: true)],
+        ).toJson(),
+      ]);
+      _setExistingUserPreferences({'workout_history': history});
+      await BodyWeightPreference.save([
+        BodyWeightEntry(
+          id: 'delete-me',
+          recordedAt: DateTime.now(),
+          weightKg: 80,
+        ),
+      ]);
+      await tester.pumpWidget(const SetkeepApp());
+      await tester.pumpAndSettle();
+      final edit = find.byKey(const Key('editBodyWeightdelete-me'));
+      await tester.scrollUntilVisible(
+        edit,
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byType(DashboardPage),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(edit);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('deleteBodyWeightButton')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('confirmDeleteBodyWeightButton')));
+      await tester.pumpAndSettle();
+      expect(await BodyWeightPreference.load(), isEmpty);
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.getString('workout_history'), history);
+      expect(find.text('体重を記録するとグラフが表示されます'), findsOneWidget);
+    },
+  );
 
   testWidgets('body weight trend appears on home but not history', (
     tester,
@@ -3479,7 +3733,7 @@ void main() {
         ).toJson(),
       ]),
     });
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('bodyWeightTrendSection')), findsOneWidget);
 
@@ -3495,7 +3749,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.person_outline_rounded));
     await tester.pumpAndSettle();
@@ -3513,7 +3767,7 @@ void main() {
 
   testWidgets('weekly goal UI is removed', (tester) async {
     _setExistingUserPreferences(const {});
-    await tester.pumpWidget(const MuscleMemoryApp());
+    await tester.pumpWidget(const SetkeepApp());
     await tester.pumpAndSettle();
     expect(find.text('1週間の目標'), findsNothing);
   });

@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:muscle_memory/main.dart';
+import 'package:setkeep/main.dart';
 
 /// Host QA driver responds to QA_REST_BOUNDARY markers with real Android
 /// home/resume/shade/lock operations. No foreground boolean is mocked.
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  const channel = MethodChannel('com.musclememory/rest_timer');
+  const channel = MethodChannel('com.setkeep.app/rest_timer');
   Future<Map<String, dynamic>> status() async =>
       (await channel.invokeMapMethod<String, dynamic>('debugStatus'))!;
   int count(Map<String, dynamic> value, String key) => value[key] as int? ?? 0;

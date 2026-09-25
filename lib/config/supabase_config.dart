@@ -10,7 +10,7 @@ class SupabaseConfig {
   );
   static const legacyAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
-  static const authRedirectUrl = 'musclemory://login-callback/';
+  static const authRedirectUrl = 'setkeep://login-callback/';
 
   static bool initialized = false;
   static LocalStorage? authStorage;

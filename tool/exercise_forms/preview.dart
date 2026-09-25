@@ -1,8 +1,8 @@
 // Authoring-only entry point; never referenced by the production app.
 // flutter run -t tool/exercise_forms/preview.dart --dart-define=FORM_PREVIEW_ID=mag_narrow
 import 'package:flutter/material.dart';
-import 'package:muscle_memory/bench_press_form.dart';
-import 'package:muscle_memory/exercise_form_catalog.dart';
+import 'package:setkeep/bench_press_form.dart';
+import 'package:setkeep/exercise_form_catalog.dart';
 
 void main() {
   const id = String.fromEnvironment(
