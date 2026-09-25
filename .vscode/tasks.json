@@ -2,9 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Galaxyで起動（Supabase・Release）",
+      "label": "SETKEEP - Galaxy（Supabase）",
       "type": "shell",
-      "command": "flutter run -d RFCY31C098T --dart-define-from-file=supabase.json",
+      "command": "flutter",
+      "args": [
+        "run",
+        "-d",
+        "RFCY31C098T",
+        "--dart-define-from-file=${workspaceFolder}/supabase.json"
+      ],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -12,9 +18,55 @@
       }
     },
     {
-      "label": "iPhoneで起動（Supabase・Release）",
+      "label": "SETKEEP - iPhone（Supabase・Release）",
       "type": "shell",
-      "command": "flutter run --release -d 00008110-000648EC360640 --dart-define-from-file=supabase.json",
+      "command": "flutter",
+      "args": [
+        "run",
+        "--release",
+        "-d",
+        "00008110-000648EC360640",
+        "--dart-define-from-file=${workspaceFolder}/supabase.json"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "SETKEEP TRAINER - Galaxy（Supabase）",
+      "type": "shell",
+      "command": "flutter",
+      "args": [
+        "run",
+        "-d",
+        "RFCY31C098T",
+        "--dart-define-from-file=${workspaceFolder}/supabase.json"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/apps/setkeep_trainer"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "SETKEEP TRAINER - iPhone（Supabase・Release）",
+      "type": "shell",
+      "command": "flutter",
+      "args": [
+        "run",
+        "--release",
+        "-d",
+        "00008110-000648EC360640",
+        "--dart-define-from-file=${workspaceFolder}/supabase.json"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/apps/setkeep_trainer"
+      },
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
