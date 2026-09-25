@@ -1,3 +1,4 @@
+import 'trainer_menu_codec.dart';
 import 'trainer_repository.dart';
 
 /// Immutable scope: a route/request can never switch its tenant underneath it.
@@ -91,7 +92,32 @@ class TenantRepository extends TrainerRepository {
       .order('created_at', ascending: false);
   @override
   Future<void> addNote(String clientId, String body) async {
-    await mutate('comment', {'client_id': clientId, 'body': body.trim()});
+    await saveComment(clientId, body);
+  }
+
+  Future<void> saveComment(
+    String clientId,
+    String body, {
+    Map<String, dynamic>? existing,
+    String? menuId,
+    String? date,
+    bool shared = true,
+    bool delete = false,
+  }) async {
+    await client.rpc(
+      'tenant_save_comment',
+      params: {
+        'p_tenant': tenantId,
+        'p_client': clientId,
+        'p_body': body.trim(),
+        'p_id': existing?['id'],
+        'p_version': existing?['version'],
+        'p_menu': menuId,
+        'p_date': date,
+        'p_shared': shared,
+        'p_delete': delete,
+      },
+    );
   }
 
   @override
@@ -102,30 +128,7 @@ class TenantRepository extends TrainerRepository {
         .eq('tenant_id', tenantId);
     if (clientId != null) q = q.eq('client_id', clientId);
     final rows = await q.order('created_at', ascending: false);
-    return rows.map((m) {
-      final exercises = List<Map<String, dynamic>>.from(
-        m['tenant_menu_exercises'] as List,
-      )..sort((a, b) => (a['position'] as int).compareTo(b['position'] as int));
-      return {
-        ...m,
-        'items': [
-          for (final e in exercises)
-            {
-              ...e,
-              'set_values':
-                  (List<Map<String, dynamic>>.from(
-                        e['tenant_menu_sets'] as List,
-                      )..sort(
-                        (a, b) => (a['position'] as int).compareTo(
-                          b['position'] as int,
-                        ),
-                      ))
-                      .map((s) => s['values'])
-                      .toList(),
-            },
-        ],
-      };
-    }).toList();
+    return rows.map(TrainerMenuCodec.fromRow).toList();
   }
 
   @override

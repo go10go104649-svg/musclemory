@@ -127,3 +127,7 @@ Galaxy / iPhone実機でのGoogleログインと本人同一性、2つの実ア�
 - 変更: `apps/setkeep_trainer/lib/main.dart`, `client_page.dart`, `menu_editor.dart`, `trainer_widgets.dart`
 - 変更: `apps/setkeep_trainer/test/trainer_app_test.dart`, `pubspec.yaml`, `pubspec.lock`
 - 文書: 本書、`docs/setkeep_trainer.md`
+
+## SETKEEP本人向け連携の追加仕様（2026-09-25）
+
+[SETKEEP / SETKEEP TRAINER 共通メニュー・コメント仕様](setkeep_trainer_delivery.md) を両アプリ共通の現行仕様とする。既存tenantメニューを本人Auth IDで参照し、一般版の通常トレーニング開始処理へ渡す。コメントは公開設定と編集・削除を持ち、従来の内部メモは明示公開するまで非公開。データの複製、RLS無効化、別Authプロジェクト化は行わない。migration 202609250003と先行002の適用・アプリ更新を揃える。

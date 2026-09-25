@@ -79,3 +79,7 @@ flutter run --dart-define-from-file=supabase.json
 
 同じSupabase Authを使う独立アプリを `apps/setkeep_trainer` に追加しています。
 一般版は引き続きリポジトリ直下で開発します。[開発・実機確認ガイド](docs/setkeep_trainer.md) を参照してください。
+
+## TRAINERとの共通データ連携
+
+一般版ホームの「トレーナーからのメニュー・コメント」で、本人に割り当てられたSupabaseの共通データを参照します。メニューから通常のトレーニングを開始できます。[両アプリ共通の連携仕様](docs/setkeep_trainer_delivery.md) に保存構造・公開範囲・更新・RLS・migration条件を記載しています。

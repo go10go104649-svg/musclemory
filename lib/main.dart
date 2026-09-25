@@ -1,3 +1,4 @@
+import 'trainer/trainer_inbox_page.dart';
 import 'design/family_theme.dart';
 import 'admin/report_management_page.dart';
 import 'gym/place_equipment_pages.dart';
@@ -1277,6 +1278,24 @@ class DashboardPage extends StatelessWidget {
             onPressed: () async {
               await _startWorkout(context);
             },
+          ),
+          const SizedBox(height: 14),
+          OutlinedButton.icon(
+            key: const Key('trainerInboxButton'),
+            icon: const Icon(Icons.fitness_center),
+            label: Text(
+              Localizations.localeOf(context).languageCode == 'ja'
+                  ? 'トレーナーからのメニュー・コメント'
+                  : 'Trainer menus and comments',
+            ),
+            onPressed: () => Navigator.of(context).push<void>(
+              MaterialPageRoute(
+                builder: (_) => TrainerInboxPage(
+                  onStart: (record) =>
+                      _startWorkout(context, initialWorkout: record),
+                ),
+              ),
+            ),
           ),
           if (workoutTemplates.isNotEmpty) ...[
             const SizedBox(height: 24),

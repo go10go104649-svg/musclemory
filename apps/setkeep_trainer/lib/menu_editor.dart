@@ -1,3 +1,4 @@
+import 'package:setkeep/trainer/trainer_menu_codec.dart';
 import 'package:flutter/material.dart';
 import 'package:setkeep/trainer/trainer_repository.dart';
 import 'package:setkeep/trainer/tenant_repository.dart';
@@ -5,7 +6,6 @@ import 'package:setkeep/main.dart'
     show
         RecordedSet,
         WorkoutRecord,
-        ExerciseRecordType,
         ExerciseRecordTypeUi,
         WorkoutExercise,
         WorkoutSet,
@@ -91,52 +91,10 @@ class _MenuEditorState extends State<MenuEditor> {
     }
   }
 
-  WorkoutSet editable(RecordedSet s) => WorkoutSet(
-    weight: s.weight,
-    reps: s.reps,
-    durationSeconds: s.durationSeconds,
-    distanceKm: s.distanceKm,
-    speedKmh: s.speedKmh,
-    inclinePercent: s.inclinePercent,
-    resistanceLevel: s.resistanceLevel,
-    paceSecondsPerKm: s.paceSecondsPerKm,
-  );
-
   void loadItems(List items) {
-    exercises.clear();
-    for (final i in items) {
-      final values =
-          i['set_values'] as List? ??
-          List.generate(
-            i['sets'] as int,
-            (_) => {'weight': i['target_weight'], 'reps': i['target_reps']},
-          );
-      exercises.add(
-        WorkoutExercise(
-          name: i['exercise_name'] as String,
-          exerciseId: i['exercise_id'] as String,
-          distanceUnit: values.isEmpty
-              ? 'km'
-              : (values.first as Map)['distanceUnit'] as String? ?? 'km',
-          bodyPart: i['body_part'] as String? ?? '',
-          equipment: i['equipment'] as String? ?? '',
-          recordType: ExerciseRecordType.fromName(i['record_type'] as String),
-          sets: [
-            for (final v in values)
-              WorkoutSet(
-                weight: (v['weight'] as num? ?? 0).toDouble(),
-                reps: (v['reps'] as num? ?? 0).toInt(),
-                durationSeconds: (v['durationSeconds'] as num? ?? 0).toInt(),
-                distanceKm: (v['distanceKm'] as num? ?? 0).toDouble(),
-                speedKmh: (v['speedKmh'] as num? ?? 0).toDouble(),
-                inclinePercent: (v['inclinePercent'] as num? ?? 0).toDouble(),
-                resistanceLevel: (v['resistanceLevel'] as num? ?? 0).toDouble(),
-                paceSecondsPerKm: (v['paceSecondsPerKm'] as num? ?? 0).toInt(),
-              ),
-          ],
-        ),
-      );
-    }
+    exercises
+      ..clear()
+      ..addAll(TrainerMenuCodec.exercises(items));
   }
 
   RecordedSet recorded(WorkoutExercise e, WorkoutSet s) => RecordedSet(
@@ -420,7 +378,7 @@ class _MenuEditorState extends State<MenuEditor> {
                 onApplyPrevious: (previous) => setState(() {
                   exercises[i].sets
                     ..clear()
-                    ..addAll(previous.map(editable));
+                    ..addAll(previous.map(TrainerMenuCodec.editable));
                   if (previous.isNotEmpty) {
                     exercises[i].recordType = previous.first.recordType;
                   }

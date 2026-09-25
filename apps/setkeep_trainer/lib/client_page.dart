@@ -16,7 +16,7 @@ class ClientPage extends StatefulWidget {
 
 class _ClientPageState extends State<ClientPage> {
   List<Map<String, dynamic>> workouts = [], notes = [], menus = [];
-  bool loading = true, more = true, busy = false;
+  bool loading = true, more = true, busy = false, shareNewComment = true;
   String? error;
   final note = TextEditingController();
   String get clientId => widget.link['client_id'] as String;
@@ -87,19 +87,61 @@ class _ClientPageState extends State<ClientPage> {
     if (mounted) setState(() => busy = false);
   }
 
-  Future<void> comment({String? menu, String? date}) async {
-    final body = await showDialog<String>(
+  Future<void> comment({
+    String? menu,
+    String? date,
+    Map<String, dynamic>? existing,
+  }) async {
+    final result = await showDialog<(String, bool)>(
       context: context,
-      builder: (ctx) => TextPromptDialog(title: tr(ctx, 'コメント', 'Comment')),
+      builder: (_) => _CommentDialog(existing: existing),
     );
-    if (!mounted || body == null || body.trim().isEmpty) return;
+    if (!mounted || result == null || result.$1.trim().isEmpty) return;
     await act(() async {
-      await (widget.repository as TenantRepository).mutate('comment', {
-        'client_id': clientId,
-        'menu_id': menu,
-        'date': date,
-        'body': body.trim(),
-      });
+      await (widget.repository as TenantRepository).saveComment(
+        clientId,
+        result.$1,
+        menuId: menu,
+        date: date,
+        existing: existing,
+        shared: result.$2,
+      );
+      await reload();
+    });
+  }
+
+  Future<void> deleteComment(Map<String, dynamic> existing) async {
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(tr(ctx, 'コメントを削除しますか？', 'Delete this comment?')),
+        content: Text(
+          tr(
+            ctx,
+            '共有コメントは本人のSETKEEPからも表示されなくなります。',
+            'Shared comments will also disappear from the client’s SETKEEP.',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(tr(ctx, '戻る', 'Cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(tr(ctx, '削除', 'Delete')),
+          ),
+        ],
+      ),
+    );
+    if (yes != true || !mounted) return;
+    await act(() async {
+      await (widget.repository as TenantRepository).saveComment(
+        clientId,
+        '',
+        existing: existing,
+        delete: true,
+      );
       await reload();
     });
   }
@@ -243,11 +285,7 @@ class _ClientPageState extends State<ClientPage> {
               ),
               const SizedBox(height: 24),
               Text(
-                tr(
-                  context,
-                  '指導メモ（担当者間で共有）',
-                  'Coaching notes (assigned trainers)',
-                ),
+                tr(context, 'コメント・指導メモ', 'Comments and coaching notes'),
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               TextField(
@@ -263,23 +301,77 @@ class _ClientPageState extends State<ClientPage> {
                   ),
                 ),
               ),
+              if (widget.repository is TenantRepository)
+                CheckboxListTile(
+                  value: shareNewComment,
+                  onChanged: busy
+                      ? null
+                      : (v) => setState(() => shareNewComment = v!),
+                  title: Text(
+                    tr(
+                      context,
+                      '本人のSETKEEPにも表示する',
+                      'Also show in the client’s SETKEEP',
+                    ),
+                  ),
+                  subtitle: Text(
+                    tr(
+                      context,
+                      'オフの場合は担当トレーナーのみ閲覧できます。',
+                      'When off, only assigned trainers can read it.',
+                    ),
+                  ),
+                ),
               FilledButton(
                 onPressed: busy
                     ? null
                     : () => act(() async {
                         if (note.text.trim().isEmpty) return;
-                        await widget.repository.addNote(clientId, note.text);
+                        final repo = widget.repository;
+                        if (repo is TenantRepository) {
+                          await repo.saveComment(
+                            clientId,
+                            note.text,
+                            shared: shareNewComment,
+                          );
+                        } else {
+                          await repo.addNote(clientId, note.text);
+                        }
                         note.clear();
                         await reload();
                       }),
-                child: Text(tr(context, 'メモを保存', 'Save note')),
+                child: Text(tr(context, 'コメントを保存', 'Save comment')),
               ),
               for (final n in notes)
                 Card(
                   child: ListTile(
                     title: Text(n['body'] as String),
+                    leading: Icon(
+                      n['shared_with_client'] == true
+                          ? Icons.chat_bubble_outline
+                          : Icons.lock_outline,
+                    ),
+                    trailing: widget.repository is! TenantRepository
+                        ? null
+                        : PopupMenuButton<String>(
+                            onSelected: (v) => v == 'edit'
+                                ? comment(existing: n)
+                                : deleteComment(n),
+                            itemBuilder: (_) => [
+                              PopupMenuItem(
+                                value: 'edit',
+                                child: Text(
+                                  tr(context, '編集・共有設定', 'Edit / sharing'),
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text(tr(context, '削除', 'Delete')),
+                              ),
+                            ],
+                          ),
                     subtitle: Text(
-                      '${dateLabel(n['created_at'])}${n['workout_date'] != null ? ' · ${n['workout_date']}' : ''}${n['menu_id'] != null ? ' · ${tr(context, 'メニュー', 'Menu')}' : ''}',
+                      '${n['shared_with_client'] == true ? tr(context, '本人に共有', 'Shared with client') : tr(context, '担当者のみ', 'Trainers only')} · ${dateLabel(n['updated_at'] ?? n['created_at'])}${n['workout_date'] != null ? ' · ${n['workout_date']}' : ''}${n['menu_id'] != null ? ' · ${tr(context, 'メニュー', 'Menu')}' : ''}',
                     ),
                   ),
                 ),
@@ -415,5 +507,64 @@ class _ClientPageState extends State<ClientPage> {
                 ),
             ],
           ),
+  );
+}
+
+class _CommentDialog extends StatefulWidget {
+  const _CommentDialog({this.existing});
+  final Map<String, dynamic>? existing;
+  @override
+  State<_CommentDialog> createState() => _CommentDialogState();
+}
+
+class _CommentDialogState extends State<_CommentDialog> {
+  late final body = TextEditingController(
+    text: widget.existing?['body'] as String? ?? '',
+  );
+  late bool shared =
+      widget.existing == null || widget.existing!['shared_with_client'] == true;
+  @override
+  void dispose() {
+    body.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: Text(tr(context, 'コメント', 'Comment')),
+    content: SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: body,
+            maxLength: 10000,
+            minLines: 2,
+            maxLines: 5,
+          ),
+          CheckboxListTile(
+            value: shared,
+            onChanged: (v) => setState(() => shared = v!),
+            title: Text(
+              tr(
+                context,
+                '本人のSETKEEPにも表示する',
+                'Also show in the client’s SETKEEP',
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: Text(tr(context, '戻る', 'Cancel')),
+      ),
+      FilledButton(
+        onPressed: () => Navigator.pop(context, (body.text, shared)),
+        child: Text(tr(context, '保存', 'Save')),
+      ),
+    ],
   );
 }
