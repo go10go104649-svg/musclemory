@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:setkeep/config/supabase_config.dart';
+import 'package:setkeep/config/auth_redirects.dart';
 import 'package:setkeep/services/account_auth_service.dart';
 import 'package:setkeep/trainer/trainer_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,7 +25,7 @@ Future<void> main() async {
           ? SupabaseAccountAuthService(
               Supabase.instance.client,
               SupabaseConfig.authStorage!,
-              redirectUrl: 'setkeep-trainer://login-callback/',
+              redirectUrl: AuthRedirects.trainer,
             )
           : null,
       repository: SupabaseConfig.initialized

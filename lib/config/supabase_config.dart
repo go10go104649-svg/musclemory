@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'auth_redirects.dart';
+
 /// Supabaseの接続情報をソースコードに残さず、ビルド時に受け取ります。
 class SupabaseConfig {
   SupabaseConfig._();
@@ -10,7 +12,7 @@ class SupabaseConfig {
   );
   static const legacyAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
-  static const authRedirectUrl = 'setkeep://login-callback/';
+  static const authRedirectUrl = AuthRedirects.setkeep;
 
   static bool initialized = false;
   static LocalStorage? authStorage;

@@ -86,8 +86,8 @@ migration **202609250001 は共通Supabaseへ適用済み**。適用後のmigrat
 - 顧客へのメニュー配信、メニュー編集/削除UI、指導メモ編集/削除UI。
 - 時間・距離・有酸素系の代理記録入力。過去履歴は既存モデルで読み取ります。
 - 3Dヒートマップの統合、専用アプリアイコン、配布サイズ最適化。
-- 実機上での2アカウント間の全操作、Googleログイン完了、メール確認フローは未検証。
-- OAuth使用時はSupabase DashboardのAuth URL Configurationに `setkeep-trainer://login-callback/` を追加してください。既存の `setkeep://login-callback/` を削除しないでください。コード側では両OSに専用schemeを登録し、Flutterルーティングとコールバック処理の競合を無効化しています。
+- 実機上での2アカウント間の顧客連携全操作とメール確認フローは未検証。GoogleログインはGalaxyでTRAINERへの復帰と一般版との共通ユーザーIDを確認済み（[修正記録](setkeep_trainer_oauth_fix.md)）。
+- 共通SupabaseのAuth許可リストに `setkeep-trainer://login-callback/` と `setkeep://login-callback/` を登録済みです。旧一般版のURLも維持しています。別環境・再配布時は `python3 tool/check_oauth_redirects.py` でサーバー設定を含めて検証してください。コード側では両OSに専用schemeを登録し、Flutterルーティングとコールバック処理の競合を無効化しています。
 - 端末にログイン資格情報があり、共通プロジェクトのAuth設定が整っている必要があります。テスト用ユーザーやパスワードは同梱しません。
 - 連携解除は今後のサーバー取得を止めます。既に閲覧・保存された情報やトレーナー所有のメモは自動消去しません。
 
