@@ -12,10 +12,11 @@ typedef TrainerScannerBuilder = Widget Function(
 );
 
 class TrainerQrPage extends StatefulWidget {
-  const TrainerQrPage({super.key, this.scannerBuilder});
+  const TrainerQrPage({super.key, this.scannerBuilder, this.onInvite});
 
   // Allows result handling to be tested without a physical camera.
   final TrainerScannerBuilder? scannerBuilder;
+  final ValueChanged<TrainerInviteQr>? onInvite;
 
   @override
   State<TrainerQrPage> createState() => _TrainerQrPageState();
@@ -34,6 +35,7 @@ class _TrainerQrPageState extends State<TrainerQrPage> {
         _invite = invite;
         _invalid = false;
       });
+      widget.onInvite?.call(invite);
     } else if (!_invalid) {
       // A persistent message avoids repeated alerts for the same invalid QR.
       setState(() => _invalid = true);

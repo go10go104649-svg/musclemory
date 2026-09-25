@@ -1642,10 +1642,10 @@ void main() {
     expect(otherY, lessThan(backupY));
 
     await tester.tap(find.byKey(const Key('trainerQrButton')));
-    // The native camera remains initializing in a widget-test environment.
+    // Linking now starts with explicit account/consent before opening the camera.
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
-    expect(find.byKey(const Key('trainerQrPage')), findsOneWidget);
+    expect(find.byKey(const Key('trainerSharingPage')), findsOneWidget);
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
 

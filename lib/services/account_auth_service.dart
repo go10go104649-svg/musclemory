@@ -18,7 +18,12 @@ abstract class AccountAuthService {
 }
 
 class SupabaseAccountAuthService implements AccountAuthService {
-  SupabaseAccountAuthService(this._client, this._storage);
+  SupabaseAccountAuthService(
+    this._client,
+    this._storage, {
+    this.redirectUrl = SupabaseConfig.authRedirectUrl,
+  });
+  final String redirectUrl;
   final LocalStorage _storage;
   final SupabaseClient _client;
 
@@ -54,7 +59,7 @@ class SupabaseAccountAuthService implements AccountAuthService {
   Future<void> signInWithGoogle() async {
     final launched = await _client.auth.signInWithOAuth(
       OAuthProvider.google,
-      redirectTo: SupabaseConfig.authRedirectUrl,
+      redirectTo: redirectUrl,
       authScreenLaunchMode: LaunchMode.externalApplication,
     );
     if (!launched) {

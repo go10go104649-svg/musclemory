@@ -1,0 +1,621 @@
+import 'trainer_widgets.dart';
+import 'client_page.dart';
+import 'menu_editor.dart';
+export 'client_page.dart';
+export 'menu_editor.dart';
+
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:setkeep/config/supabase_config.dart';
+import 'package:setkeep/services/account_auth_service.dart';
+import 'package:setkeep/trainer/trainer_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SupabaseConfig.initialize();
+  runApp(
+    TrainerApp(
+      auth: SupabaseConfig.initialized
+          ? SupabaseAccountAuthService(
+              Supabase.instance.client,
+              SupabaseConfig.authStorage!,
+              redirectUrl: 'setkeep-trainer://login-callback/',
+            )
+          : null,
+      repository: SupabaseConfig.initialized
+          ? TrainerRepository(Supabase.instance.client)
+          : null,
+    ),
+  );
+}
+
+class TrainerApp extends StatelessWidget {
+  const TrainerApp({super.key, this.auth, this.repository});
+  final AccountAuthService? auth;
+  final TrainerRepository? repository;
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    title: 'SETKEEP TRAINER',
+    debugShowCheckedModeBanner: false,
+    supportedLocales: const [Locale('ja'), Locale('en')],
+    localizationsDelegates: GlobalMaterialLocalizations.delegates,
+    theme: ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00D084)),
+      scaffoldBackgroundColor: const Color(0xFFF5F7F6),
+      navigationBarTheme: const NavigationBarThemeData(
+        indicatorColor: Color(0xFF00D084),
+      ),
+    ),
+    home: auth == null || repository == null
+        ? const SetupPage()
+        : AuthGate(auth: auth!, repository: repository!),
+  );
+}
+
+class SetupPage extends StatelessWidget {
+  const SetupPage({super.key});
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('SETKEEP TRAINER')),
+    body: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          tr(
+            context,
+            'Supabase接続設定が必要です。\n共通プロジェクトの設定でアプリを起動してください。',
+            'Supabase configuration is required.\nStart the app with the shared project configuration.',
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+class AuthGate extends StatefulWidget {
+  const AuthGate({super.key, required this.auth, required this.repository});
+  final AccountAuthService auth;
+  final TrainerRepository repository;
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  StreamSubscription<void>? subscription;
+  @override
+  void initState() {
+    super.initState();
+    subscription = widget.auth.changes.listen((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.auth.isSignedIn
+      ? TrainerShell(
+          key: ValueKey(widget.repository.userId),
+          auth: widget.auth,
+          repository: widget.repository,
+        )
+      : LoginPage(auth: widget.auth);
+}
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key, required this.auth});
+  final AccountAuthService auth;
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final email = TextEditingController(), password = TextEditingController();
+  bool busy = false;
+  String? message;
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
+  Future<void> run(Future<void> Function() action) async {
+    setState(() {
+      busy = true;
+      message = null;
+    });
+    try {
+      await action();
+    } catch (_) {
+      if (mounted) {
+        message = tr(
+          context,
+          '認証できませんでした。入力・接続を確認してください。',
+          'Authentication failed. Check your input and connection.',
+        );
+      }
+    }
+    if (mounted) setState(() => busy = false);
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('SETKEEP TRAINER')),
+    body: Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(24),
+          children: [
+            const Icon(
+              Icons.fitness_center,
+              size: 64,
+              color: Color(0xFF00D084),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              tr(
+                context,
+                'いつものアカウントで、指導を始める',
+                'Coach with your SETKEEP account',
+              ),
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Text(
+              tr(
+                context,
+                'SETKEEPと同じメール・パスワードでログインできます。',
+                'Use the same email and password as SETKEEP.',
+              ),
+            ),
+            TextField(
+              controller: email,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: tr(context, 'メール', 'Email'),
+              ),
+            ),
+            TextField(
+              controller: password,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: tr(context, 'パスワード', 'Password'),
+              ),
+            ),
+            const SizedBox(height: 20),
+            FilledButton(
+              onPressed: busy
+                  ? null
+                  : () => run(
+                      () =>
+                          widget.auth.signIn(email.text.trim(), password.text),
+                    ),
+              child: Text(tr(context, 'ログイン', 'Sign in')),
+            ),
+            OutlinedButton(
+              onPressed: busy
+                  ? null
+                  : () => run(() async {
+                      final signedIn = await widget.auth.signUp(
+                        email.text.trim(),
+                        password.text,
+                      );
+                      if (!signedIn && context.mounted) {
+                        message = tr(
+                          context,
+                          '確認メールのリンクを開いてからログインしてください。',
+                          'Confirm your email, then sign in.',
+                        );
+                      }
+                    }),
+              child: Text(tr(context, '共通アカウントを作成', 'Create a shared account')),
+            ),
+            TextButton(
+              onPressed: busy ? null : () => run(widget.auth.signInWithGoogle),
+              child: const Text('Google'),
+            ),
+            if (busy) const LinearProgressIndicator(),
+            if (message != null) Text(message!),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+class TrainerShell extends StatefulWidget {
+  const TrainerShell({super.key, required this.auth, required this.repository});
+  final AccountAuthService auth;
+  final TrainerRepository repository;
+  @override
+  State<TrainerShell> createState() => _TrainerShellState();
+}
+
+class _TrainerShellState extends State<TrainerShell> {
+  int tab = 0;
+  bool loading = true, busy = false;
+  String? error;
+  Map<String, dynamic>? profile;
+  List<Map<String, dynamic>> clients = [], menus = [];
+  final name = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    reload();
+  }
+
+  @override
+  void dispose() {
+    name.dispose();
+    super.dispose();
+  }
+
+  Future<void> reload() async {
+    setState(() {
+      loading = true;
+      error = null;
+    });
+    try {
+      final p = await widget.repository.profile();
+      final c = p == null
+          ? <Map<String, dynamic>>[]
+          : await widget.repository.clients();
+      final m = p == null
+          ? <Map<String, dynamic>>[]
+          : await widget.repository.menus();
+      if (mounted) {
+        setState(() {
+          profile = p;
+          clients = c;
+          menus = m;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        error = tr(
+          context,
+          '読み込めませんでした。接続とDB設定を確認してください。',
+          'Could not load data. Check connection and database setup.',
+        );
+      }
+    }
+    if (mounted) setState(() => loading = false);
+  }
+
+  Future<void> action(Future<void> Function() work) async {
+    setState(() => busy = true);
+    try {
+      await work();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              tr(
+                context,
+                '処理に失敗しました。接続と権限を確認してください。',
+                'Action failed. Check connection and permissions.',
+              ),
+            ),
+          ),
+        );
+      }
+    }
+    if (mounted) setState(() => busy = false);
+  }
+
+  Future<void> invite() => action(() async {
+    final token = await widget.repository.createInvite();
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tr(context, '顧客を招待', 'Invite a client')),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              QrImageView(
+                data: 'setkeep://trainer/invite?v=1&token=$token',
+                size: 200,
+              ),
+              SelectableText(token),
+              Text(
+                tr(
+                  context,
+                  '24時間有効・1回限り。再発行すると旧コードは無効です。\nSETKEEPの「Trainerと連携」で読み取り・入力し、本人が承認してください。',
+                  'Valid for 24 hours and one use. Reissuing invalidates the old code.\nThe client scans or enters it in SETKEEP and approves sharing.',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Clipboard.setData(ClipboardData(text: token)),
+            child: Text(tr(context, 'コードをコピー', 'Copy code')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(tr(context, '閉じる', 'Close')),
+          ),
+        ],
+      ),
+    );
+  });
+  Future<void> openClient(Map<String, dynamic> client) async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ClientPage(repository: widget.repository, link: client),
+      ),
+    );
+    if (mounted) await reload();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final labels = [
+      tr(context, 'ホーム', 'Home'),
+      tr(context, '顧客', 'Clients'),
+      tr(context, 'メニュー', 'Menus'),
+      tr(context, 'マイページ', 'Profile'),
+    ];
+    final icons = [
+      Icons.home_outlined,
+      Icons.people_outline,
+      Icons.list_alt,
+      Icons.person_outline,
+    ];
+    final content = loading
+        ? const Center(child: CircularProgressIndicator())
+        : error != null
+        ? Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(error!),
+                TextButton(
+                  onPressed: reload,
+                  child: Text(tr(context, '再試行', 'Retry')),
+                ),
+                TextButton(
+                  onPressed: widget.auth.signOut,
+                  child: Text(tr(context, 'ログアウト', 'Sign out')),
+                ),
+              ],
+            ),
+          )
+        : profile == null
+        ? ListView(
+            padding: const EdgeInsets.all(24),
+            children: [
+              Text(
+                tr(context, 'トレーナープロフィール', 'Trainer profile'),
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              Text(
+                tr(
+                  context,
+                  '同じユーザーIDにトレーナープロフィールを追加します。',
+                  'Add a trainer profile to your existing user ID.',
+                ),
+              ),
+              TextField(
+                controller: name,
+                maxLength: 80,
+                decoration: InputDecoration(
+                  labelText: tr(context, '表示名', 'Display name'),
+                ),
+              ),
+              FilledButton(
+                onPressed: busy
+                    ? null
+                    : () => action(() async {
+                        if (name.text.trim().isEmpty) return;
+                        await widget.repository.saveProfile(name.text);
+                        await reload();
+                      }),
+                child: Text(tr(context, '指導を始める', 'Start coaching')),
+              ),
+              TextButton(
+                onPressed: widget.auth.signOut,
+                child: Text(tr(context, 'ログアウト', 'Sign out')),
+              ),
+            ],
+          )
+        : RefreshIndicator(
+            onRefresh: reload,
+            child: ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                if (tab == 0) ...[
+                  Text(
+                    tr(
+                      context,
+                      '${profile!['display_name']}さん、こんにちは',
+                      'Hello, ${profile!['display_name']}',
+                    ),
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 20),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.people),
+                      title: Text(
+                        tr(
+                          context,
+                          '担当顧客 ${clients.length}人',
+                          '${clients.length} clients',
+                        ),
+                      ),
+                      subtitle: Text(
+                        tr(
+                          context,
+                          '作成済みメニュー ${menus.length}件',
+                          '${menus.length} menus',
+                        ),
+                      ),
+                      onTap: () => setState(() => tab = 1),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    tr(context, '担当顧客', 'Your clients'),
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ],
+                if (tab <= 1) ...[
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: busy ? null : invite,
+                    icon: const Icon(Icons.qr_code),
+                    label: Text(tr(context, '招待コードを発行', 'Create invitation')),
+                  ),
+                  if (clients.isEmpty)
+                    EmptyState(
+                      text: tr(
+                        context,
+                        '担当顧客はまだいません。招待コードを共有し、顧客の承認を待ちましょう。',
+                        'No clients yet. Share an invitation and wait for approval.',
+                      ),
+                    ),
+                  for (final c in clients)
+                    Card(
+                      child: ListTile(
+                        leading: const CircleAvatar(child: Icon(Icons.person)),
+                        title: Text(c['client_name'] as String),
+                        subtitle: LatestWorkout(
+                          repository: widget.repository,
+                          clientId: c['client_id'] as String,
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => openClient(c),
+                      ),
+                    ),
+                ],
+                if (tab == 2) ...[
+                  FilledButton.icon(
+                    onPressed: clients.isEmpty
+                        ? null
+                        : () async {
+                            await Navigator.push<void>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MenuEditor(
+                                  repository: widget.repository,
+                                  clients: clients,
+                                ),
+                              ),
+                            );
+                            if (mounted) await reload();
+                          },
+                    icon: const Icon(Icons.add),
+                    label: Text(tr(context, 'メニューを作成', 'Create menu')),
+                  ),
+                  if (menus.isEmpty)
+                    EmptyState(
+                      text: tr(
+                        context,
+                        'メニューはまだありません。顧客と連携して作成しましょう。',
+                        'No menus yet. Link a client to create one.',
+                      ),
+                    ),
+                  for (final m in menus)
+                    MenuCard(
+                      menu: m,
+                      clientName:
+                          clients
+                                  .where(
+                                    (c) => c['client_id'] == m['client_id'],
+                                  )
+                                  .firstOrNull?['client_name']
+                              as String?,
+                    ),
+                ],
+                if (tab == 3) ...[
+                  Text(
+                    profile!['display_name'] as String,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  Text(widget.auth.email ?? ''),
+                  const SizedBox(height: 20),
+                  Text(
+                    tr(
+                      context,
+                      'SETKEEPと共通のアカウントです。\n顧客の体重は公開されません。指導メモはあなた専用です。',
+                      'Your account is shared with SETKEEP.\nClient body weight is private. Coaching notes are only visible to you.',
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  OutlinedButton(
+                    onPressed: busy ? null : () => action(widget.auth.signOut),
+                    child: Text(tr(context, 'ログアウト', 'Sign out')),
+                  ),
+                ],
+              ],
+            ),
+          );
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('SETKEEP TRAINER'),
+        actions: [
+          IconButton(
+            onPressed: loading ? null : reload,
+            tooltip: tr(context, '更新', 'Refresh'),
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
+      body: LayoutBuilder(
+        builder: (context, size) => Row(
+          children: [
+            if (size.maxWidth >= 720)
+              NavigationRail(
+                selectedIndex: tab,
+                onDestinationSelected: (i) => setState(() => tab = i),
+                labelType: NavigationRailLabelType.all,
+                destinations: [
+                  for (var i = 0; i < 4; i++)
+                    NavigationRailDestination(
+                      icon: Icon(icons[i]),
+                      label: Text(labels[i]),
+                    ),
+                ],
+              ),
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1000),
+                  child: content,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: MediaQuery.sizeOf(context).width >= 720
+          ? null
+          : NavigationBar(
+              selectedIndex: tab,
+              onDestinationSelected: (i) => setState(() => tab = i),
+              destinations: [
+                for (var i = 0; i < 4; i++)
+                  NavigationDestination(icon: Icon(icons[i]), label: labels[i]),
+              ],
+            ),
+    );
+  }
+}

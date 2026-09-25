@@ -6,7 +6,7 @@ import 'gym/training_place_preference.dart';
 import 'gym/gym_equipment_cache.dart';
 import 'gym/gym_repository.dart';
 import 'gym/gym_pages.dart';
-import 'trainer_qr_page.dart';
+import 'trainer/trainer_sharing_page.dart';
 import 'exercise_form_catalog.dart';
 import 'body_tab_colors.dart';
 import 'design/app_colors.dart';
@@ -1168,6 +1168,12 @@ class _HomeShellState extends State<HomeShell> {
         selectedGym: _selectedGym,
         history: _history,
         onSyncRequested: _syncHistory,
+        onTrainerHistoryReceived: (rows) async {
+          final existingDates = _history.map((w) => w.date.toUtc()).toSet();
+          await _importWorkouts(rows.map(WorkoutRecord.tryFromJson)
+              .whereType<WorkoutRecord>()
+              .where((w) => !existingDates.contains(w.date.toUtc())).toList());
+        },
         workoutTemplates: _workoutTemplates,
         bodyWeights: _bodyWeights,
         onBackupImported: _importBackup,
@@ -10894,6 +10900,7 @@ class _ProfileNameCardState extends State<_ProfileNameCard> {
 class ProfilePage extends StatelessWidget {
   const ProfilePage({
     super.key,
+    this.onTrainerHistoryReceived,
     required this.selectedGym,
     required this.history,
     required this.onSyncRequested,
@@ -10915,6 +10922,7 @@ class ProfilePage extends StatelessWidget {
     required this.onSelectedGymChanged,
   });
 
+  final Future<void> Function(List<Map<String, dynamic>>)? onTrainerHistoryReceived;
   final String? selectedGym;
   final List<WorkoutRecord> history;
   final Future<int> Function() onSyncRequested;
@@ -10992,10 +11000,13 @@ class ProfilePage extends StatelessWidget {
               key: const Key('trainerQrButton'),
               leading: const Icon(Icons.qr_code_scanner_rounded),
               title: const Text('Trainerと連携'),
-              subtitle: const Text('招待QRコードを読み取る'),
+              subtitle: const Text('招待の承認・記録の共有・代理記録の受信'),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => Navigator.of(context).push<void>(
-                MaterialPageRoute(builder: (_) => const TrainerQrPage()),
+                MaterialPageRoute(builder: (_) => TrainerSharingPage(
+                  history: history.map((w) => w.toJson()).toList(),
+                  onReceived: onTrainerHistoryReceived ?? (_) async {},
+                )),
               ),
             ),
           ),

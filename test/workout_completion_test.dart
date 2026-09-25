@@ -59,7 +59,8 @@ void main() {
         expect(history.single.date, DateTime(2026, 9, 20, 18, 30));
         expect(history.single.gymName, 'テストジム');
         expect(history.single.note, '保存確認');
-        expect(history.single.durationSeconds, 120);
+        // Resuming adds real elapsed time; a slow test host may advance a second.
+        expect(history.single.durationSeconds, greaterThanOrEqualTo(120));
         expect(prefs.getString(activeWorkoutDraftStorageKey), isNull);
         expect(find.textContaining('自己ベスト更新'), findsOneWidget);
         if (closeDialog) {

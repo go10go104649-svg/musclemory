@@ -74,3 +74,8 @@ flutter run --dart-define-from-file=supabase.json
 ## SETKEEPへの移行
 
 識別子・旧データ互換性・外部サービス設定・検証結果は [ブランド移行記録](docs/setkeep_migration.md) を参照してください。
+
+## SETKEEP TRAINER
+
+同じSupabase Authを使う独立アプリを `apps/setkeep_trainer` に追加しています。
+一般版は引き続きリポジトリ直下で開発します。[開発・実機確認ガイド](docs/setkeep_trainer.md) を参照してください。
