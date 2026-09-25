@@ -335,7 +335,7 @@ void main() {
       Theme.of(t.element(find.byType(BodyMapPage)))
           .extension<FamilyPalette>()!
           .accent,
-      const Color(0xFF79D5F6),
+      const Color(0xFF38C6FF),
     );
   });
   testWidgets('menu opens the real shared picker', (t) async {

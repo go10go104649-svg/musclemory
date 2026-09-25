@@ -156,10 +156,11 @@ class _LoginPageState extends State<LoginPage> {
           shrinkWrap: true,
           padding: const EdgeInsets.all(24),
           children: [
-            Icon(
-              Icons.fitness_center,
-              size: 64,
-              color: FamilyPalette.trainer.accent,
+            Image.asset(
+              'assets/brand/trainer_icon.png',
+              width: 64,
+              height: 64,
+              semanticLabel: 'SETKEEP TRAINER',
             ),
             const SizedBox(height: 24),
             Text(

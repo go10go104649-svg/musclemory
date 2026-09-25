@@ -21,10 +21,10 @@ class FamilyPalette extends ThemeExtension<FamilyPalette> {
     background: AppColors.background,
   );
   static const trainer = FamilyPalette(
-    accent: Color(0xFF79D5F6),
-    soft: Color(0xFFD8F1FB),
-    subtle: Color(0xFFE8F6FC),
-    background: Color(0xFFF3F7FA),
+    accent: AppColors.trainerPrimary,
+    soft: AppColors.trainerPrimarySoft,
+    subtle: AppColors.trainerPrimaryVerySoft,
+    background: AppColors.trainerBackground,
     assetPrefix: 'packages/setkeep/',
   );
   static FamilyPalette of(BuildContext context) =>
@@ -55,37 +55,43 @@ class FamilyPalette extends ThemeExtension<FamilyPalette> {
         );
 }
 
-ThemeData familyTheme([FamilyPalette palette = FamilyPalette.setkeep]) =>
-    ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: palette.accent,
-        primary: palette == FamilyPalette.trainer
-            ? palette.accent
-            : AppColors.ink,
-        onPrimary: palette == FamilyPalette.trainer ? AppColors.ink : null,
-        secondary: palette.accent,
-        surface: palette.background,
-      ),
-      scaffoldBackgroundColor: palette.background,
-      fontFamily: '.SF Pro Display',
-      cardTheme: const CardThemeData(
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        color: Colors.white,
-      ),
-      textButtonTheme: palette == FamilyPalette.trainer
-          ? TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: AppColors.ink),
-            )
-          : null,
-      outlinedButtonTheme: palette == FamilyPalette.trainer
-          ? OutlinedButtonThemeData(
-              style: OutlinedButton.styleFrom(foregroundColor: AppColors.ink),
-            )
-          : null,
-      extensions: palette == FamilyPalette.setkeep ? const [] : [palette],
-      navigationBarTheme: palette == FamilyPalette.trainer
-          ? NavigationBarThemeData(indicatorColor: palette.accent)
-          : null,
-    );
+ThemeData familyTheme([
+  FamilyPalette palette = FamilyPalette.setkeep,
+]) => ThemeData(
+  useMaterial3: true,
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: palette.accent,
+    primary: palette == FamilyPalette.trainer ? palette.accent : AppColors.ink,
+    onPrimary: palette == FamilyPalette.trainer ? AppColors.ink : null,
+    secondary: palette.accent,
+    primaryContainer: palette == FamilyPalette.trainer ? palette.soft : null,
+    secondaryContainer: palette == FamilyPalette.trainer ? palette.soft : null,
+    tertiary: palette == FamilyPalette.trainer ? palette.accent : null,
+    tertiaryContainer: palette == FamilyPalette.trainer ? palette.subtle : null,
+    onSecondary: palette == FamilyPalette.trainer
+        ? AppColors.trainerDark
+        : null,
+    surface: palette.background,
+  ),
+  scaffoldBackgroundColor: palette.background,
+  fontFamily: '.SF Pro Display',
+  cardTheme: const CardThemeData(
+    elevation: 0,
+    margin: EdgeInsets.zero,
+    color: Colors.white,
+  ),
+  textButtonTheme: palette == FamilyPalette.trainer
+      ? TextButtonThemeData(
+          style: TextButton.styleFrom(foregroundColor: AppColors.ink),
+        )
+      : null,
+  outlinedButtonTheme: palette == FamilyPalette.trainer
+      ? OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(foregroundColor: AppColors.ink),
+        )
+      : null,
+  extensions: palette == FamilyPalette.setkeep ? const [] : [palette],
+  navigationBarTheme: palette == FamilyPalette.trainer
+      ? NavigationBarThemeData(indicatorColor: palette.accent)
+      : null,
+);
