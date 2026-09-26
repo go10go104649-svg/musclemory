@@ -14,11 +14,13 @@ Map<String, dynamic> session(
   String date = '2026-09-25T10:00:00Z',
   int reps = 8,
   String? canceledAt,
+  String note = '',
 }) => {
   'id': id,
   'performed_at': date,
   'duration_seconds': 1800,
   'gym_name': 'Gym',
+  'note': note,
   'canceled_at': canceledAt,
   'sets': [
     {
@@ -109,6 +111,18 @@ void main() {
     ], userA);
     expect(history, hasLength(1));
     expect(history.single.sets.single.reps, 12);
+  });
+
+  test('one trainer set and comment survive sync and local JSON reload', () {
+    final synced = reconcileTrainerWorkouts([], [
+      session('trainer-one', note: 'Form is improving'),
+    ], userA).single;
+    final restored = WorkoutRecord.fromJson(synced.toJson());
+    expect(restored.sets, hasLength(1));
+    expect(restored.sets.single.weight, 60);
+    expect(restored.sets.single.reps, 8);
+    expect(restored.note, 'Form is improving');
+    expect(restored.trainerWorkoutId, 'trainer-one');
   });
 
   test(

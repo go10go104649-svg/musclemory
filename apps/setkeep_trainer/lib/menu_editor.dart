@@ -6,13 +6,13 @@ import 'package:setkeep/main.dart'
     show
         RecordedSet,
         WorkoutRecord,
-        ExerciseRecordTypeUi,
         WorkoutExercise,
         WorkoutSet,
         ExerciseSelection,
         ExercisePickerSheet,
         ExercisePickerViewport,
-        ExerciseInputCard;
+        ExerciseInputCard,
+        WorkoutNumericInputController;
 
 import 'trainer_widgets.dart';
 
@@ -39,10 +39,12 @@ class _MenuEditorState extends State<MenuEditor> {
       note = TextEditingController(
         text: widget.existing?['note'] as String? ?? '',
       );
+  final sessionComment = TextEditingController();
   late String clientId =
       widget.existing?['client_id'] as String? ??
       widget.clients.first['client_id'] as String;
   final exercises = <WorkoutExercise>[];
+  late final numericInput = WorkoutNumericInputController(() => exercises);
   final requestId = TrainerRepository.requestId();
   List<WorkoutRecord> history = [];
   int historyGeneration = 0;
@@ -62,6 +64,8 @@ class _MenuEditorState extends State<MenuEditor> {
   void dispose() {
     name.dispose();
     note.dispose();
+    sessionComment.dispose();
+    numericInput.dispose();
     super.dispose();
   }
 
@@ -148,10 +152,7 @@ class _MenuEditorState extends State<MenuEditor> {
             bodyPart: t.bodyPart,
             equipment: t.equipment,
             recordType: t.recordType,
-            sets: List.generate(
-              t.recordType.usesSets ? 3 : 1,
-              (_) => WorkoutSet(weight: t.startWeight, reps: t.startReps),
-            ),
+            sets: [WorkoutSet(weight: t.startWeight, reps: t.startReps)],
           ),
         );
       }
@@ -185,6 +186,7 @@ class _MenuEditorState extends State<MenuEditor> {
           requestId,
           date,
           sets.map((s) => s.toJson()).toList(),
+          note: sessionComment.text.trim(),
         );
       } else if (repo is TenantRepository) {
         await repo.saveMenu(
@@ -263,176 +265,190 @@ class _MenuEditorState extends State<MenuEditor> {
             : tr(context, 'メニューを編集', 'Edit menu'),
       ),
     ),
-    body: AbsorbPointer(
-      absorbing: busy,
-      child: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          DropdownButtonFormField<String>(
-            initialValue: clientId,
-            isExpanded: true,
-            decoration: InputDecoration(
-              labelText: tr(context, '対象顧客', 'Client'),
-            ),
-            items: [
-              for (final c in widget.clients)
-                DropdownMenuItem(
-                  value: c['client_id'] as String,
-                  child: Text(c['client_name'] as String),
-                ),
-            ],
-            onChanged: widget.existing != null
-                ? null
-                : (v) {
-                    setState(() => clientId = v!);
-                    loadHistory();
-                  },
-          ),
-          if (!widget.recording) ...[
-            TextField(
-              controller: name,
-              maxLength: 120,
+    bottomNavigationBar: numericInput.keypad,
+    body: numericInput.wrap(
+      AbsorbPointer(
+        absorbing: busy,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: clientId,
+              isExpanded: true,
               decoration: InputDecoration(
-                labelText: tr(context, 'メニュー名', 'Menu name'),
+                labelText: tr(context, '対象顧客', 'Client'),
               ),
-            ),
-            SegmentedButton<String>(
-              segments: [
-                ButtonSegment(
-                  value: 'single',
-                  label: Text(tr(context, '単発', 'Single')),
-                ),
-                ButtonSegment(
-                  value: 'repeat',
-                  label: Text(tr(context, '繰り返し', 'Repeat')),
-                ),
+              items: [
+                for (final c in widget.clients)
+                  DropdownMenuItem(
+                    value: c['client_id'] as String,
+                    child: Text(c['client_name'] as String),
+                  ),
               ],
-              selected: {schedule},
-              onSelectionChanged: (s) => setState(() => schedule = s.single),
+              onChanged: widget.existing != null
+                  ? null
+                  : (v) {
+                      setState(() => clientId = v!);
+                      loadHistory();
+                    },
             ),
-            ListTile(
-              title: Text(tr(context, '実施期限', 'Due date')),
-              subtitle: Text(dateLabel(due)),
-              trailing: IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: () => setState(() => due = null),
+            if (!widget.recording) ...[
+              TextField(
+                controller: name,
+                maxLength: 120,
+                decoration: InputDecoration(
+                  labelText: tr(context, 'メニュー名', 'Menu name'),
+                ),
               ),
-              onTap: () async {
-                final d = await showDatePicker(
-                  context: context,
-                  initialDate: due ?? DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                );
-                if (mounted && d != null) setState(() => due = d);
-              },
-            ),
-            TextField(
-              controller: note,
-              maxLength: 10000,
-              maxLines: 3,
-              decoration: InputDecoration(
-                labelText: tr(context, 'メモ', 'Notes'),
+              SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(
+                    value: 'single',
+                    label: Text(tr(context, '単発', 'Single')),
+                  ),
+                  ButtonSegment(
+                    value: 'repeat',
+                    label: Text(tr(context, '繰り返し', 'Repeat')),
+                  ),
+                ],
+                selected: {schedule},
+                onSelectionChanged: (s) => setState(() => schedule = s.single),
               ),
-            ),
-            if (widget.repository is TenantRepository)
-              OutlinedButton(
-                onPressed: template,
-                child: Text(tr(context, 'テンプレートから追加', 'Load template')),
+              ListTile(
+                title: Text(tr(context, '実施期限', 'Due date')),
+                subtitle: Text(dateLabel(due)),
+                trailing: IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () => setState(() => due = null),
+                ),
+                onTap: () async {
+                  final d = await showDatePicker(
+                    context: context,
+                    initialDate: due ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (mounted && d != null) setState(() => due = d);
+                },
               ),
-          ] else
-            ListTile(
-              title: Text(dateLabel(date)),
-              trailing: const Icon(Icons.calendar_month),
-              onTap: () async {
-                final d = await showDatePicker(
-                  context: context,
-                  initialDate: date,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now(),
-                );
-                if (mounted && d != null) setState(() => date = d);
-              },
-            ),
-          for (var i = 0; i < exercises.length; i++)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: ExerciseInputCard(
-                key: ObjectKey(exercises[i]),
-                exerciseIndex: i,
-                exercise: exercises[i],
-                history: history,
-                showCompletionCheck: false,
-                onAddSet: () => setState(
-                  () => exercises[i].sets.add(
-                    WorkoutSet(
-                      weight: exercises[i].sets.lastOrNull?.weight ?? 0,
-                      reps: exercises[i].sets.lastOrNull?.reps ?? 10,
+              TextField(
+                controller: note,
+                maxLength: 10000,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  labelText: tr(context, 'メモ', 'Notes'),
+                ),
+              ),
+              if (widget.repository is TenantRepository)
+                OutlinedButton(
+                  onPressed: template,
+                  child: Text(tr(context, 'テンプレートから追加', 'Load template')),
+                ),
+            ] else ...[
+              ListTile(
+                title: Text(dateLabel(date)),
+                trailing: const Icon(Icons.calendar_month),
+                onTap: () async {
+                  final d = await showDatePicker(
+                    context: context,
+                    initialDate: date,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (mounted && d != null) setState(() => date = d);
+                },
+              ),
+              TextField(
+                key: const Key('sessionCommentField'),
+                controller: sessionComment,
+                minLines: 3,
+                maxLines: 5,
+                maxLength: 10000,
+                decoration: InputDecoration(
+                  labelText: tr(context, 'トレーナーコメント', 'Trainer comment'),
+                  alignLabelWithHint: true,
+                ),
+              ),
+            ],
+            for (var i = 0; i < exercises.length; i++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: ExerciseInputCard(
+                  key: ObjectKey(exercises[i]),
+                  exerciseIndex: i,
+                  exercise: exercises[i],
+                  history: history,
+                  showCompletionCheck: false,
+                  numericNodes: numericInput.nodesFor,
+                  nextNumeric: numericInput.nextNumeric,
+                  onAddSet: () => setState(
+                    () => exercises[i].sets.add(
+                      WorkoutSet.nextFrom(exercises[i].sets.lastOrNull),
                     ),
                   ),
+                  onRemoveSet: (s) =>
+                      setState(() => exercises[i].sets.removeAt(s)),
+                  onRemove: () => setState(() => exercises.removeAt(i)),
+                  onToggleSet: (_) {},
+                  onApplyPrevious: (previous) => setState(() {
+                    exercises[i].sets
+                      ..clear()
+                      ..addAll(previous.map(TrainerMenuCodec.editable));
+                    if (previous.isNotEmpty) {
+                      exercises[i].recordType = previous.first.recordType;
+                    }
+                  }),
+                  onSetAllCompleted: (_) {},
+                  onValuesChanged: () {},
+                  onRecordTypeChanged: () => setState(() {}),
                 ),
-                onRemoveSet: (s) =>
-                    setState(() => exercises[i].sets.removeAt(s)),
-                onRemove: () => setState(() => exercises.removeAt(i)),
-                onToggleSet: (_) {},
-                onApplyPrevious: (previous) => setState(() {
-                  exercises[i].sets
-                    ..clear()
-                    ..addAll(previous.map(TrainerMenuCodec.editable));
-                  if (previous.isNotEmpty) {
-                    exercises[i].recordType = previous.first.recordType;
-                  }
-                }),
-                onSetAllCompleted: (_) {},
-                onValuesChanged: () {},
-                onRecordTypeChanged: () => setState(() {}),
               ),
+            OutlinedButton.icon(
+              onPressed: add,
+              icon: const Icon(Icons.add),
+              label: Text(tr(context, '種目を追加', 'Add exercise')),
             ),
-          OutlinedButton.icon(
-            onPressed: add,
-            icon: const Icon(Icons.add),
-            label: Text(tr(context, '種目を追加', 'Add exercise')),
-          ),
-          if (error != null) Text(error!),
-          if (busy) const LinearProgressIndicator(),
-          FilledButton(
-            onPressed: busy ? null : save,
-            child: Text(tr(context, '保存', 'Save')),
-          ),
-          if (!widget.recording && widget.repository is TenantRepository)
-            TextButton(
-              onPressed: () async {
-                try {
-                  await (widget.repository as TenantRepository).mutate(
-                    'template',
-                    {'name': name.text.trim(), 'items': items},
-                  );
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          tr(context, 'テンプレートを保存しました', 'Template saved'),
+            if (error != null) Text(error!),
+            if (busy) const LinearProgressIndicator(),
+            FilledButton(
+              onPressed: busy ? null : save,
+              child: Text(tr(context, '保存', 'Save')),
+            ),
+            if (!widget.recording && widget.repository is TenantRepository)
+              TextButton(
+                onPressed: () async {
+                  try {
+                    await (widget.repository as TenantRepository).mutate(
+                      'template',
+                      {'name': name.text.trim(), 'items': items},
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            tr(context, 'テンプレートを保存しました', 'Template saved'),
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
+                  } catch (_) {
+                    if (context.mounted) {
+                      setState(
+                        () => error = tr(
+                          context,
+                          '名前・セットの値を確認してください',
+                          'Check name and set values',
+                        ),
+                      );
+                    }
                   }
-                } catch (_) {
-                  if (context.mounted) {
-                    setState(
-                      () => error = tr(
-                        context,
-                        '名前・セットの値を確認してください',
-                        'Check name and set values',
-                      ),
-                    );
-                  }
-                }
-              },
-              child: Text(
-                tr(context, 'テナントのテンプレートとして保存', 'Save as tenant template'),
+                },
+                child: Text(
+                  tr(context, 'テナントのテンプレートとして保存', 'Save as tenant template'),
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     ),
   );

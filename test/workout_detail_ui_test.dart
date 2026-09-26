@@ -73,6 +73,37 @@ void main() {
       expect(t.takeException(), isNull);
     },
   );
+  testWidgets('one trainer set shows its session comment on SK detail', (
+    t,
+  ) async {
+    final record = WorkoutRecord(
+      date: DateTime(2026, 9, 26),
+      sets: const [RecordedSet(weight: 25, reps: 8, completed: true)],
+      trainerWorkoutId: 'trainer-record',
+      trainerOwnerUserId: 'client',
+      note: 'フォームが安定してきています。',
+    );
+    await t.pumpWidget(MaterialApp(home: detailPage(record)));
+    await t.pumpAndSettle();
+    expect(find.text('1 セット'), findsOneWidget);
+    expect(find.text('25 kg × 8 回'), findsOneWidget);
+    expect(find.text('トレーナーからのコメント'), findsOneWidget);
+    expect(find.text(record.note), findsOneWidget);
+  });
+  testWidgets('no trainer comment leaves no comment heading or card', (
+    t,
+  ) async {
+    final record = WorkoutRecord(
+      date: DateTime(2026, 9, 26),
+      sets: const [RecordedSet(weight: 25, reps: 8, completed: true)],
+      trainerWorkoutId: 'trainer-record',
+      trainerOwnerUserId: 'client',
+    );
+    await t.pumpWidget(MaterialApp(home: detailPage(record)));
+    await t.pumpAndSettle();
+    expect(find.text('トレーナーからのコメント'), findsNothing);
+    expect(find.byIcon(Icons.notes_rounded), findsNothing);
+  });
   for (final duration in [0, 60]) {
     testWidgets('duration conditional: $duration', (t) async {
       if (duration > 0) WorkoutUiPreference.workoutDurationEnabled = false;

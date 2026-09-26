@@ -5064,16 +5064,28 @@ class WorkoutDetailPage extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.notes_rounded),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      workout.note,
-                      style: const TextStyle(color: Color(0xFF6C746D)),
+                  if (workout.trainerWorkoutId != null) ...[
+                    const Text(
+                      'トレーナーからのコメント',
+                      style: TextStyle(fontWeight: FontWeight.w800),
                     ),
+                    const SizedBox(height: 10),
+                  ],
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.notes_rounded),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          workout.note,
+                          style: const TextStyle(color: Color(0xFF6C746D)),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -5500,37 +5512,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   DateTime? _restEndsAt;
   String _restExerciseName = '';
   int _inputRevision = 0;
-  final _numericFocus = <WorkoutSet, List<FocusNode>>{};
-  late final _numericPad = _NumericPadController(() => _numericOrder);
-
-  List<FocusNode> _nodesFor(WorkoutSet set) =>
-      _numericFocus.putIfAbsent(set, () => [FocusNode(), FocusNode()]);
-
-  List<FocusNode> get _numericOrder => [
-    for (final exercise in _exercises)
-      for (final set in exercise.sets) ...[
-        if (exercise.recordType.hasWeightInput) _nodesFor(set)[0],
-        if (exercise.recordType.hasWeightInput ||
-            exercise.recordType == ExerciseRecordType.bodyweightReps)
-          _nodesFor(set)[1],
-      ],
-  ];
-
-  VoidCallback? _nextNumeric(FocusNode node) {
-    final order = _numericOrder;
-    final index = order.indexOf(node);
-    if (index < 0 || index == order.length - 1) return null;
-    return () {
-      final current = _numericOrder;
-      final index = current.indexOf(node);
-      if (index < 0 || index + 1 >= current.length) return;
-      final next = current[index + 1];
-      next.requestFocus();
-      if (next.context != null) {
-        Scrollable.ensureVisible(next.context!, alignment: 0.35);
-      }
-    };
-  }
+  late final _numericInput = WorkoutNumericInputController(() => _exercises);
 
   bool _allowPop = false;
   bool _leaveDialogOpen = false;
@@ -5648,12 +5630,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     _restTimer?.cancel();
     unawaited(RestNotificationService.cancel());
     _noteController.dispose();
-    _numericPad.dispose();
-    for (final nodes in _numericFocus.values) {
-      for (final node in nodes) {
-        node.dispose();
-      }
-    }
+    _numericInput.dispose();
     super.dispose();
   }
 
@@ -5739,19 +5716,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
   void _addSet(int exerciseIndex) {
     setState(() {
       final sets = _exercises[exerciseIndex].sets;
-      final previous = sets.isEmpty ? null : sets.last;
-      sets.add(
-        WorkoutSet(
-          weight: previous?.weight ?? 0,
-          reps: previous?.reps ?? 0,
-          durationSeconds: previous?.durationSeconds ?? 0,
-          distanceKm: previous?.distanceKm ?? 0,
-          speedKmh: previous?.speedKmh ?? 0,
-          inclinePercent: previous?.inclinePercent ?? 0,
-          resistanceLevel: previous?.resistanceLevel ?? 0,
-          paceSecondsPerKm: previous?.paceSecondsPerKm ?? 0,
-        ),
-      );
+      sets.add(WorkoutSet.nextFrom(sets.lastOrNull));
     });
     unawaited(_saveDraft());
   }
@@ -6440,7 +6405,7 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
       canPop: _allowPop,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) {
-          if (_numericPad.active != null) {
+          if (_numericInput.isActive) {
             FocusManager.instance.primaryFocus?.unfocus();
           } else {
             unawaited(_confirmLeave());
@@ -6489,10 +6454,9 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
             const SizedBox(width: 8),
           ],
         ),
-        bottomNavigationBar: _WorkoutNumericKeypad(controller: _numericPad),
-        body: _NumericPadScope(
-          controller: _numericPad,
-          child: AbsorbPointer(
+        bottomNavigationBar: _numericInput.keypad,
+        body: _numericInput.wrap(
+          AbsorbPointer(
             absorbing: _completing || _savedRecord != null,
             child: Form(
               key: _formKey,
@@ -6799,8 +6763,8 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                             _exercises[exerciseIndex].sets,
                             _inputRevision,
                           )),
-                          numericNodes: _nodesFor,
-                          nextNumeric: _nextNumeric,
+                          numericNodes: _numericInput.nodesFor,
+                          nextNumeric: _numericInput.nextNumeric,
                           exerciseIndex: exerciseIndex,
                           exercise: _exercises[exerciseIndex],
                           history: widget.history,
@@ -9622,6 +9586,17 @@ class WorkoutSet {
     this.paceSecondsPerKm = 0,
   }) : setId = setId ?? _newWorkoutIdentity();
 
+  factory WorkoutSet.nextFrom(WorkoutSet? previous) => WorkoutSet(
+    weight: previous?.weight ?? 0,
+    reps: previous?.reps ?? 0,
+    durationSeconds: previous?.durationSeconds ?? 0,
+    distanceKm: previous?.distanceKm ?? 0,
+    speedKmh: previous?.speedKmh ?? 0,
+    inclinePercent: previous?.inclinePercent ?? 0,
+    resistanceLevel: previous?.resistanceLevel ?? 0,
+    paceSecondsPerKm: previous?.paceSecondsPerKm ?? 0,
+  );
+
   final String setId;
   double weight;
   int reps;
@@ -9972,6 +9947,7 @@ List<WorkoutRecord> reconcileTrainerWorkouts(
       'date': row['performed_at'],
       'durationSeconds': row['duration_seconds'],
       'gymName': row['gym_name'],
+      'note': row['note'],
       'sets': row['sets'],
       'trainerWorkoutId': id,
       'trainerOwnerUserId': userId,
@@ -10437,6 +10413,57 @@ class NumericLeadingZeroFormatter extends TextInputFormatter {
       ),
       composing: TextRange.empty,
     );
+  }
+}
+
+/// Shared SK/TRAINER numeric input behavior for ExerciseInputCard.
+class WorkoutNumericInputController {
+  WorkoutNumericInputController(this.exercises);
+
+  final List<WorkoutExercise> Function() exercises;
+  final _numericFocus = <WorkoutSet, List<FocusNode>>{};
+  late final _pad = _NumericPadController(() => _numericOrder);
+
+  List<FocusNode> nodesFor(WorkoutSet set) =>
+      _numericFocus.putIfAbsent(set, () => [FocusNode(), FocusNode()]);
+
+  List<FocusNode> get _numericOrder => [
+    for (final exercise in exercises())
+      for (final set in exercise.sets) ...[
+        if (exercise.recordType.hasWeightInput) nodesFor(set)[0],
+        if (exercise.recordType.hasWeightInput ||
+            exercise.recordType == ExerciseRecordType.bodyweightReps)
+          nodesFor(set)[1],
+      ],
+  ];
+
+  VoidCallback? nextNumeric(FocusNode node) {
+    final order = _numericOrder;
+    final index = order.indexOf(node);
+    if (index < 0 || index == order.length - 1) return null;
+    return () {
+      final current = _numericOrder;
+      final index = current.indexOf(node);
+      if (index < 0 || index + 1 >= current.length) return;
+      final next = current[index + 1];
+      next.requestFocus();
+      if (next.context != null) {
+        Scrollable.ensureVisible(next.context!, alignment: 0.35);
+      }
+    };
+  }
+
+  bool get isActive => _pad.active != null;
+  Widget get keypad => _WorkoutNumericKeypad(controller: _pad);
+  Widget wrap(Widget child) => _NumericPadScope(controller: _pad, child: child);
+
+  void dispose() {
+    _pad.dispose();
+    for (final nodes in _numericFocus.values) {
+      for (final node in nodes) {
+        node.dispose();
+      }
+    }
   }
 }
 

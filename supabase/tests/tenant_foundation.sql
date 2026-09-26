@@ -79,6 +79,14 @@ select public.tenant_cancel_record(:'a',:'c',:'record',true);
 select pg_temp.ok((select canceled_at is not null from public.tenant_workouts(:'a',:'c')),'soft cancel');
 select public.tenant_cancel_record(:'a',:'c',:'record',false);
 select pg_temp.ok((select canceled_at is null from public.tenant_workouts(:'a',:'c')),'restore record');
+select public.tenant_record(:'a',:'c','20000000-0000-0000-0000-000000000002',now(),'[{"exerciseId":"bench_press","exerciseName":"Bench","recordType":"weightReps","weight":25,"reps":8,"completed":true}]','Form is improving') as commented_record \gset
+select pg_temp.ok((select jsonb_array_length(sets)=1 from public.tenant_workouts(:'a',:'c') where id=:'commented_record'),'session has one set');
+select public.tenant_record(:'a',:'c','20000000-0000-0000-0000-000000000002',now(),'[{"exerciseId":"bench_press","exerciseName":"Bench","recordType":"weightReps","weight":25,"reps":8,"completed":true}]','Form is improving');
+select pg_temp.ok((select count(*)=1 from public.tenant_workouts(:'a',:'c') where id=:'commented_record'),'commented retry keeps workout ID');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000009',true);
+select pg_temp.ok((select note='Form is improving' and jsonb_array_length(sets)=1 from public.workouts where id=:'commented_record'),'linked client reads its session comment and single set');
+select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000008',true);
+select pg_temp.ok((select count(*)=0 from public.workouts where id=:'commented_record'),'other client cannot read session comment');
 select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
 select public.tenant_mutate(:'a','unassign',jsonb_build_object('client_id',:'c','user_id','10000000-0000-0000-0000-000000000003'));
 select public.tenant_mutate(:'a','assign',jsonb_build_object('client_id',:'c','user_id','10000000-0000-0000-0000-000000000003'));

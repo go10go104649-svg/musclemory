@@ -99,8 +99,12 @@ class TrainerRepository {
     String clientId,
     String requestId,
     DateTime date,
-    List<Map<String, dynamic>> sets,
-  ) async {
+    List<Map<String, dynamic>> sets, {
+    String note = '',
+  }) async {
+    if (note.trim().isNotEmpty) {
+      throw UnsupportedError('Session comments require a tenant repository');
+    }
     await client.rpc(
       'trainer_record_workout',
       params: {
@@ -126,7 +130,7 @@ class TrainerRepository {
 
   Future<List<Map<String, dynamic>>> recordedForMe({int offset = 0}) => client
       .from('workouts')
-      .select('id,performed_at,duration_seconds,gym_name,sets,canceled_at')
+      .select('id,performed_at,duration_seconds,gym_name,note,sets,canceled_at')
       .eq('user_id', userId)
       .eq('record_source', 'trainer')
       .order('performed_at')

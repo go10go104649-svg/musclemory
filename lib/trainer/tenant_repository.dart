@@ -173,8 +173,9 @@ class TenantRepository extends TrainerRepository {
     String clientId,
     String requestId,
     DateTime date,
-    List<Map<String, dynamic>> sets,
-  ) async {
+    List<Map<String, dynamic>> sets, {
+    String note = '',
+  }) async {
     await client.rpc(
       'tenant_record',
       params: {
@@ -183,6 +184,7 @@ class TenantRepository extends TrainerRepository {
         'p_request': requestId,
         'p_date': date.toUtc().toIso8601String(),
         'p_sets': sets,
+        if (note.trim().isNotEmpty) 'p_note': note.trim(),
       },
     );
   }

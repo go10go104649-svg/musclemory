@@ -38,6 +38,7 @@ class FakeRepository implements TrainerRepository {
   String? recordedClient;
   String? recordedRequest;
   List<Map<String, dynamic>> recordedSets = [];
+  String? recordedNote;
   bool fail = false;
   final historyRows = <Map<String, dynamic>>[];
   @override
@@ -91,11 +92,13 @@ class FakeRepository implements TrainerRepository {
     String clientId,
     String requestId,
     DateTime date,
-    List<Map<String, dynamic>> sets,
-  ) async {
+    List<Map<String, dynamic>> sets, {
+    String note = '',
+  }) async {
     recordedClient = clientId;
     recordedRequest = requestId;
     recordedSets = sets;
+    recordedNote = note;
   }
 
   @override
@@ -146,6 +149,26 @@ Map<String, dynamic> menuFixture() => {
     },
   ],
 };
+
+Future<void> addBenchPress(WidgetTester tester) async {
+  await tester.ensureVisible(find.text('Add exercise'));
+  await tester.tap(find.text('Add exercise'));
+  await tester.pumpAndSettle();
+  await tester.enterText(
+    find.byKey(const Key('exerciseSearchField')),
+    'ベンチプレス',
+  );
+  await tester.pumpAndSettle();
+  FocusManager.instance.primaryFocus?.unfocus();
+  await tester.pumpAndSettle();
+  final row = find.byKey(const Key('selectExercisebench_press'));
+  await tester.ensureVisible(row);
+  await tester.tap(row);
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('addSelectedExercises')));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
@@ -300,6 +323,143 @@ void main() {
     expect(repo.recordedSets, hasLength(2));
     expect(repo.recordedSets.first['completed'], true);
     expect(repo.recordedSets.first['exerciseId'], isNotEmpty);
+    expect(repo.recordedNote, isEmpty);
+  });
+  testWidgets(
+    'new session starts with one set and uses SK add/remove and keypad',
+    (t) async {
+      t.view.physicalSize = const Size(600, 1600);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.resetPhysicalSize);
+      addTearDown(t.view.resetDevicePixelRatio);
+      await t.pumpWidget(
+        MaterialApp(
+          theme: familyTheme(FamilyPalette.trainer),
+          home: MenuEditor(
+            repository: FakeRepository(),
+            clients: [link(recording: true)],
+            recording: true,
+          ),
+        ),
+      );
+      await t.pumpAndSettle();
+      await addBenchPress(t);
+      ExerciseInputCard card() =>
+          t.widget<ExerciseInputCard>(find.byType(ExerciseInputCard));
+      expect(card().exercise.sets, hasLength(1));
+      final startWeight = card().exercise.sets.single.weight;
+      await t.tap(find.byKey(const Key('weightField0_1')));
+      await t.pumpAndSettle();
+      expect(find.byKey(const Key('workoutNumericKeypad')), findsOneWidget);
+      final numericField = t.widget<TextField>(
+        find.descendant(
+          of: find.byKey(const Key('weightField0_1')),
+          matching: find.byType(TextField),
+        ),
+      );
+      expect(numericField.keyboardType, TextInputType.none);
+      await t.tap(find.byKey(const Key('numericKeyplus5')));
+      await t.pumpAndSettle();
+      expect(card().exercise.sets.single.weight, startWeight + 5);
+      await t.tap(find.byKey(const Key('closeNumericKeypad')));
+      await t.pumpAndSettle();
+      await t.ensureVisible(find.byKey(const Key('addSetButton')));
+      await t.tap(find.byKey(const Key('addSetButton')));
+      await t.pumpAndSettle();
+      expect(card().exercise.sets, hasLength(2));
+      expect(card().exercise.sets[1].weight, startWeight + 5);
+      await t.tap(find.byKey(const Key('addSetButton')));
+      await t.pumpAndSettle();
+      expect(card().exercise.sets, hasLength(3));
+      await t.tap(find.byKey(const Key('deleteSet0_3')));
+      await t.pumpAndSettle();
+      expect(card().exercise.sets, hasLength(2));
+    },
+  );
+  testWidgets('one set and optional trainer comment are saved together', (
+    t,
+  ) async {
+    t.view.physicalSize = const Size(600, 1600);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.resetPhysicalSize);
+    addTearDown(t.view.resetDevicePixelRatio);
+    final repo = FakeRepository();
+    await t.pumpWidget(
+      MaterialApp(
+        theme: familyTheme(FamilyPalette.trainer),
+        home: MenuEditor(
+          repository: repo,
+          clients: [link(recording: true)],
+          recording: true,
+        ),
+      ),
+    );
+    await t.pumpAndSettle();
+    await addBenchPress(t);
+    final card = t.widget<ExerciseInputCard>(find.byType(ExerciseInputCard));
+    expect(card.exercise.sets, hasLength(1));
+    if (card.exercise.sets.single.weight == 0) {
+      await t.tap(find.byKey(const Key('weightField0_1')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const Key('numericKeyplus5')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const Key('closeNumericKeypad')));
+      await t.pumpAndSettle();
+    }
+    await t.enterText(
+      find.byKey(const Key('sessionCommentField')),
+      '  Form is improving.\nNext time reduce assistance by 5 kg.  ',
+    );
+    await t.ensureVisible(find.text('Save'));
+    await t.tap(find.text('Save'));
+    await t.pumpAndSettle();
+    expect(repo.recordedSets, hasLength(1));
+    expect(repo.recordedSets.single['reps'], card.exercise.sets.single.reps);
+    expect(
+      repo.recordedSets.single['weight'],
+      card.exercise.sets.single.weight,
+    );
+    expect(
+      repo.recordedNote,
+      'Form is improving.\nNext time reduce assistance by 5 kg.',
+    );
+  });
+  testWidgets('assisted weight retains SK meaning and saves without comment', (
+    t,
+  ) async {
+    final repo = FakeRepository();
+    final assisted = menuFixture();
+    final item = (assisted['items'] as List).single as Map<String, dynamic>;
+    item['record_type'] = 'assistedReps';
+    item['set_values'] = [
+      {'weight': 25.0, 'reps': 8},
+    ];
+    await t.pumpWidget(
+      MaterialApp(
+        theme: familyTheme(FamilyPalette.trainer),
+        home: MenuEditor(
+          repository: repo,
+          clients: [link(recording: true)],
+          recording: true,
+          existing: assisted,
+        ),
+      ),
+    );
+    await t.pumpAndSettle();
+    expect(find.textContaining('補助重量（kg）'), findsOneWidget);
+    await t.tap(find.byKey(const Key('weightField0_1')));
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const Key('numericKeyplus5')));
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const Key('closeNumericKeypad')));
+    await t.pumpAndSettle();
+    await t.ensureVisible(find.text('Save'));
+    await t.tap(find.text('Save'));
+    await t.pumpAndSettle();
+    expect(repo.recordedSets, hasLength(1));
+    expect(repo.recordedSets.single['recordType'], 'assistedReps');
+    expect(repo.recordedSets.single['weight'], 30);
+    expect(repo.recordedNote, isEmpty);
   });
   testWidgets('invalid menu numbers are not persisted', (t) async {
     final repo = FakeRepository();
