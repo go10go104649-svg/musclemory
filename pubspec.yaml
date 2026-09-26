@@ -21,6 +21,7 @@ dependencies:
     path: packages/interactive_3d
   image_picker: ^1.2.3
   mobile_scanner: ^7.4.2
+  video_player: ^2.14.0
 
 dev_dependencies:
   integration_test:
@@ -29,10 +30,15 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   url_launcher_platform_interface: ^2.3.2
+  video_player_platform_interface: ^6.9.0
 
 flutter:
   uses-material-design: true
   assets:
+    - assets/brand/setkeep_splash_mark.png
+    - assets/exercise_thumbnails/
+    - local_assets/vital_animations/free50/videos/
+    - local_assets/vital_animations/free50/thumbnails/
     - assets/models/body_tab.glb
     - assets/models/forms/
     - assets/models/form_chunks/

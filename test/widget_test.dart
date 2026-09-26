@@ -845,7 +845,7 @@ void main() {
     expect(find.text('上腕三頭筋'), findsOneWidget);
   });
 
-  testWidgets('exercise list opens 3D detail for multiple exercises', (
+  testWidgets('exercise rows show thumbnail, name, favorite and detail', (
     tester,
   ) async {
     _setExistingUserPreferences({});
@@ -876,61 +876,54 @@ void main() {
         exercise.name,
       );
       await tester.pumpAndSettle();
-      final badge = find.byKey(
-        Key('exerciseMuscles${exercise.exerciseId ?? exercise.name}'),
-      );
-      expect(badge, findsOneWidget);
-      expect(tester.getSize(badge), const Size.square(44));
-      final mark = find.descendant(
-        of: badge,
-        matching: find.byWidgetPredicate(
-          (widget) =>
-              widget is SizedBox && widget.width == 30 && widget.height == 30,
-        ),
-      );
-      expect(tester.getSize(mark), const Size.square(30));
-      final badgeText = tester.widget<Text>(
-        find.descendant(of: badge, matching: find.text('3D')),
-      );
-      expect(badgeText.style!.fontSize, 9.5);
       final row = find.byKey(
         Key('selectExercise${exercise.exerciseId ?? exercise.name}'),
       );
-      expect(
-        tester.getRect(row).right - tester.getRect(badge).right,
-        closeTo(4, .01),
+      final thumbnail = find.descendant(
+        of: row,
+        matching: find.byKey(const Key('exerciseListThumbnail')),
       );
-      final tile = tester.widget<ListTile>(row);
+      final detail = find.byKey(
+        Key('exerciseDetails${exercise.exerciseId ?? exercise.name}'),
+      );
       final favorite = find.byKey(Key('favoriteExercise${exercise.identity}'));
-      final title = find.byWidget(tile.title!);
+      final title = find.byWidget(tester.widget<ListTile>(row).title!);
+      expect(thumbnail, findsOneWidget);
+      expect(tester.getSize(thumbnail), const Size.square(56));
       expect(
-        tester.getRect(favorite).left - tester.getRect(row).left,
-        closeTo(8, .01),
+        tester.getRect(thumbnail).right,
+        lessThan(tester.getRect(title).left),
       );
       expect(
-        tester.getRect(title).left - tester.getRect(favorite).right,
-        closeTo(8, .01),
-      );
-
-      expect(
-        find.descendant(of: badge, matching: find.byType(TextButton)),
-        findsNothing,
+        tester.getRect(title).right,
+        lessThanOrEqualTo(tester.getRect(favorite).left),
       );
       expect(
-        find.descendant(of: badge, matching: find.text('3D')),
-        findsOneWidget,
+        tester.getRect(favorite).right,
+        lessThanOrEqualTo(tester.getRect(detail).left),
       );
+      expect(
+        tester.getRect(detail).right,
+        lessThanOrEqualTo(tester.getRect(row).right),
+      );
+      expect(tester.widget<Text>(title).maxLines, 2);
       final favoritesBefore = await ExerciseFavoritePreference.load();
-      await tester.tap(badge);
+      await tester.tap(detail);
       await tester.pumpAndSettle();
       expect(find.byType(ExerciseMuscleDetailPage), findsOneWidget);
       expect(find.text(exercise.name), findsWidgets);
-      // Desktop widget tests use the existing non-mobile 3D fallback.
       expect(find.byKey(const Key('exerciseMuscleModel3D')), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('0種目選択中'), findsOneWidget);
       expect(await ExerciseFavoritePreference.load(), favoritesBefore);
+      await tester.tap(favorite);
+      await tester.pumpAndSettle();
+      expect(find.text('0種目選択中'), findsOneWidget);
+      expect(
+        (await ExerciseFavoritePreference.load()).contains(exercise.identity),
+        !favoritesBefore.contains(exercise.identity),
+      );
     }
     final unavailable = exerciseTemplates.firstWhere(
       (e) =>
@@ -943,17 +936,58 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       find.byKey(
-        Key('selectExercise${unavailable.exerciseId ?? unavailable.name}'),
+        Key('exerciseDetails${unavailable.exerciseId ?? unavailable.name}'),
       ),
       findsOneWidget,
     );
-    expect(
-      find.byKey(
-        Key('exerciseMuscles${unavailable.exerciseId ?? unavailable.name}'),
-      ),
-      findsNothing,
-    );
   });
+
+  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+    testWidgets('long exercise row fits a compact $platform screen', (
+      tester,
+    ) async {
+      _setExistingUserPreferences({});
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(platform: platform),
+          home: const Scaffold(body: ExercisePickerSheet()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final exercise = exerciseTemplates.reduce(
+        (a, b) => a.name.length >= b.name.length ? a : b,
+      );
+      await tester.enterText(
+        find.byKey(const Key('exerciseSearchField')),
+        exercise.name,
+      );
+      await tester.pumpAndSettle();
+      final row = find.byKey(
+        Key('selectExercise${exercise.exerciseId ?? exercise.name}'),
+      );
+      expect(row, findsOneWidget);
+      final title = tester.widget<ListTile>(row).title! as Text;
+      expect(title.maxLines, 2);
+      expect(title.overflow, TextOverflow.ellipsis);
+      final favorite = find.byKey(Key('favoriteExercise${exercise.identity}'));
+      final detail = find.byKey(
+        Key('exerciseDetails${exercise.exerciseId ?? exercise.name}'),
+      );
+      expect(
+        tester.getRect(favorite).right,
+        lessThanOrEqualTo(tester.getRect(detail).left),
+      );
+      expect(
+        tester.getRect(detail).right,
+        lessThanOrEqualTo(tester.getRect(row).right),
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('custom exercise is created from and inherits its category', (
     tester,

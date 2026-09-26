@@ -12,6 +12,9 @@ import 'gym/gym_pages.dart';
 import 'trainer/trainer_sharing_page.dart';
 import 'trainer/trainer_repository.dart';
 import 'exercise_form_catalog.dart';
+import 'exercise_media.dart';
+import 'exercise_media_form_view.dart';
+import 'exercise_list_thumbnail.dart';
 import 'body_tab_colors.dart';
 import 'design/app_colors.dart';
 
@@ -434,6 +437,7 @@ class SetkeepApp extends StatelessWidget {
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [Locale('ja', 'JP')],
       theme: familyTheme(),
+      navigatorObservers: [exerciseMediaRouteObserver],
       home: const _OnboardingGate(),
     );
   }
@@ -8320,22 +8324,18 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                             end: 4,
                           ),
                           horizontalTitleGap: 8,
+                          minVerticalPadding: 8,
                           selected: added || _selected.containsKey(e.identity),
                           selectedTileColor: FamilyPalette.of(context).soft,
                           selectedColor: const Color(0xFF101820),
-                          leading: IconButton(
-                            key: ValueKey('favoriteExercise${e.identity}'),
-                            tooltip: _favorites.contains(e.identity)
-                                ? 'お気に入り解除'
-                                : 'お気に入りに追加',
-                            onPressed: !_favoritesReady || _savingFavorite
-                                ? null
-                                : () => _toggleFavorite(e.identity),
-                            icon: Icon(
-                              _favorites.contains(e.identity)
-                                  ? Icons.star_rounded
-                                  : Icons.star_border_rounded,
-                            ),
+                          leading: ExerciseListThumbnail(
+                            assetPath:
+                                ExerciseMediaCatalog.forExerciseId(e.exerciseId)
+                                    ?.thumbnailAssetPath ??
+                                ExerciseFormCatalog.resolve(
+                                  e.exerciseId,
+                                  e.name,
+                                )?.thumbnailAssetPath,
                           ),
                           title: Text(
                             exerciseDisplayName(
@@ -8344,77 +8344,52 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                               languageCode: Localizations.localeOf(context)
                                   .languageCode,
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(fontWeight: FontWeight.w800),
                           ),
                           subtitle: Text(
                             added ? '追加済み' : '${e.bodyPart} ・ ${e.equipment}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          trailing:
-                              !_storeOnly &&
-                                  ExerciseFormCatalog.resolve(
-                                        e.exerciseId,
-                                        e.name,
-                                      )?.available !=
-                                      true
-                              ? null
-                              : Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (_storeOnly)
-                                      IconButton(
-                                        key: Key(
-                                          'exerciseEquipment${e.exerciseId ?? e.name}',
-                                        ),
-                                        tooltip: 'この店舗で使う設備',
-                                        icon: const Icon(Icons.info_outline),
-                                        onPressed: () =>
-                                            showModalBottomSheet<void>(
-                                              context: context,
-                                              showDragHandle: true,
-                                              builder: (_) => SafeArea(
-                                                child: SingleChildScrollView(
-                                                  padding: const EdgeInsets.all(
-                                                    20,
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        e.name,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .titleMedium,
-                                                      ),
-                                                      const Text('この店舗で使用可能'),
-                                                      GymEvidenceList(
-                                                        evidence: _evidenceFor(
-                                                          e,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                      ),
-                                    if (ExerciseFormCatalog.resolve(
-                                          e.exerciseId,
-                                          e.name,
-                                        )?.available ==
-                                        true)
-                                      _Exercise3dBadge(
-                                        key: Key(
-                                          'exerciseMuscles${e.exerciseId ?? e.name}',
-                                        ),
-                                        onPressed: () =>
-                                            _showExerciseMuscles(e),
-                                      ),
-                                  ],
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                key: ValueKey('favoriteExercise${e.identity}'),
+                                tooltip: _favorites.contains(e.identity)
+                                    ? 'お気に入り解除'
+                                    : 'お気に入りに追加',
+                                constraints: const BoxConstraints.tightFor(
+                                  width: 44,
+                                  height: 44,
                                 ),
+                                padding: EdgeInsets.zero,
+                                onPressed: !_favoritesReady || _savingFavorite
+                                    ? null
+                                    : () => _toggleFavorite(e.identity),
+                                icon: Icon(
+                                  _favorites.contains(e.identity)
+                                      ? Icons.star_rounded
+                                      : Icons.star_border_rounded,
+                                ),
+                              ),
+                              IconButton(
+                                key: Key(
+                                  'exerciseDetails${e.exerciseId ?? e.name}',
+                                ),
+                                tooltip: '種目詳細を見る',
+                                constraints: const BoxConstraints.tightFor(
+                                  width: 44,
+                                  height: 44,
+                                ),
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(Icons.info_outline_rounded),
+                                onPressed: () => _showExerciseMuscles(e),
+                              ),
+                            ],
+                          ),
                           onTap: added ? null : () => _toggle(item),
                         );
                       }),
@@ -8511,91 +8486,6 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
   }
 }
 
-/// A compact box mark with an independent, accessible touch target.
-class _Exercise3dBadge extends StatelessWidget {
-  const _Exercise3dBadge({super.key, required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) => IconButton(
-    tooltip: '使う筋肉を見る',
-    onPressed: onPressed,
-    padding: const EdgeInsets.all(7),
-    iconSize: 30,
-    style: IconButton.styleFrom(
-      fixedSize: const Size.square(44),
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      visualDensity: VisualDensity.standard,
-    ),
-    constraints: const BoxConstraints.tightFor(width: 44, height: 44),
-    icon: ExcludeSemantics(
-      child: SizedBox.square(
-        dimension: 30,
-        child: CustomPaint(
-          painter: _Exercise3dBadgePainter(FamilyPalette.of(context).soft),
-          child: Align(
-            alignment: const Alignment(-0.3, 0.3),
-            child: Text(
-              '3D',
-              textScaler: TextScaler.noScaling,
-              style: const TextStyle(
-                color: Color(0xFF303A40),
-                fontSize: 9.5,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-class _Exercise3dBadgePainter extends CustomPainter {
-  const _Exercise3dBadgePainter(this.color);
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.save();
-    canvas.scale(size.width / 36, size.height / 36);
-    final top = Path()
-      ..moveTo(3, 11)
-      ..lineTo(10, 4)
-      ..lineTo(33, 4)
-      ..lineTo(26, 11)
-      ..close();
-    canvas.drawPath(top, Paint()..color = color);
-    final outline = Path()
-      ..moveTo(3, 11)
-      ..lineTo(10, 4)
-      ..lineTo(33, 4)
-      ..lineTo(33, 26)
-      ..lineTo(26, 33)
-      ..lineTo(3, 33)
-      ..close()
-      ..moveTo(3, 11)
-      ..lineTo(26, 11)
-      ..lineTo(33, 4)
-      ..moveTo(26, 11)
-      ..lineTo(26, 33);
-    canvas.drawPath(
-      outline,
-      Paint()
-        ..color = const Color(0xFF303A40)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.4
-        ..strokeJoin = StrokeJoin.round,
-    );
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _Exercise3dBadgePainter oldDelegate) =>
-      oldDelegate.color != color;
-}
-
 class ExerciseMuscleDetailPage extends StatelessWidget {
   const ExerciseMuscleDetailPage({
     super.key,
@@ -8617,6 +8507,7 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
       exercise.exerciseId,
       exercise.name,
     );
+    final media = ExerciseMediaCatalog.forExerciseId(exercise.exerciseId);
     final primaryLabels = form != null
         ? form.primaryMuscleLabels
         : profile.primary.map((muscle) => muscle.label).toList();
@@ -8640,28 +8531,14 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
             const Text('この店舗で使用可能'),
             GymEvidenceList(evidence: storeEvidence),
           ],
-          if ((form?.available == true) &&
-              (Platform.isIOS || Platform.isAndroid))
-            ExerciseFormView(
+          if (media != null)
+            ExerciseMediaFormView(
               key: ValueKey(exercise.identity),
-              exerciseName: exercise.name,
-              definition: form,
+              media: media,
+              fallback: _existingGuide(form, scores),
             )
           else
-            Container(
-              key: const Key('exerciseMuscleModel3D'),
-              height: 470,
-              decoration: BoxDecoration(
-                color: const Color(0xFF091219),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: MuscleMannequinView(
-                showAngleControls: false,
-                scores: scores,
-                fallbackBodyPartCounts: {exercise.bodyPart: 1},
-              ),
-            ),
+            _existingGuide(form, scores),
           const SizedBox(height: 18),
           const Text(
             '主に使う筋肉',
@@ -8712,6 +8589,33 @@ class ExerciseMuscleDetailPage extends StatelessWidget {
             style: const TextStyle(color: Color(0xFF666D68)),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _existingGuide(
+    ExerciseFormDefinition? form,
+    Map<MuscleRegion, double> scores,
+  ) {
+    if (form?.available == true && (Platform.isIOS || Platform.isAndroid)) {
+      return ExerciseFormView(
+        key: ValueKey(exercise.identity),
+        exerciseName: exercise.name,
+        definition: form,
+      );
+    }
+    return Container(
+      key: const Key('exerciseMuscleModel3D'),
+      height: 470,
+      decoration: BoxDecoration(
+        color: const Color(0xFF091219),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: MuscleMannequinView(
+        showAngleControls: false,
+        scores: scores,
+        fallbackBodyPartCounts: {exercise.bodyPart: 1},
       ),
     );
   }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -206,7 +205,9 @@ void main() {
       expect(find.byKey(const Key('gymEquipmentrack')), findsNothing);
       expect(find.byKey(const Key('gymEquipmentrow')), findsOneWidget);
       final before = repo.detailCalls;
-      final refresh = t.state<RefreshIndicatorState>(find.byType(RefreshIndicator)).show();
+      final refresh = t
+          .state<RefreshIndicatorState>(find.byType(RefreshIndicator))
+          .show();
       await t.pumpAndSettle();
       await refresh;
       expect(repo.detailCalls, greaterThan(before));
@@ -310,7 +311,7 @@ void main() {
     await t.pumpAndSettle();
     await t.enterText(find.byKey(const Key('exerciseSearchField')), 'ベンチプレス');
     await t.pumpAndSettle();
-    await t.tap(find.byKey(const Key('exerciseEquipmentbench_press')));
+    await t.tap(find.byKey(const Key('exerciseDetailsbench_press')));
     await t.pumpAndSettle();
     expect(find.text('この店舗で使用可能'), findsOneWidget);
     expect(find.text('パワーラック ＋ アジャスタブルベンチ'), findsOneWidget);

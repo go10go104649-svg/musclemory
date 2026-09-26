@@ -72,3 +72,8 @@ android/key.properties
 /docs/qa/**/*.webp
 /docs/qa/**/*.mp4
 /docs/qa/**/*.mov
+
+# Licensed Vital trial media stays on the local machine.
+/local_assets/vital_animations/**/*.mp4
+/local_assets/vital_animations/**/*.json
+/local_assets/vital_animations/**/*.png
