@@ -8,6 +8,27 @@ class TrainerInboxRepository {
   final SupabaseClient client;
   String? get userId => client.auth.currentUser?.id;
   Stream<void> get authChanges => client.auth.onAuthStateChange.map((_) {});
+  Future<int> unreadCount() async {
+    if (userId == null) return 0;
+    return (await client.rpc('tenant_inbox_unread_count') as num).toInt();
+  }
+
+  Future<void> markRead({
+    required Map<String, int> menuVersions,
+    required Map<String, int> commentVersions,
+  }) async {
+    if (userId == null || (menuVersions.isEmpty && commentVersions.isEmpty)) {
+      return;
+    }
+    await client.rpc(
+      'tenant_mark_inbox_seen',
+      params: {
+        'p_menu_versions': menuVersions,
+        'p_comment_versions': commentVersions,
+      },
+    );
+  }
+
   static const _menuSelect =
       '*,tenant_clients!inner(linked_user_id,status),tenant_menu_exercises(*,tenant_menu_sets(*))';
 

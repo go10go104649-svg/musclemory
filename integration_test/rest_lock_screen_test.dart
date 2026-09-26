@@ -17,7 +17,7 @@ void main() {
     await t.pumpAndSettle();
   }
 
-  testWidgets('native rest display uses one deadline and cancels consistently', (
+  testWidgets('native rest display pauses, extends, and resumes consistently', (
     t,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -95,16 +95,39 @@ void main() {
     final paused = await state();
     expect(paused['endsAtMilliseconds'], 0);
     expect(paused['remainingSeconds'], greaterThan(90));
+    if (Platform.isAndroid) {
+      expect(paused['phase'], 'paused');
+      expect(paused['timerId'], first['timerId']);
+    }
     expect(find.byKey(const Key('startRestTimerButton')), findsOneWidget);
     final stopped = await channel.invokeMapMethod<String, dynamic>(
       'debugStatus',
     );
     if (Platform.isAndroid) {
-      expect(stopped!['delivered'], isNot(contains(7340)));
+      expect(stopped!['delivered'], contains(7340));
+      expect((stopped['ongoingDetails'] as List).single['actions'], [
+        '再開',
+        '+30秒',
+        'セット完了',
+      ]);
+      final held = paused['remainingSeconds'];
+      await Future<void>.delayed(const Duration(seconds: 2));
+      expect((await state())['remainingSeconds'], held);
+      await channel.invokeMethod<void>('debugRestAction', {'action': 'extend'});
+      expect((await state())['remainingSeconds'], (held as int) + 30);
+      await t.drag(find.byType(Scrollable).first, const Offset(0, 180));
+      await t.pumpAndSettle();
+      await t.tap(find.text('+30秒'));
+      await flush(t);
+      expect((await state())['remainingSeconds'], held + 60);
     }
     if (Platform.isIOS) expect(stopped!['liveActivities'], 0);
     await t.tap(find.byKey(const Key('startRestTimerButton')));
     await flush(t);
+    if (Platform.isAndroid) {
+      expect((await state())['timerId'], first['timerId']);
+      expect((await state())['phase'], 'running');
+    }
     expect(
       (await state())['endsAtMilliseconds'],
       greaterThan(DateTime.now().millisecondsSinceEpoch + 85000),
@@ -117,13 +140,23 @@ void main() {
     expect((await state())['endsAtMilliseconds'], 0);
     // Simulate a notification action followed by app resume; native state wins.
     await RestNotificationService.schedule(45, exerciseName: 'ベンチプレス');
-    await RestNotificationService.cancel(remainingSeconds: 34);
+    if (Platform.isAndroid) {
+      await RestNotificationService.pause();
+    } else {
+      await RestNotificationService.cancel(remainingSeconds: 34);
+    }
+    final heldOnResume = (await state())['remainingSeconds'] as int;
     t.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
     t.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await flush(t);
     await t.drag(find.byType(Scrollable).first, const Offset(0, 500));
     await t.pumpAndSettle();
-    expect(find.text('00:34'), findsOneWidget);
+    expect(
+      find.text(
+        '${(heldOnResume ~/ 60).toString().padLeft(2, '0')}:${(heldOnResume % 60).toString().padLeft(2, '0')}',
+      ),
+      findsOneWidget,
+    );
     await t.pumpWidget(const SizedBox.shrink());
     await flush(t);
     expect((await state())['remainingSeconds'], 0);

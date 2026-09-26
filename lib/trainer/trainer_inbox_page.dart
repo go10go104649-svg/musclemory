@@ -4,14 +4,32 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/supabase_config.dart';
-import '../main.dart' show WorkoutRecord;
+import '../main.dart'
+    show
+        ExerciseRecordType,
+        ExerciseRecordTypeUi,
+        RecordedSet,
+        SetHeader,
+        WorkoutExerciseCardHeader,
+        WorkoutExerciseCardShell,
+        WorkoutPrimaryButton,
+        WorkoutRecord,
+        WorkoutSetRowLayout,
+        formatDurationSeconds,
+        formatWeight;
 import 'trainer_inbox_repository.dart';
 import 'trainer_menu_codec.dart';
 
 class TrainerInboxPage extends StatefulWidget {
-  const TrainerInboxPage({super.key, required this.onStart, this.repository});
+  const TrainerInboxPage({
+    super.key,
+    required this.onStart,
+    this.repository,
+    this.onReadChanged,
+  });
   final Future<void> Function(WorkoutRecord) onStart;
   final TrainerInboxRepository? repository;
+  final VoidCallback? onReadChanged;
   @override
   State<TrainerInboxPage> createState() => _TrainerInboxPageState();
 }
@@ -82,6 +100,33 @@ class _TrainerInboxPageState extends State<TrainerInboxPage>
         menus = result[0];
         comments = result[1];
       });
+      // A covered inbox (for example, while a workout is open) is not viewed.
+      if (ModalRoute.of(context)?.isCurrent != true) {
+        setState(() => loading = false);
+        return;
+      }
+      try {
+        await repo!.markRead(
+          menuVersions: {
+            for (final m in result[0]) m['id'] as String: m['version'] as int,
+          },
+          commentVersions: {
+            for (final c in result[1]) c['id'] as String: c['version'] as int,
+          },
+        );
+        if (mounted && current == generation && repo?.userId == uid) {
+          widget.onReadChanged?.call();
+        }
+      } catch (_) {
+        if (mounted && current == generation) {
+          setState(
+            () => error = tr(
+              '既読状態を更新できませんでした。再読み込みしてください。',
+              'Could not update read status. Please refresh.',
+            ),
+          );
+        }
+      }
     } catch (_) {
       if (mounted && current == generation) {
         setState(
@@ -181,50 +226,7 @@ class _TrainerInboxPageState extends State<TrainerInboxPage>
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 if (menus.isEmpty) Text(tr('メニューはまだありません', 'No menus yet')),
-                for (final m in menus)
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            m['name'] as String,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          if ((m['note'] as String? ?? '').isNotEmpty)
-                            Text(m['note'] as String),
-                          Text(
-                            '${tr('更新', 'Updated')}: ${m['updated_at'] ?? m['created_at']}',
-                          ),
-                          if (m['due_at'] != null)
-                            Text('${tr('期限', 'Due')}: ${m['due_at']}'),
-                          Text(
-                            m['schedule'] == 'repeat'
-                                ? tr('繰り返し', 'Repeat')
-                                : tr('単発', 'Single'),
-                          ),
-                          for (final item in m['items'] as List) ...[
-                            Text(item['exercise_name'] as String),
-                            for (final s in TrainerMenuCodec.setsForItem(
-                              item as Map,
-                            ))
-                              Text(_setLabel(s.toJson())),
-                          ],
-                          if (m['status'] == 'planned')
-                            FilledButton(
-                              key: ValueKey('startTrainerMenu:${m['id']}'),
-                              onPressed: starting ? null : () => start(m),
-                              child: Text(
-                                tr('このメニューでトレーニング開始', 'Start this workout'),
-                              ),
-                            )
-                          else
-                            Text(tr('実施済み', 'Completed')),
-                        ],
-                      ),
-                    ),
-                  ),
+                for (final m in menus) _menuCard(m),
                 const SizedBox(height: 24),
                 Text(
                   tr('トレーナーからのコメント', 'Trainer comments'),
@@ -232,17 +234,7 @@ class _TrainerInboxPageState extends State<TrainerInboxPage>
                 ),
                 if (comments.isEmpty)
                   Text(tr('コメントはまだありません', 'No comments yet')),
-                for (final c in comments)
-                  Card(
-                    child: ListTile(
-                      title: Text(c['body'] as String),
-                      subtitle: Text(
-                        '${tr('更新', 'Updated')}: ${c['updated_at'] ?? c['created_at']}'
-                        '${c['workout_date'] == null ? '' : '\n${c['workout_date']}'}'
-                        '${c['menu_id'] == null ? '' : '\n${_menuName(c['menu_id'])}'}',
-                      ),
-                    ),
-                  ),
+                for (final c in comments) _commentCard(c),
               ],
             ),
           ),
@@ -253,14 +245,159 @@ class _TrainerInboxPageState extends State<TrainerInboxPage>
           .map((m) => m['name'] as String)
           .firstOrNull ??
       tr('関連メニュー', 'Related menu');
-  String _setLabel(Map<String, dynamic> s) {
-    final parts = <String>[];
-    if ((s['weight'] as num) > 0) parts.add('${s['weight']} kg');
-    if ((s['reps'] as num) > 0) parts.add('${s['reps']} ${tr('回', 'reps')}');
-    if ((s['durationSeconds'] as num) > 0) {
-      parts.add('${s['durationSeconds']} s');
-    }
-    if ((s['distanceKm'] as num) > 0) parts.add('${s['distanceKm']} km');
-    return parts.join(' × ');
+
+  String? _japanDate(Object? raw, {bool padHour = true}) {
+    final parsed = DateTime.tryParse(raw?.toString() ?? '');
+    if (parsed == null) return null;
+    final japan = parsed.toUtc().add(const Duration(hours: 9));
+    final hour = padHour
+        ? japan.hour.toString().padLeft(2, '0')
+        : '${japan.hour}';
+    final clock = '$hour:${japan.minute.toString().padLeft(2, '0')}';
+    return tr(
+      '${japan.month}月${japan.day}日 $clock',
+      '${japan.month}/${japan.day} $clock JST',
+    );
   }
+
+  Widget _timestamp(String label, Object? value, {bool padHour = true}) {
+    final date = _japanDate(value, padHour: padHour);
+    if (date == null) return const SizedBox.shrink();
+    return Text(
+      '$label：$date',
+      style: TextStyle(
+        fontSize: 12,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+
+  Widget _setValue(String value) => Container(
+    constraints: const BoxConstraints(minHeight: 48),
+    alignment: Alignment.center,
+    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+    decoration: BoxDecoration(
+      color: const Color(0xFFF4F5F0),
+      borderRadius: BorderRadius.circular(11),
+    ),
+    child: Text(
+      value,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+    ),
+  );
+
+  Widget _exerciseCard(Map menu, int index, Map item) {
+    final sets = TrainerMenuCodec.setsForItem(item);
+    final recordType = sets.isEmpty
+        ? ExerciseRecordType.fromName(item['record_type'] as String?)
+        : sets.first.recordType;
+    return WorkoutExerciseCardShell(
+      key: ValueKey('trainerMenuExercise:${menu['id']}:$index'),
+      children: [
+        WorkoutExerciseCardHeader(
+          name: item['exercise_name'] as String,
+          exerciseId: item['exercise_id'] as String?,
+          bodyPart: item['body_part'] as String? ?? '',
+          equipment: item['equipment'] as String? ?? '',
+        ),
+        const SizedBox(height: 10),
+        if (recordType.usesSets) ...[
+          SetHeader(
+            recordType: recordType,
+            showCompletionCheck: false,
+            trailingWidth: 8,
+          ),
+          const SizedBox(height: 8),
+        ],
+        for (final (setIndex, set) in sets.indexed)
+          WorkoutSetRowLayout(
+            key: ValueKey('trainerMenuSet:${menu['id']}:$index:$setIndex'),
+            number: setIndex + 1,
+            values: _setValues(set, recordType),
+          ),
+      ],
+    );
+  }
+
+  List<Widget> _setValues(RecordedSet set, ExerciseRecordType type) {
+    if (!type.usesSets) return [_setValue(set.displaySummary)];
+    return [
+      if (type.hasWeightInput) _setValue(formatWeight(set.weight)),
+      if (type.hasWeightInput || type == ExerciseRecordType.bodyweightReps)
+        _setValue('${set.reps}'),
+      if (type == ExerciseRecordType.timed)
+        _setValue(formatDurationSeconds(set.durationSeconds)),
+    ];
+  }
+
+  Widget _menuCard(Map<String, dynamic> menu) {
+    final updated = menu['updated_at'] ?? menu['created_at'];
+    return Card(
+      key: ValueKey('trainerMenu:${menu['id']}'),
+      margin: const EdgeInsets.only(top: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              menu['name'] as String,
+              style: Theme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            if ((menu['note'] as String? ?? '').isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(menu['note'] as String),
+            ],
+            const SizedBox(height: 8),
+            _timestamp(tr('更新', 'Updated'), updated),
+            if (menu['due_at'] != null)
+              _timestamp(tr('期限', 'Due'), menu['due_at'], padHour: false),
+            const SizedBox(height: 12),
+            for (final (index, item) in (menu['items'] as List).indexed) ...[
+              if (index > 0) const SizedBox(height: 10),
+              _exerciseCard(menu, index, item as Map),
+            ],
+            const SizedBox(height: 14),
+            if (menu['status'] == 'planned')
+              WorkoutPrimaryButton(
+                key: ValueKey('startTrainerMenu:${menu['id']}'),
+                onPressed: starting ? null : () => start(menu),
+                label: tr('このメニューでトレーニング開始', 'Start this workout'),
+              )
+            else
+              Text(tr('実施済み', 'Completed')),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _commentCard(Map<String, dynamic> comment) => Padding(
+    padding: const EdgeInsets.only(top: 12),
+    child: WorkoutExerciseCardShell(
+      key: ValueKey('trainerComment:${comment['id']}'),
+      children: [
+        Text(
+          comment['body'] as String,
+          style: Theme.of(context).textTheme.bodyLarge
+              ?.copyWith(fontWeight: FontWeight.w700, height: 1.35),
+        ),
+        if (comment['menu_id'] != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            '${tr('対象メニュー', 'Menu')}：${_menuName(comment['menu_id'])}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+        const SizedBox(height: 6),
+        _timestamp(
+          tr('更新', 'Updated'),
+          comment['updated_at'] ?? comment['created_at'],
+        ),
+      ],
+    ),
+  );
 }

@@ -16,6 +16,9 @@ import org.json.JSONObject
 object RestTimerState {
     const val ONGOING = 7340
     const val CHANNEL = "rest_timer_running"
+    const val PAUSE = "setkeep.rest.PAUSE"
+    const val RESUME = "setkeep.rest.RESUME"
+    // Old notifications may still deliver STOP after an app update.
     const val STOP = "setkeep.rest.STOP"
     const val EXTEND = "setkeep.rest.EXTEND"
     var onChanged: (() -> Unit)? = null
@@ -32,14 +35,8 @@ object RestTimerState {
         deadlineTask = null
     }
 
-    fun schedule(c: Context, deadline: Long, name: String = "", target: JSONObject? = null, restSeconds: Int = 90) {
+    private fun armDeadline(c: Context, id: String, deadline: Long) {
         clearDeadlineTask()
-        RestTimerFeedback.stop(c)
-        val id = UUID.randomUUID().toString()
-        prefs(c).edit().putLong("deadline", deadline).putInt("remainingSeconds", 0)
-            .putString("exerciseName", name).putString("timerId", id).commit()
-        manager(c).cancel(7341)
-        WorkoutNotificationState.arm(c, target, id, restSeconds)
         if (deadline <= System.currentTimeMillis()) {
             completeIfDue(c, id, deadline, "schedule_due")
             return
@@ -60,6 +57,17 @@ object RestTimerState {
             }
         }
         handler.postDelayed(deadlineTask!!, (deadline - System.currentTimeMillis()).coerceAtLeast(1))
+    }
+
+    fun schedule(c: Context, deadline: Long, name: String = "", target: JSONObject? = null, restSeconds: Int = 90) {
+        clearDeadlineTask()
+        RestTimerFeedback.stop(c)
+        val id = UUID.randomUUID().toString()
+        check(prefs(c).edit().putLong("deadline", deadline).putInt("remainingSeconds", 0)
+            .putBoolean("paused", false).putString("exerciseName", name).putString("timerId", id).commit())
+        manager(c).cancel(7341)
+        WorkoutNotificationState.arm(c, target, id, restSeconds)
+        armDeadline(c, id, deadline)
         RestTimerDiagnostics.log(c, id, "scheduled deadline=$deadline")
         show(c)
     }
@@ -69,12 +77,73 @@ object RestTimerState {
         clearDeadlineTask()
         RestTimerDiagnostics.log(c, prefs(c).getString("timerId", null), "cancelled")
         RestTimerDiagnostics.set("lastCancellationAt", System.currentTimeMillis())
-        prefs(c).edit().remove("deadline").remove("timerId")
+        prefs(c).edit().remove("deadline").remove("timerId").remove("paused")
             .putInt("remainingSeconds", remaining.coerceAtLeast(0)).apply()
         alarm(c).cancel(alarmIntent(c))
         RestTimerFeedback.stop(c)
         manager(c).cancel(ONGOING)
         manager(c).cancel(7341)
+    }
+
+    @Synchronized
+    fun pause(c: Context, expectedId: String? = null): Boolean {
+        val p = prefs(c)
+        val id = p.getString("timerId", null) ?: return false
+        if (expectedId != null && expectedId != id) return false
+        val deadline = p.getLong("deadline", 0)
+        if (deadline <= 0) return false
+        if (deadline <= System.currentTimeMillis()) {
+            completeIfDue(c, id, deadline, "pause_due")
+            return false
+        }
+        val remaining = ((deadline - System.currentTimeMillis() + 999) / 1000).toInt()
+        if (!p.edit().remove("deadline").putBoolean("paused", true)
+            .putInt("remainingSeconds", remaining).commit()) return false
+        clearDeadlineTask()
+        alarm(c).cancel(alarmIntent(c))
+        show(c)
+        onChanged?.invoke()
+        return true
+    }
+
+    @Synchronized
+    fun resume(c: Context, expectedId: String? = null): Boolean {
+        val p = prefs(c)
+        val id = p.getString("timerId", null) ?: return false
+        if (expectedId != null && expectedId != id || !p.getBoolean("paused", false)) return false
+        val remaining = p.getInt("remainingSeconds", 0)
+        if (remaining <= 0) return false
+        val deadline = System.currentTimeMillis() + remaining * 1000L
+        if (!p.edit().putLong("deadline", deadline).putBoolean("paused", false)
+            .putInt("remainingSeconds", 0).commit()) return false
+        armDeadline(c, id, deadline)
+        show(c)
+        onChanged?.invoke()
+        return true
+    }
+
+    @Synchronized
+    fun extend(c: Context, expectedId: String? = null): Boolean {
+        val p = prefs(c)
+        val id = p.getString("timerId", null) ?: return false
+        if (expectedId != null && expectedId != id) return false
+        if (p.getBoolean("paused", false)) {
+            val remaining = p.getInt("remainingSeconds", 0)
+            if (remaining <= 0 || !p.edit().putInt("remainingSeconds", remaining + 30).commit()) return false
+        } else {
+            val deadline = p.getLong("deadline", 0)
+            if (deadline <= System.currentTimeMillis()) {
+                completeIfDue(c, id, deadline, "extend_due")
+                return false
+            }
+            val extended = deadline + 30_000
+            if (!p.edit().putLong("deadline", extended).commit()) return false
+            alarm(c).cancel(alarmIntent(c))
+            armDeadline(c, id, extended)
+        }
+        show(c)
+        onChanged?.invoke()
+        return true
     }
 
     /** All callers run on the main looper; persisted claim also survives recreation. */
@@ -96,7 +165,7 @@ object RestTimerState {
         if (p.getString("lastCompletionTimerId", null) == id) return false
         val at = System.currentTimeMillis()
         // Claim before output. Duplicate Alarm/Dart/resume events cannot replay it.
-        if (!p.edit().remove("deadline").remove("timerId").putInt("remainingSeconds", 0)
+        if (!p.edit().remove("deadline").remove("timerId").remove("paused").putInt("remainingSeconds", 0)
             .putString("lastCompletionTimerId", id).putLong("lastCompletionAt", at)
             .putLong("lastCompletionDeadline", deadline).commit()) {
             RestTimerDiagnostics.set("lastSoundError", "completion claim persistence failed")
@@ -120,6 +189,8 @@ object RestTimerState {
         val target = listOf("sessionId", "exerciseInstanceId", "previousSetId", "targetSetId", "exerciseName", "setNumber")
             .associateWith { pending?.optString(it) ?: "" }
         return mapOf("target" to target, "timerId" to (p.getString("timerId", "") ?: ""),
+            "phase" to (if (p.getBoolean("paused", false) && p.getString("timerId", null) != null) "paused"
+                        else if (deadline > 0) "running" else "finished"),
             "lastCompletionTimerId" to (p.getString("lastCompletionTimerId", "") ?: ""),
             "lastCompletionAt" to p.getLong("lastCompletionAt", 0),
             "lastCompletionDeadline" to p.getLong("lastCompletionDeadline", 0), "endsAtMilliseconds" to deadline, "remainingSeconds" to p.getInt("remainingSeconds", 0),
@@ -127,17 +198,14 @@ object RestTimerState {
     }
 
     fun action(c: Context, intent: Intent): Boolean {
-        if (intent.action != STOP && intent.action != EXTEND) return false
+        if (intent.action != PAUSE && intent.action != STOP && intent.action != RESUME && intent.action != EXTEND) return false
         val p = prefs(c)
         if (intent.getStringExtra("timerId") != p.getString("timerId", null)) return true
-        val deadline = p.getLong("deadline", 0)
-        if (deadline <= System.currentTimeMillis()) return true
-        if (intent.action == STOP) cancel(c, ((deadline - System.currentTimeMillis() + 999) / 1000).toInt())
-        else {
-            val target = WorkoutNotificationState.pending(c)
-            schedule(c, deadline + 30_000, p.getString("exerciseName", "") ?: "", target, target?.optInt("restSeconds", 90) ?: 90)
+        when (intent.action) {
+            PAUSE, STOP -> pause(c, p.getString("timerId", null))
+            RESUME -> resume(c, p.getString("timerId", null))
+            EXTEND -> extend(c, p.getString("timerId", null))
         }
-        onChanged?.invoke()
         return true
     }
 
@@ -150,13 +218,17 @@ object RestTimerState {
     /** System Chronometer ticks in SystemUI; Flutter never posts once per second.
      * Custom layout intentionally prioritizes legibility over promoted-chip eligibility. */
     private fun timerLayout(c: Context, builder: Notification.Builder, deadline: Long,
-                            target: JSONObject?, complete: PendingIntent?, name: String) {
+                            target: JSONObject?, complete: PendingIntent?, name: String,
+                            pausedRemaining: Int = 0) {
         if (Build.VERSION.SDK_INT < 24) return
         fun view(expanded: Boolean): RemoteViews {
             val layout = RemoteViews(c.packageName, if (expanded) R.layout.rest_notification_expanded else R.layout.rest_notification_compact)
-            val running = deadline > System.currentTimeMillis()
+            val paused = pausedRemaining > 0
+            val running = !paused && deadline > System.currentTimeMillis()
             layout.setViewVisibility(R.id.rest_clock, if (running) View.VISIBLE else View.GONE)
             layout.setViewVisibility(R.id.rest_zero, if (running) View.GONE else View.VISIBLE)
+            if (paused) layout.setTextViewText(R.id.rest_zero,
+                "%02d:%02d".format(pausedRemaining / 60, pausedRemaining % 60))
             layout.setChronometer(R.id.rest_clock,
                 SystemClock.elapsedRealtime() + (deadline - System.currentTimeMillis()).coerceAtLeast(0), null, running)
             layout.setChronometerCountDown(R.id.rest_clock, true)
@@ -164,7 +236,8 @@ object RestTimerState {
             val number = target?.optString("setNumber")?.takeIf { it.isNotBlank() }
             layout.setTextViewText(R.id.rest_detail, detail)
             layout.setTextViewText(R.id.rest_next, number?.let { if (expanded) "次：${it}セット目" else "次：$it" } ?: "休憩")
-            if (expanded) layout.setTextViewText(R.id.rest_label, if (running) "休憩タイマー" else "休憩終了")
+            if (expanded) layout.setTextViewText(R.id.rest_label,
+                if (paused) "一時停止中" else if (running) "休憩タイマー" else "休憩終了")
             else {
                 layout.setViewVisibility(R.id.rest_complete, if (complete == null) View.GONE else View.VISIBLE)
                 if (complete != null) layout.setOnClickPendingIntent(R.id.rest_complete, complete)
@@ -179,7 +252,9 @@ object RestTimerState {
     fun show(c: Context) {
         val p = prefs(c)
         val deadline = p.getLong("deadline", 0)
-        if (deadline <= System.currentTimeMillis()) {
+        val paused = p.getBoolean("paused", false) && p.getString("timerId", null) != null
+        val pausedRemaining = if (paused) p.getInt("remainingSeconds", 0) else 0
+        if (!paused && deadline <= System.currentTimeMillis()) {
             if (deadline > 0) completeIfDue(c, source = "display_resume")
             val id = p.getString("lastCompletionTimerId", "") ?: ""
             if (WorkoutNotificationState.valid(c, id) != null) {
@@ -201,19 +276,20 @@ object RestTimerState {
                 .setData(android.net.Uri.parse("setkeep://rest-action/${p.getString("timerId", "")}/$action"))
                 .putExtra("timerId", p.getString("timerId", "")),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle("休憩タイマー")
-            .setContentText("残り時間 · ${p.getString("exerciseName", "")}").setContentIntent(open)
+        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle(if (paused) "休憩タイマー（一時停止中）" else "休憩タイマー")
+            .setContentText("${if (paused) "残り" else "残り時間"} · ${p.getString("exerciseName", "")}").setContentIntent(open)
             .setStyle(Notification.BigTextStyle().bigText("休憩タイマー — 残り時間\n${p.getString("exerciseName", "")}"))
             .setCategory(Notification.CATEGORY_STATUS).setVisibility(Notification.VISIBILITY_PUBLIC)
-            .setOngoing(true).setOnlyAlertOnce(true).setWhen(deadline).setShowWhen(true).setUsesChronometer(true)
-            .addAction(Notification.Action.Builder(null, "停止", actionIntent(STOP, 7343)).build())
+            .setOngoing(true).setOnlyAlertOnce(true).setWhen(deadline).setShowWhen(!paused).setUsesChronometer(!paused)
+            .addAction(Notification.Action.Builder(null, if (paused) "再開" else "一時停止",
+                actionIntent(if (paused) RESUME else PAUSE, 7343)).build())
             .addAction(Notification.Action.Builder(null, "+30秒", actionIntent(EXTEND, 7344)).build())
         val id = p.getString("timerId", "") ?: ""
         val target = WorkoutNotificationState.valid(c, id)
         val complete = target?.let { completeIntent(c, id, it) }
         if (complete != null) builder.addAction(Notification.Action.Builder(null, "セット完了", complete).build())
-        timerLayout(c, builder, deadline, target, complete, p.getString("exerciseName", "") ?: "")
-        if (Build.VERSION.SDK_INT >= 24) builder.setChronometerCountDown(true)
+        timerLayout(c, builder, deadline, target, complete, p.getString("exerciseName", "") ?: "", pausedRemaining)
+        if (Build.VERSION.SDK_INT >= 24 && !paused) builder.setChronometerCountDown(true)
         // No timeout: completion replaces this same slot with the set action.
         try { manager(c).notify(ONGOING, builder.build()) } catch (_: SecurityException) { }
     }

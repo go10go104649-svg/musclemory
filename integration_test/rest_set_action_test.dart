@@ -46,12 +46,12 @@ void main() {
   };
   Future<Map<String, dynamic>> draft() async =>
       jsonDecode((await AndroidWorkoutDraft.read())!);
-  Future<String> start() async {
+  Future<String> start([int seconds = 2]) async {
     await RestNotificationService.schedule(
-      2,
+      seconds,
       exerciseName: 'ベンチプレス',
       target: target,
-      restSeconds: 2,
+      restSeconds: seconds,
     );
     final state = (await RestNotificationService.state())!;
     return state['timerId'] as String;
@@ -61,6 +61,74 @@ void main() {
     'debugRestAction',
     {'action': 'complete', 'timerId': id, 'targetSetId': set},
   );
+  Future<void> notificationAction(String name) async {
+    await channel.invokeMethod<void>('debugRestAction', {'action': name});
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+  }
+
+  testWidgets('paused countdown survives time and resumes to natural expiry', (
+    t,
+  ) async {
+    await t.pumpWidget(const MaterialApp(home: Scaffold()));
+    await AndroidWorkoutDraft.clear();
+    await AndroidWorkoutDraft.write(jsonEncode(fixture()));
+    final before = (await channel.invokeMapMethod<String, dynamic>(
+      'debugStatus',
+    ))!;
+    final id = await start(5);
+    await notificationAction('pauseNotification');
+    final paused = (await RestNotificationService.state())!;
+    expect(paused['phase'], 'paused');
+    expect(paused['timerId'], id);
+    final held = paused['remainingSeconds'] as int;
+    await Future<void>.delayed(const Duration(seconds: 3));
+    expect((await RestNotificationService.state())!['remainingSeconds'], held);
+    await notificationAction('resumeNotification');
+    final resumed = (await RestNotificationService.state())!;
+    expect(resumed['phase'], 'running');
+    expect(resumed['timerId'], id);
+    final remaining =
+        ((resumed['endsAtMilliseconds'] as int) -
+            DateTime.now().millisecondsSinceEpoch) /
+        1000;
+    expect(remaining, closeTo(held, 1));
+    await Future<void>.delayed(Duration(seconds: held + 1));
+    expect((await RestNotificationService.state())!['phase'], 'finished');
+    final after = (await channel.invokeMapMethod<String, dynamic>(
+      'debugStatus',
+    ))!;
+    expect(after['completionCount'], (before['completionCount'] ?? 0) + 1);
+    await AndroidWorkoutDraft.clear();
+  });
+
+  testWidgets('paused extension and set completion work from notification', (
+    t,
+  ) async {
+    await t.pumpWidget(const MaterialApp(home: Scaffold()));
+    await AndroidWorkoutDraft.clear();
+    await AndroidWorkoutDraft.write(jsonEncode(fixture()));
+    final id = await start(5);
+    await notificationAction('pauseNotification');
+    final before = (await RestNotificationService.state())!;
+    await notificationAction('extendNotification');
+    final extended = (await RestNotificationService.state())!;
+    expect(
+      extended['remainingSeconds'],
+      (before['remainingSeconds'] as int) + 30,
+    );
+    expect(extended['timerId'], id);
+    await action(id, 'set_1');
+    expect((await draft())['exercises'][0]['sets'][1]['completed'], true);
+    final next = (await RestNotificationService.state())!;
+    expect(next['phase'], 'running');
+    expect(next['timerId'], isNot(id));
+    expect(next['target']['targetSetId'], 'set_2');
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
+    await action(next['timerId'], 'set_2');
+    expect((await draft())['exercises'][0]['sets'][2]['completed'], true);
+    expect((await RestNotificationService.state())!['endsAtMilliseconds'], 0);
+    await AndroidWorkoutDraft.clear();
+  });
   testWidgets(
     'native set action persists once and advances only its bound set',
     (t) async {
@@ -160,7 +228,7 @@ void main() {
     await AndroidWorkoutDraft.clear();
   });
   testWidgets(
-    'extended action replaces stale generation and stop stays silent',
+    'extension keeps identity; pause preserves the set action and stays silent',
     (t) async {
       await t.pumpWidget(const MaterialApp(home: Scaffold()));
       await AndroidWorkoutDraft.clear();
@@ -173,11 +241,19 @@ void main() {
         extended['endsAtMilliseconds'],
         before['endsAtMilliseconds'] + 30000,
       );
-      await action(oldId, 'set_1');
+      expect(extended['timerId'], oldId);
+      await channel.invokeMethod<void>('debugRestAlarm', {
+        'timerId': oldId,
+        'deadline': before['endsAtMilliseconds'],
+      });
       expect((await draft())['lockRevision'], 0);
       await action(extended['timerId'], 'set_1');
       expect((await draft())['lockRevision'], 1);
-      await channel.invokeMethod<void>('debugRestAction', {'action': 'stop'});
+      final next = (await RestNotificationService.state())!;
+      await channel.invokeMethod<void>('debugRestAction', {'action': 'pause'});
+      final paused = (await RestNotificationService.state())!;
+      expect(paused['phase'], 'paused');
+      expect(paused['timerId'], next['timerId']);
       final status = (await channel.invokeMapMethod<String, dynamic>(
         'debugStatus',
       ))!;
@@ -186,7 +262,16 @@ void main() {
         'debugStatus',
       ))!;
       expect(after['completionCount'], status['completionCount']);
-      expect(after['delivered'], isNot(contains(7340)));
+      expect(after['delivered'], contains(7340));
+      expect((after['ongoingDetails'] as List).single['actions'], [
+        '再開',
+        '+30秒',
+        'セット完了',
+      ]);
+      expect(
+        (await RestNotificationService.state())!['remainingSeconds'],
+        paused['remainingSeconds'],
+      );
       await action(extended['timerId'], 'set_1');
       expect((await draft())['lockRevision'], 1);
       await AndroidWorkoutDraft.clear();
@@ -366,7 +451,7 @@ void main() {
       final details = (running['ongoingDetails'] as List).single as Map;
       expect(details['chronometer'], true);
       expect(details['countdown'], true);
-      expect(details['actions'], ['停止', '+30秒', 'セット完了']);
+      expect(details['actions'], ['一時停止', '+30秒', 'セット完了']);
       debugPrint('QA_REST_BOUNDARY_lock');
       await Future<void>.delayed(const Duration(seconds: 4));
       final before = (await channel.invokeMapMethod<String, dynamic>(

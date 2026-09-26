@@ -7,6 +7,20 @@ import 'package:setkeep/trainer/trainer_inbox_page.dart';
 import 'package:setkeep/trainer/trainer_inbox_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+Future<void> revealTrainerComment(WidgetTester tester, String body) async {
+  await tester.scrollUntilVisible(
+    find.text(body),
+    240,
+    scrollable: find
+        .descendant(
+          of: find.byKey(const Key('trainerInboxPage')),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  await tester.pumpAndSettle();
+}
+
 Map<String, dynamic> deliveryMenu({int version = 1}) => {
   'id': 'menu-a',
   'client_id': 'client-a',
@@ -41,6 +55,9 @@ class DeliveryRepository implements TrainerInboxRepository {
   int version = 1;
   bool canceled = false, deleted = false, fail = false;
   String body = 'Coach comment';
+  int get commentVersion => body == 'Coach comment' ? 1 : 2;
+  final Map<String, int> readMenuVersions = {};
+  final Map<String, int> readCommentVersions = {};
   Completer<List<Map<String, dynamic>>>? pending;
   @override
   Future<List<Map<String, dynamic>>> menus({int offset = 0}) async {
@@ -58,6 +75,7 @@ class DeliveryRepository implements TrainerInboxRepository {
           {
             'id': 'comment-a',
             'body': body,
+            'version': commentVersion,
             'updated_at': '2026-09-25',
             'menu_id': 'menu-a',
           },
@@ -66,6 +84,27 @@ class DeliveryRepository implements TrainerInboxRepository {
   @override
   Future<Map<String, dynamic>?> menu(String id) async =>
       userId == 'user-a' && !canceled ? deliveryMenu(version: version) : null;
+  @override
+  Future<int> unreadCount() async {
+    if (fail) throw StateError('offline');
+    if (userId != 'user-a') return 0;
+    return (canceled || readMenuVersions[userId] == version ? 0 : 1) +
+        (deleted || readCommentVersions[userId] == commentVersion ? 0 : 1);
+  }
+
+  @override
+  Future<void> markRead({
+    required Map<String, int> menuVersions,
+    required Map<String, int> commentVersions,
+  }) async {
+    if (fail) throw StateError('offline');
+    if (userId != 'user-a') return;
+    if (menuVersions['menu-a'] == version) readMenuVersions[userId!] = version;
+    if (commentVersions['comment-a'] == commentVersion) {
+      readCommentVersions[userId!] = commentVersion;
+    }
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -101,7 +140,18 @@ void trainerDeliveryNativeFlow() {
         ),
       );
       await t.pumpAndSettle();
+      await revealTrainerComment(t, 'Coach comment');
       expect(find.text('Coach comment'), findsOneWidget);
+      await t.scrollUntilVisible(
+        find.byKey(const ValueKey('startTrainerMenu:menu-a')),
+        -240,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const Key('trainerInboxPage')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
       await t.tap(find.byKey(const ValueKey('startTrainerMenu:menu-a')));
       await t.pumpAndSettle();
       expect(find.byType(WorkoutPage), findsOneWidget);

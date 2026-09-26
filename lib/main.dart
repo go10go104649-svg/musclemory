@@ -1,4 +1,5 @@
 import 'trainer/trainer_inbox_page.dart';
+import 'trainer/trainer_inbox_repository.dart';
 import 'design/family_theme.dart';
 import 'admin/report_management_page.dart';
 import 'gym/place_equipment_pages.dart';
@@ -205,6 +206,36 @@ class RestNotificationService {
       });
     } on PlatformException catch (error) {
       debugPrint('Rest notification cancellation failed: $error');
+    }
+  }
+
+  static Future<bool> pause() async {
+    if (!Platform.isAndroid) return false;
+    try {
+      return await _channel.invokeMethod<bool>('pause') ?? false;
+    } on PlatformException catch (error) {
+      debugPrint('Rest timer pause failed: $error');
+      return false;
+    }
+  }
+
+  static Future<bool> resume() async {
+    if (!Platform.isAndroid) return false;
+    try {
+      return await _channel.invokeMethod<bool>('resume') ?? false;
+    } on PlatformException catch (error) {
+      debugPrint('Rest timer resume failed: $error');
+      return false;
+    }
+  }
+
+  static Future<bool> extend() async {
+    if (!Platform.isAndroid) return false;
+    try {
+      return await _channel.invokeMethod<bool>('extend') ?? false;
+    } on PlatformException catch (error) {
+      debugPrint('Rest timer extension failed: $error');
+      return false;
     }
   }
 
@@ -1239,6 +1270,7 @@ class DashboardPage extends StatelessWidget {
     required this.workoutDraft,
     required this.onDraftChanged,
     required this.onDraftDiscarded,
+    this.inboxRepository,
   });
 
   final List<WorkoutRecord> history;
@@ -1256,6 +1288,7 @@ class DashboardPage extends StatelessWidget {
   final WorkoutDraftSummary? workoutDraft;
   final Future<void> Function() onDraftChanged;
   final Future<void> Function() onDraftDiscarded;
+  final TrainerInboxRepository? inboxRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -1264,7 +1297,10 @@ class DashboardPage extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
         children: [
-          const HomeHeader(),
+          HomeHeader(
+            repository: inboxRepository,
+            onStart: (record) => _startWorkout(context, initialWorkout: record),
+          ),
           const SizedBox(height: 24),
           if (workoutDraft != null) ...[
             ActiveWorkoutDraftCard(
@@ -1280,23 +1316,6 @@ class DashboardPage extends StatelessWidget {
             },
           ),
           const SizedBox(height: 14),
-          OutlinedButton.icon(
-            key: const Key('trainerInboxButton'),
-            icon: const Icon(Icons.fitness_center),
-            label: Text(
-              Localizations.localeOf(context).languageCode == 'ja'
-                  ? 'トレーナーからのメニュー・コメント'
-                  : 'Trainer menus and comments',
-            ),
-            onPressed: () => Navigator.of(context).push<void>(
-              MaterialPageRoute(
-                builder: (_) => TrainerInboxPage(
-                  onStart: (record) =>
-                      _startWorkout(context, initialWorkout: record),
-                ),
-              ),
-            ),
-          ),
           if (workoutTemplates.isNotEmpty) ...[
             const SizedBox(height: 24),
             const SectionTitle(title: 'マイメニュー', action: '保存したメニュー'),
@@ -1969,8 +1988,88 @@ class _RenameWorkoutTemplateDialogState
   }
 }
 
-class HomeHeader extends StatelessWidget {
-  const HomeHeader({super.key});
+class HomeHeader extends StatefulWidget {
+  const HomeHeader({super.key, required this.onStart, this.repository});
+
+  final Future<void> Function(WorkoutRecord) onStart;
+  final TrainerInboxRepository? repository;
+
+  @override
+  State<HomeHeader> createState() => _HomeHeaderState();
+}
+
+class _HomeHeaderState extends State<HomeHeader> with WidgetsBindingObserver {
+  late final TrainerInboxRepository? _repository =
+      widget.repository ??
+      (SupabaseConfig.initialized
+          ? TrainerInboxRepository(Supabase.instance.client)
+          : null);
+  StreamSubscription<void>? _authSubscription;
+  Timer? _refreshTimer;
+  int _unreadCount = 0;
+  int _generation = 0;
+  bool _active = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    if (_repository != null) {
+      _authSubscription = _repository.authChanges.listen((_) {
+        setState(() => _unreadCount = 0);
+        unawaited(_refresh());
+      });
+      _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+        if (_active) unawaited(_refresh());
+      });
+      unawaited(_refresh());
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _active = state == AppLifecycleState.resumed;
+    if (_active) unawaited(_refresh());
+  }
+
+  Future<void> _refresh() async {
+    final current = ++_generation;
+    final uid = _repository?.userId;
+    if (uid == null) {
+      if (mounted) setState(() => _unreadCount = 0);
+      return;
+    }
+    try {
+      final count = await _repository!.unreadCount();
+      if (mounted && current == _generation && _repository.userId == uid) {
+        setState(() => _unreadCount = count);
+      }
+    } catch (_) {
+      // A transient network error must not mark notifications as read.
+    }
+  }
+
+  Future<void> _openInbox() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => TrainerInboxPage(
+          repository: _repository,
+          onStart: widget.onStart,
+          onReadChanged: () => unawaited(_refresh()),
+        ),
+      ),
+    );
+    if (mounted) await _refresh();
+  }
+
+  @override
+  void dispose() {
+    _generation++;
+    _refreshTimer?.cancel();
+    _authSubscription?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1999,7 +2098,46 @@ class HomeHeader extends StatelessWidget {
             color: Colors.white,
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.notifications_none_rounded),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                key: const Key('trainerInboxBell'),
+                tooltip: Localizations.localeOf(context).languageCode == 'ja'
+                    ? 'トレーナーからのメニュー・コメント'
+                    : 'Trainer menus and comments',
+                onPressed: _openInbox,
+                icon: const Icon(Icons.notifications_none_rounded),
+              ),
+              if (_unreadCount > 0)
+                Positioned(
+                  right: -3,
+                  top: -3,
+                  child: Container(
+                    key: const Key('trainerInboxUnreadBadge'),
+                    constraints: const BoxConstraints(
+                      minWidth: 20,
+                      minHeight: 20,
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      _unreadCount > 99 ? '99+' : '$_unreadCount',
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ],
     );
@@ -2036,33 +2174,45 @@ class StartWorkoutCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 22),
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: FilledButton.icon(
-              key: const Key('startWorkoutButton'),
-              onPressed: onPressed,
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primaryGreen,
-                foregroundColor: const Color(0xFF101820),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(17),
-                ),
-              ),
-              icon: const Icon(Icons.play_arrow_rounded),
-              label: Text(
-                buttonLabel,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
+          WorkoutPrimaryButton(
+            key: const Key('startWorkoutButton'),
+            onPressed: onPressed,
+            label: buttonLabel,
           ),
         ],
       ),
     );
   }
+}
+
+class WorkoutPrimaryButton extends StatelessWidget {
+  const WorkoutPrimaryButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: double.infinity,
+    height: 54,
+    child: FilledButton.icon(
+      onPressed: onPressed,
+      style: FilledButton.styleFrom(
+        backgroundColor: FamilyPalette.of(context).accent,
+        foregroundColor: const Color(0xFF101820),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
+      ),
+      icon: const Icon(Icons.play_arrow_rounded),
+      label: Text(
+        label,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+      ),
+    ),
+  );
 }
 
 class ActiveWorkoutDraftCard extends StatelessWidget {
@@ -5776,13 +5926,31 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
     _restTimer?.cancel();
     _restTimer = null;
     _restEndsAt = null;
-    unawaited(RestNotificationService.cancel(remainingSeconds: remaining));
+    if (Platform.isAndroid) {
+      unawaited(RestNotificationService.pause().then((_) => _syncRestState()));
+    } else {
+      unawaited(RestNotificationService.cancel(remainingSeconds: remaining));
+    }
     setState(() => _restRemaining = remaining);
   }
 
-  void _resumeRest() => _startRestTimer(
-    _restRemaining > 0 ? _restRemaining : RestTimerPreference.seconds,
-  );
+  Future<void> _resumeRest() async {
+    if (Platform.isAndroid && _restRemaining > 0) {
+      final native = await RestNotificationService.state();
+      if (native?['phase'] == 'running') {
+        await _syncRestState();
+        return;
+      }
+      if (native?['phase'] == 'paused') {
+        await RestNotificationService.resume();
+        await _syncRestState();
+        return;
+      }
+    }
+    await _startRestTimer(
+      _restRemaining > 0 ? _restRemaining : RestTimerPreference.seconds,
+    );
+  }
 
   void _skipRest() {
     _restRevision++;
@@ -6380,9 +6548,16 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
                                 ),
                               ),
                               TextButton(
-                                onPressed: () {
+                                onPressed: () async {
+                                  if (Platform.isAndroid &&
+                                      (_restEndsAt != null ||
+                                          _restRemaining > 0) &&
+                                      await RestNotificationService.extend()) {
+                                    await _syncRestState();
+                                    return;
+                                  }
                                   if (_restEndsAt != null) {
-                                    _startRestTimer(_restRemaining + 30);
+                                    await _startRestTimer(_restRemaining + 30);
                                   } else {
                                     setState(
                                       () => _restRemaining =
@@ -8900,6 +9075,124 @@ class WorkoutExercise {
   final List<WorkoutSet> sets;
 }
 
+class WorkoutExerciseCardShell extends StatelessWidget {
+  const WorkoutExerciseCardShell({super.key, required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color:
+          Theme.of(context).cardTheme.color ??
+          Theme.of(context).colorScheme.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(22),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    ),
+  );
+}
+
+class WorkoutExerciseCardHeader extends StatelessWidget {
+  const WorkoutExerciseCardHeader({
+    super.key,
+    required this.name,
+    this.exerciseId,
+    required this.bodyPart,
+    required this.equipment,
+    this.trailing,
+    this.titleKey,
+    this.containerKey,
+  });
+
+  final String name;
+  final String? exerciseId;
+  final String bodyPart;
+  final String equipment;
+  final Widget? trailing;
+  final Key? titleKey;
+  final Key? containerKey;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    key: containerKey,
+    padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+    decoration: BoxDecoration(
+      color: FamilyPalette.of(context).accent,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final title = exerciseDisplayName(
+                    name,
+                    exerciseId: exerciseId,
+                  );
+                  const baseStyle = TextStyle(
+                    color: Color(0xFF101820),
+                    fontWeight: FontWeight.w900,
+                  );
+                  var fontSize = 16.0;
+                  for (final size in [18.0, 17.0, 16.0]) {
+                    final painter = TextPainter(
+                      text: TextSpan(
+                        text: title,
+                        style: DefaultTextStyle.of(context).style
+                            .merge(baseStyle.copyWith(fontSize: size)),
+                      ),
+                      textDirection: Directionality.of(context),
+                      textScaler: MediaQuery.textScalerOf(context),
+                      locale: Localizations.maybeLocaleOf(context),
+                      maxLines: 1,
+                      ellipsis: '…',
+                    )..layout(maxWidth: constraints.maxWidth);
+                    final fits = !painter.didExceedMaxLines;
+                    painter.dispose();
+                    if (fits) {
+                      fontSize = size;
+                      break;
+                    }
+                  }
+                  return Text(
+                    title,
+                    key: titleKey,
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                    style: baseStyle.copyWith(fontSize: fontSize),
+                  );
+                },
+              ),
+              if (bodyPart.isNotEmpty || equipment.isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Text(
+                  [
+                    bodyPart,
+                    equipment,
+                  ].where((value) => value.isNotEmpty).join(' ・ '),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF101820),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        ?trailing,
+      ],
+    ),
+  );
+}
+
 class ExerciseInputCard extends StatelessWidget {
   const ExerciseInputCard({
     super.key,
@@ -8946,263 +9239,194 @@ class ExerciseInputCard extends StatelessWidget {
     final previousText = previousSets.isEmpty
         ? '前回の記録はありません'
         : '前回  ${previousSets.map((set) => set.displaySummary).join(' ・ ')}';
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color:
-            Theme.of(context).cardTheme.color ??
-            Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(22),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            key: Key('exerciseInputHeader$exerciseIndex'),
-            padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-            decoration: BoxDecoration(
-              color: FamilyPalette.of(context).accent,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final name = exerciseDisplayName(
-                            exercise.name,
-                            exerciseId: exercise.exerciseId,
-                          );
-                          const baseStyle = TextStyle(
-                            color: Color(0xFF101820),
-                            fontWeight: FontWeight.w900,
-                          );
-                          var fontSize = 16.0;
-                          for (final size in [18.0, 17.0, 16.0]) {
-                            final painter = TextPainter(
-                              text: TextSpan(
-                                text: name,
-                                style: DefaultTextStyle.of(context).style
-                                    .merge(baseStyle.copyWith(fontSize: size)),
-                              ),
-                              textDirection: Directionality.of(context),
-                              textScaler: MediaQuery.textScalerOf(context),
-                              locale: Localizations.maybeLocaleOf(context),
-                              maxLines: 1,
-                              ellipsis: '…',
-                            )..layout(maxWidth: constraints.maxWidth);
-                            final fits = !painter.didExceedMaxLines;
-                            painter.dispose();
-                            if (fits) {
-                              fontSize = size;
-                              break;
-                            }
-                          }
-                          return Text(
-                            name,
-                            key: Key('exerciseInputTitle$exerciseIndex'),
-                            maxLines: 1,
-                            softWrap: false,
-                            overflow: TextOverflow.ellipsis,
-                            style: baseStyle.copyWith(fontSize: fontSize),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        '${exercise.bodyPart} ・ ${exercise.equipment}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF101820),
-                        ),
-                      ),
-                    ],
+    return WorkoutExerciseCardShell(
+      children: [
+        WorkoutExerciseCardHeader(
+          containerKey: Key('exerciseInputHeader$exerciseIndex'),
+          titleKey: Key('exerciseInputTitle$exerciseIndex'),
+          name: exercise.name,
+          exerciseId: exercise.exerciseId,
+          bodyPart: exercise.bodyPart,
+          equipment: exercise.equipment,
+          trailing: onRemove == null
+              ? null
+              : IconButton(
+                  tooltip: '種目を削除',
+                  onPressed: onRemove,
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: Color(0xFF101820),
                   ),
                 ),
-                if (onRemove != null)
-                  IconButton(
-                    tooltip: '種目を削除',
-                    onPressed: onRemove,
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: Color(0xFF101820),
-                    ),
-                  ),
-              ],
-            ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: FamilyPalette.of(context).subtle,
+            borderRadius: BorderRadius.circular(14),
           ),
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: FamilyPalette.of(context).subtle,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.history_rounded, size: 18),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    previousText,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
+          child: Row(
+            children: [
+              const Icon(Icons.history_rounded, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  previousText,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                if (previousSets.isNotEmpty)
-                  TextButton(
-                    key: Key('applyPrevious$exerciseIndex'),
-                    onPressed: () => onApplyPrevious(previousSets),
-                    child: const Text('反映'),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          if ((showCompletionCheck ??
-                  WorkoutUiPreference.completionCheckEnabled) &&
-              exercise.recordType.usesSets)
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '完了 $completedCount / ${exercise.sets.length}',
-                    style: const TextStyle(
-                      color: Color(0xFF6C746D),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                if (exercise.sets.isNotEmpty)
-                  TextButton.icon(
-                    key: Key('toggleAllSets$exerciseIndex'),
-                    onPressed: () => onSetAllCompleted(!allCompleted),
-                    icon: Icon(
-                      allCompleted
-                          ? Icons.remove_done_rounded
-                          : Icons.done_all_rounded,
-                      size: 18,
-                    ),
-                    label: Text(allCompleted ? 'すべて解除' : 'すべて完了'),
-                  ),
-              ],
-            ),
-          if (exercise.recordType == ExerciseRecordType.bodyweightReps &&
-              usesAssistanceWeight(
-                exercise.name,
-                exerciseId: exercise.exerciseId,
-              ))
-            TextButton(
-              key: Key('addAssistanceWeight$exerciseIndex'),
-              onPressed: () {
-                exercise.recordType = ExerciseRecordType.assistedReps;
-                (onRecordTypeChanged ?? onValuesChanged)();
-              },
-              child: const Text('補助重量を追加'),
-            ),
-          if (usesAdditionalWeight(
-            exercise.name,
-            exerciseId: exercise.exerciseId,
-          ))
-            const Padding(
-              padding: EdgeInsets.only(bottom: 8),
-              child: Text('追加重量（kg）・自重のみは0', style: TextStyle(fontSize: 12)),
-            ),
-          if (exercise.recordType == ExerciseRecordType.assistedReps)
-            const Padding(
-              padding: EdgeInsets.only(bottom: 8),
-              child: Text(
-                '補助重量（kg）・補助なしは0。軽いほど負荷が高くなります。',
-                style: TextStyle(fontSize: 12),
               ),
+              if (previousSets.isNotEmpty)
+                TextButton(
+                  key: Key('applyPrevious$exerciseIndex'),
+                  onPressed: () => onApplyPrevious(previousSets),
+                  child: const Text('反映'),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        if ((showCompletionCheck ??
+                WorkoutUiPreference.completionCheckEnabled) &&
+            exercise.recordType.usesSets)
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '完了 $completedCount / ${exercise.sets.length}',
+                  style: const TextStyle(
+                    color: Color(0xFF6C746D),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              if (exercise.sets.isNotEmpty)
+                TextButton.icon(
+                  key: Key('toggleAllSets$exerciseIndex'),
+                  onPressed: () => onSetAllCompleted(!allCompleted),
+                  icon: Icon(
+                    allCompleted
+                        ? Icons.remove_done_rounded
+                        : Icons.done_all_rounded,
+                    size: 18,
+                  ),
+                  label: Text(allCompleted ? 'すべて解除' : 'すべて完了'),
+                ),
+            ],
+          ),
+        if (exercise.recordType == ExerciseRecordType.bodyweightReps &&
+            usesAssistanceWeight(
+              exercise.name,
+              exerciseId: exercise.exerciseId,
+            ))
+          TextButton(
+            key: Key('addAssistanceWeight$exerciseIndex'),
+            onPressed: () {
+              exercise.recordType = ExerciseRecordType.assistedReps;
+              (onRecordTypeChanged ?? onValuesChanged)();
+            },
+            child: const Text('補助重量を追加'),
+          ),
+        if (usesAdditionalWeight(
+          exercise.name,
+          exerciseId: exercise.exerciseId,
+        ))
+          const Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: Text('追加重量（kg）・自重のみは0', style: TextStyle(fontSize: 12)),
+          ),
+        if (exercise.recordType == ExerciseRecordType.assistedReps)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: Text(
+              '補助重量（kg）・補助なしは0。軽いほど負荷が高くなります。',
+              style: TextStyle(fontSize: 12),
             ),
-          SetHeader(
+          ),
+        SetHeader(
+          recordType: exercise.recordType,
+          showCompletionCheck:
+              (showCompletionCheck ??
+              WorkoutUiPreference.completionCheckEnabled),
+        ),
+        const SizedBox(height: 8),
+        ...List.generate(exercise.sets.length, (setIndex) {
+          final set = exercise.sets[setIndex];
+          final nodes = numericNodes?.call(set);
+          return SetRow(
+            key: ObjectKey(set),
+            weightFocus: nodes?[0],
+            repsFocus: nodes?[1],
+            nextWeight: nodes == null ? null : nextNumeric?.call(nodes[0]),
+            nextReps: nodes == null ? null : nextNumeric?.call(nodes[1]),
+            number: setIndex + 1,
+            fieldPrefix: '${exerciseIndex}_',
+            set: set,
             recordType: exercise.recordType,
+            exerciseName: exercise.name,
+            exerciseId: exercise.exerciseId,
+            distanceUnit: exercise.distanceUnit,
             showCompletionCheck:
                 (showCompletionCheck ??
-                WorkoutUiPreference.completionCheckEnabled),
-          ),
-          const SizedBox(height: 8),
-          ...List.generate(exercise.sets.length, (setIndex) {
-            final set = exercise.sets[setIndex];
-            final nodes = numericNodes?.call(set);
-            return SetRow(
-              key: ObjectKey(set),
-              weightFocus: nodes?[0],
-              repsFocus: nodes?[1],
-              nextWeight: nodes == null ? null : nextNumeric?.call(nodes[0]),
-              nextReps: nodes == null ? null : nextNumeric?.call(nodes[1]),
-              number: setIndex + 1,
-              fieldPrefix: '${exerciseIndex}_',
-              set: set,
-              recordType: exercise.recordType,
-              exerciseName: exercise.name,
-              exerciseId: exercise.exerciseId,
-              distanceUnit: exercise.distanceUnit,
-              showCompletionCheck:
-                  (showCompletionCheck ??
-                      WorkoutUiPreference.completionCheckEnabled) &&
-                  exercise.recordType.usesSets,
-              onWeightChanged: (value) {
-                set.weight = value;
-                onValuesChanged();
-              },
-              onRepsChanged: (value) {
-                set.reps = value;
-                onValuesChanged();
-              },
-              onDurationChanged: (value) {
-                set.durationSeconds = value;
-                onValuesChanged();
-              },
-              onDistanceChanged: (value) {
-                set.distanceKm = value;
-                onValuesChanged();
-              },
-              onSpeedChanged: (value) {
-                set.speedKmh = value;
-                onValuesChanged();
-              },
-              onInclineChanged: (value) {
-                set.inclinePercent = value;
-                onValuesChanged();
-              },
-              onResistanceChanged: (value) {
-                set.resistanceLevel = value;
-                onValuesChanged();
-              },
-              onPaceChanged: (value) {
-                set.paceSecondsPerKm = value;
-                onValuesChanged();
-              },
-              onToggle: () => onToggleSet(setIndex),
-              onDelete: () => onRemoveSet(setIndex),
-            );
-          }),
-          if (exercise.recordType.usesSets) ...[
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                key: exerciseIndex == 0
-                    ? const Key('addSetButton')
-                    : Key('addSetButton$exerciseIndex'),
-                onPressed: onAddSet,
-                icon: const Icon(Icons.add_rounded),
-                label: const Text('セットを追加'),
-              ),
+                    WorkoutUiPreference.completionCheckEnabled) &&
+                exercise.recordType.usesSets,
+            onWeightChanged: (value) {
+              set.weight = value;
+              onValuesChanged();
+            },
+            onRepsChanged: (value) {
+              set.reps = value;
+              onValuesChanged();
+            },
+            onDurationChanged: (value) {
+              set.durationSeconds = value;
+              onValuesChanged();
+            },
+            onDistanceChanged: (value) {
+              set.distanceKm = value;
+              onValuesChanged();
+            },
+            onSpeedChanged: (value) {
+              set.speedKmh = value;
+              onValuesChanged();
+            },
+            onInclineChanged: (value) {
+              set.inclinePercent = value;
+              onValuesChanged();
+            },
+            onResistanceChanged: (value) {
+              set.resistanceLevel = value;
+              onValuesChanged();
+            },
+            onPaceChanged: (value) {
+              set.paceSecondsPerKm = value;
+              onValuesChanged();
+            },
+            onToggle: () => onToggleSet(setIndex),
+            onDelete: () => onRemoveSet(setIndex),
+          );
+        }),
+        if (exercise.recordType.usesSets) ...[
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              key: exerciseIndex == 0
+                  ? const Key('addSetButton')
+                  : Key('addSetButton$exerciseIndex'),
+              onPressed: onAddSet,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('セットを追加'),
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 }
@@ -9649,10 +9873,12 @@ class SetHeader extends StatelessWidget {
     super.key,
     required this.recordType,
     this.showCompletionCheck = true,
+    this.trailingWidth,
   });
 
   final ExerciseRecordType recordType;
   final bool showCompletionCheck;
+  final double? trailingWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -9673,10 +9899,45 @@ class SetHeader extends StatelessWidget {
             child: Center(child: Text(label, style: setLabelStyle)),
           ),
         ],
-        SizedBox(width: showCompletionCheck ? 96 : 52),
+        SizedBox(width: trailingWidth ?? (showCompletionCheck ? 96 : 52)),
       ],
     );
   }
+}
+
+class WorkoutSetRowLayout extends StatelessWidget {
+  const WorkoutSetRowLayout({
+    super.key,
+    required this.number,
+    required this.values,
+    this.trailing = const [],
+  });
+
+  final int number;
+  final List<Widget> values;
+  final List<Widget> trailing;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 5),
+    child: Row(
+      children: [
+        SizedBox(
+          width: 28,
+          child: Text(
+            '$number',
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+        ),
+        for (final (index, value) in values.indexed) ...[
+          if (index > 0) const SizedBox(width: 8),
+          Expanded(child: value),
+        ],
+        const SizedBox(width: 8),
+        ...trailing,
+      ],
+    ),
+  );
 }
 
 class SetRow extends StatelessWidget {
@@ -9746,93 +10007,78 @@ class SetRow extends StatelessWidget {
         onPaceChanged: onPaceChanged,
       );
     }
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 28,
-            child: Text(
-              '$number',
-              style: const TextStyle(fontWeight: FontWeight.w800),
-            ),
+    return WorkoutSetRowLayout(
+      number: number,
+      values: [
+        if (recordType.hasWeightInput) ...[
+          ValueBox(
+            largeTouchTarget: true,
+            key: Key('weightField$fieldPrefix$number'),
+            value: set.weight,
+            stepLabel: recordType == ExerciseRecordType.assistedReps
+                ? '補助 KG'
+                : 'KG',
+            focusNode: weightFocus,
+            onNext: nextWeight,
+            normalizeZeros: true,
+            allowDecimal: true,
+            onChanged: (value) => onWeightChanged(value.toDouble()),
           ),
-          if (recordType.hasWeightInput) ...[
-            Expanded(
-              child: ValueBox(
-                largeTouchTarget: true,
-                key: Key('weightField$fieldPrefix$number'),
-                value: set.weight,
-                stepLabel: recordType == ExerciseRecordType.assistedReps
-                    ? '補助 KG'
-                    : 'KG',
-                focusNode: weightFocus,
-                onNext: nextWeight,
-                normalizeZeros: true,
-                allowDecimal: true,
-                onChanged: (value) => onWeightChanged(value.toDouble()),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-          if (recordType.hasWeightInput ||
-              recordType == ExerciseRecordType.bodyweightReps)
-            Expanded(
-              child: ValueBox(
-                largeTouchTarget: true,
-                key: Key('repsField$fieldPrefix$number'),
-                value: set.reps,
-                stepLabel: 'REPS',
-                focusNode: repsFocus,
-                onNext: nextReps,
-                normalizeZeros: true,
-                onChanged: (value) => onRepsChanged(value.toInt()),
-              ),
-            ),
-          if (recordType == ExerciseRecordType.timed)
-            Expanded(
-              child: ValueBox(
-                largeTouchTarget: true,
-                key: Key('durationField$fieldPrefix$number'),
-                value: set.durationSeconds,
-                onChanged: (value) => onDurationChanged(value.toInt()),
-              ),
-            ),
-          const SizedBox(width: 8),
-          if (showCompletionCheck) ...[
-            SizedBox(
-              width: 44,
-              height: 44,
-              child: IconButton.filled(
-                key: Key('toggleSet$fieldPrefix$number'),
-                padding: EdgeInsets.zero,
-                onPressed: onToggle,
-                style: IconButton.styleFrom(
-                  backgroundColor: set.completed
-                      ? FamilyPalette.of(context).accent
-                      : const Color(0xFFE8EBE5),
-                  foregroundColor: const Color(0xFF101820),
-                ),
-                icon: Icon(
-                  set.completed ? Icons.check_rounded : Icons.circle_outlined,
-                  size: 18,
-                ),
-              ),
-            ),
-          ],
+        ],
+        if (recordType.hasWeightInput ||
+            recordType == ExerciseRecordType.bodyweightReps)
+          ValueBox(
+            largeTouchTarget: true,
+            key: Key('repsField$fieldPrefix$number'),
+            value: set.reps,
+            stepLabel: 'REPS',
+            focusNode: repsFocus,
+            onNext: nextReps,
+            normalizeZeros: true,
+            onChanged: (value) => onRepsChanged(value.toInt()),
+          ),
+        if (recordType == ExerciseRecordType.timed)
+          ValueBox(
+            largeTouchTarget: true,
+            key: Key('durationField$fieldPrefix$number'),
+            value: set.durationSeconds,
+            onChanged: (value) => onDurationChanged(value.toInt()),
+          ),
+      ],
+      trailing: [
+        if (showCompletionCheck) ...[
           SizedBox(
             width: 44,
             height: 44,
-            child: IconButton(
-              key: Key('deleteSet$fieldPrefix$number'),
-              tooltip: 'セットを削除',
+            child: IconButton.filled(
+              key: Key('toggleSet$fieldPrefix$number'),
               padding: EdgeInsets.zero,
-              onPressed: onDelete,
-              icon: const Icon(Icons.delete_outline_rounded, size: 18),
+              onPressed: onToggle,
+              style: IconButton.styleFrom(
+                backgroundColor: set.completed
+                    ? FamilyPalette.of(context).accent
+                    : const Color(0xFFE8EBE5),
+                foregroundColor: const Color(0xFF101820),
+              ),
+              icon: Icon(
+                set.completed ? Icons.check_rounded : Icons.circle_outlined,
+                size: 18,
+              ),
             ),
           ),
         ],
-      ),
+        SizedBox(
+          width: 44,
+          height: 44,
+          child: IconButton(
+            key: Key('deleteSet$fieldPrefix$number'),
+            tooltip: 'セットを削除',
+            padding: EdgeInsets.zero,
+            onPressed: onDelete,
+            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+          ),
+        ),
+      ],
     );
   }
 }

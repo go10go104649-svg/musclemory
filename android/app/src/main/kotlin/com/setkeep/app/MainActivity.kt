@@ -81,6 +81,19 @@ class MainActivity : FlutterActivity() {
                                 result.success(null)
                                 return@setMethodCallHandler
                             }
+                            val notificationAction = when (action) {
+                                "pauseNotification" -> "一時停止"
+                                "resumeNotification" -> "再開"
+                                "extendNotification" -> "+30秒"
+                                else -> null
+                            }
+                            if (notificationAction != null) {
+                                val notification = (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                                    .activeNotifications.single { it.id == RestTimerState.ONGOING }.notification
+                                notification.actions.single { it.title.toString() == notificationAction }.actionIntent.send()
+                                result.success(null)
+                                return@setMethodCallHandler
+                            }
                             if (action == "complete") {
                                 RestTimerReceiver().onReceive(this, Intent(this, RestTimerReceiver::class.java)
                                     .setAction(WorkoutNotificationState.COMPLETE)
@@ -90,7 +103,11 @@ class MainActivity : FlutterActivity() {
                                 return@setMethodCallHandler
                             }
                             RestTimerState.action(this, Intent(this, RestTimerReceiver::class.java)
-                                .setAction(if (action == "extend") RestTimerState.EXTEND else RestTimerState.STOP)
+                                .setAction(when (action) {
+                                    "extend" -> RestTimerState.EXTEND
+                                    "resume" -> RestTimerState.RESUME
+                                    else -> RestTimerState.PAUSE
+                                })
                                 .putExtra("timerId", p.getString("timerId", "")))
                             result.success(null)
                         }
@@ -120,6 +137,8 @@ class MainActivity : FlutterActivity() {
                                         "promoted" to (Build.VERSION.SDK_INT >= 36 && n.notification.flags and android.app.Notification.FLAG_PROMOTED_ONGOING != 0)
                                     ) },
                                 "playing" to RestTimerFeedback.isPlaying, "deadline" to p.getLong("deadline", 0),
+                                "paused" to p.getBoolean("paused", false),
+                                "remainingSeconds" to p.getInt("remainingSeconds", 0),
                                 "timerId" to (p.getString("timerId", "") ?: ""),
                                 "lastCompletionTimerId" to (p.getString("lastCompletionTimerId", "") ?: ""),
                                 "lastCompletionAt" to p.getLong("lastCompletionAt", 0),
@@ -141,6 +160,9 @@ class MainActivity : FlutterActivity() {
                         RestTimerState.cancel(this, call.argument<Int>("remainingSeconds") ?: 0)
                         result.success(null)
                     }
+                    "pause" -> result.success(RestTimerState.pause(this))
+                    "resume" -> result.success(RestTimerState.resume(this))
+                    "extend" -> result.success(RestTimerState.extend(this))
                     "completeIfDue" -> {
                         val deadline = call.argument<Number>("endsAtMilliseconds")?.toLong() ?: 0
                         result.success(deadline > 0 && RestTimerState.completeIfDue(this,
