@@ -18,6 +18,22 @@
       }
     },
     {
+      "label": "SETKEEP - 新Android（Supabase）",
+      "type": "shell",
+      "command": "flutter",
+      "args": [
+        "run",
+        "-d",
+        "57d02fd",
+        "--dart-define-from-file=${workspaceFolder}/supabase.json"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
       "label": "SETKEEP - iPhone（Supabase・Release）",
       "type": "shell",
       "command": "flutter",
@@ -42,6 +58,25 @@
         "run",
         "-d",
         "RFCY31C098T",
+        "--dart-define-from-file=${workspaceFolder}/supabase.json"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/apps/setkeep_trainer"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "SETKEEP TRAINER - 新Android（Supabase）",
+      "type": "shell",
+      "command": "flutter",
+      "args": [
+        "run",
+        "-d",
+        "57d02fd",
         "--dart-define-from-file=${workspaceFolder}/supabase.json"
       ],
       "options": {

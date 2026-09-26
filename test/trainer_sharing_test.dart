@@ -7,6 +7,7 @@ class FakeSharingRepository implements TrainerRepository {
   bool accepted = false;
   bool recording = true;
   bool heatmap = true;
+  bool linkedCallback = false;
   int shared = 0;
   @override
   Future<List<Map<String, dynamic>>> myLinks() async => accepted
@@ -38,14 +39,6 @@ class FakeSharingRepository implements TrainerRepository {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> recordedForMe({int offset = 0}) async => [
-    {
-      'performed_at': '2026-09-25T10:00:00Z',
-      'sets': [],
-      'duration_seconds': 60,
-    },
-  ];
-  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
@@ -75,7 +68,7 @@ void main() {
           home: TrainerSharingPage(
             history: const [],
             repository: repo,
-            onReceived: (_) async {},
+            onLinked: () async => repo.linkedCallback = true,
           ),
         ),
       );
@@ -95,28 +88,19 @@ void main() {
       expect(repo.recording, false);
       expect(repo.heatmap, false);
       expect(repo.shared, 0);
+      expect(repo.linkedCallback, true);
+      expect(find.text('Receive recorded sessions'), findsNothing);
     },
   );
-  testWidgets('session receipt forwards original history payload', (t) async {
+  testWidgets('manual receipt control is absent', (t) async {
     final repo = FakeSharingRepository();
-    List<Map<String, dynamic>>? received;
     await t.pumpWidget(
       MaterialApp(
-        home: TrainerSharingPage(
-          history: const [],
-          repository: repo,
-          onReceived: (rows) async {
-            received = rows;
-          },
-        ),
+        home: TrainerSharingPage(history: const [], repository: repo),
       ),
     );
     await t.pumpAndSettle();
-    await t.ensureVisible(find.text('Receive recorded sessions'));
-    await t.tap(find.text('Receive recorded sessions'));
-    await t.pumpAndSettle();
-    expect(received!.single['date'], '2026-09-25T10:00:00Z');
-    expect(received!.single['durationSeconds'], 60);
+    expect(find.text('Receive recorded sessions'), findsNothing);
     expect(repo.shared, 0);
   });
 }

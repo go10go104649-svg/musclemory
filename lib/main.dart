@@ -10,6 +10,7 @@ import 'gym/gym_equipment_cache.dart';
 import 'gym/gym_repository.dart';
 import 'gym/gym_pages.dart';
 import 'trainer/trainer_sharing_page.dart';
+import 'trainer/trainer_repository.dart';
 import 'exercise_form_catalog.dart';
 import 'body_tab_colors.dart';
 import 'design/app_colors.dart';
@@ -875,7 +876,7 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> {
+class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   static const _storageKey = 'workout_history';
   static const _gymStorageKey = 'selected_gym';
   int _selectedIndex = 0;
@@ -884,11 +885,96 @@ class _HomeShellState extends State<HomeShell> {
   String? _selectedGym;
   List<SavedWorkoutTemplate> _workoutTemplates = [];
   WorkoutDraftSummary? _workoutDraft;
+  StreamSubscription<AuthState>? _trainerAuthSubscription;
+  late final Future<void> _historyReady;
+  bool _trainerSyncRunning = false;
+  bool _trainerSyncPending = false;
+  Future<void> _historyMutation = Future<void>.value();
+
+  Future<T> _withHistoryMutation<T>(Future<T> Function() action) {
+    final result = _historyMutation.then((_) => action());
+    _historyMutation = result.then<void>((_) {}, onError: (Object _) {});
+    return result;
+  }
 
   @override
   void initState() {
     super.initState();
-    _loadHistory();
+    WidgetsBinding.instance.addObserver(this);
+    _historyReady = _loadHistory();
+    unawaited(_historyReady.then((_) => _syncTrainerHistory()));
+    if (SupabaseConfig.initialized) {
+      _trainerAuthSubscription = Supabase.instance.client.auth.onAuthStateChange
+          .listen((state) {
+            if (state.event == AuthChangeEvent.signedIn ||
+                state.event == AuthChangeEvent.initialSession ||
+                state.event == AuthChangeEvent.signedOut) {
+              if (mounted) setState(() {});
+              if (state.session != null) unawaited(_syncTrainerHistory());
+            }
+          });
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) unawaited(_syncTrainerHistory());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _trainerAuthSubscription?.cancel();
+    super.dispose();
+  }
+
+  List<WorkoutRecord> get _visibleHistory {
+    final userId = SupabaseConfig.initialized
+        ? Supabase.instance.client.auth.currentUser?.id
+        : null;
+    return _history
+        .where(
+          (w) =>
+              w.trainerWorkoutId == null ||
+              (userId != null && w.trainerOwnerUserId == userId),
+        )
+        .toList();
+  }
+
+  Future<void> _syncTrainerHistory() async {
+    await _historyReady;
+    if (!mounted || !SupabaseConfig.initialized) return;
+    final client = Supabase.instance.client;
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return;
+    if (_trainerSyncRunning) {
+      _trainerSyncPending = true;
+      return;
+    }
+    _trainerSyncRunning = true;
+    try {
+      final repo = TrainerRepository(client);
+      final rows = await fetchAllTrainerWorkouts(
+        (offset) => repo.recordedForMe(offset: offset),
+      );
+      if (!mounted || client.auth.currentUser?.id != userId) return;
+      await _withHistoryMutation(() async {
+        if (!mounted || client.auth.currentUser?.id != userId) return;
+        final updated = reconcileTrainerWorkouts(_history, rows, userId);
+        await _persistHistory(updated);
+        if (mounted && client.auth.currentUser?.id == userId) {
+          setState(() => _history = updated);
+        }
+      });
+    } catch (error) {
+      debugPrint('Trainer workout sync failed: $error');
+    } finally {
+      _trainerSyncRunning = false;
+      if (_trainerSyncPending) {
+        _trainerSyncPending = false;
+        unawaited(_syncTrainerHistory());
+      }
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -956,12 +1042,13 @@ class _HomeShellState extends State<HomeShell> {
     await WorkoutTemplatePreference.save(updated);
   }
 
-  Future<void> _saveWorkout(WorkoutRecord workout) async {
-    final updated = sortWorkoutsNewestFirst([workout, ..._history]);
-    await _persistHistory(updated);
-    if (mounted) setState(() => _history = updated);
-    unawaited(_syncHistory(updated));
-  }
+  Future<void> _saveWorkout(WorkoutRecord workout) =>
+      _withHistoryMutation(() async {
+        final updated = sortWorkoutsNewestFirst([workout, ..._history]);
+        await _persistHistory(updated);
+        if (mounted) setState(() => _history = updated);
+        unawaited(_syncHistory(updated));
+      });
 
   Future<void> _persistHistory(List<WorkoutRecord> history) async {
     final preferences = await SharedPreferences.getInstance();
@@ -987,47 +1074,60 @@ class _HomeShellState extends State<HomeShell> {
     if (mounted) setState(() => _bodyWeights = updated);
   }
 
-  Future<void> _replaceWorkout(
-    DateTime originalDate,
-    WorkoutRecord workout,
-  ) async {
-    final updated = sortWorkoutsNewestFirst(
-      _history.map((item) => item.date == originalDate ? workout : item),
-    );
-    await _persistHistory(updated);
-    if (mounted) setState(() => _history = updated);
-    unawaited(_syncHistory(updated));
-  }
+  Future<void> _replaceWorkout(WorkoutRecord original, WorkoutRecord workout) =>
+      _withHistoryMutation(() async {
+        final updated = sortWorkoutsNewestFirst(
+          _history.map((item) => identical(item, original) ? workout : item),
+        );
+        await _persistHistory(updated);
+        if (mounted) setState(() => _history = updated);
+        unawaited(_syncHistory(updated));
+      });
 
   Future<bool> _deleteWorkout(WorkoutRecord workout) async {
     try {
-      if (SupabaseSyncService.canUseCloud) {
+      if (workout.trainerWorkoutId == null && SupabaseSyncService.canUseCloud) {
         await SupabaseSyncService.deleteWorkout(workout.date.toIso8601String());
       }
     } catch (error) {
       debugPrint('Supabase delete failed: $error');
       return false;
     }
-    final updated = _history
-        .where((item) => item.date != workout.date)
-        .toList();
-    setState(() => _history = updated);
-    await _persistHistory(updated);
-    return true;
+    return _withHistoryMutation(() async {
+      final updated = _history
+          .where((item) => !identical(item, workout))
+          .toList();
+      await _persistHistory(updated);
+      if (mounted) setState(() => _history = updated);
+      return true;
+    });
   }
 
-  Future<int> _importWorkouts(List<WorkoutRecord> imported) async {
+  Future<int> _importWorkouts(
+    List<WorkoutRecord> imported,
+  ) => _withHistoryMutation(() async {
     final merged = <String, WorkoutRecord>{
-      for (final workout in _history) workout.date.toIso8601String(): workout,
-      for (final workout in imported) workout.date.toIso8601String(): workout,
+      for (final workout in _history.where((w) => w.trainerWorkoutId == null))
+        workout.date.toIso8601String(): workout,
+      for (final workout in imported.where((w) => w.trainerWorkoutId == null))
+        workout.date.toIso8601String(): workout,
     };
-    final updated = sortWorkoutsNewestFirst(merged.values);
+    final trainerRecords = <String, WorkoutRecord>{
+      for (final workout in _history.where((w) => w.trainerWorkoutId != null))
+        '${workout.trainerOwnerUserId}:${workout.trainerWorkoutId}': workout,
+      for (final workout in imported.where((w) => w.trainerWorkoutId != null))
+        '${workout.trainerOwnerUserId}:${workout.trainerWorkoutId}': workout,
+    };
+    final updated = sortWorkoutsNewestFirst([
+      ...merged.values,
+      ...trainerRecords.values,
+    ]);
     final addedCount = updated.length - _history.length;
     setState(() => _history = updated);
     await _persistHistory(updated);
     await _syncHistory(updated);
     return addedCount;
-  }
+  });
 
   Future<int> _importBackup(SetkeepBackup backup) async {
     final addedCount = await _importWorkouts(backup.workouts);
@@ -1082,7 +1182,10 @@ class _HomeShellState extends State<HomeShell> {
     try {
       final localHistory = history ?? _history;
       await SupabaseSyncService.syncWorkouts(
-        localHistory.map((item) => item.toJson()).toList(),
+        localHistory
+            .where((w) => w.trainerWorkoutId == null)
+            .map((item) => item.toJson())
+            .toList(),
       );
       final cloudItems = await SupabaseSyncService.fetchWorkouts();
       if (!SupabaseSyncService.isSignedIn || !SupabaseSyncService.canUseCloud) {
@@ -1090,7 +1193,9 @@ class _HomeShellState extends State<HomeShell> {
       }
 
       final merged = <String, WorkoutRecord>{
-        for (final workout in localHistory)
+        for (final workout in localHistory.where(
+          (w) => w.trainerWorkoutId == null,
+        ))
           workout.date.toIso8601String(): workout,
       };
       for (final item in cloudItems) {
@@ -1098,7 +1203,10 @@ class _HomeShellState extends State<HomeShell> {
         if (workout == null) continue;
         merged[workout.date.toIso8601String()] = workout;
       }
-      final updated = sortWorkoutsNewestFirst(merged.values);
+      final updated = sortWorkoutsNewestFirst([
+        ...merged.values,
+        ...localHistory.where((w) => w.trainerWorkoutId != null),
+      ]);
       final preferences = await SharedPreferences.getInstance();
       await preferences.setString(
         _storageKey,
@@ -1156,7 +1264,7 @@ class _HomeShellState extends State<HomeShell> {
   Widget build(BuildContext context) {
     final pages = [
       DashboardPage(
-        history: _history,
+        history: _visibleHistory,
         bodyWeights: _bodyWeights,
         selectedGym: _selectedGym,
         onGymChanged: _saveGym,
@@ -1173,27 +1281,18 @@ class _HomeShellState extends State<HomeShell> {
         onDraftDiscarded: _discardWorkoutDraft,
       ),
       MonthlyHistoryPage(
-        history: _history,
+        history: _visibleHistory,
         selectedGym: _selectedGym,
         onWorkoutCompleted: _saveWorkout,
         onWorkoutUpdated: _replaceWorkout,
         onWorkoutDeleted: _deleteWorkout,
       ),
-      BodyMapPage(history: _history, active: _selectedIndex == 2),
+      BodyMapPage(history: _visibleHistory, active: _selectedIndex == 2),
       ProfilePage(
         selectedGym: _selectedGym,
-        history: _history,
+        history: _visibleHistory,
         onSyncRequested: _syncHistory,
-        onTrainerHistoryReceived: (rows) async {
-          final existingDates = _history.map((w) => w.date.toUtc()).toSet();
-          await _importWorkouts(
-            rows
-                .map(WorkoutRecord.tryFromJson)
-                .whereType<WorkoutRecord>()
-                .where((w) => !existingDates.contains(w.date.toUtc()))
-                .toList(),
-          );
-        },
+        onTrainerLinked: _syncTrainerHistory,
         workoutTemplates: _workoutTemplates,
         bodyWeights: _bodyWeights,
         onBackupImported: _importBackup,
@@ -1278,7 +1377,7 @@ class DashboardPage extends StatelessWidget {
   final String? selectedGym;
   final ValueChanged<String> onGymChanged;
   final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
-  final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
+  final Future<void> Function(WorkoutRecord, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
   final Future<void> Function(BodyWeightEntry)? onBodyWeightSaved;
   final Future<void> Function(BodyWeightEntry)? onBodyWeightDeleted;
@@ -3313,7 +3412,7 @@ class MonthlyHistoryPage extends StatefulWidget {
   final List<WorkoutRecord> history;
   final String? selectedGym;
   final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
-  final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
+  final Future<void> Function(WorkoutRecord, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
 
   @override
@@ -4172,7 +4271,7 @@ class HistorySearchPage extends StatefulWidget {
   final List<WorkoutRecord> history;
   final String? selectedGym;
   final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
-  final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
+  final Future<void> Function(WorkoutRecord, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
 
   @override
@@ -4647,7 +4746,7 @@ class HistoryCard extends StatelessWidget {
   final WorkoutRecord workout;
   final String? selectedGym;
   final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
-  final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
+  final Future<void> Function(WorkoutRecord, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
 
   @override
@@ -4882,7 +4981,7 @@ class WorkoutDetailPage extends StatelessWidget {
   final WorkoutRecord workout;
   final String? selectedGym;
   final Future<void> Function(WorkoutRecord) onWorkoutCompleted;
-  final Future<void> Function(DateTime, WorkoutRecord) onWorkoutUpdated;
+  final Future<void> Function(WorkoutRecord, WorkoutRecord) onWorkoutUpdated;
   final Future<bool> Function(WorkoutRecord) onWorkoutDeleted;
 
   @override
@@ -4914,8 +5013,7 @@ class WorkoutDetailPage extends StatelessWidget {
                       initialWorkout: workout,
                       isEditing: true,
                       gymName: workout.gymName ?? selectedGym,
-                      onSave: (updated) =>
-                          onWorkoutUpdated(workout.date, updated),
+                      onSave: (updated) => onWorkoutUpdated(workout, updated),
                     ),
                   ),
                 );
@@ -6863,6 +6961,12 @@ class _WorkoutPageState extends State<WorkoutPage> with WidgetsBindingObserver {
           gymStoreId: _gymStore?.id,
           customPlaceId: _customPlaceId,
           note: _noteController.text.trim(),
+          trainerWorkoutId: widget.isEditing
+              ? widget.initialWorkout!.trainerWorkoutId
+              : null,
+          trainerOwnerUserId: widget.isEditing
+              ? widget.initialWorkout!.trainerOwnerUserId
+              : null,
         );
     setState(() => _completing = true);
     try {
@@ -9725,6 +9829,8 @@ class WorkoutRecord {
     this.gymStoreId,
     this.customPlaceId,
     this.note = '',
+    this.trainerWorkoutId,
+    this.trainerOwnerUserId,
   });
 
   final DateTime date;
@@ -9734,6 +9840,10 @@ class WorkoutRecord {
   final String? gymStoreId;
   final String? customPlaceId;
   final String note;
+
+  /// Supabase workouts.id. Only records with this ID are changed by trainer sync.
+  final String? trainerWorkoutId;
+  final String? trainerOwnerUserId;
 
   Map<String, List<RecordedSet>> get exerciseGroups => groupRecordedSets(sets);
   List<String> get exerciseNames => exerciseGroups.values
@@ -9798,6 +9908,8 @@ class WorkoutRecord {
     gymStoreId: json['gymStoreId'] as String?,
     customPlaceId: json['customPlaceId'] as String?,
     note: json['note'] as String? ?? '',
+    trainerWorkoutId: json['trainerWorkoutId'] as String?,
+    trainerOwnerUserId: json['trainerOwnerUserId'] as String?,
     sets: (json['sets'] as List<dynamic>)
         .map((item) => RecordedSet.fromJson(item as Map<String, dynamic>))
         .toList(),
@@ -9820,8 +9932,85 @@ class WorkoutRecord {
     if (gymStoreId != null) 'gymStoreId': gymStoreId,
     if (customPlaceId != null) 'customPlaceId': customPlaceId,
     'note': note,
+    if (trainerWorkoutId != null) 'trainerWorkoutId': trainerWorkoutId,
+    if (trainerOwnerUserId != null) 'trainerOwnerUserId': trainerOwnerUserId,
     'sets': sets.map((set) => set.toJson()).toList(),
   };
+}
+
+/// Fetch every page before changing local history. A failed page never causes
+/// a partial import or removal of an existing record.
+Future<List<Map<String, dynamic>>> fetchAllTrainerWorkouts(
+  Future<List<Map<String, dynamic>>> Function(int offset) fetchPage,
+) async {
+  final rows = <Map<String, dynamic>>[];
+  for (var offset = 0; ; offset += 100) {
+    final page = await fetchPage(offset);
+    rows.addAll(page);
+    if (page.length < 100) return rows;
+  }
+}
+
+/// Apply only server-identified trainer records. Self and backup records are
+/// never removed by absence from a server response.
+List<WorkoutRecord> reconcileTrainerWorkouts(
+  List<WorkoutRecord> history,
+  List<Map<String, dynamic>> rows,
+  String userId,
+) {
+  final updated = List<WorkoutRecord>.from(history);
+  final seen = <String>{};
+  for (final row in rows) {
+    final id = row['id'];
+    if (id is! String || id.isEmpty || !seen.add(id)) {
+      throw const FormatException('Invalid trainer workout ID');
+    }
+    final matching = updated.indexWhere(
+      (w) => w.trainerWorkoutId == id && w.trainerOwnerUserId == userId,
+    );
+    final incoming = WorkoutRecord.fromJson({
+      'date': row['performed_at'],
+      'durationSeconds': row['duration_seconds'],
+      'gymName': row['gym_name'],
+      'sets': row['sets'],
+      'trainerWorkoutId': id,
+      'trainerOwnerUserId': userId,
+    });
+    if (incoming.sets.isEmpty) {
+      throw const FormatException('Trainer workout has no sets');
+    }
+    final canceled = row['canceled_at'] != null;
+    if (matching >= 0) {
+      if (canceled) {
+        updated.removeAt(matching);
+      } else {
+        updated[matching] = incoming;
+      }
+      continue;
+    }
+    // Old manual receipts had no provenance. Even an exact payload could be a
+    // self record, so suppress a duplicate without tagging or deleting it.
+    final legacyMatches = <int>[];
+    for (var i = 0; i < updated.length; i++) {
+      final local = updated[i];
+      if (local.trainerWorkoutId == null &&
+          local.note.isEmpty &&
+          local.gymStoreId == null &&
+          local.customPlaceId == null &&
+          local.date.toUtc() == incoming.date.toUtc() &&
+          local.durationSeconds == incoming.durationSeconds &&
+          local.gymName == incoming.gymName &&
+          jsonEncode(local.sets.map((s) => s.toJson()).toList()) ==
+              jsonEncode(incoming.sets.map((s) => s.toJson()).toList())) {
+        legacyMatches.add(i);
+      }
+    }
+    if (legacyMatches.length == 1) continue;
+    if (!canceled) {
+      updated.add(incoming);
+    }
+  }
+  return sortWorkoutsNewestFirst(updated);
 }
 
 List<WorkoutRecord> decodeWorkoutItems(Object? source) {
@@ -11163,7 +11352,7 @@ class _ProfileNameCardState extends State<_ProfileNameCard> {
 class ProfilePage extends StatelessWidget {
   const ProfilePage({
     super.key,
-    this.onTrainerHistoryReceived,
+    this.onTrainerLinked,
     required this.selectedGym,
     required this.history,
     required this.onSyncRequested,
@@ -11185,8 +11374,7 @@ class ProfilePage extends StatelessWidget {
     required this.onSelectedGymChanged,
   });
 
-  final Future<void> Function(List<Map<String, dynamic>>)?
-  onTrainerHistoryReceived;
+  final Future<void> Function()? onTrainerLinked;
   final String? selectedGym;
   final List<WorkoutRecord> history;
   final Future<int> Function() onSyncRequested;
@@ -11264,13 +11452,13 @@ class ProfilePage extends StatelessWidget {
               key: const Key('trainerQrButton'),
               leading: const Icon(Icons.qr_code_scanner_rounded),
               title: const Text('Trainerと連携'),
-              subtitle: const Text('招待の承認・記録の共有・代理記録の受信'),
+              subtitle: const Text('招待の承認・記録の共有・代理記録の自動同期'),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => Navigator.of(context).push<void>(
                 MaterialPageRoute(
                   builder: (_) => TrainerSharingPage(
                     history: history.map((w) => w.toJson()).toList(),
-                    onReceived: onTrainerHistoryReceived ?? (_) async {},
+                    onLinked: onTrainerLinked,
                   ),
                 ),
               ),

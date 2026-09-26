@@ -1,4 +1,5 @@
 import 'tenant_repository.dart';
+
 import 'dart:math';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,7 +8,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class TrainerRepository {
   TrainerRepository(this.client);
   final SupabaseClient client;
-  TrainerRepository forTenant(String tenantId) => TenantRepository(client, tenantId);
+  TrainerRepository forTenant(String tenantId) =>
+      TenantRepository(client, tenantId);
   String get userId => client.auth.currentUser!.id;
   Future<Map<String, dynamic>?> profile() => client
       .from('trainer_profiles')
@@ -124,11 +126,11 @@ class TrainerRepository {
 
   Future<List<Map<String, dynamic>>> recordedForMe({int offset = 0}) => client
       .from('workouts')
-      .select('performed_at,duration_seconds,gym_name,sets')
+      .select('id,performed_at,duration_seconds,gym_name,sets,canceled_at')
       .eq('user_id', userId)
       .eq('record_source', 'trainer')
-      .isFilter('canceled_at', null)
       .order('performed_at')
+      .order('id')
       .range(offset, offset + 99);
   static String requestId() {
     final random = Random.secure();

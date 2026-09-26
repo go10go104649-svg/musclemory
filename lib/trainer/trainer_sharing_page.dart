@@ -11,11 +11,11 @@ class TrainerSharingPage extends StatefulWidget {
   const TrainerSharingPage({
     super.key,
     required this.history,
-    required this.onReceived,
+    this.onLinked,
     this.repository,
   });
   final List<Map<String, dynamic>> history;
-  final Future<void> Function(List<Map<String, dynamic>>) onReceived;
+  final Future<void> Function()? onLinked;
   final TrainerRepository? repository;
   @override
   State<TrainerSharingPage> createState() => _TrainerSharingPageState();
@@ -94,30 +94,6 @@ class _TrainerSharingPageState extends State<TrainerSharingPage> {
         trainerName = result;
         token = value;
       });
-    }
-  });
-  Future<void> receive() => run(() async {
-    final all = <Map<String, dynamic>>[];
-    for (var offset = 0; ; offset += 100) {
-      final rows = await repo!.recordedForMe(offset: offset);
-      all.addAll(
-        rows.map(
-          (r) => <String, dynamic>{
-            'date': r['performed_at'],
-            'durationSeconds': r['duration_seconds'],
-            'gymName': r['gym_name'],
-            'sets': r['sets'],
-          },
-        ),
-      );
-      if (rows.length < 100) break;
-    }
-    await widget.onReceived(all);
-    if (mounted) {
-      message = text(
-        '${all.length}件の代理記録を確認しました。履歴タブで確認できます。',
-        'Received ${all.length} session records. Open History to view them.',
-      );
     }
   });
   @override
@@ -226,6 +202,9 @@ class _TrainerSharingPageState extends State<TrainerSharingPage> {
                                 recording: recording,
                                 heatmap: heatmap,
                               );
+                              if (widget.onLinked != null) {
+                                await widget.onLinked!();
+                              }
                               final updated = await repo!.myLinks();
                               if (mounted) {
                                 setState(() {
@@ -304,13 +283,6 @@ class _TrainerSharingPageState extends State<TrainerSharingPage> {
                       ),
                     ),
                   ),
-                const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: receive,
-                  child: Text(
-                    text('トレーナーの代理記録を受信', 'Receive recorded sessions'),
-                  ),
-                ),
                 const SizedBox(height: 24),
                 Text(
                   text('端末内の記録を選んで共有', 'Select local records to share'),
