@@ -1,5 +1,7 @@
 # Android Live Update / 通知セット完了（2026-09-24）
 
+> 本書は2026-09-24時点の実装・検証記録です。現行の判定は [現行確定仕様](../current_spec.md) を優先します。Galaxy実機では停止ボタンを押すとポップアップが消え、画面を開かないと続行できない未完了点が残るため、本機能を実装済みとは扱いません。
+
 ## 実装
 
 - API 36で`POST_PROMOTED_NOTIFICATIONS`と正式なpromotion extra `android.requestPromotedOngoing`を使用。現在のSDKにBuilderの便宜メソッドがないため、公開extraで要求する。`canPostPromotedNotifications()`を診断に記録する。
@@ -30,7 +32,7 @@ Galaxy S25実機は未接続。One UIでの実際の昇格、表示サイズ、P
 - 関連Flutterテスト106件＋完了保存/画面12件＋セット位置/休憩1件、計119件成功。
 - Android API 36エミュレーター：既存の終了音・停止・延長・最終セット・OS抑制の5テスト成功。
 - 新規`rest_set_action_test.dart`の4テスト成功。対象固定、連打、古い通知、編集/削除後、値保持、次の休憩、最終セット、遅れたUI保存との競合、通常完了保存への反映を確認。
-- 実際のBroadcast PendingIntentをロック状態（Keyguard=true）で送信し、Activityが前面にならず対象セットだけ保存されたことを確認。手指によるGalaxy実機操作ではない。
+- 実際のBroadcast PendingIntentをロック状態（Keyguard=true）で送信し、Activityが前面にならず対象セットだけ保存されたことを確認。これは自動送信の確認であり、Galaxy実機の停止ボタンを手指で操作して続行できることの確認ではない。
 - 初回ロックテストはエミュレーターのロック無効設定で失敗。設定を直し、同じテストを再実行して成功。
 - ロック画面の「休憩終了」通知を画像確認。標準通知では折りたたみ状態になるため、Actionは展開時に表示される。Live Update昇格を実機確認したとは扱わない。
 - 背景プロセスを終了した後、永続化ファイルを読み、完了チェック・80.5kg・未完了の次セットが維持されていることを確認。OS強制停止中に通知Actionを動かす保証はしない。
